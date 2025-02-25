@@ -265,7 +265,6 @@ import type { DefinitionConfigForm } from '@/api/workflow/definitionConfig/types
 import type { WfCategoryVo } from '@/api/workflow/model/categoryModel';
 import {
   convertToModel,
-  definitionImage,
   definitionXml,
   deleteProcessDefinition,
   deployProcessFile,

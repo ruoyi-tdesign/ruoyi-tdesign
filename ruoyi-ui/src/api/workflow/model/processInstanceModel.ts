@@ -1,7 +1,7 @@
 import type { BasePageQuery } from '@/api/model/resultModel';
+import type { DefinitionConfigVO } from '@/api/workflow/definitionConfig/types';
+import type { NodeConfigVO } from '@/api/workflow/nodeConfig/types';
 import type { TaskVo } from '@/api/workflow/task/types';
-import type {NodeConfigVO} from "@/api/workflow/nodeConfig/types";
-import type {DefinitionConfigVO} from "@/api/workflow/definitionConfig/types";
 
 export interface ProcessInstanceQuery extends BasePageQuery {
   categoryCode?: string;

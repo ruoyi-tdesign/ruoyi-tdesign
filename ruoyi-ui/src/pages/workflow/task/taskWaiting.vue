@@ -95,7 +95,7 @@
 </template>
 
 <script lang="ts" setup>
-import { EditIcon, RefreshIcon, SettingIcon } from 'tdesign-icons-vue-next';
+import { EditIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 

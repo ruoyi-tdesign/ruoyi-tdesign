@@ -44,7 +44,7 @@ defineOptions({
 });
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, nextTick, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import type { SysRoleVo } from '@/api/system/model/roleModel';
 import type { SysUserVo } from '@/api/system/model/userModel';

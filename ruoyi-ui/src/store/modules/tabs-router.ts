@@ -1,13 +1,7 @@
 import { defineStore } from 'pinia';
 import { nextTick } from 'vue';
-import type {
-  LocationQueryRaw,
-  RouteLocationAsPathGeneric,
-  RouteLocationAsRelativeGeneric,
-  RouteRecordRaw,
-} from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
-import Router from '@/router';
 import { store, unfoldRoutesPath, usePermissionStore } from '@/store';
 import type { TRouterInfo, TTabRouterType } from '@/types/interface';
 

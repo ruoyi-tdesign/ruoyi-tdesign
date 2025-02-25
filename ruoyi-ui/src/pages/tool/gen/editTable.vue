@@ -185,7 +185,7 @@ defineOptions({
 import { RefreshIcon, SettingIcon } from 'tdesign-icons-vue-next';
 import type { FormInstanceFunctions, FormRule, PrimaryTableCol, SubmitContext } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, onMounted, reactive, ref, toRefs } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import { optionselect as getDictOptionselect } from '@/api/system/dict/type';
 import type { SysDictTypeVo } from '@/api/system/model/dictModel';

@@ -14,7 +14,7 @@
             {{ $t('layout.notice.clear') }}
           </t-button>
         </div>
-        <t-list v-if="unreadMsg.length > 0" class="narrow-scrollbar" style="max-height: 366px"  :split="false">
+        <t-list v-if="unreadMsg.length > 0" class="narrow-scrollbar" style="max-height: 366px" :split="false">
           <t-list-item v-for="(item, index) in unreadMsg" :key="index">
             <div>
               <p class="msg-content">{{ item.message }}</p>
