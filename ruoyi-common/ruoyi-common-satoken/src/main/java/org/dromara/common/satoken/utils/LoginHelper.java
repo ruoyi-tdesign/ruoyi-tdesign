@@ -122,6 +122,13 @@ public class LoginHelper {
     }
 
     /**
+     * 获取用户账户
+     */
+    public static String getUsername() {
+        return getUserOptional().map(LoginUser::getUsername).orElse(null);
+    }
+
+    /**
      * 获取租户ID
      */
     public static String getTenantId() {
@@ -147,13 +154,6 @@ public class LoginHelper {
      */
     public static String getDeptCategory() {
         return Convert.toStr(getUserOptional().map(LoginUser::getDeptCategory));
-    }
-
-    /**
-     * 获取用户账户
-     */
-    public static String getUsername() {
-        return getUserOptional().map(LoginUser::getUsername).orElse(null);
     }
 
     /**
