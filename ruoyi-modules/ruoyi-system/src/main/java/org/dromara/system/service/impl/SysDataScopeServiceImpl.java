@@ -26,6 +26,12 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * 获取角色自定义权限
+     *
+     * @param roleId 角色Id
+     * @return 部门Id组
+     */
     @Override
     public String getRoleCustom(Long roleId) {
         List<Long> deptIds = jdbcTemplate.queryForList("select dept_id from sys_role_dept srd where srd.role_id = ?", Long.class, roleId);
@@ -35,6 +41,12 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
         return null;
     }
 
+    /**
+     * 获取部门及以下权限
+     *
+     * @param deptId 部门Id
+     * @return 部门Id组
+     */
     @Override
     public String getDeptAndChild(Long deptId) {
         List<Long> ids = jdbcTemplate.queryForList("select dept_id from sys_dept sd where " + DataBaseHelper.findInSet(deptId, "ancestors"), Long.class);
