@@ -317,7 +317,7 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
         for (SysOss oss : list) {
             CacheUtils.evict(CacheNames.SYS_OSS, oss.getOssId());
         }
-        boolean b = removeBatchByIds(ids);
+        boolean b = removeByIds(ids);
         if (b) {
             removeRealOss(list);
         }

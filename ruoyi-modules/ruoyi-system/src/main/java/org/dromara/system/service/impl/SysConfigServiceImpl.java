@@ -161,7 +161,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
             boolean isGlobal = YesNoEnum.YES.getCodeNum().equals(config.getIsGlobal());
             CacheUtils.evict(GlobalConstants.getGlobalKey(isGlobal, CacheNames.SYS_CONFIG), config.getConfigKey());
         }
-        baseMapper.deleteBatchIds(Arrays.asList(configIds));
+        baseMapper.deleteByIds(Arrays.asList(configIds));
     }
 
     /**

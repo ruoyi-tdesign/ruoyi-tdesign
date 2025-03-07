@@ -155,7 +155,7 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteLogininforByIds(Long[] infoIds) {
-        return baseMapper.deleteBatchIds(Arrays.asList(infoIds));
+        return baseMapper.deleteByIds(Arrays.asList(infoIds));
     }
 
     /**

@@ -98,7 +98,7 @@ public class SysOperLogServiceImpl extends ServiceImpl<SysOperLogMapper, SysOper
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteOperLogByIds(Long[] operIds) {
-        return baseMapper.deleteBatchIds(Arrays.asList(operIds));
+        return baseMapper.deleteByIds(Arrays.asList(operIds));
     }
 
     /**

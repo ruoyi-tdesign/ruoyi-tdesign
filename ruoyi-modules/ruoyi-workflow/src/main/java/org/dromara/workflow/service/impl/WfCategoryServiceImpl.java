@@ -118,7 +118,7 @@ public class WfCategoryServiceImpl extends ServiceImpl<WfCategoryMapper, WfCateg
         if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return baseMapper.deleteBatchIds(ids) > 0;
+        return baseMapper.deleteByIds(ids) > 0;
     }
 
     /**

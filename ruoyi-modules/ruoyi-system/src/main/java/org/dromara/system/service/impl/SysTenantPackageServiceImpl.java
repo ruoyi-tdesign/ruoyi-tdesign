@@ -121,7 +121,7 @@ public class SysTenantPackageServiceImpl extends ServiceImpl<SysTenantPackageMap
                 throw new ServiceException("租户套餐已被使用");
             }
         }
-        return baseMapper.deleteBatchIds(ids) > 0;
+        return baseMapper.deleteByIds(ids) > 0;
     }
 
     /**

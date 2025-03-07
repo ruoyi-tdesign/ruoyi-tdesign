@@ -416,7 +416,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids));
         // 删除角色与部门关联
         roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().in(SysRoleDept::getRoleId, ids));
-        return baseMapper.deleteBatchIds(ids);
+        return baseMapper.deleteByIds(ids);
     }
 
     /**
