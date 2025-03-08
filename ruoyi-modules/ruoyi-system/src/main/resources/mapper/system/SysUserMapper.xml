@@ -91,7 +91,7 @@
             <if test="excludeUserIds != null and excludeUserIds != ''">
                 and su.user_id not in
                 <foreach collection="excludeUserIds.split(',')" index="index" item="item" open="(" separator="," close=")">
-                    #{item}
+                    #{item, jdbcType=BIGINT}
                 </foreach>
             </if>
         </where>
@@ -133,6 +133,12 @@
             <if test="phonenumber != null and phonenumber != ''"> and su.phonenumber like concat(concat('%', #{phonenumber}), '%')</if>
             <if test="status != null and status != ''"> and su.status = #{status}</if>
             <if test="params.beginTime != null and params.endTime != null">and su.create_time between #{params.beginTime} and #{params.endTime}</if>
+            <if test="excludeUserIds != null and excludeUserIds != ''">
+                and su.user_id not in
+                <foreach collection="excludeUserIds.split(',')" index="index" item="item" open="(" separator="," close=")">
+                    #{item, jdbcType=BIGINT}
+                </foreach>
+            </if>
         </where>
         order by su.create_time desc
     </select>
