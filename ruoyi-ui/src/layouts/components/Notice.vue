@@ -55,7 +55,7 @@ import { onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 import Nothing from '@/assets/images/nothing.png';
-import { useNoticeStore } from '@/store';
+import { useNoticeStore, useSSE } from '@/store';
 import type { NoticeItem } from '@/types/interface';
 import { closeWebsocket, initWebSocket } from '@/utils/websocket';
 
@@ -69,8 +69,13 @@ onMounted(() => {
   initWebSocket(`${address}/resource/websocket`);
 });
 
+onMounted(() => {
+  useSSE().execute(`${import.meta.env.VITE_APP_BASE_API}/resource/sse/connect/login`);
+});
+
 onUnmounted(() => {
   closeWebsocket();
+  useSSE().close();
 });
 
 const router = useRouter();

@@ -113,6 +113,7 @@ public class AuthController {
         LoginVo login = IAuthStrategy.login(client, loginBody);
         LoginEvent event = new LoginEvent();
         event.setUserId(LoginHelper.getUserId());
+        event.setLoginType(LoginHelper.getLoginType());
         SpringUtils.getApplicationContext().publishEvent(event);
         return R.ok(login);
     }

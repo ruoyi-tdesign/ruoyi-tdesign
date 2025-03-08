@@ -5,13 +5,13 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 登录事件
+ * 登出事件
  *
  * @author hexm
  * @date 2023/11/20 15:45
  */
 @Data
-public class LoginEvent implements Serializable {
+public class LogoutEvent implements Serializable {
 
     /**
      * 登录类型
@@ -22,4 +22,9 @@ public class LoginEvent implements Serializable {
      * 用户id
      */
     private Long userId;
+
+    /**
+     * token
+     */
+    private String token;
 }

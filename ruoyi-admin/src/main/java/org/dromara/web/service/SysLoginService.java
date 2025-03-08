@@ -18,6 +18,7 @@ import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.TenantStatus;
+import org.dromara.common.core.events.LogoutEvent;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.DateUtils;
@@ -119,6 +120,11 @@ public class SysLoginService {
         try {
             LoginUser loginUser = LoginHelper.getUser();
             if (loginUser != null) {
+                LogoutEvent event = new LogoutEvent();
+                event.setLoginType(loginUser.getLoginType());
+                event.setUserId(loginUser.getUserId());
+                event.setToken(LoginHelper.getStpLogic().getTokenValue());
+                SpringUtils.getApplicationContext().publishEvent(event);
                 // 将用户对象放到上下文缓存中
                 SaSecurityContext.setContext(loginUser);
                 if (TenantHelper.isEnable() && LoginHelper.isSuperAdmin()) {

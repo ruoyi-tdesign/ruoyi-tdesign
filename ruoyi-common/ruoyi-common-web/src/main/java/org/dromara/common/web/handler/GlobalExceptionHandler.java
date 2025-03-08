@@ -17,6 +17,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -141,6 +142,16 @@ public class GlobalExceptionHandler {
     public R<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage());
         String message = e.getBindingResult().getFieldError().getDefaultMessage();
+        return R.fail(message);
+    }
+
+    /**
+     * SSE消息异常
+     */
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public R<Void> handleAsyncRequestNotUsableException(AsyncRequestNotUsableException e) {
+        log.error(e.getMessage());
+        String message = e.getMessage();
         return R.fail(message);
     }
 

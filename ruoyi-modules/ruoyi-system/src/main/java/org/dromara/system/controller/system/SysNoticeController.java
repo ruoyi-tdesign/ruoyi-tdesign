@@ -13,6 +13,7 @@ import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysNoticeBo;
 import org.dromara.system.domain.query.SysNoticeQuery;
@@ -82,6 +83,7 @@ public class SysNoticeController extends BaseController {
         NoticeInsertEvent event = new NoticeInsertEvent();
         event.setType(notice.getNoticeType());
         event.setTitle(notice.getNoticeTitle());
+        event.setLoginType(LoginHelper.getLoginType());
         SpringUtils.getApplicationContext().publishEvent(event);
         return R.ok();
     }
