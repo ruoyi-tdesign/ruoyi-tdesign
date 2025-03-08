@@ -132,9 +132,22 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         if (CollUtil.isEmpty(tablesMap)) {
             return new ArrayList<>(0);
         }
+        List<String> tableNames = baseMapper.selectTableNameList(query.getDataName());
+        String[] tableArrays;
+        if (CollUtil.isNotEmpty(tableNames)) {
+            tableArrays = tableNames.toArray(new String[0]);
+        } else {
+            tableArrays = new String[0];
+        }
         // 过滤并转换表格数据
         return tablesMap.values().stream()
             .filter(x -> !StringUtils.containsAnyIgnoreCase(x.getName(), TABLE_IGNORE))
+            .filter(x -> {
+                if (CollUtil.isEmpty(tableNames)) {
+                    return true;
+                }
+                return !StringUtils.containsAnyIgnoreCase(x.getName(), tableArrays);
+            })
             .filter(x -> {
                 boolean nameMatches = true;
                 boolean commentMatches = true;
