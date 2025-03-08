@@ -1,7 +1,7 @@
 # 平台简介
 
 [![码云Gitee](https://gitee.com/yixiacoco/ruoyi-tdesign/badge/star.svg?theme=blue)](https://gitee.com/yixiacoco/ruoyi-tdesign)
-[![GitHub](https://img.shields.io/github/stars/yixiaco/ruoyi-tdesign.svg?style=social&label=Stars)](https://github.com/yixiaco/ruoyi-tdesign)
+[![GitHub](https://img.shields.io/github/ruoyi-tdesign/yixiaco/ruoyi-tdesign.svg?style=social&label=Stars)](https://github.com/ruoyi-tdesign/ruoyi-tdesign)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/yixiacoco/ruoyi-tdesign/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=ruoyi-tdesign)
 <br>
@@ -15,13 +15,13 @@
 > 项目代码、文档 均开源免费可商用 遵循开源协议在项目中保留开源协议文件即可<br>
 活到老写到老 为兴趣而开源 为学习而开源 为让大家真正可以学到技术而开源
 
-> 交流与讨论: [交流群](https://github.com/yixiaco/ruoyi-tdesign/wiki/%E4%BA%A4%E6%B5%81%E7%BE%A4)<br>
+> 交流与讨论: [交流群](https://github.com/ruoyi-tdesign/ruoyi-tdesign/wiki/%E4%BA%A4%E6%B5%81%E7%BE%A4)<br>
 > 系统演示(感谢 [疯狂的麦克粥](https://gitee.com/CrazyMikePorridge) 贡献的演示服务器): [传送门](https://ruoyi-tdesign.hexm.online)
 
 > 查看项目[更新日志](./CHANGELOG.md)
 
 ## 文档
-要查看项目文档，请访问[ruoyi-tdesign-doc](https://yixiaco.github.io/ruoyi-tdesign-doc/)
+要查看项目文档，请访问[ruoyi-tdesign-doc](https://ruoyi-tdesign.github.io/ruoyi-tdesign-doc/)
 
 ## 介绍
 | 功能介绍     | 使用技术                | 文档地址                                                                                            | 描述                                                                                                                                              |
