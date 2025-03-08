@@ -616,7 +616,7 @@ public class StreamUtils {
      * @param filter     过滤条件
      * @return
      */
-    public static <T> Optional<T> findFirst(Collection<T> collection, Function<T, Boolean> filter) {
+    public static <T> Optional<T> findFirstOptional(Collection<T> collection, Function<T, Boolean> filter) {
         return collection.stream().filter(filter::apply).findFirst();
     }
 

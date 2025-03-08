@@ -37,14 +37,14 @@ public interface TestDemoMapper extends BaseMapperPlus<TestDemo, TestDemoVo> {
     List<TestDemo> selectList(IPage<TestDemo> page, @Param(Constants.WRAPPER) Wrapper<TestDemo> queryWrapper);
 
     @Override
-    @DataPermission({
+    @DataPermission(value = {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
-    })
+    }, joinStr = "AND")
     List<TestDemo> selectBatchIds(@Param(Constants.COLL) Collection<? extends Serializable> idList);
 
     @Override
-    @DataPermission({
+    @DataPermission(value = {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
     })
