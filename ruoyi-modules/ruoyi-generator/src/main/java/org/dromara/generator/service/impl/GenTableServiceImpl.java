@@ -2,6 +2,7 @@ package org.dromara.generator.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
@@ -10,6 +11,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.anyline.metadata.Column;
+import org.anyline.metadata.Table;
+import org.anyline.proxy.CacheProxy;
+import org.anyline.proxy.ServiceProxy;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -48,12 +53,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -120,9 +120,40 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
      */
     @DS("#query.dataName")
     @Override
-    public TableDataInfo<GenTableVo> selectPageDbTableList(GenTableQuery query) {
-        query.setGenTableNames(baseMapper.selectTableNameList(query.getDataName()));
-        return PageQuery.of(() -> baseMapper.selectDbTableList(query));
+    public List<GenTableVo> selectPageDbTableList(GenTableQuery query) {
+        // 清理数据库元数据缓存
+        CacheProxy.clear();
+        // 获取查询条件
+        String tableName = query.getTableName();
+        String tableComment = query.getTableComment();
+        LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
+        if (CollUtil.isEmpty(tablesMap)) {
+            return new ArrayList<>(0);
+        }
+        // 过滤并转换表格数据
+        return tablesMap.values().stream()
+            .filter(x -> {
+                boolean nameMatches = true;
+                boolean commentMatches = true;
+                // 进行表名称的模糊查询
+                if (StringUtils.isNotBlank(tableName)) {
+                    nameMatches = StringUtils.containsIgnoreCase(x.getName(), tableName);
+                }
+                // 进行表描述的模糊查询
+                if (StringUtils.isNotBlank(tableComment)) {
+                    commentMatches = StringUtils.containsIgnoreCase(x.getComment(), tableComment);
+                }
+                // 同时匹配名称和描述
+                return nameMatches && commentMatches;
+            })
+            .map(x -> {
+                GenTableVo gen = new GenTableVo();
+                gen.setTableName(x.getName());
+                gen.setTableComment(x.getComment());
+                gen.setCreateTime(x.getCreateTime());
+                gen.setUpdateTime(x.getUpdateTime());
+                return gen;
+            }).toList();
     }
 
     /**
@@ -136,7 +167,30 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     public List<GenTableVo> selectDbTableListByNames(String[] tableNames, String dataName) {
         DynamicDataSourceContextHolder.push(dataName);
         try {
-            return baseMapper.selectDbTableListByNames(tableNames);
+            // 清理数据库元数据缓存
+            CacheProxy.clear();
+            Set<String> tableNameSet = new HashSet<>(List.of(tableNames));
+            LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
+
+            if (CollUtil.isEmpty(tablesMap)) {
+                return new ArrayList<>();
+            }
+
+            List<Table<?>> tableList = tablesMap.values().stream()
+                .filter(x -> tableNameSet.contains(x.getName())).toList();
+
+            if (ArrayUtil.isEmpty(tableList)) {
+                return new ArrayList<>();
+            }
+            return tableList.stream().map(x -> {
+                GenTableVo gen = new GenTableVo();
+                gen.setDataName(dataName);
+                gen.setTableName(x.getName());
+                gen.setTableComment(x.getComment());
+                gen.setCreateTime(x.getCreateTime());
+                gen.setUpdateTime(x.getUpdateTime());
+                return gen;
+            }).toList();
         } finally {
             DynamicDataSourceContextHolder.poll();
         }
@@ -225,7 +279,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                 tableVo.setTableId(table.getTableId());
                 if (row > 0) {
                     // 保存列信息
-                    List<GenTableColumn> genTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName, dataName);
+                    List<GenTableColumn> genTableColumns = selectDbTableColumnsByName(tableName, dataName);
                     List<GenTableColumn> saveColumns = new ArrayList<>();
                     for (GenTableColumn column : genTableColumns) {
                         GenUtils.initColumnField(column, tableVo);
@@ -238,6 +292,36 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
             }
         } catch (Exception e) {
             throw new ServiceException("导入失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 根据表名称查询列信息
+     *
+     * @param tableName 表名称
+     * @param dataName  数据源名称
+     * @return 列信息
+     */
+    private List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName) {
+        DynamicDataSourceContextHolder.push(dataName);
+        try {
+            Table<?> table = ServiceProxy.service().metadata().table(tableName);
+            LinkedHashMap<String, Column> columns = table.getColumns();
+            List<GenTableColumn> tableColumns = new ArrayList<>();
+            columns.forEach((columnName, column) -> {
+                GenTableColumn tableColumn = new GenTableColumn();
+                tableColumn.setIsPk(column.isPrimaryKey() == 1 ? "1" : "0");
+                tableColumn.setColumnName(column.getName());
+                tableColumn.setColumnComment(column.getComment());
+                tableColumn.setColumnType(column.getTypeName().toLowerCase());
+                tableColumn.setSort(column.getPosition());
+                tableColumn.setIsRequired(column.isNullable() == 0 || column.isPrimaryKey() == 1 ? "1" : "0");
+                tableColumn.setIsIncrement(column.isAutoIncrement() == 1 ? "1" : "0");
+                tableColumns.add(tableColumn);
+            });
+            return tableColumns;
+        } finally {
+            DynamicDataSourceContextHolder.poll();
         }
     }
 
@@ -359,7 +443,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         Map<String, GenTableColumn> tableColumnMap = tableColumns.stream()
             .collect(Collectors.toMap(GenTableColumn::getColumnName, Function.identity(), BiOperator::last));
 
-        List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableVo.getTableName(), tableVo.getDataName());
+        List<GenTableColumn> dbTableColumns = selectDbTableColumnsByName(tableVo.getTableName(), tableVo.getDataName());
         if (CollUtil.isEmpty(dbTableColumns)) {
             throw new ServiceException("同步数据失败，原表结构不存在");
         }

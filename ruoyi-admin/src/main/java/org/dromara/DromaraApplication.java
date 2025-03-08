@@ -11,7 +11,6 @@ import org.springframework.util.StopWatch;
  *
  * @author ruoyi
  */
-
 @SpringBootApplication
 public class DromaraApplication {
 

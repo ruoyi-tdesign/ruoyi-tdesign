@@ -69,8 +69,8 @@ public class GenController extends BaseController {
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/db/list")
-    public TableDataInfo<GenTableVo> dataList(GenTableQuery query) {
-        return genTableService.selectPageDbTableList(query);
+    public R<List<GenTableVo>> dataList(GenTableQuery query) {
+        return R.ok(genTableService.selectPageDbTableList(query));
     }
 
     /**

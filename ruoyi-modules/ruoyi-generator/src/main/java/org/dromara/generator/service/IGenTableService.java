@@ -41,7 +41,7 @@ public interface IGenTableService extends IService<GenTable> {
      * @param query 查询对象
      * @return 数据库表集合
      */
-    TableDataInfo<GenTableVo> selectPageDbTableList(GenTableQuery query);
+    List<GenTableVo> selectPageDbTableList(GenTableQuery query);
 
     /**
      * 查询据库列表
