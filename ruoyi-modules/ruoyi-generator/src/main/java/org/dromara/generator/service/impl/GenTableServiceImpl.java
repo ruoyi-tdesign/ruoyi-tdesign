@@ -73,6 +73,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     @Autowired
     private IdentifierGenerator identifierGenerator;
 
+    private static final String[] TABLE_IGNORE = new String[]{"sj_", "act_", "flw_", "gen_"};
+
     /**
      * 查询业务字段列表
      *
@@ -132,6 +134,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         }
         // 过滤并转换表格数据
         return tablesMap.values().stream()
+            .filter(x -> !StringUtils.containsAnyIgnoreCase(x.getName(), TABLE_IGNORE))
             .filter(x -> {
                 boolean nameMatches = true;
                 boolean commentMatches = true;
@@ -177,6 +180,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
             }
 
             List<Table<?>> tableList = tablesMap.values().stream()
+                .filter(x -> !StringUtils.containsAnyIgnoreCase(x.getName(), TABLE_IGNORE))
                 .filter(x -> tableNameSet.contains(x.getName())).toList();
 
             if (ArrayUtil.isEmpty(tableList)) {
@@ -306,6 +310,9 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         DynamicDataSourceContextHolder.push(dataName);
         try {
             Table<?> table = ServiceProxy.service().metadata().table(tableName);
+            if (Objects.isNull(table)) {
+                return new ArrayList<>();
+            }
             LinkedHashMap<String, Column> columns = table.getColumns();
             List<GenTableColumn> tableColumns = new ArrayList<>();
             columns.forEach((columnName, column) -> {
