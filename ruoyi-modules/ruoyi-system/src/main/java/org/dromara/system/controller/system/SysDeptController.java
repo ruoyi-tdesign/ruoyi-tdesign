@@ -92,8 +92,6 @@ public class SysDeptController extends BaseController {
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysDeptBo dept) {
         if (!deptService.checkDeptNameUnique(dept)) {
             return R.fail("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
-        } else if (StringUtils.isNotBlank(dept.getDeptCategory()) && !deptService.checkDeptCategoryUnique(dept)) {
-            return R.fail("新增部门'" + dept.getDeptName() + "'失败，部门类别编码已存在");
         }
         return toAjax(deptService.insertDept(dept));
     }
@@ -109,8 +107,6 @@ public class SysDeptController extends BaseController {
         deptService.checkDeptDataScope(deptId);
         if (!deptService.checkDeptNameUnique(dept)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
-        } else if (StringUtils.isNotBlank(dept.getDeptCategory()) && !deptService.checkDeptCategoryUnique(dept)) {
-            return R.fail("修改部门'" + dept.getDeptName() + "'失败，部门类别编码已存在");
         } else if (dept.getParentId().equals(deptId)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
         } else if (StringUtils.equals(NormalDisableEnum.DISABLE.getCode(), dept.getStatus())) {
