@@ -477,17 +477,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     private void insertUserRole(Long userId, Long[] roleIds, boolean clear) {
         if (ArrayUtil.isNotEmpty(roleIds)) {
-            // 判断是否具有此角色的操作权限
-            List<SysRoleVo> roles = roleMapper.queryList(new SysRoleQuery());
-            if (CollUtil.isEmpty(roles)) {
-                throw new ServiceException("没有权限访问角色的数据");
-            }
-            List<Long> roleList = StreamUtils.toList(roles, SysRoleVo::getRoleId);
+            List<Long> roleList = new ArrayList<>(List.of(roleIds));
             if (!LoginHelper.isSuperAdmin(userId)) {
                 roleList.remove(UserConstants.SUPER_ADMIN_ID);
             }
-            List<Long> canDoRoleList = StreamUtils.filter(List.of(roleIds), roleList::contains);
-            if (CollUtil.isEmpty(canDoRoleList)) {
+            // 判断是否具有此角色的操作权限
+            SysRoleQuery query = new SysRoleQuery();
+            query.setRoleIds(roleList);
+            List<SysRoleVo> roles = roleMapper.queryList(query);
+            if (CollUtil.isEmpty(roles)) {
                 throw new ServiceException("没有权限访问角色的数据");
             }
             if (clear) {
@@ -495,7 +493,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
             }
             // 新增用户与角色管理
-            List<SysUserRole> list = StreamUtils.toList(canDoRoleList, roleId -> {
+            List<SysUserRole> list = StreamUtils.toList(roleList, roleId -> {
                 SysUserRole ur = new SysUserRole();
                 ur.setUserId(userId);
                 ur.setRoleId(roleId);

@@ -35,8 +35,8 @@
             <if test="roleName != null and roleName != ''"> and r.role_name like concat(concat('%', #{roleName}), '%')</if>
             <if test="roleKey != null and roleKey != ''"> and r.role_key like concat(concat('%', #{roleKey}), '%')</if>
             <if test="status != null and status != ''"> and r.status = #{status}</if>
-            <if test="params.beginTime != null and params.endTime != null">and r.create_time between #{params.beginTime} and #{params.endTime}</if>
-            <foreach collection="roleIds" item="item" open="and r.role_id in (" close=")" separator="," nullable="true">
+            <if test="params.beginTime != null and params.endTime != null"> and r.create_time between #{params.beginTime} and #{params.endTime}</if>
+            <foreach collection="roleIds" item="item" open=" and r.role_id in (" close=")" separator="," nullable="true">
                 #{item}
             </foreach>
         </where>
