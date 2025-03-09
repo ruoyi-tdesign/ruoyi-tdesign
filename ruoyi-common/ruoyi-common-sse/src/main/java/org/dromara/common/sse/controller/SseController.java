@@ -6,6 +6,8 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.sse.core.SseEmitterManager;
 import org.dromara.common.sse.dto.SseMessageDto;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +18,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.List;
 
 @RestController
+@ConditionalOnProperty(value = "sse.enabled", havingValue = "true")
 @RequiredArgsConstructor
 @RequestMapping("/resource/sse")
-public class SseController {
+public class SseController implements DisposableBean {
 
     private final SseEmitterManager sseEmitterManager;
 
@@ -51,6 +54,11 @@ public class SseController {
     public R<Void> send(@PathVariable String loginType, String msg) {
         sseEmitterManager.publishAll(loginType, msg);
         return R.ok();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        // 销毁时不需要做什么 此方法避免无用操作报错
     }
 
 }
