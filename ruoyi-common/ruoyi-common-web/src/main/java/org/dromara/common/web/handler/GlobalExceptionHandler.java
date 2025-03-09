@@ -16,10 +16,12 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.io.IOException;
 
 /**
  * 全局异常处理器
@@ -96,6 +98,20 @@ public class GlobalExceptionHandler {
     /**
      * 拦截未知的运行时异常
      */
+    @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(IOException.class)
+    public void handleRuntimeException(IOException e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        if (requestURI.contains("sse")) {
+            // sse 经常性连接中断 例如关闭浏览器 直接屏蔽
+            return;
+        }
+        log.error("请求地址'{}',连接中断", requestURI, e);
+    }
+
+    /**
+     * 拦截未知的运行时异常
+     */
     @ExceptionHandler(RuntimeException.class)
     public R<Void> handleRuntimeException(RuntimeException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
@@ -142,16 +158,6 @@ public class GlobalExceptionHandler {
     public R<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage());
         String message = e.getBindingResult().getFieldError().getDefaultMessage();
-        return R.fail(message);
-    }
-
-    /**
-     * SSE消息异常
-     */
-    @ExceptionHandler(AsyncRequestNotUsableException.class)
-    public R<Void> handleAsyncRequestNotUsableException(AsyncRequestNotUsableException e) {
-        log.error(e.getMessage());
-        String message = e.getMessage();
         return R.fail(message);
     }
 
