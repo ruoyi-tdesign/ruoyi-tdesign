@@ -141,8 +141,9 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
     @Override
     public List<OssDTO> selectByIds(String ossIds) {
         List<OssDTO> list = new ArrayList<>();
+        SysOssServiceImpl ossService = SpringUtils.getAopProxy(this);
         for (Long id : StringUtils.splitTo(ossIds, Convert::toLong)) {
-            SysOssVo vo = SpringUtils.getAopProxy(this).getById(id);
+            SysOssVo vo = ossService.getById(id);
             if (ObjectUtil.isNotNull(vo)) {
                 try {
                     vo.setUrl(this.matchingUrl(vo).getUrl());
