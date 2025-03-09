@@ -50,7 +50,7 @@ public class SseEmitterManager {
         if (emitters != null) {
             try {
                 emitters.get(token).send(SseEmitter.event().comment("disconnected"));
-            } catch (IOException ignore) {
+            } catch (Exception ignore) {
             }
             emitters.remove(token);
         }
