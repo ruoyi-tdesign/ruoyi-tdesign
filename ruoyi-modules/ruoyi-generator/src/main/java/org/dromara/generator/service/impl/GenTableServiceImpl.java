@@ -26,6 +26,7 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.core.utils.funtion.BiOperator;
+import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -296,7 +297,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                 tableVo.setTableId(table.getTableId());
                 if (row > 0) {
                     // 保存列信息
-                    List<GenTableColumn> genTableColumns = selectDbTableColumnsByName(tableName, dataName);
+                    List<GenTableColumn> genTableColumns = SpringUtils.getAopProxy(this).selectDbTableColumnsByName(tableName, dataName);
                     List<GenTableColumn> saveColumns = new ArrayList<>();
                     for (GenTableColumn column : genTableColumns) {
                         GenUtils.initColumnField(column, tableVo);
@@ -319,14 +320,12 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
      * @param dataName  数据源名称
      * @return 列信息
      */
-    private List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName) {
+    @DS("#dataName")
+    @Override
+    public List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName) {
         DynamicDataSourceContextHolder.push(dataName);
         try {
-            Table<?> table = ServiceProxy.service().metadata().table(tableName);
-            if (Objects.isNull(table)) {
-                return new ArrayList<>();
-            }
-            LinkedHashMap<String, Column> columns = table.getColumns();
+            LinkedHashMap<String, Column> columns = ServiceProxy.metadata().columns(tableName);
             List<GenTableColumn> tableColumns = new ArrayList<>();
             columns.forEach((columnName, column) -> {
                 GenTableColumn tableColumn = new GenTableColumn();
@@ -463,7 +462,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         Map<String, GenTableColumn> tableColumnMap = tableColumns.stream()
             .collect(Collectors.toMap(GenTableColumn::getColumnName, Function.identity(), BiOperator::last));
 
-        List<GenTableColumn> dbTableColumns = selectDbTableColumnsByName(tableVo.getTableName(), tableVo.getDataName());
+        List<GenTableColumn> dbTableColumns = SpringUtils.getAopProxy(this).selectDbTableColumnsByName(tableVo.getTableName(), tableVo.getDataName());
         if (CollUtil.isEmpty(dbTableColumns)) {
             throw new ServiceException("同步数据失败，原表结构不存在");
         }

@@ -95,6 +95,15 @@ public interface IGenTableService extends IService<GenTable> {
     void importGenTable(List<GenTableVo> tableList, String dataName);
 
     /**
+     * 根据表名称查询列信息
+     *
+     * @param tableName 表名称
+     * @param dataName  数据源名称
+     * @return 列信息
+     */
+    List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName);
+
+    /**
      * 预览代码
      *
      * @param tableId 表编号
