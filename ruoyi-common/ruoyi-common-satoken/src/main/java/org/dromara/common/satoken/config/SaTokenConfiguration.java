@@ -19,6 +19,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Map;
@@ -32,6 +33,8 @@ import java.util.Map;
 @AutoConfiguration
 @EnableConfigurationProperties(MultipleSaTokenProperties.class)
 public class SaTokenConfiguration implements WebMvcConfigurer {
+
+    public static final AntPathMatcher matcher = new AntPathMatcher(":");
 
     /**
      * 权限接口实现(使用bean注入方便用户替换)
@@ -80,7 +83,30 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
     @Autowired
     public void rewriteSaStrategy() {
         // 重写Sa-Token的注解处理器，增加注解合并功能
-        SaStrategy.me.getAnnotation = AnnotatedElementUtils::getMergedAnnotation;
+        SaStrategy.instance.getAnnotation = AnnotatedElementUtils::getMergedAnnotation;
+        // 重写权限判断，是否包含权限或角色
+        SaStrategy.instance.hasElement = (list, pattern) -> {
+            // 空集合直接返回false
+            if (list == null || list.isEmpty()) {
+                return false;
+            }
+            for (String element : list) {
+                if (element.equals(pattern)) {
+                    return true;
+                }
+                // 如果用户用户权限包含*号，有限使用用户作为通配符权限匹配
+                if (element.indexOf('*') != -1) {
+                    if (matcher.match(element, pattern)) {
+                        return true;
+                    }
+                }
+                // 否则使用接口作为通配符权限匹配
+                else if (matcher.match(pattern, element)) {
+                    return true;
+                }
+            }
+            return false;
+        };
     }
 
     /**
