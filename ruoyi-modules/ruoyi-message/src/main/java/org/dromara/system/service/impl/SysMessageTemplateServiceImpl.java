@@ -45,7 +45,7 @@ public class SysMessageTemplateServiceImpl extends ServiceImpl<SysMessageTemplat
      */
     @Override
     public SysMessageTemplateVo queryById(Long messageTemplateId) {
-        return baseMapper.selectVoById(messageTemplateId);
+        return baseMapper.queryById(messageTemplateId);
     }
 
     /**

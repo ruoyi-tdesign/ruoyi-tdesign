@@ -1,5 +1,6 @@
 package org.dromara.system.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysMessageTemplate;
 import org.dromara.system.domain.query.SysMessageTemplateQuery;
@@ -14,6 +15,14 @@ import java.util.List;
  * @date 2023-06-28
  */
 public interface SysMessageTemplateMapper extends BaseMapperPlus<SysMessageTemplate, SysMessageTemplateVo> {
+
+    /**
+     * 查询消息模板
+     *
+     * @param messageTemplateId 主键
+     * @return SysMessageTemplateVo
+     */
+    SysMessageTemplateVo queryById(@Param("messageTemplateId") Long messageTemplateId);
 
     /**
      * 查询消息模板列表

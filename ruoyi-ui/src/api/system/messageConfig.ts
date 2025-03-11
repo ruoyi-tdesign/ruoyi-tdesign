@@ -1,5 +1,7 @@
 import type { R, TableDataInfo } from '@/api/model/resultModel';
 import type {
+  MessageFieldConfig,
+  MessageTypeVo,
   SysMessageConfigForm,
   SysMessageConfigQuery,
   SysMessageConfigVo,
@@ -48,5 +50,34 @@ export function delMessageConfig(messageConfigIds: number | Array<number>) {
 export function refreshCache() {
   return request.delete<R>({
     url: '/system/messageConfig/refreshCache',
+  });
+}
+
+/**
+ * 获取消息字段配置
+ */
+export function getMessageFieldConfigs() {
+  return request
+    .get<R<Record<string, MessageFieldConfig>>>({
+      url: '/system/messageConfig/getMessageFieldConfigs',
+    })
+    .then((res) => {
+      Object.entries(res.data).forEach(([, value]) => {
+        Object.entries(value.supplierConfig).forEach(([, v]) => {
+          v.rules?.forEach((rule) => {
+            rule.pattern = new RegExp(rule.pattern);
+          });
+        });
+      });
+      return res;
+    });
+}
+
+/**
+ * 获取消息字段配置
+ */
+export function getMessageSupplierType() {
+  return request.get<R<MessageTypeVo[]>>({
+    url: '/system/messageConfig/getSupplierType',
   });
 }

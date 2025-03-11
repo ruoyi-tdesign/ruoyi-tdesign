@@ -1,4 +1,4 @@
-package org.dromara.system.config;
+package org.dromara.system.configuration;
 
 import io.github.linpeilie.annotations.MapperConfig;
 
