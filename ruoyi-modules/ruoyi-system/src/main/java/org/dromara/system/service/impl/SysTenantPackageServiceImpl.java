@@ -1,5 +1,6 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.dromara.common.core.enums.NormalDisableEnum;
@@ -95,6 +96,17 @@ public class SysTenantPackageServiceImpl extends ServiceImpl<SysTenantPackageMap
             tenantPackageMenuService.update(bo.getPackageId(), bo.getMenuIds());
         }
         return b;
+    }
+
+    /**
+     * 校验套餐名称是否唯一
+     */
+    @Override
+    public boolean checkPackageNameUnique(SysTenantPackageBo bo) {
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysTenantPackage>()
+            .eq(SysTenantPackage::getPackageName, bo.getPackageName())
+            .ne(ObjectUtil.isNotNull(bo.getPackageId()), SysTenantPackage::getPackageId, bo.getPackageId()));
+        return !exist;
     }
 
     /**
