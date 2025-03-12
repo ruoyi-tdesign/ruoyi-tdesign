@@ -57,7 +57,7 @@ import { useRouter } from 'vue-router';
 import Nothing from '@/assets/images/nothing.png';
 import { useNoticeStore, useSSE } from '@/store';
 import type { NoticeItem } from '@/types/interface';
-import { closeWebsocket, initWebSocket } from '@/utils/websocket';
+import { initWebSocket } from '@/utils/websocket';
 
 onMounted(() => {
   const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
@@ -74,7 +74,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  closeWebsocket();
   useSSE().close();
 });
 
