@@ -37,30 +37,6 @@ public class TreeBuildUtils extends TreeUtil {
     }
 
     /**
-     * 自定义各项tree节点
-     *
-     * @param list        数据
-     * @param rootId      根id
-     * @param getId       获取id的方法
-     * @param getParentId 获取父id的方法
-     * @param setChildren 设置子节点数据
-     * @param <T>
-     * @param <K>
-     * @return
-     */
-    public static <T, K> List<T> build(List<T> list, K rootId, Function<T, K> getId, Function<T, K> getParentId, BiConsumer<T, List<T>> setChildren) {
-        List<T> treeList = new ArrayList<>();
-        for (T t : list) {
-            if (rootId.equals(getParentId.apply(t))) {
-                List<T> children = build(list, getId.apply(t), getId, getParentId, setChildren);
-                setChildren.accept(t, children);
-                treeList.add(t);
-            }
-        }
-        return treeList;
-    }
-
-    /**
      * 对一个tree展开
      *
      * @param data        数据
