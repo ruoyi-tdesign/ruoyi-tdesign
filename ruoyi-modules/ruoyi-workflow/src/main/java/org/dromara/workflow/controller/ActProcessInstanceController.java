@@ -130,7 +130,7 @@ public class ActProcessInstanceController extends BaseController {
      */
     @Log(title = "流程实例管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
-    @PostMapping("/cancelProcessApply/{businessKey}")
+    @PutMapping("/cancelProcessApply/{businessKey}")
     public R<Void> cancelProcessApply(@NotBlank(message = "业务id不能为空") @PathVariable String businessKey) {
         return toAjax(actProcessInstanceService.cancelProcessApply(businessKey));
     }

@@ -104,7 +104,7 @@ export function getPageByCurrent(query: ProcessInstanceQuery) {
  * @returns
  */
 export function cancelProcessApply(businessKey: string) {
-  return request.post<R>({
+  return request.put<R>({
     url: `/workflow/processInstance/cancelProcessApply/${businessKey}`,
   });
 }
