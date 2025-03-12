@@ -75,7 +75,10 @@ export function getInfo() {
 }
 
 // 退出方法
-export function logout() {
+export async function logout() {
+  await request.get<R<void>>({
+    url: '/resource/sse/close',
+  });
   return request.post<R>({
     url: '/auth/logout',
   });
