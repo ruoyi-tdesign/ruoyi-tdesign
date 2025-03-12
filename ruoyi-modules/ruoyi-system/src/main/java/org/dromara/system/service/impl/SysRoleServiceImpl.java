@@ -289,6 +289,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw new ServiceException("禁止修改管理员角色保留关键字");
         }
         SysRole role = MapstructUtils.convert(bo, SysRole.class);
+
+        if (NormalDisableEnum.DISABLE.getCode().equals(role.getStatus()) && this.countUserRoleByRoleId(role.getRoleId()) > 0) {
+            throw new ServiceException("角色已分配，不能禁用!");
+        }
         // 修改角色信息
         baseMapper.updateById(role);
         // 删除角色与菜单关联
