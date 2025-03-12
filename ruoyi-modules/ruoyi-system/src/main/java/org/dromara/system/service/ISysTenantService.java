@@ -81,4 +81,9 @@ public interface ISysTenantService extends IService<SysTenant> {
      * 同步租户套餐
      */
     Boolean syncTenantPackage(String tenantId, Long packageId);
+
+    /**
+     * 同步租户字典
+     */
+    void syncTenantDict();
 }
