@@ -17,6 +17,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
+/**
+ * SSE 控制器
+ *
+ * @author Lion Li
+ */
 @RestController
 @ConditionalOnProperty(value = "sse.enabled", havingValue = "true")
 @RequiredArgsConstructor
@@ -25,6 +30,9 @@ public class SseController implements DisposableBean {
 
     private final SseEmitterManager sseEmitterManager;
 
+    /**
+     * 建立 SSE 连接
+     */
     @GetMapping(value = "/connect/{loginType}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter connect(@PathVariable String loginType) {
         String tokenValue = StpUtil.getTokenValue();
@@ -32,6 +40,9 @@ public class SseController implements DisposableBean {
         return sseEmitterManager.connect(loginType, userId, tokenValue);
     }
 
+    /**
+     * 关闭 SSE 连接
+     */
     @GetMapping(value = "/{loginType}/close")
     public R<Void> close(@PathVariable String loginType) {
         String tokenValue = StpUtil.getTokenValue();
@@ -40,6 +51,12 @@ public class SseController implements DisposableBean {
         return R.ok();
     }
 
+    /**
+     * 向特定用户发送消息
+     *
+     * @param userId 目标用户的 ID
+     * @param msg    要发送的消息内容
+     */
     @GetMapping(value = "/{loginType}/send")
     public R<Void> send(@PathVariable String loginType, Long userId, String msg) {
         SseMessageDto dto = new SseMessageDto();
@@ -50,12 +67,20 @@ public class SseController implements DisposableBean {
         return R.ok();
     }
 
+    /**
+     * 向所有用户发送消息
+     *
+     * @param msg 要发送的消息内容
+     */
     @GetMapping(value = "/{loginType}/sendAll")
     public R<Void> send(@PathVariable String loginType, String msg) {
         sseEmitterManager.publishAll(loginType, msg);
         return R.ok();
     }
 
+    /**
+     * 清理资源。此方法目前不执行任何操作，但避免因未实现而导致错误
+     */
     @Override
     public void destroy() throws Exception {
         // 销毁时不需要做什么 此方法避免无用操作报错
