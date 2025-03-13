@@ -51,7 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 /**
  * 用户 业务层处理
@@ -696,10 +696,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, roleIds));
 
         // 获取用户ID列表
-        List<Long> userIds = userRoles.stream()
-            .map(SysUserRole::getUserId).distinct().collect(Collectors.toList());
+        Set<Long> userIds = StreamUtils.toSet(userRoles, SysUserRole::getUserId);
 
-        return selectListByIds(userIds);
+        return selectListByIds(new ArrayList<>(userIds));
     }
 
     /**
