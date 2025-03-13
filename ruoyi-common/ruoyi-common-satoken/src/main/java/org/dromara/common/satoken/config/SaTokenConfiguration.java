@@ -4,6 +4,7 @@ import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.dao.SaTokenDao;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.strategy.SaAnnotationStrategy;
 import cn.dev33.satoken.strategy.SaStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.satoken.core.dao.PlusSaTokenDao;
@@ -83,7 +84,7 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
     @Autowired
     public void rewriteSaStrategy() {
         // 重写Sa-Token的注解处理器，增加注解合并功能
-        SaStrategy.instance.getAnnotation = AnnotatedElementUtils::getMergedAnnotation;
+        SaAnnotationStrategy.instance.getAnnotation = AnnotatedElementUtils::getMergedAnnotation;
         // 重写权限判断，是否包含权限或角色
         SaStrategy.instance.hasElement = (list, pattern) -> {
             // 空集合直接返回false

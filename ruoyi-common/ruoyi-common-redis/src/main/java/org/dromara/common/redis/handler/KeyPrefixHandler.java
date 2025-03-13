@@ -28,10 +28,8 @@ public class KeyPrefixHandler implements NameMapper {
             return null;
         }
         if (StringUtils.isNotBlank(keyPrefix) && !name.startsWith(keyPrefix)) {
-            System.out.println(keyPrefix + name);
             return keyPrefix + name;
         }
-        System.out.println(name);
         return name;
     }
 

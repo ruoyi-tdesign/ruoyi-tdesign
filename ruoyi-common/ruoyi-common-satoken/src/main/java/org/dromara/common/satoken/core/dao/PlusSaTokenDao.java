@@ -27,7 +27,15 @@ public class PlusSaTokenDao implements SaTokenDao {
         // 初始的缓存空间大小
         .initialCapacity(100)
         // 缓存的最大条数
-        .maximumSize(1000)
+        .maximumSize(65535)
+        .build();
+    private static final Cache<String, Object> CAFFEINE_WRITE = Caffeine.newBuilder()
+        // 设置最后一次写入或访问后经过固定时间过期
+        .expireAfterWrite(5, TimeUnit.SECONDS)
+        // 初始的缓存空间大小
+        .initialCapacity(100)
+        // 缓存的最大条数
+        .maximumSize(65535)
         .build();
 
     /**
@@ -47,6 +55,10 @@ public class PlusSaTokenDao implements SaTokenDao {
         if (timeout == 0 || timeout <= NOT_VALUE_EXPIRE) {
             return;
         }
+        // 如果本地缓存未过期，则不做任何处理
+        if (CAFFEINE_WRITE.getIfPresent(key) != null) {
+            return;
+        }
         // 判断是否为永不过期
         if (timeout == NEVER_EXPIRE) {
             RedisUtils.setObject(key, value);
@@ -54,16 +66,18 @@ public class PlusSaTokenDao implements SaTokenDao {
             RedisUtils.setObject(key, value, Duration.ofSeconds(timeout));
         }
         CAFFEINE.invalidate(key);
+        CAFFEINE_WRITE.put(key, value);
     }
 
     /**
-     * 修修改指定key-value键值对 (过期时间不变)
+     * 修改指定key-value键值对 (过期时间不变)
      */
     @Override
     public void update(String key, String value) {
         if (RedisUtils.hasKey(key)) {
             RedisUtils.setObject(key, value, true);
             CAFFEINE.invalidate(key);
+            CAFFEINE_WRITE.invalidate(key);
         }
     }
 
@@ -73,6 +87,8 @@ public class PlusSaTokenDao implements SaTokenDao {
     @Override
     public void delete(String key) {
         RedisUtils.deleteObject(key);
+        CAFFEINE.invalidate(key);
+        CAFFEINE_WRITE.invalidate(key);
     }
 
     /**
@@ -90,6 +106,8 @@ public class PlusSaTokenDao implements SaTokenDao {
     @Override
     public void updateTimeout(String key, long timeout) {
         RedisUtils.expire(key, Duration.ofSeconds(timeout));
+        CAFFEINE.invalidate(key);
+        CAFFEINE_WRITE.invalidate(key);
     }
 
     /**
@@ -97,8 +115,7 @@ public class PlusSaTokenDao implements SaTokenDao {
      */
     @Override
     public Object getObject(String key) {
-        Object o = CAFFEINE.get(key, k -> RedisUtils.getObject(key));
-        return o;
+        return CAFFEINE.get(key, k -> RedisUtils.getObject(key));
     }
 
     /**
@@ -109,6 +126,10 @@ public class PlusSaTokenDao implements SaTokenDao {
         if (timeout == 0 || timeout <= NOT_VALUE_EXPIRE) {
             return;
         }
+        // 如果本地缓存未过期，则不做任何处理
+        if (CAFFEINE_WRITE.getIfPresent(key) != null) {
+            return;
+        }
         // 判断是否为永不过期
         if (timeout == NEVER_EXPIRE) {
             RedisUtils.setObject(key, object);
@@ -116,6 +137,7 @@ public class PlusSaTokenDao implements SaTokenDao {
             RedisUtils.setObject(key, object, Duration.ofSeconds(timeout));
         }
         CAFFEINE.invalidate(key);
+        CAFFEINE_WRITE.invalidate(key);
     }
 
     /**
@@ -126,6 +148,7 @@ public class PlusSaTokenDao implements SaTokenDao {
         if (RedisUtils.hasKey(key)) {
             RedisUtils.setObject(key, object, true);
             CAFFEINE.invalidate(key);
+            CAFFEINE_WRITE.invalidate(key);
         }
     }
 
@@ -136,6 +159,7 @@ public class PlusSaTokenDao implements SaTokenDao {
     public void deleteObject(String key) {
         RedisUtils.deleteObject(key);
         CAFFEINE.invalidate(key);
+        CAFFEINE_WRITE.invalidate(key);
     }
 
     /**
@@ -153,6 +177,8 @@ public class PlusSaTokenDao implements SaTokenDao {
     @Override
     public void updateObjectTimeout(String key, long timeout) {
         RedisUtils.expire(key, Duration.ofSeconds(timeout));
+        CAFFEINE.invalidate(key);
+        CAFFEINE_WRITE.invalidate(key);
     }
 
 

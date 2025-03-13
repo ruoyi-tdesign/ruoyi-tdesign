@@ -57,14 +57,12 @@ public class SecurityConfig implements WebMvcConfigurer {
                         StpLogic logic = DynamicStpLogic.getDynamicStpLogic(type);
                         SaRouter
                             .match(config.getMatch())
-                            .check(logic::checkLogin)
                             .check(() -> {
-                                BaseUser user = (BaseUser) logic.getTokenSession().get(MultipleStpUtil.LOGIN_USER_KEY);
-                                SaSecurityContext.setContext(user);
+                                if (logic.isLogin()) {
+                                    BaseUser user = (BaseUser) logic.getTokenSession().get(MultipleStpUtil.LOGIN_USER_KEY);
+                                    SaSecurityContext.setContext(user);
+                                }
                             });
-                        if (SaSecurityContext.getContext() != null) {
-                            break;
-                        }
                     }
                 }
                 if (SaSecurityContext.getContext() == null) {
