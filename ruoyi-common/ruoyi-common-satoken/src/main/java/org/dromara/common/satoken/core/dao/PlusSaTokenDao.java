@@ -29,9 +29,9 @@ public class PlusSaTokenDao implements SaTokenDao {
         // 缓存的最大条数
         .maximumSize(65535)
         .build();
-    private static final Cache<String, Object> CAFFEINE_WRITE = Caffeine.newBuilder()
+    private static final Cache<String, Boolean> CAFFEINE_WRITE = Caffeine.newBuilder()
         // 设置最后一次写入或访问后经过固定时间过期
-        .expireAfterWrite(5, TimeUnit.SECONDS)
+        .expireAfterWrite(10, TimeUnit.SECONDS)
         // 初始的缓存空间大小
         .initialCapacity(100)
         // 缓存的最大条数
@@ -66,7 +66,7 @@ public class PlusSaTokenDao implements SaTokenDao {
             RedisUtils.setObject(key, value, Duration.ofSeconds(timeout));
         }
         CAFFEINE.invalidate(key);
-        CAFFEINE_WRITE.put(key, value);
+        CAFFEINE_WRITE.put(key, Boolean.TRUE);
     }
 
     /**
@@ -137,7 +137,7 @@ public class PlusSaTokenDao implements SaTokenDao {
             RedisUtils.setObject(key, object, Duration.ofSeconds(timeout));
         }
         CAFFEINE.invalidate(key);
-        CAFFEINE_WRITE.invalidate(key);
+        CAFFEINE_WRITE.put(key, Boolean.TRUE);
     }
 
     /**
