@@ -51,7 +51,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { MailIcon } from 'tdesign-icons-vue-next';
-import { onMounted, onUnmounted } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 import Nothing from '@/assets/images/nothing.png';
@@ -73,7 +73,7 @@ onMounted(() => {
   useSSE().execute(`${import.meta.env.VITE_APP_BASE_API}/resource/sse/connect/login`);
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   useSSE().close();
 });
 
