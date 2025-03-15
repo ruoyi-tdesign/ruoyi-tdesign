@@ -453,12 +453,14 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
                 }
             }
         }
-        if (CollUtil.isNotEmpty(saveTypeList)) {
-            dictTypeMapper.insertBatch(saveTypeList);
-        }
-        if (CollUtil.isNotEmpty(saveDataList)) {
-            dictDataMapper.insertBatch(saveDataList);
-        }
+        TenantHelper.ignore(() -> {
+            if (CollUtil.isNotEmpty(saveTypeList)) {
+                dictTypeMapper.insertBatch(saveTypeList);
+            }
+            if (CollUtil.isNotEmpty(saveDataList)) {
+                dictDataMapper.insertBatch(saveDataList);
+            }
+        });
         for (String tenantId : set) {
             TenantHelper.dynamicTenant(tenantId, () -> CacheUtils.clear(CacheNames.SYS_DICT));
         }
