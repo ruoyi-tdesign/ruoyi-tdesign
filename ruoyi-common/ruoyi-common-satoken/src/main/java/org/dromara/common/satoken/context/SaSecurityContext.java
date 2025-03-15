@@ -25,6 +25,9 @@ public class SaSecurityContext {
      */
     @SuppressWarnings("unchecked cast")
     public static <T extends BaseUser> void setContext(T context) {
+        if (context == null) {
+            return;
+        }
         List<T> list = (List<T>) SaHolder.getStorage().get(KEY);
         if (list == null) {
             list = new ArrayList<>();

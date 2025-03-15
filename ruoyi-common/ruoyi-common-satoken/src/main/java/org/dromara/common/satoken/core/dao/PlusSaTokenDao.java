@@ -126,10 +126,6 @@ public class PlusSaTokenDao implements SaTokenDao {
         if (timeout == 0 || timeout <= NOT_VALUE_EXPIRE) {
             return;
         }
-        // 如果本地缓存未过期，则不做任何处理
-        if (CAFFEINE_WRITE.getIfPresent(key) != null) {
-            return;
-        }
         // 判断是否为永不过期
         if (timeout == NEVER_EXPIRE) {
             RedisUtils.setObject(key, object);
@@ -137,7 +133,6 @@ public class PlusSaTokenDao implements SaTokenDao {
             RedisUtils.setObject(key, object, Duration.ofSeconds(timeout));
         }
         CAFFEINE.invalidate(key);
-        CAFFEINE_WRITE.put(key, Boolean.TRUE);
     }
 
     /**

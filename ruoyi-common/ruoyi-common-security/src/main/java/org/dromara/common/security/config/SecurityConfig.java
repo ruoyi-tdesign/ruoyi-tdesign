@@ -18,7 +18,7 @@ import org.dromara.common.satoken.config.MultipleSaTokenConfig;
 import org.dromara.common.satoken.config.MultipleSaTokenProperties;
 import org.dromara.common.satoken.context.SaSecurityContext;
 import org.dromara.common.satoken.stp.DynamicStpLogic;
-import org.dromara.common.satoken.utils.MultipleStpUtil;
+import org.dromara.common.satoken.utils.MultipleLoginBaseHelper;
 import org.dromara.common.security.config.properties.SecurityProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -59,8 +59,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                             .match(config.getMatch())
                             .check(() -> {
                                 if (logic.isLogin()) {
-                                    BaseUser user = (BaseUser) logic.getTokenSession().get(MultipleStpUtil.LOGIN_USER_KEY);
-                                    SaSecurityContext.setContext(user);
+                                    BaseUser baseUser = MultipleLoginBaseHelper.getUser(logic);
+                                    SaSecurityContext.setContext(baseUser);
                                 }
                             });
                     }
