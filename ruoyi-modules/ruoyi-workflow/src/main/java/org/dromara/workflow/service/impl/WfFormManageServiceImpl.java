@@ -40,7 +40,7 @@ public class WfFormManageServiceImpl extends ServiceImpl<WfFormManageMapper, WfF
 
     @Override
     public List<WfFormManageVo> queryByIds(List<Long> ids) {
-        return baseMapper.selectVoBatchIds(ids);
+        return baseMapper.selectVoByIds(ids);
     }
 
     /**
