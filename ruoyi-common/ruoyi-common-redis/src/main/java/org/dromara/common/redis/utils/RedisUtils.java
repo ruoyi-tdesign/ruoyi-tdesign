@@ -1,10 +1,12 @@
 package org.dromara.common.redis.utils;
 
+import cn.hutool.core.collection.CollUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.spring.SpringUtils;
 import org.redisson.api.*;
 import org.redisson.api.listener.MessageListener;
+import org.redisson.api.options.KeysScanParams;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -13,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * redis 工具类
@@ -687,18 +687,20 @@ public class RedisUtils {
     }
 
     /**
-     * 获得缓存的基本对象列表
+     * 获得缓存的基本对象列表(全局匹配忽略租户 自行移除租户id)
      *
      * @param pattern 字符串前缀
      * @return 对象列表
      */
     public static Collection<String> keys(final String pattern) {
-        Stream<String> stream = CLIENT.getKeys().getKeysStreamByPattern(pattern);
-        return stream.collect(Collectors.toList());
+        KeysScanParams params = new KeysScanParams();
+        params.pattern(pattern);
+        Iterable<String> keys = CLIENT.getKeys().getKeys(params);
+        return CollUtil.newArrayList(keys);
     }
 
     /**
-     * 删除缓存的基本对象列表
+     * 删除缓存的基本对象列表(全局匹配忽略租户 自行拼接租户id)
      *
      * @param pattern 字符串前缀
      */
@@ -711,7 +713,7 @@ public class RedisUtils {
      *
      * @param key 键
      */
-    public static Boolean hasKey(String key) {
+    public static Boolean hasKey(String... key) {
         RKeys rKeys = CLIENT.getKeys();
         return rKeys.countExists(key) > 0;
     }
