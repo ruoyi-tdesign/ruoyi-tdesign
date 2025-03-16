@@ -7,7 +7,7 @@ import org.dromara.workflow.domain.ActHiProcinst;
 import org.dromara.workflow.service.IActHiProcinstService;
 import org.dromara.workflow.service.IActProcessInstanceService;
 import org.dromara.workflow.utils.WorkflowUtils;
-import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +24,9 @@ import java.util.Map;
 public class WorkflowServiceImpl implements WorkflowService {
 
     @Autowired(required = false)
-    private RuntimeService runtimeService;
-    private final IActProcessInstanceService iActProcessInstanceService;
-    private final IActHiProcinstService iActHiProcinstService;
+    private TaskService taskService;
+    private final IActProcessInstanceService actProcessInstanceService;
+    private final IActHiProcinstService actHiProcinstService;
     /**
      * 运行中的实例 删除程实例，删除历史记录，删除业务与流程关联信息
      *
@@ -35,7 +35,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public boolean deleteRunAndHisInstance(List<String> businessKeys) {
-        return iActProcessInstanceService.deleteRunAndHisInstance(businessKeys);
+        return actProcessInstanceService.deleteRunAndHisInstance(businessKeys);
     }
 
     /**
@@ -67,7 +67,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public void setVariable(String taskId, String variableName, Object value) {
-        runtimeService.setVariable(taskId, variableName, value);
+        taskService.setVariable(taskId, variableName, value);
     }
 
     /**
@@ -78,7 +78,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public void setVariables(String taskId, Map<String, Object> variables) {
-        runtimeService.setVariables(taskId, variables);
+        taskService.setVariables(taskId, variables);
     }
 
     /**
@@ -90,7 +90,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public void setVariableLocal(String taskId, String variableName, Object value) {
-        runtimeService.setVariableLocal(taskId, variableName, value);
+        taskService.setVariableLocal(taskId, variableName, value);
     }
 
     /**
@@ -101,7 +101,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public void setVariablesLocal(String taskId, Map<String, Object> variables) {
-        runtimeService.setVariablesLocal(taskId, variables);
+        taskService.setVariablesLocal(taskId, variables);
     }
 
     /**
@@ -112,7 +112,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      */
     @Override
     public String getInstanceIdByBusinessKey(String businessKey) {
-        ActHiProcinst actHiProcinst = iActHiProcinstService.selectByBusinessKey(businessKey);
+        ActHiProcinst actHiProcinst = actHiProcinstService.selectByBusinessKey(businessKey);
         if (actHiProcinst == null) {
             return StrUtil.EMPTY;
         }
