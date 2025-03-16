@@ -14,7 +14,7 @@
             {{ $t('layout.notice.clear') }}
           </t-button>
         </div>
-        <t-list v-if="unreadMsg.length > 0" class="narrow-scrollbar" style="max-height: 366px"  :split="false">
+        <t-list v-if="unreadMsg.length > 0" class="narrow-scrollbar" style="max-height: 366px" :split="false">
           <t-list-item v-for="(item, index) in unreadMsg" :key="index">
             <div>
               <p class="msg-content">{{ item.message }}</p>
@@ -51,13 +51,13 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { MailIcon } from 'tdesign-icons-vue-next';
-import { onMounted, onUnmounted } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 import Nothing from '@/assets/images/nothing.png';
-import { useNoticeStore } from '@/store';
+import { useNoticeStore, useSSE } from '@/store';
 import type { NoticeItem } from '@/types/interface';
-import { closeWebsocket, initWebSocket } from '@/utils/websocket';
+import { initWebSocket } from '@/utils/websocket';
 
 onMounted(() => {
   const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
@@ -69,8 +69,12 @@ onMounted(() => {
   initWebSocket(`${address}/resource/websocket`);
 });
 
-onUnmounted(() => {
-  closeWebsocket();
+onMounted(() => {
+  useSSE().execute(`${import.meta.env.VITE_APP_BASE_API}/resource/sse/connect/login`);
+});
+
+onBeforeUnmount(() => {
+  useSSE().close();
 });
 
 const router = useRouter();

@@ -10,8 +10,8 @@ spring:
 spring:
   security:
     user:
-      name: ruoyi
-      password: 123456
+      name: @monitor.username@
+      password: @monitor.password@
   boot:
     admin:
       ui:
@@ -38,5 +38,8 @@ spring.boot.admin.client:
   url: http://localhost:9090/admin
   instance:
     service-host-type: IP
-  username: ruoyi
-  password: 123456
+    metadata:
+      username: ${spring.boot.admin.client.username}
+      userpassword: ${spring.boot.admin.client.password}
+  username: @monitor.username@
+  password: @monitor.password@

@@ -103,7 +103,7 @@ public class CryptoFilter implements Filter {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return null;
         }
         return null;
     }

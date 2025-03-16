@@ -39,6 +39,34 @@ public class StreamUtils {
     }
 
     /**
+     * 找到流中满足条件的第一个元素
+     *
+     * @param collection 需要查询的集合
+     * @param function   过滤方法
+     * @return 找到符合条件的第一个元素，没有则返回null
+     */
+    public static <E> E findFirst(Collection<E> collection, Predicate<E> function) {
+        if (CollUtil.isEmpty(collection)) {
+            return null;
+        }
+        return collection.stream().filter(function).findFirst().orElse(null);
+    }
+
+    /**
+     * 找到流中任意一个满足条件的元素
+     *
+     * @param collection 需要查询的集合
+     * @param function   过滤方法
+     * @return 找到符合条件的任意一个元素，没有则返回null
+     */
+    public static <E> Optional<E> findAny(Collection<E> collection, Predicate<E> function) {
+        if (CollUtil.isEmpty(collection)) {
+            return Optional.empty();
+        }
+        return collection.stream().filter(function).findAny();
+    }
+
+    /**
      * 将collection拼接
      *
      * @param collection 需要转化的集合
@@ -588,7 +616,7 @@ public class StreamUtils {
      * @param filter     过滤条件
      * @return
      */
-    public static <T> Optional<T> findFirst(Collection<T> collection, Function<T, Boolean> filter) {
+    public static <T> Optional<T> findFirstOptional(Collection<T> collection, Function<T, Boolean> filter) {
         return collection.stream().filter(filter::apply).findFirst();
     }
 

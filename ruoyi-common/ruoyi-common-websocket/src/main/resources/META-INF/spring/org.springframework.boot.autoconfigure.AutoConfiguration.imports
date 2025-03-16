@@ -1,2 +1,2 @@
 org.dromara.common.websocket.config.WebSocketConfig
-org.dromara.common.websocket.listener.SystemEventsListener
+org.dromara.common.sse.listener.SystemEventsListener

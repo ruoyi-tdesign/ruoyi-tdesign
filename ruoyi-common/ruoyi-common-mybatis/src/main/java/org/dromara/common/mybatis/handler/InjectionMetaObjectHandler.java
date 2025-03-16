@@ -27,6 +27,11 @@ import java.util.Objects;
 @Slf4j
 public class InjectionMetaObjectHandler implements MetaObjectHandler {
 
+    /**
+     * 插入填充方法，用于在插入数据时自动填充实体对象中的创建时间、更新时间、创建人、更新人等信息
+     *
+     * @param metaObject 元对象，用于获取原始对象并进行填充
+     */
     @Override
     public void insertFill(MetaObject metaObject) {
         try {
@@ -51,12 +56,18 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
                 fieldFills.add(StrictFill.of(property, () -> NumberUtil.parseInt(notDeleteValue), Integer.class));
             }
 
+            // 插入时，如果对象值不为空，则使用对象值，否则使用填充值
             fillStrategy(true, metaObject, tableInfo, fieldFills);
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
         }
     }
 
+    /**
+     * 更新填充方法，用于在更新数据时自动填充实体对象中的更新时间和更新人信息
+     *
+     * @param metaObject 元对象，用于获取原始对象并进行填充
+     */
     @Override
     public void updateFill(MetaObject metaObject) {
         try {
@@ -66,6 +77,7 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
             fieldFills.add(StrictFill.of("updateBy", this::getLoginUsername, String.class));
             fieldFills.add(StrictFill.of("updateBy", this::getLoginId, Long.class));
 
+            // 更新时，不管值是否为空，都覆盖
             fillStrategy(false, metaObject, tableInfo, fieldFills);
         } catch (Exception e) {
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
@@ -82,7 +94,9 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
     }
 
     /**
-     * 获取登录用户名
+     * 获取当前登录用户名
+     *
+     * @return 当前登录用户的名称，如果用户未登录则返回 null
      */
     private String getLoginUsername() {
         return SaSecurityContext.getContextOptional().map(BaseUser::getUsername).orElse(null);

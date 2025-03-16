@@ -24,16 +24,18 @@
     </select>
 
     <select id="selectMenuListByUserId" parameterType="org.dromara.system.domain.query.SysMenuQuery" resultMap="SysMenuResultVo">
-        select distinct sm.menu_id, sm.parent_id, sm.menu_name, sm.path, sm.component, sm.query_param, sm.visible, sm.status,
+        select sm.menu_id, sm.parent_id, sm.menu_name, sm.path, sm.component, sm.query_param, sm.visible, sm.status,
         sm.perms, sm.is_frame, sm.is_cache, sm.menu_type, sm.icon, sm.hidden_expression, sm.shop_expression, sm.order_num, sm.create_time
         from sys_menu sm
-        left join sys_role_menu rm on sm.menu_id = rm.menu_id
-        left join sys_user_role sur on rm.role_id = sur.role_id
-        left join sys_role ro on sur.role_id = ro.role_id
         <where>
-            and sur.user_id = #{userId}
-            and ro.status = '1'
-            and ro.del_flag = '0'
+            EXISTS (SELECT 1 FROM sys_role_menu rm
+                JOIN sys_role ro ON rm.role_id = ro.role_id
+            WHERE
+                ro.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId})
+                AND ro.status = '1'
+                AND ro.del_flag = '0'
+                AND sm.menu_id = rm.menu_id
+            )
             <if test="menuName != null and menuName != ''"> and sm.menu_name like concat(concat('%', #{menuName}), '%')</if>
             <if test="componentName != null and componentName != ''"> and sm.component_name like concat(concat('%', #{componentName}), '%')</if>
             <if test="visible != null and visible != ''"> and sm.visible = #{visible}</if>
@@ -61,14 +63,11 @@
                         sm.order_num,
                         sm.create_time
         from sys_menu sm
-                 left join sys_role_menu rm on sm.menu_id = rm.menu_id
-                 left join sys_user_role sur on rm.role_id = sur.role_id
-                 left join sys_role ro on sur.role_id = ro.role_id
-        where sur.user_id = #{userId}
-          and sm.menu_type in ('M', 'C')
+                 left join sys_role_menu rm on sm.menu_id = rm.menu_id and sm.status = '1'
+                 left join sys_role ro on rm.role_id = ro.role_id and ro.status = '1'
+        where sm.menu_type in ('M', 'C')
           and sm.status = '1'
-          and ro.status = '1'
-          and ro.del_flag = '0'
+          and ro.role_id in (select role_id from sys_user_role where user_id = #{userId})
         order by sm.parent_id, sm.order_num
     </select>
 
@@ -84,22 +83,12 @@
         order by m.parent_id, m.order_num
     </select>
 
-    <select id="selectMenuPerms" resultType="String">
-        select distinct m.perms
-        from sys_menu m
-                 left join sys_role_menu rm on m.menu_id = rm.menu_id
-                 left join sys_user_role sur on rm.role_id = sur.role_id
-    </select>
-
     <select id="selectMenuPermsByUserId" parameterType="Long" resultType="String">
         select distinct m.perms
         from sys_menu m
-                 left join sys_role_menu rm on m.menu_id = rm.menu_id
-                 left join sys_user_role sur on rm.role_id = sur.role_id
-                 left join sys_role r on r.role_id = sur.role_id
-        where m.status = '1'
-          and r.status = '1'
-          and sur.user_id = #{userId}
+                 left join sys_role_menu rm on m.menu_id = rm.menu_id and m.status = '1'
+                 left join sys_role r on r.role_id = rm.role_id and r.status = '1'
+        where r.role_id in (select role_id from sys_user_role where user_id = #{userId})
     </select>
 
     <select id="selectMenuPermsByRoleId" parameterType="Long" resultType="String">

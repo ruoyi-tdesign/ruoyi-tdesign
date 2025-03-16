@@ -10,7 +10,7 @@
         </t-form-item>
         <t-form-item label="消息类型" name="messageType">
           <t-select v-model="queryParams.messageType" placeholder="请选择消息类型" clearable>
-            <t-option v-for="dict in sys_message_type" :key="dict.value" :label="dict.label" :value="dict.value" />
+            <t-option v-for="dict in messageTypeOptions" :key="dict.value" :label="dict.label" :value="dict.value" />
           </t-select>
         </t-form-item>
         <t-form-item label="模板类型" name="templateMode">
@@ -117,7 +117,10 @@
           </t-row>
         </template>
         <template #messageType="{ row }">
-          <dict-tag :options="sys_message_type" :value="row.messageType" />
+          <dict-tag :options="messageTypeOptions" :value="row.messageType" />
+        </template>
+        <template #supplierType="{ row }">
+          <dict-tag :options="supplierTypeOptions" :value="row.supplierType" />
         </template>
         <template #templateMode="{ row }">
           <dict-tag :options="sys_message_template_mode" :value="row.templateMode" />
@@ -215,7 +218,7 @@
                   @change="handleMessageTypeChange($event as string)"
                 >
                   <t-option
-                    v-for="dict in sys_message_type"
+                    v-for="dict in messageTypeOptions"
                     :key="dict.value"
                     :label="dict.label"
                     :value="dict.value"
@@ -289,6 +292,9 @@
                 <template #help>
                   <b>变量格式</b>：${name}；例如，尊敬的 ${name}，您的快递已飞奔在路上，将今天 ${time}
                   送达您的手里，请留意查收。
+                  <p v-if="form.templateMode === 'TEMPLATE_ID'" class="color-red">
+                    <b>模版内容以实际平台配置的内容为准</b>
+                  </p>
                 </template>
                 <t-textarea v-model="form.content" placeholder="请输入内容" @change="handleVarsChange" />
               </t-form-item>
@@ -339,7 +345,10 @@
         <t-descriptions-item label="消息配置id">{{ form.messageConfigId }}</t-descriptions-item>
         <t-descriptions-item label="消息key">{{ form.messageKey }}</t-descriptions-item>
         <t-descriptions-item label="消息类型">
-          <dict-tag :options="sys_message_type" :value="form.messageType" />
+          <dict-tag :options="messageTypeOptions" :value="form.messageType" />
+        </t-descriptions-item>
+        <t-descriptions-item label="支持平台类型">
+          <dict-tag :options="supplierTypeOptions" :value="form.supplierType" />
         </t-descriptions-item>
         <t-descriptions-item label="模板类型">
           <dict-tag :options="sys_message_template_mode" :value="form.templateMode" />
@@ -430,6 +439,7 @@ import type {
 } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
+import { getMessageFieldConfigs, getMessageSupplierType } from '@/api/system/messageConfig';
 import {
   addMessageTemplate,
   delMessageTemplate,
@@ -441,7 +451,7 @@ import {
   sendMessageTest,
   updateMessageTemplate,
 } from '@/api/system/messageTemplate';
-import type { SysMessageConfigVo } from '@/api/system/model/messageConfigModel';
+import type { MessageFieldConfig, MessageTypeVo, SysMessageConfigVo } from '@/api/system/model/messageConfigModel';
 import type { SysMessageKeyVo } from '@/api/system/model/messageKeyModel';
 import type {
   SysMessageTemplateForm,
@@ -450,14 +460,12 @@ import type {
   SysMessageTemplateVar,
   SysMessageTemplateVo,
 } from '@/api/system/model/messageTemplateModel';
-import { SUPPLIER_TYPE_MAP } from '@/pages/system/messageConfig/data';
-import type { MessageConfig } from '@/pages/system/messageConfig/model';
 import { ArrayOps } from '@/utils/array';
+import type { DictModel } from '@/utils/dict';
 
 const { proxy } = getCurrentInstance();
-const { sys_message_template_mode, sys_message_type, sys_normal_disable } = proxy.useDict(
+const { sys_message_template_mode, sys_normal_disable } = proxy.useDict(
   'sys_message_template_mode',
-  'sys_message_type',
   'sys_normal_disable',
 );
 
@@ -482,6 +490,8 @@ const messageKeys = ref<SysMessageKeyVo[]>([]);
 const messageConfigs = ref<SysMessageConfigVo[]>([]);
 const openTest = ref(false);
 const formTest = ref<SysMessageTemplateTest>({});
+const messageFieldConfigs = ref<Record<string, MessageFieldConfig>>({});
+const supplierTypeList = ref<MessageTypeVo[]>([]);
 
 // 校验规则
 const rules = ref<Record<string, Array<FormRule>>>({
@@ -501,6 +511,7 @@ const columns = ref<Array<PrimaryTableCol>>([
   { title: `模板名称`, colKey: 'templateName', align: 'center' },
   { title: `消息key`, colKey: 'messageKey', align: 'center', sorter: true },
   { title: `消息类型`, colKey: 'messageType', align: 'center' },
+  { title: `支持平台标识`, colKey: 'supplierType', align: 'center' },
   { title: `模板类型`, colKey: 'templateMode', align: 'center' },
   { title: `状态`, colKey: 'status', align: 'center' },
   { title: `内容`, colKey: 'content', align: 'center', ellipsis: true },
@@ -543,12 +554,12 @@ const pagination = computed(() => {
   };
 });
 
-const messageConfig = computed<MessageConfig>(() => {
+const messageConfig = computed<MessageFieldConfig>(() => {
   if (!form.value.messageConfigId) {
     return null;
   }
   const config = messageConfigs.value.find((value) => value.messageConfigId === form.value.messageConfigId);
-  return SUPPLIER_TYPE_MAP.get(config?.supplierType);
+  return messageFieldConfigs.value[config?.supplierType];
 });
 
 const maxVarsLabelWidth = computed(() => {
@@ -599,6 +610,26 @@ function handleVarsChange() {
     return { key, value: value?.value ?? `$\{${key}}` };
   });
 }
+
+const messageTypeOptions = computed(() => {
+  return (
+    supplierTypeList.value?.map<DictModel>((item) => ({
+      label: item.description,
+      value: item.messageType,
+      tagType: 'primary',
+    })) ?? []
+  );
+});
+
+const supplierTypeOptions = computed(() => {
+  return supplierTypeList.value.flatMap((item) => {
+    return Object.entries(item.supplierTypeMap).map<DictModel>(([key, value]) => ({
+      label: value,
+      value: key,
+      tagType: 'primary',
+    }));
+  });
+});
 
 /** 处理消息类型变更 */
 function handleMessageTypeChange(value: string) {
@@ -839,5 +870,18 @@ function handleExport() {
   );
 }
 
-getList();
+/** 初始化消息配置 */
+function initMessageFieldConfigs() {
+  getMessageFieldConfigs().then((res) => {
+    messageFieldConfigs.value = res.data;
+  });
+  getMessageSupplierType().then((res) => {
+    supplierTypeList.value = res.data;
+  });
+}
+
+onMounted(() => {
+  getList();
+  initMessageFieldConfigs();
+});
 </script>

@@ -15,15 +15,17 @@ public class CaffeineCacheDecorator implements Cache {
     private static final com.github.benmanes.caffeine.cache.Cache<Object, Object>
         CAFFEINE = SpringUtils.getBean("caffeine");
 
+    private final String name;
     private final Cache cache;
 
-    public CaffeineCacheDecorator(Cache cache) {
+    public CaffeineCacheDecorator(String name, Cache cache) {
+        this.name = name;
         this.cache = cache;
     }
 
     @Override
     public String getName() {
-        return cache.getName();
+        return name;
     }
 
     @Override
@@ -32,7 +34,7 @@ public class CaffeineCacheDecorator implements Cache {
     }
 
     public String getUniqueKey(Object key) {
-        return cache.getName() + ":" + key;
+        return name + ":" + key;
     }
 
     @Override
@@ -42,6 +44,7 @@ public class CaffeineCacheDecorator implements Cache {
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public <T> T get(Object key, Class<T> type) {
         Object o = CAFFEINE.get(getUniqueKey(key), k -> cache.get(key, type));
         return (T) o;
@@ -53,6 +56,7 @@ public class CaffeineCacheDecorator implements Cache {
         cache.put(key, value);
     }
 
+    @Override
     public ValueWrapper putIfAbsent(Object key, Object value) {
         CAFFEINE.invalidate(getUniqueKey(key));
         return cache.putIfAbsent(key, value);
@@ -63,6 +67,7 @@ public class CaffeineCacheDecorator implements Cache {
         evictIfPresent(key);
     }
 
+    @Override
     public boolean evictIfPresent(Object key) {
         boolean b = cache.evictIfPresent(key);
         if (b) {
@@ -76,6 +81,7 @@ public class CaffeineCacheDecorator implements Cache {
         cache.clear();
     }
 
+    @Override
     public boolean invalidate() {
         return cache.invalidate();
     }

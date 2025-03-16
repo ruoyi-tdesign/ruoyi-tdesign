@@ -13,7 +13,7 @@
     <t-space>
       <t-button shape="circle" variant="outline" title="使用 微信 账号授权登录" @click="authUrl('wechat_open')">
         <template #icon>
-          <logo-wechat-icon style="color: #1aad19" />
+          <logo-wechat-stroke-filled-icon style="color: #1aad19" />
         </template>
       </t-button>
       <t-button shape="circle" variant="outline" title="使用 QQ 账号授权登录" @click="authUrl('qq')">
@@ -49,7 +49,7 @@
 defineOptions({
   name: 'ThirdParty',
 });
-import { LogoGithubFilledIcon, LogoQqIcon, LogoWechatIcon } from 'tdesign-icons-vue-next';
+import { LogoGithubFilledIcon, LogoQqIcon, LogoWechatStrokeFilledIcon } from 'tdesign-icons-vue-next';
 import type { PrimaryTableCol } from 'tdesign-vue-next';
 import { getCurrentInstance, onMounted, ref } from 'vue';
 

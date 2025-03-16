@@ -16,7 +16,6 @@ import java.util.Objects;
  *
  * @author Lion Li
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("gen_table_column")

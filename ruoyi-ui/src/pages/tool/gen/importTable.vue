@@ -78,12 +78,11 @@
 <script lang="ts" setup>
 import { RefreshIcon, SearchIcon } from 'tdesign-icons-vue-next';
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
-import { computed, getCurrentInstance, reactive, ref } from 'vue';
+import { getCurrentInstance, reactive, ref } from 'vue';
 
 import { getDataNames, importTable, listDbTable } from '@/api/tool/gen';
 import type { GenTableQuery, GenTableVo } from '@/api/tool/model/genModel';
 
-const total = ref(0);
 const loading = ref(false);
 const visible = ref(false);
 const tables = ref([]);
@@ -109,16 +108,19 @@ const columns = ref<Array<PrimaryTableCol>>([
 ]);
 
 // 分页
+// const pagination = ref({
+//   pageSize: 10,
+// });
 const pagination = computed(() => {
   return {
     current: queryParams.pageNum,
     pageSize: queryParams.pageSize,
-    total: total.value,
+    total: dbTableList.value.length,
     showJumper: true,
     onChange: (pageInfo: PageInfo) => {
       queryParams.pageNum = pageInfo.current;
       queryParams.pageSize = pageInfo.pageSize;
-      getList();
+      // getList();
     },
   };
 });
@@ -143,8 +145,8 @@ function handleSelectionChange(selection: Array<string | number>) {
 function getList() {
   loading.value = true;
   listDbTable(queryParams).then((res) => {
-    dbTableList.value = res.rows;
-    total.value = res.total;
+    dbTableList.value = res.data;
+    // total.value = res.total;
     loading.value = false;
   });
 }

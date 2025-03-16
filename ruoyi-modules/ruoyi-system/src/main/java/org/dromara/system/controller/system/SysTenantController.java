@@ -170,4 +170,18 @@ public class SysTenantController extends BaseController {
         return toAjax(tenantService.syncTenantPackage(tenantId, packageId));
     }
 
+    /**
+     * 同步租户字典 (本框架不采用多租户字典，因此关闭同步字段功能)
+     */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @Log(title = "同步租户字典", businessType = BusinessType.INSERT)
+//    @GetMapping("/syncTenantDict")
+    public R<Void> syncTenantDict() {
+        if (!TenantHelper.isEnable()) {
+            return R.fail("当前未开启租户模式");
+        }
+        tenantService.syncTenantDict();
+        return R.msg("同步租户字典成功");
+    }
+
 }

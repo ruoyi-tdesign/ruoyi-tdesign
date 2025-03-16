@@ -52,6 +52,7 @@ import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,11 +72,16 @@ import static org.dromara.workflow.common.constant.FlowConstant.*;
 @Service
 public class ActTaskServiceImpl implements IActTaskService {
 
-    private final RuntimeService runtimeService;
-    private final TaskService taskService;
-    private final HistoryService historyService;
-    private final IdentityService identityService;
-    private final ManagementService managementService;
+    @Autowired(required = false)
+    private RuntimeService runtimeService;
+    @Autowired(required = false)
+    private TaskService taskService;
+    @Autowired(required = false)
+    private HistoryService historyService;
+    @Autowired(required = false)
+    private IdentityService identityService;
+    @Autowired(required = false)
+    private ManagementService managementService;
     private final ActTaskMapper actTaskMapper;
     private final IWfTaskBackNodeService wfTaskBackNodeService;
     private final ActHiTaskinstMapper actHiTaskinstMapper;
@@ -261,7 +267,8 @@ public class ActTaskServiceImpl implements IActTaskService {
         String userId = String.valueOf(LoginHelper.getUserId());
         queryWrapper.eq("t.business_status_", BusinessStatusEnum.WAITING.getStatus());
         queryWrapper.eq(TenantHelper.isEnable(), "t.tenant_id_", TenantHelper.getTenantId());
-        queryWrapper.and(w1 -> w1.eq("t.assignee_", userId).or(w2 -> w2.isNull("t.assignee_").apply("exists ( select LINK.ID_ from ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = t.ID_ and LINK.TYPE_ = 'candidate' " + "and (LINK.USER_ID_ = {0} or ( LINK.GROUP_ID_ IN " + getInParam(roleIds) + " ) ))", userId)));
+        String ids = StreamUtils.join(roleIds, x -> "'" + x + "'");
+        queryWrapper.and(w1 -> w1.eq("t.assignee_", userId).or(w2 -> w2.isNull("t.assignee_").apply("exists ( select LINK.ID_ from ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = t.ID_ and LINK.TYPE_ = 'candidate' and (LINK.USER_ID_ = {0} or ( LINK.GROUP_ID_ IN (" + ids + ") ) ))", userId)));
         if (StringUtils.isNotBlank(taskBo.getName())) {
             queryWrapper.like("t.name_", taskBo.getName());
         }
@@ -271,6 +278,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         if (StringUtils.isNotBlank(taskBo.getProcessDefinitionKey())) {
             queryWrapper.eq("t.processDefinitionKey", taskBo.getProcessDefinitionKey());
         }
+        queryWrapper.orderByDesc("t.CREATE_TIME_");
         Page<TaskVo> page = actTaskMapper.getTaskWaitByPage(pageQuery.build(), queryWrapper);
 
         List<TaskVo> taskList = page.getRecords();
@@ -288,19 +296,6 @@ public class ActTaskServiceImpl implements IActTaskService {
             }
         }
         return TableDataInfo.build(page);
-    }
-
-    private String getInParam(List<String> param) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("(");
-        for (int i = 0; i < param.size(); i++) {
-            sb.append("'").append(param.get(i)).append("'");
-            if (i != param.size() - 1) {
-                sb.append(",");
-            }
-        }
-        sb.append(")");
-        return sb.toString();
     }
 
     /**
@@ -373,6 +368,7 @@ public class ActTaskServiceImpl implements IActTaskService {
         queryWrapper.like(StringUtils.isNotBlank(taskBo.getProcessDefinitionName()), "t.processDefinitionName", taskBo.getProcessDefinitionName());
         queryWrapper.eq(StringUtils.isNotBlank(taskBo.getProcessDefinitionKey()), "t.processDefinitionKey", taskBo.getProcessDefinitionKey());
         queryWrapper.eq("t.assignee_", userId);
+        queryWrapper.orderByDesc("t.START_TIME_");
         Page<TaskVo> page = actTaskMapper.getTaskFinishByPage(pageQuery.build(), queryWrapper);
 
         List<TaskVo> taskList = page.getRecords();
@@ -409,6 +405,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             queryWrapper.eq("t.processDefinitionKey", taskBo.getProcessDefinitionKey());
         }
         queryWrapper.eq("t.assignee_", userId);
+        queryWrapper.orderByDesc("t.START_TIME_");
         Page<TaskVo> page = actTaskMapper.getTaskCopyByPage(pageQuery.build(), queryWrapper);
 
         List<TaskVo> taskList = page.getRecords();
@@ -697,7 +694,7 @@ public class ActTaskServiceImpl implements IActTaskService {
             if (multiInstance == null && taskList.size() > 1) {
                 List<Task> tasks = StreamUtils.filter(taskList, e -> !e.getTaskDefinitionKey().equals(task.getTaskDefinitionKey()));
                 if (CollUtil.isNotEmpty(tasks)) {
-                    actHiTaskinstMapper.deleteBatchIds(StreamUtils.toList(tasks, Task::getId));
+                    actHiTaskinstMapper.deleteByIds(StreamUtils.toList(tasks, Task::getId));
                 }
             }
 

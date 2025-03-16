@@ -83,6 +83,8 @@ export interface SysMessageTemplateVo {
   updateTime?: any;
   /** 创建时间 */
   createTime?: any;
+  /** 支持平台标识 */
+  supplierType?: string;
 }
 
 /** 模板测试 */

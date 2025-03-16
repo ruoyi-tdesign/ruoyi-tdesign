@@ -41,7 +41,7 @@ public interface GenConstants {
     /**
      * 数据库数字类型
      */
-    String[] COLUMN_TYPE_NUMBER = {"tinyint", "smallint", "mediumint", "int", "number", "integer", "bit", "bigint", "float", "double", "decimal", "numeric", "real", "double precision", "smallserial", "serial", "bigserial", "money", "smallmoney"};
+    String[] COLUMN_TYPE_NUMBER = {"tinyint", "smallint", "mediumint", "int", "int2", "int4", "int8", "number", "integer", "bit", "bigint", "float", "double", "decimal", "numeric", "real", "double precision", "smallserial", "serial", "bigserial", "money", "smallmoney"};
 
     String[] COLUMN_TYPE_DOUBLE = {"float", "double", "decimal"};
 

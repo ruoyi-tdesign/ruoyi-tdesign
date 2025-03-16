@@ -1,12 +1,11 @@
 package org.dromara.system.handle.handler;
 
+import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.json.JSONUtil;
 import org.dromara.common.core.enums.CommonStatusEnum;
-import org.dromara.system.enums.MailMessageSupplierType;
-import org.dromara.system.enums.SmsMessageSupplierType;
+import org.dromara.common.core.enums.MailMessageSupplierType;
 import org.dromara.common.core.enums.MessageTypeEnum;
 import org.dromara.common.core.exception.ServiceException;
-import org.dromara.common.mail.utils.MailAccount;
 import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.system.domain.SysMessageConfig;
 import org.dromara.system.domain.SysMessageTemplate;

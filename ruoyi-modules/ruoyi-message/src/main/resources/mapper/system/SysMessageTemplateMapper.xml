@@ -9,9 +9,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap id="SysMessageTemplateResultVo" autoMapping="true" type="org.dromara.system.domain.vo.SysMessageTemplateVo">
     </resultMap>
 
-    <sql id="selectSysMessageTemplateVo">
+    <sql id="selectSysMessageTemplate">
         select smt.message_template_id, smt.template_name, smt.message_config_id, smt.message_key_id, smt.message_key, smt.message_type, smt.template_mode, smt.title, smt.signature, smt.template_id, smt.content, smt.vars_json, smt.status, smt.remark, smt.create_dept, smt.update_by, smt.create_by, smt.update_time, smt.create_time from sys_message_template smt
     </sql>
+    <sql id="selectSysMessageTemplateVo">
+        select smt.message_template_id, smt.template_name, smt.message_config_id, smt.message_key_id, smt.message_key, smt.message_type, smt.template_mode, smt.title, smt.signature, smt.template_id, smt.content, smt.vars_json, smt.status, smt.remark, smt.create_dept, smt.update_by, smt.create_by, smt.update_time, smt.create_time, (select supplier_type from sys_message_config where message_config_id = smt.message_config_id) as supplier_type from sys_message_template smt
+    </sql>
+    <select id="queryById" resultMap="SysMessageTemplateResultVo">
+        <include refid="selectSysMessageTemplateVo"/>
+        where smt.message_template_id = #{messageTemplateId}
+    </select>
     <select id="queryList" parameterType="org.dromara.system.domain.query.SysMessageTemplateQuery" resultMap="SysMessageTemplateResultVo">
         <include refid="selectSysMessageTemplateVo"/>
         <where>

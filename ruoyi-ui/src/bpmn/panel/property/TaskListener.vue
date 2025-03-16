@@ -115,7 +115,7 @@ const selectRow = ref<TaskListenerVO | null>();
 const formDialog = useDialog({
   title: selectRow.value ? '编辑&保存' : '新增&保存',
 });
-const { showConfig, elementType, updateProperties } = usePanel({
+const { updateProperties } = usePanel({
   element: toRaw(props.element),
 });
 const { getModdle } = useModelerStore();

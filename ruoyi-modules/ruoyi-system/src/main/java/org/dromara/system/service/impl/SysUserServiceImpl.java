@@ -51,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 用户 业务层处理
@@ -477,17 +478,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      */
     private void insertUserRole(Long userId, Long[] roleIds, boolean clear) {
         if (ArrayUtil.isNotEmpty(roleIds)) {
-            // 判断是否具有此角色的操作权限
-            List<SysRoleVo> roles = roleMapper.queryList(new SysRoleQuery());
-            if (CollUtil.isEmpty(roles)) {
-                throw new ServiceException("没有权限访问角色的数据");
-            }
-            List<Long> roleList = StreamUtils.toList(roles, SysRoleVo::getRoleId);
+            List<Long> roleList = new ArrayList<>(List.of(roleIds));
             if (!LoginHelper.isSuperAdmin(userId)) {
                 roleList.remove(UserConstants.SUPER_ADMIN_ID);
             }
-            List<Long> canDoRoleList = StreamUtils.filter(List.of(roleIds), roleList::contains);
-            if (CollUtil.isEmpty(canDoRoleList)) {
+            // 判断是否具有此角色的操作权限
+            SysRoleQuery query = new SysRoleQuery();
+            query.setRoleIds(roleList);
+            List<SysRoleVo> roles = roleMapper.queryList(query);
+            if (CollUtil.isEmpty(roles)) {
                 throw new ServiceException("没有权限访问角色的数据");
             }
             if (clear) {
@@ -495,7 +494,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
             }
             // 新增用户与角色管理
-            List<SysUserRole> list = StreamUtils.toList(canDoRoleList, roleId -> {
+            List<SysUserRole> list = StreamUtils.toList(roleList, roleId -> {
                 SysUserRole ur = new SysUserRole();
                 ur.setUserId(userId);
                 ur.setRoleId(roleId);
@@ -549,7 +548,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 删除用户与岗位表
         userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().in(SysUserPost::getUserId, ids));
         // 防止更新失败导致的数据删除
-        int flag = baseMapper.deleteBatchIds(ids);
+        int flag = baseMapper.deleteByIds(ids);
         if (flag < 1) {
             throw new ServiceException("删除用户失败!");
         }
@@ -646,23 +645,77 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return ObjectUtil.isNull(sysUser) ? null : sysUser.getEmail();
     }
 
+    /**
+     * 通过用户ID查询用户列表
+     *
+     * @param userIds 用户ids
+     * @return 用户列表
+     */
     @Override
     public List<UserDTO> selectListByIds(List<Long> userIds) {
         if (CollUtil.isEmpty(userIds)) {
             return List.of();
         }
         List<SysUserVo> list = baseMapper.selectVoList(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName)
+            .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName, SysUser::getEmail, SysUser::getPhonenumber)
             .eq(SysUser::getStatus, NormalDisableEnum.NORMAL.getCode())
-            .in(CollUtil.isNotEmpty(userIds), SysUser::getUserId, userIds));
+            .in(SysUser::getUserId, userIds));
         return BeanUtil.copyToList(list, UserDTO.class);
     }
 
+    /**
+     * 通过角色ID查询用户ID
+     *
+     * @param roleIds 角色ids
+     * @return 用户ids
+     */
     @Override
     public List<Long> selectUserIdsByRoleIds(List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return List.of();
+        }
         List<SysUserRole> userRoles = userRoleMapper.selectList(
             new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, roleIds));
         return StreamUtils.toList(userRoles, SysUserRole::getUserId);
     }
 
+    /**
+     * 通过角色ID查询用户
+     *
+     * @param roleIds 角色ids
+     * @return 用户
+     */
+    @Override
+    public List<UserDTO> selectUsersByRoleIds(List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return List.of();
+        }
+
+        // 通过角色ID获取用户角色信息
+        List<SysUserRole> userRoles = userRoleMapper.selectList(
+            new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, roleIds));
+
+        // 获取用户ID列表
+        Set<Long> userIds = StreamUtils.toSet(userRoles, SysUserRole::getUserId);
+
+        return selectListByIds(new ArrayList<>(userIds));
+    }
+
+    /**
+     * 通过部门ID查询用户
+     *
+     * @param deptIds 部门ids
+     * @return 用户
+     */
+    @Override
+    public List<UserDTO> selectUsersByDeptIds(List<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return List.of();
+        }
+        List<SysUserVo> list = baseMapper.selectVoList(new LambdaQueryWrapper<SysUser>()
+            .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName, SysUser::getEmail, SysUser::getPhonenumber)
+            .eq(SysUser::getStatus, NormalDisableEnum.NORMAL.getCode())
+            .in(SysUser::getDeptId, deptIds));
+        return BeanUtil.copyToList(list, UserDTO.class);
+    }
 }

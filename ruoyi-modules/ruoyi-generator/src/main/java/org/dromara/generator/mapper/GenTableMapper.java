@@ -27,22 +27,6 @@ public interface GenTableMapper extends BaseMapperPlus<GenTable, GenTableVo> {
     List<GenTableVo> queryList(GenTableQuery query);
 
     /**
-     * 查询数据库列表
-     *
-     * @param query 查询条件
-     * @return 数据库表集合
-     */
-    List<GenTableVo> selectDbTableList(GenTableQuery query);
-
-    /**
-     * 查询数据库列表
-     *
-     * @param tableNames 表名称组
-     * @return 数据库表集合
-     */
-    List<GenTableVo> selectDbTableListByNames(String[] tableNames);
-
-    /**
      * 查询所有表信息
      *
      * @return 表信息集合
@@ -66,10 +50,12 @@ public interface GenTableMapper extends BaseMapperPlus<GenTable, GenTableVo> {
     GenTableVo selectGenTableByName(@Param("tableName") String tableName);
 
     /**
-     * 查询表名列表
+     * 查询指定数据源下的所有表名列表
      *
-     * @param dataName 数据源
-     * @return
+     * @param dataName 数据源名称，用于选择不同的数据源
+     * @return 当前数据库中的表名列表
+     *
+     * @DS("") 使用默认数据源执行查询操作
      */
     @DS("")
     List<String> selectTableNameList(@Param("dataName") String dataName);

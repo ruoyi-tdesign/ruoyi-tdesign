@@ -1,5 +1,7 @@
 package org.dromara.common.tenant.manager;
 
+import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
@@ -12,6 +14,7 @@ import org.springframework.cache.Cache;
  *
  * @author Lion Li
  */
+@Slf4j
 public class TenantSpringCacheManager extends PlusSpringCacheManager {
 
     public TenantSpringCacheManager() {
@@ -19,6 +22,9 @@ public class TenantSpringCacheManager extends PlusSpringCacheManager {
 
     @Override
     public Cache getCache(String name) {
+        if (InterceptorIgnoreHelper.willIgnoreTenantLine("")) {
+            return super.getCache(name);
+        }
         if (StringUtils.contains(name, GlobalConstants.GLOBAL_REDIS_KEY) || TenantHelper.isIgnoreCache()) {
             return super.getCache(name);
         }

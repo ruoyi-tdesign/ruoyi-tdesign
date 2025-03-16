@@ -22,4 +22,9 @@ public class NoticeInsertEvent implements Serializable {
      * 通知标题
      */
     private String title;
+
+    /**
+     * 通知用户类型
+     */
+    private String loginType;
 }

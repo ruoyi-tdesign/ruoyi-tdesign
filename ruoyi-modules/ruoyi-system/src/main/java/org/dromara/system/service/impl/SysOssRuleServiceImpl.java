@@ -238,7 +238,7 @@ public class SysOssRuleServiceImpl extends ServiceImpl<SysOssRuleMapper, SysOssR
                 }).toList();
 
             // 设置覆盖默认字段值
-            Optional<SysOssRule> overwriteRuleOpt = StreamUtils.findFirst(list, o -> YesNoEnum.YES.getCodeStr().equals(o.getIsOverwrite()));
+            Optional<SysOssRule> overwriteRuleOpt = StreamUtils.findFirstOptional(list, o -> YesNoEnum.YES.getCodeStr().equals(o.getIsOverwrite()));
             String realUrl = url;
             // 如果存在覆盖默认字段值规则，则覆盖默认值
             HashMap<String, Object> urlVariable = getUrlVariable(url);

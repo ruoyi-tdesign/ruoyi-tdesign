@@ -162,6 +162,17 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     }
 
     /**
+     * 通过部门ID查询岗位使用数量
+     *
+     * @param deptId 部门id
+     * @return 结果
+     */
+    @Override
+    public long countPostByDeptId(Long deptId) {
+        return baseMapper.selectCount(new LambdaQueryWrapper<SysPost>().eq(SysPost::getDeptId, deptId));
+    }
+
+    /**
      * 删除岗位信息
      *
      * @param postId 岗位ID
@@ -186,7 +197,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
                 throw new ServiceException(String.format("%1$s已分配，不能删除!", post.getPostName()));
             }
         }
-        return baseMapper.deleteBatchIds(Arrays.asList(postIds));
+        return baseMapper.deleteByIds(Arrays.asList(postIds));
     }
 
     /**

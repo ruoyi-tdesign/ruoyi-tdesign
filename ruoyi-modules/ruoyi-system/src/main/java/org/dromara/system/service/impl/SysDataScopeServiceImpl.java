@@ -2,6 +2,7 @@ package org.dromara.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.system.service.ISysDataScopeService;
@@ -26,24 +27,44 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * 获取角色自定义权限
+     *
+     * @param roleId 角色Id
+     * @return 部门Id组
+     */
     @Override
     public String getRoleCustom(Long roleId) {
+        if (ObjectUtil.isNull(roleId)) {
+            return "-1";
+        }
+        // 此处使用jdbc防止与pagehelper插件冲突
         List<Long> deptIds = jdbcTemplate.queryForList("select dept_id from sys_role_dept srd where srd.role_id = ?", Long.class, roleId);
         if (CollUtil.isNotEmpty(deptIds)) {
             return deptIds.stream().map(Convert::toStr).collect(Collectors.joining(","));
         }
-        return null;
+        return "-1";
     }
 
+    /**
+     * 获取部门及以下权限
+     *
+     * @param deptId 部门Id
+     * @return 部门Id组
+     */
     @Override
     public String getDeptAndChild(Long deptId) {
+        if (ObjectUtil.isNull(deptId)) {
+            return "-1";
+        }
+        // 此处使用jdbc防止与pagehelper插件冲突
         List<Long> ids = jdbcTemplate.queryForList("select dept_id from sys_dept sd where " + DataBaseHelper.findInSet(deptId, "ancestors"), Long.class);
         ids.add(deptId);
 
         if (CollUtil.isNotEmpty(ids)) {
             return StreamUtils.join(ids, Convert::toStr);
         }
-        return null;
+        return "-1";
     }
 
 }

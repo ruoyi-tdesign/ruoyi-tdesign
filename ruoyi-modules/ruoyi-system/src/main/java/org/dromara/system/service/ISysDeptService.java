@@ -40,15 +40,6 @@ public interface ISysDeptService extends IService<SysDept> {
     List<Tree<Long>> buildDeptTreeSelect(List<SysDeptVo> depts);
 
     /**
-     * 查询部门名称
-     *
-     * @param deptIds   多个部门id
-     * @param separator 分隔符
-     * @return
-     */
-    String selectDeptNameByDeptIds(List<Long> deptIds, CharSequence separator);
-
-    /**
      * 根据角色ID查询部门树信息
      *
      * @param roleId 角色ID
@@ -103,14 +94,6 @@ public interface ISysDeptService extends IService<SysDept> {
      * @return 结果
      */
     boolean checkDeptNameUnique(SysDeptBo dept);
-
-    /**
-     * 校验部门类别编码是否唯一
-     *
-     * @param dept 部门信息
-     * @return 结果
-     */
-    boolean checkDeptCategoryUnique(SysDeptBo dept);
 
     /**
      * 校验部门是否有数据权限

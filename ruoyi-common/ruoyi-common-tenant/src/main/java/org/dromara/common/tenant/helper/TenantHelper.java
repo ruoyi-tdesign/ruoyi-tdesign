@@ -2,7 +2,6 @@ package org.dromara.common.tenant.helper;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.hutool.core.convert.Convert;
-import com.alibaba.ttl.TransmittableThreadLocal;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +36,13 @@ public class TenantHelper {
     // 动态租户的缓存key
     private static final String DYNAMIC_TENANT_KEY = GlobalConstants.GLOBAL_REDIS_KEY + "dynamicTenant";
     // 临时动态租户，可重入可动态切换
-    private static final ThreadLocal<Deque<String>> TEMP_DYNAMIC_TENANT = TransmittableThreadLocal.withInitial(ArrayDeque::new);
+    private static final ThreadLocal<Deque<String>> TEMP_DYNAMIC_TENANT = InheritableThreadLocal.withInitial(ArrayDeque::new);
     // 忽略缓存
-    private static final ThreadLocal<Boolean> IGNORE_CACHE_TENANT = new TransmittableThreadLocal<>();
+    private static final ThreadLocal<Boolean> IGNORE_CACHE_TENANT = new InheritableThreadLocal<>();
     // 忽略租户db重入计数,防止重入调用提前关闭租户
-    private static final ThreadLocal<AtomicInteger> HEAVY_ENTRY_IGNORE_DB_TENANT = TransmittableThreadLocal.withInitial(() -> new AtomicInteger(0));
+    private static final ThreadLocal<AtomicInteger> HEAVY_ENTRY_IGNORE_DB_TENANT = InheritableThreadLocal.withInitial(() -> new AtomicInteger(0));
     // 忽略租户缓存重入计数,防止重入调用提前关闭租户
-    private static final ThreadLocal<AtomicInteger> HEAVY_ENTRY_IGNORE_CACHE_TENANT = TransmittableThreadLocal.withInitial(() -> new AtomicInteger(0));
+    private static final ThreadLocal<AtomicInteger> HEAVY_ENTRY_IGNORE_CACHE_TENANT = InheritableThreadLocal.withInitial(() -> new AtomicInteger(0));
 
     /**
      * 是否启用了缓存忽略租户

@@ -12,7 +12,7 @@
 - 增加自动导入vue、vue-router、pinia类型
 - 代码生成支持修改表名称
 - 个人头像支持选择我的文件上传
-- 新增敏感词功能、代码生成新增导入功能、RedisUtils工具新增ZSet by @yixiaco in [#76](https://github.com/yixiaco/ruoyi-tdesign/pull/76)
+- 新增敏感词功能、代码生成新增导入功能、RedisUtils工具新增ZSet by @yixiaco in [#76](https://github.com/ruoyi-tdesign/ruoyi-tdesign/pull/76)
 - 新增StreamUtils工具方法
 - 新增集合的两次分组后的值操作转为List和Set
 ### 🔥 Performance
@@ -33,22 +33,22 @@
 - 修复README单词拼写错误
 - 修复了无法清空用户岗位的问题
 - 修复nginx匹配location优先级过高导致正则不生效问题
-- 通知中心消息多解决溢出的情况 添加固定高度 by @WWTBNBWN in [#72](https://github.com/yixiaco/ruoyi-tdesign/pull/72)
+- 通知中心消息多解决溢出的情况 添加固定高度 by @WWTBNBWN in [#72](https://github.com/ruoyi-tdesign/ruoyi-tdesign/pull/72)
 - td描述组件新增tableLayout属性，并修改为原默认行为"auto"
 - 修复个人中心手机号、邮箱为空时修改报错；修复租户联系电话前端没校验问题
-- 修改接口权限代码错误问题-获取系统访问记录详细信息 by @WWTBNBWN in [#71](https://github.com/yixiaco/ruoyi-tdesign/pull/71)
+- 修改接口权限代码错误问题-获取系统访问记录详细信息 by @WWTBNBWN in [#71](https://github.com/ruoyi-tdesign/ruoyi-tdesign/pull/71)
 - 修复SaSecurityContext方法名错误
 - 修复RedisLockUtil问题
 - 修复TransactionalEventPublisher发送commit事件执行两次、beforeCommit未执行回调
 - 修复MultipleLoginBaseHelper更新用户方法可能引起报错问题
 - 数据库枚举类型字段导入报错
 - 修复代码生成设置动态数据库没生效问题
-- 修复普通角色查询菜单报错问题 by @yixiaco in [#67](https://github.com/yixiaco/ruoyi-tdesign/pull/67)
+- 修复普通角色查询菜单报错问题 by @yixiaco in [#67](https://github.com/ruoyi-tdesign/ruoyi-tdesign/pull/67)
 - 修复国际化提示问题，前端切换语言时，服务端也需要切换
 - 多租户忽略检验兼容分页插件写法
 - powerJob表名错误问题
-- 修复MapStructPlus 1.4.0版本在对象属性为List发生复制时的报错问题 by @yixiaco in [#65](https://github.com/yixiaco/ruoyi-tdesign/pull/65)
-- TaskExecutorBuilder过期的问题，使用ThreadPoolTaskExecutorBuilder替换 by @WWTBNBWN in [#69](https://github.com/yixiaco/ruoyi-tdesign/pull/69)
+- 修复MapStructPlus 1.4.0版本在对象属性为List发生复制时的报错问题 by @yixiaco in [#65](https://github.com/ruoyi-tdesign/ruoyi-tdesign/pull/65)
+- TaskExecutorBuilder过期的问题，使用ThreadPoolTaskExecutorBuilder替换 by @WWTBNBWN in [#69](https://github.com/ruoyi-tdesign/ruoyi-tdesign/pull/69)
 ### 🏡 Chore
 - remove npm lock file ignore
 - 补充弹窗内容最大高度样式
@@ -93,7 +93,7 @@
 - Upgrade to vue-tsc@^2.0.29
 - remove @vue/compiler-sfc
 ## 🎉New Contributors
-* @WWTBNBWN made their first contribution in [#69](https://github.com/yixiaco/ruoyi-tdesign/pull/69)
+* @WWTBNBWN made their first contribution in [#69](https://github.com/ruoyi-tdesign/ruoyi-tdesign/pull/69)
 
 ## 🌈 1.3.0 `2024-4-13`
 > 本次更新需要执行`update_1.2.0-1.3.0.sql`脚本<br>

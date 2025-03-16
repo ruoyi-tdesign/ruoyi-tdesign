@@ -141,8 +141,9 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
     @Override
     public List<OssDTO> selectByIds(String ossIds) {
         List<OssDTO> list = new ArrayList<>();
+        SysOssServiceImpl ossService = SpringUtils.getAopProxy(this);
         for (Long id : StringUtils.splitTo(ossIds, Convert::toLong)) {
-            SysOssVo vo = SpringUtils.getAopProxy(this).getById(id);
+            SysOssVo vo = ossService.getById(id);
             if (ObjectUtil.isNotNull(vo)) {
                 try {
                     vo.setUrl(this.matchingUrl(vo).getUrl());
@@ -206,7 +207,7 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
         OssClient storage = OssFactory.instance();
         UploadResult uploadResult;
         try {
-            uploadResult = storage.uploadSuffix(file.getBytes(), suffix);
+            uploadResult = storage.uploadSuffix(file.getBytes(), suffix, file.getContentType());
         } catch (IOException e) {
             throw new ServiceException(e.getMessage());
         }
@@ -313,11 +314,11 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
         if (exists) {
             throw new ServiceException("加锁文件必须解锁后才能删除");
         }
-        List<SysOss> list = baseMapper.selectBatchIds(ids);
+        List<SysOss> list = baseMapper.selectByIds(ids);
         for (SysOss oss : list) {
             CacheUtils.evict(CacheNames.SYS_OSS, oss.getOssId());
         }
-        boolean b = removeBatchByIds(ids);
+        boolean b = removeByIds(ids);
         if (b) {
             removeRealOss(list);
         }

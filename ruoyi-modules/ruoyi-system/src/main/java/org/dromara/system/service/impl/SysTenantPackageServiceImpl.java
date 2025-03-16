@@ -1,5 +1,6 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.dromara.common.core.enums.NormalDisableEnum;
@@ -98,6 +99,17 @@ public class SysTenantPackageServiceImpl extends ServiceImpl<SysTenantPackageMap
     }
 
     /**
+     * 校验套餐名称是否唯一
+     */
+    @Override
+    public boolean checkPackageNameUnique(SysTenantPackageBo bo) {
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysTenantPackage>()
+            .eq(SysTenantPackage::getPackageName, bo.getPackageName())
+            .ne(ObjectUtil.isNotNull(bo.getPackageId()), SysTenantPackage::getPackageId, bo.getPackageId()));
+        return !exist;
+    }
+
+    /**
      * 修改套餐状态
      *
      * @param bo 套餐信息
@@ -121,7 +133,7 @@ public class SysTenantPackageServiceImpl extends ServiceImpl<SysTenantPackageMap
                 throw new ServiceException("租户套餐已被使用");
             }
         }
-        return baseMapper.deleteBatchIds(ids) > 0;
+        return baseMapper.deleteByIds(ids) > 0;
     }
 
     /**

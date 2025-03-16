@@ -17,6 +17,7 @@ import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.domain.query.SysDeptQuery;
 import org.dromara.system.domain.vo.SysDeptVo;
 import org.dromara.system.service.ISysDeptService;
+import org.dromara.system.service.ISysPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,8 @@ public class SysDeptController extends BaseController {
 
     @Autowired
     private ISysDeptService deptService;
+    @Autowired
+    private ISysPostService postService;
 
     /**
      * 获取部门列表
@@ -92,8 +95,6 @@ public class SysDeptController extends BaseController {
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysDeptBo dept) {
         if (!deptService.checkDeptNameUnique(dept)) {
             return R.fail("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
-        } else if (StringUtils.isNotBlank(dept.getDeptCategory()) && !deptService.checkDeptCategoryUnique(dept)) {
-            return R.fail("新增部门'" + dept.getDeptName() + "'失败，部门类别编码已存在");
         }
         return toAjax(deptService.insertDept(dept));
     }
@@ -109,8 +110,6 @@ public class SysDeptController extends BaseController {
         deptService.checkDeptDataScope(deptId);
         if (!deptService.checkDeptNameUnique(dept)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
-        } else if (StringUtils.isNotBlank(dept.getDeptCategory()) && !deptService.checkDeptCategoryUnique(dept)) {
-            return R.fail("修改部门'" + dept.getDeptName() + "'失败，部门类别编码已存在");
         } else if (dept.getParentId().equals(deptId)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
         } else if (StringUtils.equals(NormalDisableEnum.DISABLE.getCode(), dept.getStatus())) {
@@ -137,6 +136,9 @@ public class SysDeptController extends BaseController {
         }
         if (deptService.checkDeptExistUser(deptId)) {
             return R.warn("部门存在用户,不允许删除");
+        }
+        if (postService.countPostByDeptId(deptId) > 0) {
+            return R.warn("部门存在岗位,不允许删除");
         }
         deptService.checkDeptDataScope(deptId);
         return toAjax(deptService.deleteDeptById(deptId));

@@ -5,3 +5,7 @@ UPDATE sys_post SET dept_id = 103 where post_id = 1;
 delete from sys_menu where menu_id in (120,114);
 insert into sys_menu values('120',  '任务调度中心',  '2',   '6',  'snailjob',     'monitor/snailjob/index', null,        '', 0, 1, 'C', '1', '1', 'monitor:snailjob:list', 'video',           null, '!getProperty(''snail-job.enabled'')', 103, 1, sysdate(), null, null, 'SnailJob控制台菜单');
 UPDATE sys_menu SET menu_name = '文件管理' WHERE menu_id = 1510;
+
+-- 删除消息类型、消息支持平台字典
+delete from sys_dict_type where dict_type in ('sys_message_type', 'sys_message_supplier_type');
+delete from sys_dict_data where dict_type in ('sys_message_type', 'sys_message_supplier_type');

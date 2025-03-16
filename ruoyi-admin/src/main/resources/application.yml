@@ -151,6 +151,7 @@ sa-token:
       token-prefix: "Bearer"
       match:
         - /user/**
+        - /resource/**
 
 # security配置
 security:
@@ -167,9 +168,6 @@ security:
     # swagger 文档配置
     - /*/api-docs
     - /*/api-docs/**
-    # actuator 监控配置
-    - /actuator
-    - /actuator/**
 
 # 多租户配置
 tenant:
@@ -284,9 +282,13 @@ xss:
   # 过滤开关
   enabled: true
   # 排除链接（多个用逗号分隔）
-  excludes: /system/notice,/system/config/**,/system/messageTemplate,/system/messageConfig
-  # 匹配链接
-  urlPatterns: /system/*,/monitor/*,/tool/*
+  excludeUrls:
+    - /system/notice
+    - /workflow/model/save
+    - /workflow/model/editModelXml
+    - /system/config/**
+    - /system/messageTemplate
+    - /system/messageConfig
 
 # 全局线程池相关配置
 # 如使用JDK21请直接使用虚拟线程 不要开启此配置
@@ -317,10 +319,14 @@ management:
     logfile:
       external-file: ./logs/${ruoyi.name}-console.log
 
+--- # 默认/推荐使用sse推送
+sse:
+  enabled: true
+
 --- # websocket
 websocket:
   # 如果关闭 需要和前端开关一起关闭
-  enabled: true
+  enabled: false
   multiple:
     login:
       # 路径
@@ -334,6 +340,10 @@ sms:
 
 --- #flowable配置
 flowable:
+  # 开关 用于启动/停用工作流
+  enabled: true
+  process.enabled: ${flowable.enabled}
+  eventregistry.enabled: ${flowable.enabled}
   async-executor-activate: false #关闭定时任务JOB
   #  将databaseSchemaUpdate设置为true。当Flowable发现库与数据库表结构不一致时，会自动将数据库表结构升级至新版本。
   database-schema-update: true

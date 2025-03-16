@@ -40,7 +40,7 @@ public class WfFormManageServiceImpl extends ServiceImpl<WfFormManageMapper, WfF
 
     @Override
     public List<WfFormManageVo> queryByIds(List<Long> ids) {
-        return baseMapper.selectVoBatchIds(ids);
+        return baseMapper.selectVoByIds(ids);
     }
 
     /**
@@ -95,6 +95,6 @@ public class WfFormManageServiceImpl extends ServiceImpl<WfFormManageMapper, WfF
      */
     @Override
     public Boolean deleteByIds(Collection<Long> ids) {
-        return baseMapper.deleteBatchIds(ids) > 0;
+        return baseMapper.deleteByIds(ids) > 0;
     }
 }

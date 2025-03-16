@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import org.dromara.common.core.enums.CommonStatusEnum;
 import org.dromara.sms4j.qiniu.config.QiNiuConfig;
 import org.dromara.sms4j.qiniu.config.QiNiuFactory;
-import org.dromara.system.enums.SmsMessageSupplierType;
+import org.dromara.common.core.enums.SmsMessageSupplierType;
 import org.dromara.common.core.enums.MessageTemplateMode;
 import org.dromara.common.core.enums.MessageTypeEnum;
 import org.dromara.common.core.exception.ServiceException;

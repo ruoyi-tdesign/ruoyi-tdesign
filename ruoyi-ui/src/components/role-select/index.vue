@@ -105,7 +105,6 @@ defineOptions({
   name: 'RoleSelect',
 });
 
-import cloneDeep from 'lodash/cloneDeep';
 import { RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
 import type { PageInfo, PrimaryTableCol, TableProps, TableSort } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, type PropType, ref } from 'vue';

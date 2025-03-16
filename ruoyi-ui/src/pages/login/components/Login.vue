@@ -100,7 +100,7 @@
     </div>
     <div style="display: flex; justify-content: flex-end; flex-direction: row">
       <t-button shape="circle" variant="outline" title="微信登录" @click="doSocialLogin('wechat_open')">
-        <logo-wechat-icon style="color: #1aad19" />
+        <logo-wechat-stroke-filled-icon style="color: #1aad19" />
       </t-button>
       <t-button shape="circle" variant="outline" title="QQ登录" @click="doSocialLogin('qq')">
         <logo-qq-icon />
@@ -129,7 +129,7 @@ import {
   LockOnIcon,
   LogoGithubFilledIcon,
   LogoQqIcon,
-  LogoWechatIcon,
+  LogoWechatStrokeFilledIcon,
   MobileIcon,
   RefreshIcon,
   SecuredIcon,

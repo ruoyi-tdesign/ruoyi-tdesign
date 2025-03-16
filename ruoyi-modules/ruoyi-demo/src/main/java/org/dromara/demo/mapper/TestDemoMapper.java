@@ -11,6 +11,7 @@ import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.demo.domain.TestDemo;
 import org.dromara.demo.domain.vo.TestDemoVo;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,16 +37,17 @@ public interface TestDemoMapper extends BaseMapperPlus<TestDemo, TestDemoVo> {
     List<TestDemo> selectList(IPage<TestDemo> page, @Param(Constants.WRAPPER) Wrapper<TestDemo> queryWrapper);
 
     @Override
-    @DataPermission({
+    @DataPermission(value = {
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "user_id")
+    }, joinStr = "AND")
+    List<TestDemo> selectByIds(@Param(Constants.COLL) Collection<? extends Serializable> idList);
+
+    @Override
+    @DataPermission(value = {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
     })
     int updateById(@Param(Constants.ENTITY) TestDemo entity);
 
-    @Override
-    @DataPermission({
-        @DataColumn(key = "deptName", value = "dept_id"),
-        @DataColumn(key = "userName", value = "user_id")
-    })
-    int deleteBatchIds(@Param(Constants.COLL) Collection<?> idList);
 }

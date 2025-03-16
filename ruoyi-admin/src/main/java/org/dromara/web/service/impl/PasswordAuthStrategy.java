@@ -98,7 +98,7 @@ public class PasswordAuthStrategy implements IAuthStrategy<PasswordLoginBody> {
      * @param uuid     唯一标识
      */
     private void validateCaptcha(String tenantId, Long userId, String username, String code, String uuid) {
-        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
+        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.blankToDefault(uuid, "");
         String captcha = RedisUtils.getObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {

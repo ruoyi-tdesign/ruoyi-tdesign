@@ -99,29 +99,6 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     }
 
     /**
-     * 查询部门名称
-     *
-     * @param deptIds   多个部门id
-     * @param separator 分隔符
-     * @return
-     */
-    @Override
-    public String selectDeptNameByDeptIds(List<Long> deptIds, CharSequence separator) {
-        if (CollUtil.isEmpty(deptIds)) {
-            return null;
-        }
-        List<SysDept> deptList = lambdaQuery()
-            .select(SysDept::getDeptId, SysDept::getDeptName)
-            .in(SysDept::getDeptId, deptIds)
-            .list();
-        Map<Long, SysDept> identityMap = StreamUtils.toIdentityMap(deptList, SysDept::getDeptId);
-        return deptIds.stream().map(identityMap::get)
-            .filter(Objects::nonNull)
-            .map(SysDept::getDeptName)
-            .collect(Collectors.joining(separator));
-    }
-
-    /**
      * 根据角色ID查询部门树信息
      *
      * @param roleId 角色ID
@@ -142,7 +119,14 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     @Cacheable(cacheNames = CacheNames.SYS_DEPT, key = "#deptId")
     @Override
     public SysDeptVo selectDeptById(Long deptId) {
-        return baseMapper.queryVoById(deptId);
+        SysDeptVo dept = baseMapper.selectVoById(deptId);
+        if (ObjectUtil.isNull(dept)) {
+            return null;
+        }
+        SysDeptVo parentDept = baseMapper.selectVoOne(new LambdaQueryWrapper<SysDept>()
+            .select(SysDept::getDeptName).eq(SysDept::getDeptId, dept.getParentId()));
+        dept.setParentName(ObjectUtil.isNotNull(parentDept) ? parentDept.getDeptName() : null);
+        return dept;
     }
 
     @Override
@@ -225,20 +209,6 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     }
 
     /**
-     * 校验部门类别编码是否唯一
-     *
-     * @param dept 部门信息
-     * @return 结果
-     */
-    @Override
-    public boolean checkDeptCategoryUnique(SysDeptBo dept) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDept>()
-            .eq(SysDept::getDeptCategory, dept.getDeptCategory())
-            .ne(ObjectUtil.isNotNull(dept.getDeptId()), SysDept::getDeptId, dept.getDeptId()));
-        return !exist;
-    }
-
-    /**
      * 校验部门是否有数据权限
      *
      * @param deptId 部门id
@@ -284,13 +254,19 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     @Override
     public int updateDept(SysDeptBo bo) {
         SysDept dept = MapstructUtils.convert(bo, SysDept.class);
-        SysDept newParentDept = baseMapper.selectById(dept.getParentId());
         SysDept oldDept = baseMapper.selectById(dept.getDeptId());
-        if (ObjectUtil.isNotNull(newParentDept) && ObjectUtil.isNotNull(oldDept)) {
-            String newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
-            String oldAncestors = oldDept.getAncestors();
-            dept.setAncestors(newAncestors);
-            updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
+        if (!oldDept.getParentId().equals(dept.getParentId())) {
+            // 如果是新父部门 则校验是否具有新父部门权限 避免越权
+            this.checkDeptDataScope(dept.getParentId());
+            SysDept newParentDept = baseMapper.selectById(dept.getParentId());
+            if (ObjectUtil.isNotNull(newParentDept) && ObjectUtil.isNotNull(oldDept)) {
+                String newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
+                String oldAncestors = oldDept.getAncestors();
+                dept.setAncestors(newAncestors);
+                updateDeptChildren(dept.getDeptId(), newAncestors, oldAncestors);
+            }
+        } else {
+            dept.setAncestors(oldDept.getAncestors());
         }
         int result = baseMapper.updateById(dept);
         if (NormalDisableEnum.NORMAL.getCode().equals(dept.getStatus()) && StringUtils.isNotEmpty(dept.getAncestors())

@@ -96,7 +96,7 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
         baseMapper.delete(new LambdaQueryWrapper<WfDefinitionConfig>().eq(WfDefinitionConfig::getTableName, bo.getTableName()));
         add.setTableName(add.getTableName().toLowerCase());
         boolean flag = baseMapper.insertOrUpdate(add);
-        if (baseMapper.insertOrUpdate(add)) {
+        if (flag) {
             bo.setId(add.getId());
         }
         return flag;
@@ -107,7 +107,7 @@ public class WfDefinitionConfigServiceImpl implements IWfDefinitionConfigService
      */
     @Override
     public Boolean deleteByIds(Collection<Long> ids) {
-        return baseMapper.deleteBatchIds(ids) > 0;
+        return baseMapper.deleteByIds(ids) > 0;
     }
 
     @Override

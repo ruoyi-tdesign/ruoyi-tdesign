@@ -1,6 +1,5 @@
 package org.dromara.common.mybatis.helper;
 
-import com.alibaba.ttl.TransmittableThreadLocal;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 
@@ -15,12 +14,12 @@ import java.util.Map;
  */
 public class MyInterceptorIgnoreHelper extends InterceptorIgnoreHelper {
 
-    public static final ThreadLocal<Boolean> ignoreTenantLine = new TransmittableThreadLocal<>();
-    public static final ThreadLocal<Boolean> ignoreDynamicTableName = new TransmittableThreadLocal<>();
-    public static final ThreadLocal<Boolean> ignoreBlockAttack = new TransmittableThreadLocal<>();
-    public static final ThreadLocal<Boolean> ignoreIllegalSql = new TransmittableThreadLocal<>();
-    public static final ThreadLocal<Boolean> ignoreDataPermission = new TransmittableThreadLocal<>();
-    public static final ThreadLocal<Map<String, Boolean>> ignoreOthersByKey = new TransmittableThreadLocal<>();
+    public static final ThreadLocal<Boolean> ignoreTenantLine = new InheritableThreadLocal<>();
+    public static final ThreadLocal<Boolean> ignoreDynamicTableName = new InheritableThreadLocal<>();
+    public static final ThreadLocal<Boolean> ignoreBlockAttack = new InheritableThreadLocal<>();
+    public static final ThreadLocal<Boolean> ignoreIllegalSql = new InheritableThreadLocal<>();
+    public static final ThreadLocal<Boolean> ignoreDataPermission = new InheritableThreadLocal<>();
+    public static final ThreadLocal<Map<String, Boolean>> ignoreOthersByKey = new InheritableThreadLocal<>();
 
     /**
      * 设置忽略租户策略

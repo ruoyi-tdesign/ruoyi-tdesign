@@ -2,6 +2,7 @@ package org.dromara.web.service;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Header;
 import cn.hutool.http.useragent.UserAgent;
@@ -18,6 +19,7 @@ import org.dromara.common.core.domain.dto.RoleDTO;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.TenantStatus;
+import org.dromara.common.core.events.LogoutEvent;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.DateUtils;
@@ -119,6 +121,11 @@ public class SysLoginService {
         try {
             LoginUser loginUser = LoginHelper.getUser();
             if (loginUser != null) {
+                LogoutEvent event = new LogoutEvent();
+                event.setLoginType(loginUser.getLoginType());
+                event.setUserId(loginUser.getUserId());
+                event.setToken(LoginHelper.getStpLogic().getTokenValue());
+                SpringUtils.getApplicationContext().publishEvent(event);
                 // 将用户对象放到上下文缓存中
                 SaSecurityContext.setContext(loginUser);
                 if (TenantHelper.isEnable() && LoginHelper.isSuperAdmin()) {
@@ -180,12 +187,11 @@ public class SysLoginService {
         loginUser.setUserType(user.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(user.getUserId()));
         loginUser.setRolePermission(permissionService.getRolePermission(user.getUserId()));
-        SysDeptVo dept = null;
         if (ObjectUtil.isNotNull(user.getDeptId())) {
-            dept = deptService.selectDeptById(user.getDeptId());
+            Opt<SysDeptVo> deptOpt = Opt.of(user.getDeptId()).map(deptService::selectDeptById);
+            loginUser.setDeptName(deptOpt.map(SysDeptVo::getDeptName).orElse(StringUtils.EMPTY));
+            loginUser.setDeptCategory(deptOpt.map(SysDeptVo::getDeptCategory).orElse(StringUtils.EMPTY));
         }
-        loginUser.setDeptName(ObjectUtil.isNull(dept) ? "" : dept.getDeptName());
-        loginUser.setDeptCategory(ObjectUtil.isNull(dept) ? "" : dept.getDeptCategory());
         List<SysRoleVo> roles = roleService.selectRolesByUserId(user.getUserId());
         loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
         return loginUser;

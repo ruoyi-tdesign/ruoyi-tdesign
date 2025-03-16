@@ -28,12 +28,7 @@
               />
             </t-form-item>
             <t-form-item label="类别编码" name="postCategory">
-              <t-input
-                v-model="queryParams.postCategory"
-                placeholder="请输入类别编码"
-                clearable
-                @enter="handleQuery"
-              />
+              <t-input v-model="queryParams.postCategory" placeholder="请输入类别编码" clearable @enter="handleQuery" />
             </t-form-item>
             <t-form-item label="状态" name="status">
               <t-select v-model="queryParams.status" placeholder="岗位状态" clearable style="width: 200px">

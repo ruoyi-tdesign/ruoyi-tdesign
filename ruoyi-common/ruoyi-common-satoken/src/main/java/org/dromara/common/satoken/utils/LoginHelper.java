@@ -2,6 +2,7 @@ package org.dromara.common.satoken.utils;
 
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpLogic;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -122,6 +123,13 @@ public class LoginHelper {
     }
 
     /**
+     * 获取用户账户
+     */
+    public static String getUsername() {
+        return getUserOptional().map(LoginUser::getUsername).orElse(null);
+    }
+
+    /**
      * 获取租户ID
      */
     public static String getTenantId() {
@@ -147,13 +155,6 @@ public class LoginHelper {
      */
     public static String getDeptCategory() {
         return Convert.toStr(getUserOptional().map(LoginUser::getDeptCategory));
-    }
-
-    /**
-     * 获取用户账户
-     */
-    public static String getUsername() {
-        return getUserOptional().map(LoginUser::getUsername).orElse(null);
     }
 
     /**
@@ -190,6 +191,9 @@ public class LoginHelper {
      * @return 结果
      */
     public static boolean isTenantAdmin(Set<String> rolePermission) {
+        if (CollUtil.isEmpty(rolePermission)) {
+            return false;
+        }
         return rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
     }
 

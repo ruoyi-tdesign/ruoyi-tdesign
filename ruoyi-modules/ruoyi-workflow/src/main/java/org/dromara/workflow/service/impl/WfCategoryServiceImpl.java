@@ -15,6 +15,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +31,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class WfCategoryServiceImpl extends ServiceImpl<WfCategoryMapper, WfCategory> implements IWfCategoryService {
-
-    private final RepositoryService repositoryService;
+    @Autowired(required = false)
+    private RepositoryService repositoryService;
 
     /**
      * 查询流程分类
@@ -118,7 +119,7 @@ public class WfCategoryServiceImpl extends ServiceImpl<WfCategoryMapper, WfCateg
         if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return baseMapper.deleteBatchIds(ids) > 0;
+        return baseMapper.deleteByIds(ids) > 0;
     }
 
     /**
