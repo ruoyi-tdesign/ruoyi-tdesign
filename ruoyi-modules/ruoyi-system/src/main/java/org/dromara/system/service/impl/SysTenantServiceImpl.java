@@ -192,7 +192,7 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
         String numbers = RandomUtil.randomNumbers(6);
         // 判断是否存在，如果存在则重新生成
         if (tenantIds.contains(numbers)) {
-            generateTenantId(tenantIds);
+            return generateTenantId(tenantIds);
         }
         return numbers;
     }
