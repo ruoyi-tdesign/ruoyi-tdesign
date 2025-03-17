@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerIntercept
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.redis.config.RedisConfig;
 import org.dromara.common.redis.config.properties.RedissonProperties;
+import org.dromara.common.satoken.config.SaTokenConfiguration;
 import org.dromara.common.satoken.online.OnlineUserCacheManager;
 import org.dromara.common.tenant.aspect.TenantAspect;
 import org.dromara.common.tenant.core.TenantSaTokenDao;
@@ -31,7 +32,7 @@ import org.springframework.context.annotation.Primary;
  * @author Lion Li
  */
 @EnableConfigurationProperties(TenantProperties.class)
-@AutoConfiguration(after = {RedisConfig.class})
+@AutoConfiguration(before = SaTokenConfiguration.class, after = {RedisConfig.class})
 @ConditionalOnProperty(value = "tenant.enable", havingValue = "true")
 public class TenantConfig {
 
