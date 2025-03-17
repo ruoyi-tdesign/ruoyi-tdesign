@@ -4,10 +4,8 @@ import cn.dev33.satoken.dao.SaTokenDao;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
-import org.dromara.common.mybatis.config.MybatisPlusConfig;
 import org.dromara.common.redis.config.RedisConfig;
 import org.dromara.common.redis.config.properties.RedissonProperties;
-import org.dromara.common.satoken.config.SaTokenConfiguration;
 import org.dromara.common.satoken.online.OnlineUserCacheManager;
 import org.dromara.common.tenant.aspect.TenantAspect;
 import org.dromara.common.tenant.core.TenantSaTokenDao;
@@ -20,7 +18,7 @@ import org.redisson.config.ClusterServersConfig;
 import org.redisson.config.SingleServerConfig;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
@@ -33,13 +31,13 @@ import org.springframework.context.annotation.Primary;
  * @author Lion Li
  */
 @EnableConfigurationProperties(TenantProperties.class)
-@AutoConfiguration(before = SaTokenConfiguration.class, after = {RedisConfig.class})
+@AutoConfiguration(after = {RedisConfig.class})
 @ConditionalOnProperty(value = "tenant.enable", havingValue = "true")
 public class TenantConfig {
 
-    @ConditionalOnBean(MybatisPlusConfig.class)
-    @AutoConfiguration(after = {MybatisPlusConfig.class})
-    public static class MybatisPlusConfiguration {
+    @ConditionalOnClass(TenantLineInnerInterceptor.class)
+    @AutoConfiguration
+    static class MybatisPlusConfiguration {
 
         /**
          * 多租户插件
