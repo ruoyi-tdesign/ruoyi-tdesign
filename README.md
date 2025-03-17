@@ -6,7 +6,7 @@
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=ruoyi-tdesign)
 <br>
 [![ruoyi-tdesign](https://img.shields.io/badge/ruoyi%20tdesign-1.3.1-success.svg)](https://gitee.com/yixiacoco/ruoyi-tdesign)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-blue.svg)]()
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-blue.svg)]()
 [![JDK-17](https://img.shields.io/badge/JDK-17-green.svg)]()
 [![JDK-21](https://img.shields.io/badge/JDK-21-green.svg)]()
 
