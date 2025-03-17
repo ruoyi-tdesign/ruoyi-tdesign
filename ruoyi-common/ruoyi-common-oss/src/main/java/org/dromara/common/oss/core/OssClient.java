@@ -21,7 +21,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.crt.S3CrtHttpConfiguration;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.CompletedFileUpload;
@@ -123,31 +122,11 @@ public class OssClient {
                 .serviceConfiguration(config)
                 .build();
 
-            checkBucket();
         } catch (Exception e) {
             if (e instanceof OssException) {
                 throw e;
             }
             throw new OssException("配置错误! 请检查系统配置:[" + e.getMessage() + "]");
-        }
-    }
-
-    /**
-     * 检查桶是否存在
-     *
-     * @throws OssException 当创建存储桶时发生异常时抛出
-     */
-    public void checkBucket() {
-        String bucketName = properties.getBucketName();
-        try {
-            // 尝试获取存储桶的信息
-            client.headBucket(x -> x.bucket(bucketName).build()).join();
-        } catch (Exception ex) {
-            if (ex.getCause() instanceof NoSuchBucketException) {
-                throw new OssException("Bucket桶是不存在的，请核对配置信息:[" + ex.getMessage() + "]");
-            } else {
-                throw new OssException("判断Bucket是否存在失败，请核对配置信息:[" + ex.getMessage() + "]");
-            }
         }
     }
 
