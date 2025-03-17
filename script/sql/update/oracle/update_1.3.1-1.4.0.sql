@@ -32,3 +32,5 @@ delete from sys_dict_type where dict_type in ('sys_message_type', 'sys_message_s
 delete from sys_dict_data where dict_type in ('sys_message_type', 'sys_message_supplier_type');
 
 ALTER TABLE sys_oss_config DROP COLUMN create_bucket;
+
+ALTER TABLE sys_social MODIFY (tenant_id DEFAULT '000000');
