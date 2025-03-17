@@ -38,9 +38,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 部门管理 服务实现
@@ -95,8 +92,8 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
         List<Tree<Long>> treeList = CollUtil.newArrayList();
         for (SysDeptVo d : depts) {
             Long parentId = d.getParentId();
-            SysDeptVo sysDeptVo = depts.stream().filter(it -> it.getDeptId().longValue() == parentId).findFirst().orElse(null);
-            if (sysDeptVo == null) {
+            SysDeptVo sysDeptVo = StreamUtils.findFirst(depts, it -> it.getDeptId().longValue() == parentId);
+            if (ObjectUtil.isNull(sysDeptVo)) {
                 List<Tree<Long>> trees = TreeBuildUtils.build(depts, parentId, (dept, tree) ->
                     tree.setId(dept.getDeptId())
                         .setParentId(dept.getParentId())
@@ -266,11 +263,14 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     public int updateDept(SysDeptBo bo) {
         SysDept dept = MapstructUtils.convert(bo, SysDept.class);
         SysDept oldDept = baseMapper.selectById(dept.getDeptId());
+        if (ObjectUtil.isNull(oldDept)) {
+            throw new ServiceException("部门不存在，无法修改");
+        }
         if (!oldDept.getParentId().equals(dept.getParentId())) {
             // 如果是新父部门 则校验是否具有新父部门权限 避免越权
             this.checkDeptDataScope(dept.getParentId());
             SysDept newParentDept = baseMapper.selectById(dept.getParentId());
-            if (ObjectUtil.isNotNull(newParentDept) && ObjectUtil.isNotNull(oldDept)) {
+            if (ObjectUtil.isNotNull(newParentDept)) {
                 String newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
                 String oldAncestors = oldDept.getAncestors();
                 dept.setAncestors(newAncestors);
