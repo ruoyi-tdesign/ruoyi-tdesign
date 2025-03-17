@@ -22,9 +22,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!--日志分割-->
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>100MB</maxFileSize>
             <!-- 日志最大的历史 30天 -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
