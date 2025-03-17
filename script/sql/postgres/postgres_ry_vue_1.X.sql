@@ -1300,7 +1300,6 @@ create table if not exists sys_oss_config
     region        varchar(255) default ''::varchar,
     access_policy char(1)      default '1'::bpchar not null,
     status        char         default '0'::bpchar,
-    create_bucket int2         default 0 not null,
     ext1          varchar(255) default ''::varchar,
     create_dept   int8,
     create_by     int8,
@@ -1325,7 +1324,6 @@ comment on column sys_oss_config.is_https       is '是否https（Y=是,N=否）
 comment on column sys_oss_config.region         is '域';
 comment on column sys_oss_config.access_policy  is '桶权限类型(0=private 1=public 2=custom)';
 comment on column sys_oss_config.status         is '是否默认（1=是,0=否）';
-comment on column sys_oss_config.create_bucket  is '创建桶（1=是,0=否）';
 comment on column sys_oss_config.ext1           is '扩展字段';
 comment on column sys_oss_config.create_dept    is '创建部门';
 comment on column sys_oss_config.create_by      is '创建者';

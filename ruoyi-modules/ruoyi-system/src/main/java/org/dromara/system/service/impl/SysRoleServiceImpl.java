@@ -1,6 +1,7 @@
 package org.dromara.system.service.impl;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -534,7 +535,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
                 return;
             }
-            LoginUser loginUser = LoginHelper.getLoginUser(token);
+            LoginUser loginUser = LoginHelper.getUser(token);
             if (ObjectUtil.isNull(loginUser)) {
                 return;
             }

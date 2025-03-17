@@ -925,7 +925,6 @@ create table sys_oss_config (
     region          varchar(255)            default ''      comment '域',
     access_policy   char(1)       not null  default '1'     comment '桶权限类型(0=private 1=public 2=custom)',
     status          char(1)                 default '0'     comment '是否默认（1=是,0=否）',
-    create_bucket   tinyint(1)    not null  default '0'     comment '创建桶（1=是,0=否）',
     ext1            varchar(255)            default ''      comment '扩展字段',
     create_dept     bigint(20)              default null    comment '创建部门',
     create_by       bigint(20)              default null    comment '创建者',

@@ -169,9 +169,6 @@
           <t-form-item label="桶名称" name="bucketName">
             <t-input v-model="form.bucketName" placeholder="请输入桶名称" />
           </t-form-item>
-          <t-form-item label="创建桶" name="createBucket">
-            <t-switch v-model="form.createBucket" :custom-value="[1, 0]" />
-          </t-form-item>
           <t-form-item label="前缀" name="prefix">
             <t-input v-model="form.prefix" placeholder="请输入前缀" />
           </t-form-item>
@@ -221,7 +218,6 @@
         <t-descriptions-item label="状态">
           <dict-tag :options="sys_normal_disable" :value="form.status" />
         </t-descriptions-item>
-        <t-descriptions-item label="创建桶">{{ form.createBucket === 1 ? '是' : '否' }}</t-descriptions-item>
         <t-descriptions-item label="扩展字段">{{ form.ext1 }}</t-descriptions-item>
         <t-descriptions-item label="创建时间">{{ parseTime(form.createTime) }}</t-descriptions-item>
         <t-descriptions-item label="更新时间">{{ parseTime(form.updateTime) }}</t-descriptions-item>
@@ -340,7 +336,6 @@ const rules = ref<Record<string, Array<FormRule>>>({
 });
 // 提交表单对象
 const form = ref<SysOssConfigVo & SysOssConfigForm>({
-  createBucket: 0,
 });
 // 查询对象
 const queryParams = ref<SysOssConfigQuery>({
@@ -382,7 +377,6 @@ function reset() {
     isHttps: 'N',
     accessPolicy: '1',
     status: '1',
-    createBucket: 0,
   };
   proxy.resetForm('ossConfigRef');
 }

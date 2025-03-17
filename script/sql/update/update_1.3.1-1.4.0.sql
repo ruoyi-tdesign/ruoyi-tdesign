@@ -9,3 +9,5 @@ UPDATE sys_menu SET menu_name = '文件管理' WHERE menu_id = 1510;
 -- 删除消息类型、消息支持平台字典
 delete from sys_dict_type where dict_type in ('sys_message_type', 'sys_message_supplier_type');
 delete from sys_dict_data where dict_type in ('sys_message_type', 'sys_message_supplier_type');
+
+ALTER TABLE sys_oss_config DROP COLUMN create_bucket;
