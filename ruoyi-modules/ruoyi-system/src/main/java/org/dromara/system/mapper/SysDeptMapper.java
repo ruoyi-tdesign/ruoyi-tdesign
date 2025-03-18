@@ -43,11 +43,23 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo> {
     })
     List<SysDeptVo> selectDeptList(@Param(Constants.WRAPPER) Wrapper<SysDept> queryWrapper);
 
+    /**
+     * 统计指定部门ID的部门数量
+     *
+     * @param deptId 部门ID
+     * @return 该部门ID的部门数量
+     */
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id")
     })
     long countDeptById(Long deptId);
 
+    /**
+     * 根据父部门ID查询其所有子部门的列表
+     *
+     * @param parentId 父部门ID
+     * @return 包含子部门的列表
+     */
     default List<SysDept> selectListByParentId(Long parentId) {
         return this.selectList(new LambdaQueryWrapper<SysDept>()
             .select(SysDept::getDeptId)

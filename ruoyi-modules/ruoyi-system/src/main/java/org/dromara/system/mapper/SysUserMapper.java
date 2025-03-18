@@ -32,6 +32,12 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     })
     List<SysUserVo> queryList(SysUserQuery query);
 
+    /**
+     * 查询用户列表，并进行数据权限控制
+     *
+     * @param queryWrapper 查询条件
+     * @return 用户信息集合
+     */
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "user_id")
@@ -88,10 +94,10 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     SysUserVo selectSafeUserById(@Param("userId") Long userId);
 
     /**
-     * 通过权限查询用户
+     * 根据用户ID统计用户数量
      *
      * @param userId 用户ID
-     * @return 用户对象信息
+     * @return 用户数量
      */
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),
@@ -99,6 +105,13 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     })
     long countUserById(@Param("userId") Long userId);
 
+    /**
+     * 根据条件更新用户数据
+     *
+     * @param user          要更新的用户实体
+     * @param updateWrapper 更新条件封装器
+     * @return 更新操作影响的行数
+     */
     @Override
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),
@@ -106,6 +119,12 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     })
     int update(@Param(Constants.ENTITY) SysUser user, @Param(Constants.WRAPPER) Wrapper<SysUser> updateWrapper);
 
+    /**
+     * 根据用户ID更新用户数据
+     *
+     * @param user 要更新的用户实体
+     * @return 更新操作影响的行数
+     */
     @Override
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),
