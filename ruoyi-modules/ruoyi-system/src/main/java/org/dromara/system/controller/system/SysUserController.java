@@ -145,14 +145,9 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:query")
     @GetMapping(value = {"/", "/{userId}"})
     public R<SysUserInfoVo> getInfo(@PathVariable(value = "userId", required = false) Long userId) {
-        userService.checkUserDataScope(userId);
         SysUserInfoVo userInfoVo = new SysUserInfoVo();
-        SysRoleQuery roleQuery = new SysRoleQuery();
-        roleQuery.setStatus(NormalDisableEnum.NORMAL.getCode());
-
-        List<SysRoleVo> roles = roleService.selectRoleList(roleQuery);
-        userInfoVo.setRoles(LoginHelper.isSuperAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isSuperAdmin()));
         if (ObjectUtil.isNotNull(userId)) {
+            userService.checkUserDataScope(userId);
             SysUserVo sysUser = userService.selectUserById(userId);
             userInfoVo.setUser(sysUser);
             userInfoVo.setRoleIds(roleService.selectRoleListByUserId(userId));
@@ -165,6 +160,11 @@ public class SysUserController extends BaseController {
                 userInfoVo.setPostIds(postService.selectPostListByUserId(userId));
             }
         }
+        SysRoleQuery roleQuery = new SysRoleQuery();
+        roleQuery.setStatus(NormalDisableEnum.NORMAL.getCode());
+
+        List<SysRoleVo> roles = roleService.selectRoleList(roleQuery);
+        userInfoVo.setRoles(LoginHelper.isSuperAdmin(userId) ? roles : StreamUtils.filter(roles, r -> !r.isSuperAdmin()));
         return R.ok(userInfoVo);
     }
 
