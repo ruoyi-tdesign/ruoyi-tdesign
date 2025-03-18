@@ -39,6 +39,7 @@
             <t-form-item label="请假时间">
               <t-date-range-picker
                 v-model="leaveTime"
+                value-type="YYYY-MM-DD HH:mm:ss"
                 allow-input
                 clearable
                 separator="至"

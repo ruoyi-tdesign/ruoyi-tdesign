@@ -26,7 +26,7 @@ export function getOnline() {
 
 // 删除当前在线设备
 export function delOnline(tokenId: string) {
-  return request.post<R>({
-    url: `/monitor/online/${tokenId}`,
+  return request.delete<R>({
+    url: `/monitor/online/myself/${tokenId}`,
   });
 }
