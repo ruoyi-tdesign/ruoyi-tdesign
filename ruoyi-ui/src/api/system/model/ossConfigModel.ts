@@ -64,6 +64,13 @@ export interface SysOssConfigVo {
   prefix?: string;
   /** 访问站点 */
   endpoint?: string;
+  /** 访问站点url风格
+   *
+   * 0：虚拟主机风格（virtualHostStyle）
+   *
+   * 1：路径风格（pathStyle）
+   */
+  urlStyle?: '0' | '1';
   /** 自定义域名 */
   domain?: string;
   /** 是否https（Y=是,N=否） */

@@ -76,6 +76,13 @@ public class SysOssConfigBo extends BaseEntity {
     private String domain;
 
     /**
+     * URL风格（0=虚拟托管风格，1=路径风格）
+     *
+     * @see https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/VirtualHosting.html
+     */
+    private String urlStyle = "0";
+
+    /**
      * 是否https（Y=是,N=否）
      */
     @NotBlank(message = "是否https", groups = {AddGroup.class, EditGroup.class})

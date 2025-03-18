@@ -34,8 +34,7 @@ import java.net.URL;
 import java.util.Date;
 
 /**
- * S3 存储协议 所有兼容S3协议的云厂商均支持
- * 阿里云 腾讯云 七牛云 minio
+ * S3 存储协议 所有兼容S3协议的云存储服务均支持
  *
  * @author Lion Li
  */
@@ -66,22 +65,19 @@ public class OssClient {
                 .withEndpointConfiguration(endpointConfig)
                 .withClientConfiguration(clientConfig)
                 .withCredentials(credentialsProvider)
+                .withPathStyleAccessEnabled(OssConstant.PATH_STYLE_ACCESS_ENABLED.equals(properties.getUrlStyle()))
                 .disableChunkedEncoding();
-            if (!StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE)) {
-                // minio 使用https限制使用域名访问 需要此配置 站点填域名
-                build.enablePathStyleAccess();
-            }
             this.client = build.build();
 
             if (Boolean.TRUE.equals(ossProperties.getCreateBucket())) {
                 createBucket();
             }
+        } catch (OssException e) {
+            throw e;
         } catch (Exception e) {
-            if (e instanceof OssException) {
-                throw e;
-            }
             throw new OssException("配置错误! 请检查系统配置:[" + e.getMessage() + "]");
         }
+
     }
 
     public void createBucket() {
@@ -175,19 +171,21 @@ public class OssClient {
     public String getUrl() {
         String domain = properties.getDomain();
         String endpoint = properties.getEndpoint();
-        String header = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
-        // 云服务商直接返回
-        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
-            if (StringUtils.isNotBlank(domain)) {
-                return header + domain;
+        String protocol = OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? "https://" : "http://";
+        boolean pathStyleAccessEnabled = OssConstant.PATH_STYLE_ACCESS_ENABLED.equals(properties.getUrlStyle());
+        boolean customDomainIsBlank = StringUtils.isBlank(domain);
+        // 路径风格访问
+        if (pathStyleAccessEnabled) {
+            if (customDomainIsBlank) {
+                return protocol + endpoint + "/" + properties.getBucketName();
             }
-            return header + properties.getBucketName() + "." + endpoint;
+            return protocol + domain + "/" + properties.getBucketName();
         }
-        // minio 单独处理
-        if (StringUtils.isNotBlank(domain)) {
-            return header + domain + "/" + properties.getBucketName();
+        // 虚拟主机域名风格访问
+        if (customDomainIsBlank) {
+           return protocol + properties.getBucketName() + "." + endpoint;
         }
-        return header + endpoint + "/" + properties.getBucketName();
+        return protocol + domain;
     }
 
     public String getPath(String prefix, String suffix) {

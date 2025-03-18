@@ -28,13 +28,12 @@ public interface OssConstant {
     List<Long> SYSTEM_DATA_IDS = Arrays.asList(1L, 2L, 3L, 4L);
 
     /**
-     * 云服务商
-     */
-    String[] CLOUD_SERVICE = new String[]{"aliyun", "qcloud", "qiniu", "obs"};
-
-    /**
      * https 状态
      */
     String IS_HTTPS = "Y";
 
+    /**
+     * 启用s3路径访问风格
+     */
+    String PATH_STYLE_ACCESS_ENABLED = "1";
 }

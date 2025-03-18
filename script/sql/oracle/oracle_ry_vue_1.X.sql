@@ -885,6 +885,7 @@ insert into sys_dict_type values(14, '000000', '消息模板类型', 'sys_messag
 insert into sys_dict_type values(15, '000000', '授权类型', 'sys_grant_type',     103, 1, sysdate, null, null, '认证授权类型');
 insert into sys_dict_type values(16, '000000', '设备类型', 'sys_device_type',    103, 1, sysdate, null, null, '客户端设备类型');
 insert into sys_dict_type values(17, '000000', '敏感词类别', 'sensitive_words_category', 103, 1, sysdate, 1, sysdate, null);
+insert into sys_dict_type values(18, '000000', 'OSS的URL风格', 'oss_url_style', 103, 1, sysdate, 1, sysdate, 'https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/VirtualHosting.html#VirtualHostingControl');
 
 
 -- ----------------------------
@@ -987,6 +988,8 @@ insert into sys_dict_data values(59, '000000', 12, '鼎众短信', 'DING_ZHONG',
 insert into sys_dict_data values(60, '000000', 13, '联麓短信', 'LIAN_LU', 'sys_message_supplier_type', null, 'primary', '', 'N', 103, 1, sysdate, 1, sysdate, null);
 insert into sys_dict_data values(61, '000000', 14, '七牛云短信', 'QI_NIU', 'sys_message_supplier_type', null, 'primary', null, 'N', 103, 1, sysdate, 1, sysdate, null);
 insert into sys_dict_data values(70, '000000', 99, '其他', 'other', 'sensitive_words_category', null, 'primary', null, 'N', 103, 1, sysdate, 1, sysdate, null);
+insert into sys_dict_data values(71, '000000', 1,  '虚拟托管风格', '0', 'oss_url_style',  '',   '', '',  'Y', 103, 1, sysdate, null, null, '示例：<bucket-name>.s3.region-code.amazonaws.com');
+insert into sys_dict_data values(72, '000000', 2,  '路径风格',   '1', 'oss_url_style',  '',   '', '',  'N', 103, 1, sysdate, null, null, '示例：s3.region-code.amazonaws.com/<bucket-name>');
 
 
 -- ----------------------------
@@ -1310,6 +1313,7 @@ create table sys_oss_config (
   prefix          varchar2(255)  default '',
   endpoint        varchar2(255)  default '',
   domain          varchar2(255)  default '',
+  url_style       char(1)        default '0',
   is_https        char(1)        default 'N',
   region          varchar2(255)  default '',
   access_policy   char(1)        default '1' not null,
@@ -1336,6 +1340,7 @@ comment on column sys_oss_config.bucket_name    is '桶名称';
 comment on column sys_oss_config.prefix         is '前缀';
 comment on column sys_oss_config.endpoint       is '访问站点';
 comment on column sys_oss_config.domain         is '自定义域名';
+comment on column sys_oss_config.url_style      is 'URL（0=虚拟托管风格，1=路径风格）';
 comment on column sys_oss_config.is_https       is '是否https（Y=是,N=否）';
 comment on column sys_oss_config.region         is '域';
 comment on column sys_oss_config.access_policy  is '桶权限类型(0=private 1=public 2=custom)';
@@ -1349,11 +1354,11 @@ comment on column sys_oss_config.create_time    is '创建时间';
 comment on column sys_oss_config.update_by      is '更新者';
 comment on column sys_oss_config.update_time    is '更新时间';
 
-insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',            '1', '1', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
-insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',            '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
-insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',            '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
-insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',  '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
-insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',            '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
+insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','1','N', '',            '1', '1', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
+insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','0','N', '',            '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
+insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','0','N', '',            '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
+insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','0','N', 'ap-beijing',  '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
+insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','1','N', '',            '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
 
 -- ----------------------------
 -- 系统授权表

@@ -96,6 +96,9 @@
         <template #accessPolicy="{ row }">
           <dict-tag :options="accessPolicyOptions" :value="row.accessPolicy" />
         </template>
+        <template #urlStyle="{ row }">
+          <dict-tag :options="oss_url_style" :value="row.urlStyle" />
+        </template>
         <template #status="{ row }">
           <t-switch
             v-model="row.status"
@@ -152,39 +155,112 @@
       <t-loading :loading="buttonLoading" size="small">
         <t-form ref="ossConfigRef" :data="form" :rules="rules" label-width="calc(6em + 41px)" @submit="submitForm">
           <t-form-item label="配置key" name="configKey">
-            <t-input v-model="form.configKey" placeholder="请输入配置key" />
+            <t-input v-model.trim="form.configKey" placeholder="请输入配置key" />
           </t-form-item>
-          <t-form-item label="访问站点" name="endpoint">
-            <t-input v-model="form.endpoint" placeholder="请输入访问站点" />
-          </t-form-item>
-          <t-form-item label="自定义域名" name="domain">
-            <t-input v-model="form.domain" placeholder="请输入自定义域名" />
+          <t-form-item name="endpoint">
+            <template #label>
+              <t-tooltip placement="top-start">
+                <help-circle-icon size="small" /> 访问站点
+                <template #content> 对应S3 SDK的endpoint参数 </template>
+              </t-tooltip>
+            </template>
+            <t-input v-model.trim="form.endpoint" placeholder="请输入访问站点" />
           </t-form-item>
           <t-form-item label="accessKey" name="accessKey">
-            <t-input v-model="form.accessKey" placeholder="请输入accessKey" />
+            <t-input v-model.trim="form.accessKey" placeholder="请输入accessKey" />
           </t-form-item>
           <t-form-item label="secretKey" name="secretKey">
-            <t-input v-model="form.secretKey" placeholder="请输入秘钥" type="password" />
+            <t-input v-model.trim="form.secretKey" placeholder="请输入秘钥" type="password" />
           </t-form-item>
-          <t-form-item label="桶名称" name="bucketName">
-            <t-input v-model="form.bucketName" placeholder="请输入桶名称" />
+          <t-form-item name="bucketName">
+            <template #label>
+              <t-tooltip placement="top-start">
+                <help-circle-icon size="small" /> 存储桶名称
+                <template #content> 对应S3 SDK的bucketName参数 </template>
+              </t-tooltip>
+            </template>
+            <t-input v-model.trim="form.bucketName" placeholder="请输入桶名称" />
           </t-form-item>
-          <t-form-item label="创建桶" name="createBucket">
+          <t-form-item name="urlStyle">
+            <template #label>
+              <t-popup :overlay-style="{ width: '300px' }">
+                <template #content>
+                  更多细节信息参考
+                  <t-link
+                    theme="primary"
+                    href="https://docs.aws.amazon.com/zh_cn/AmazonS3/latest/userguide/VirtualHosting.html#path-style-access"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    S3官方文档（存储桶的虚拟托管）
+                    <template #suffix-icon>
+                      <jump-icon />
+                    </template>
+                  </t-link>
+                </template>
+                <help-circle-icon size="small" /> URL风格
+              </t-popup>
+            </template>
+            <t-radio-group v-model="form.urlStyle">
+              <t-radio v-for="dict in oss_url_style" :key="dict.value" :value="dict.value">{{ dict.label }}</t-radio>
+            </t-radio-group>
+            <template #help>
+              <template v-if="form.urlStyle === '0'">
+                <help-circle-icon size="small" />
+                阿里云、腾讯云、华为云等云服务厂商提供的存储服务请使用此风格
+              </template>
+              <template v-if="form.urlStyle === '1'">
+                <help-circle-icon size="small" />
+                minio、ceph等自建S3服务如无特殊配置请使用此风格
+              </template>
+            </template>
+          </t-form-item>
+          <t-form-item name="createBucket">
+            <template #label>
+              <t-tooltip placement="top-start">
+                <help-circle-icon size="small" /> 创建存储桶
+                <template #content> 启用时若存储桶不存在则自动创建，提供的accessKey需要有相关权限 </template>
+              </t-tooltip>
+            </template>
             <t-switch v-model="form.createBucket" :custom-value="[1, 0]" />
           </t-form-item>
           <t-form-item label="前缀" name="prefix">
-            <t-input v-model="form.prefix" placeholder="请输入前缀" />
+            <t-input v-model.trim="form.prefix" placeholder="请输入前缀" />
           </t-form-item>
           <t-form-item label="是否HTTPS">
             <t-radio-group v-model="form.isHttps">
               <t-radio v-for="dict in sys_yes_no" :key="dict.value" :value="dict.value">{{ dict.label }}</t-radio>
             </t-radio-group>
           </t-form-item>
+          <t-form-item label="自定义域名" name="domain">
+            <t-input v-model.trim="form.domain" placeholder="请输入自定义域名" />
+          </t-form-item>
+          <t-form-item label="URL访问示例">
+            <span>
+              <template v-if="form.isHttps === 'Y'">https://</template>
+              <template v-else-if="form.isHttps === 'N'">http://</template>
+              <template v-if="form.urlStyle === '1'">
+                <template v-if="form.domain">{{ form.domain }}/{{ form.bucketName }}</template>
+                <template v-else>{{ form.endpoint }}/{{ form.bucketName }}</template>
+              </template>
+              <template v-else-if="form.urlStyle === '0'">
+                <template v-if="form.domain">{{ form.domain }}</template>
+                <template v-else>{{ form.bucketName }}.{{ form.endpoint }}</template>
+              </template>
+              <template v-if="form.prefix">/{{ form.prefix }}</template>
+            </span>
+          </t-form-item>
           <t-form-item label="桶权限类型">
             <t-radio-group v-model="form.accessPolicy" :options="accessPolicyOptions" />
           </t-form-item>
-          <t-form-item label="域" name="region">
-            <t-input v-model="form.region" placeholder="请输入域" />
+          <t-form-item name="region">
+            <template #label>
+              <t-tooltip placement="top-start">
+                <help-circle-icon size="small" /> 域
+                <template #content> 对应S3 SDK的region参数 </template>
+              </t-tooltip>
+            </template>
+            <t-input v-model.trim="form.region" placeholder="请输入域" />
           </t-form-item>
           <t-form-item label="备注" name="remark">
             <t-textarea v-model="form.remark" placeholder="请输入备注" />
@@ -214,6 +290,9 @@
         <t-descriptions-item label="是否https">
           <dict-tag :options="sys_yes_no" :value="form.isHttps" />
         </t-descriptions-item>
+        <t-descriptions-item label="URL风格">
+          <dict-tag :options="oss_url_style" :value="form.urlStyle" />
+        </t-descriptions-item>
         <t-descriptions-item label="域">{{ form.region }}</t-descriptions-item>
         <t-descriptions-item label="桶权限类型">
           <dict-tag :options="accessPolicyOptions" :value="form.accessPolicy" />
@@ -240,6 +319,8 @@ import {
   BrowseIcon,
   DeleteIcon,
   EditIcon,
+  HelpCircleIcon,
+  JumpIcon,
   RefreshIcon,
   SearchIcon,
   SettingIcon,
@@ -261,7 +342,11 @@ import type { DictModel } from '@/utils/dict';
 import { handleChangeStatus } from '@/utils/ruoyi';
 
 const { proxy } = getCurrentInstance();
-const { sys_yes_no, sys_normal_disable } = proxy.useDict('sys_yes_no', 'sys_normal_disable');
+const { sys_yes_no, sys_normal_disable, oss_url_style } = proxy.useDict(
+  'sys_yes_no',
+  'sys_normal_disable',
+  'oss_url_style',
+);
 
 const openView = ref(false);
 const openViewLoading = ref(false);
@@ -292,6 +377,7 @@ const columns = ref<Array<PrimaryTableCol>>([
   { title: `自定义域名`, colKey: 'domain', align: 'center', ellipsis: true },
   { title: `桶名称`, colKey: 'bucketName', align: 'center' },
   { title: `前缀`, colKey: 'prefix', align: 'center' },
+  { title: `URL风格`, colKey: 'urlStyle', align: 'center' },
   { title: `域`, colKey: 'region', align: 'center' },
   { title: `桶权限类型`, colKey: 'accessPolicy', align: 'center' },
   { title: `是否默认`, colKey: 'status', align: 'center' },
@@ -327,6 +413,7 @@ const rules = ref<Record<string, Array<FormRule>>>({
       trigger: 'blur',
     },
   ],
+  urlStyle: [{ required: true, message: '请选择URL风格' }],
   endpoint: [
     { required: true, message: 'endpoint不能为空' },
     {

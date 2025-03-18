@@ -17,7 +17,7 @@ import type {
   selectDictLabels,
 } from '@/utils/ruoyi';
 
-declare module '@vue/runtime-core' {
+declare module 'vue' {
   interface ComponentCustomProperties {
     useDict: typeof useDict;
     getConfigKey: typeof getConfigKey;
