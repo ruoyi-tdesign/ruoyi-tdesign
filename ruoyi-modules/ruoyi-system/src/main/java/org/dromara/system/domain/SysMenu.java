@@ -5,11 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-import org.dromara.common.core.constant.Constants;
-import org.dromara.common.core.constant.UserConstants;
-import org.dromara.common.core.enums.MenuTypeEnum;
-import org.dromara.common.core.enums.YesNoFrameEnum;
-import org.dromara.common.core.utils.StringUtils;
 
 import java.io.Serial;
 import java.io.Serializable;

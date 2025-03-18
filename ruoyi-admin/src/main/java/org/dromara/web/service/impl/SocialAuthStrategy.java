@@ -8,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import org.dromara.common.core.constant.GrantTypeConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.domain.model.SocialLoginBody;
-import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -106,7 +106,7 @@ public class SocialAuthStrategy implements IAuthStrategy<SocialLoginBody> {
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", "");
             throw new UserException("user.not.exists", "");
-        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+        } else if (SystemConstants.DISABLE.equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", "");
             throw new UserException("user.blocked", "");
         }

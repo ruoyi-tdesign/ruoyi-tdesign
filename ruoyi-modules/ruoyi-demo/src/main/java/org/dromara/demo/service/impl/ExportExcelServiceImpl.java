@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.dromara.common.core.enums.UserStatus;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.excel.core.DropDownOptions;
 import org.dromara.common.excel.utils.ExcelUtil;
@@ -35,7 +35,7 @@ public class ExportExcelServiceImpl implements IExportExcelService {
             // 模拟数据库中的一条数据
             ExportDemoVo everyRowData = new ExportDemoVo();
             everyRowData.setNickName("用户-" + i);
-            everyRowData.setUserStatus(UserStatus.OK.getCode());
+            everyRowData.setUserStatus(SystemConstants.NORMAL);
             everyRowData.setGender("1");
             everyRowData.setPhoneNumber(String.format("175%08d", i));
             everyRowData.setEmail(String.format("175%08d", i) + "@163.com");

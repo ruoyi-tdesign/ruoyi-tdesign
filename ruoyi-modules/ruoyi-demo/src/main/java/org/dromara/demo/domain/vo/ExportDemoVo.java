@@ -15,6 +15,9 @@ import org.dromara.common.excel.annotation.ExcelEnumFormat;
 import org.dromara.common.excel.convert.ExcelDictConvert;
 import org.dromara.common.excel.convert.ExcelEnumConvert;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 带有下拉选的Excel导出
  *
@@ -24,8 +27,9 @@ import org.dromara.common.excel.convert.ExcelEnumConvert;
 @ExcelIgnoreUnannotated
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExportDemoVo {
+public class ExportDemoVo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
