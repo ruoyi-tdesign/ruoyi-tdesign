@@ -72,10 +72,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
             .select(SysConfig::getConfigId, SysConfig::getConfigValue)
             .eq(SysConfig::getIsGlobal, YesNoEnum.NO.getCodeNum())
             .oneOpt();
-        if (oneOpt.isPresent()) {
-            return oneOpt.get().getConfigValue();
-        }
-        return StringUtils.EMPTY;
+        return oneOpt.map(SysConfig::getConfigValue).orElse(StringUtils.EMPTY);
     }
 
     /**
