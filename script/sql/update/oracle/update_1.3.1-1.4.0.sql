@@ -35,6 +35,6 @@ ALTER TABLE sys_oss_config DROP COLUMN create_bucket;
 
 ALTER TABLE sys_social MODIFY (tenant_id DEFAULT '000000');
 
-ALTER TABLE sys_oper_log MODIFY oper_param VARCHAR2(5000);
-ALTER TABLE sys_oper_log MODIFY json_result VARCHAR2(5000);
-ALTER TABLE sys_oper_log MODIFY error_msg VARCHAR2(5000);
+ALTER TABLE sys_oper_log MODIFY oper_param VARCHAR2(4000);
+ALTER TABLE sys_oper_log MODIFY json_result VARCHAR2(4000);
+ALTER TABLE sys_oper_log MODIFY error_msg VARCHAR2(4000);
