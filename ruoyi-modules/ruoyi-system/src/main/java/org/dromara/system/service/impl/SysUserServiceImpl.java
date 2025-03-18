@@ -35,6 +35,7 @@ import org.dromara.system.domain.vo.SysPostVo;
 import org.dromara.system.domain.vo.SysRoleVo;
 import org.dromara.system.domain.vo.SysUserExportVo;
 import org.dromara.system.domain.vo.SysUserVo;
+import org.dromara.system.mapper.SysDeptMapper;
 import org.dromara.system.mapper.SysPostMapper;
 import org.dromara.system.mapper.SysRoleMapper;
 import org.dromara.system.mapper.SysUserMapper;
@@ -72,6 +73,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private SysUserRoleMapper userRoleMapper;
     @Autowired
     private SysUserPostMapper userPostMapper;
+    @Autowired
+    private SysDeptMapper deptMapper;
 
     /**
      * 根据条件分页查询用户列表
@@ -98,10 +101,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     private void setDeptIds(SysUserQuery user) {
         if (user.getDeptId() != null) {
-            List<SysDept> deptList = deptService.lambdaQuery()
-                .select(SysDept::getDeptId)
-                .apply(DataBaseHelper.findInSet(user.getDeptId(), "ancestors"))
-                .list();
+            List<SysDept> deptList = deptMapper.selectListByParentId(user.getDeptId());
             List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
             ids.add(user.getDeptId());
             user.setDeptIds(ids.toArray(Long[]::new));

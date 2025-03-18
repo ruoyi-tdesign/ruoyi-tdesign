@@ -19,6 +19,7 @@ import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.bo.SysPostBo;
 import org.dromara.system.domain.query.SysPostQuery;
 import org.dromara.system.domain.vo.SysPostVo;
+import org.dromara.system.mapper.SysDeptMapper;
 import org.dromara.system.mapper.SysPostMapper;
 import org.dromara.system.mapper.SysUserPostMapper;
 import org.dromara.system.service.ISysDeptService;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> implements ISysPostService {
 
     @Autowired
-    private ISysDeptService deptService;
+    private SysDeptMapper deptMapper;
     @Autowired
     private SysUserPostMapper userPostMapper;
 
@@ -64,13 +65,9 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     private void buildQuery(SysPostQuery query) {
         if (ObjectUtil.isNull(query.getDeptId()) && ObjectUtil.isNotNull(query.getBelongDeptId())) {
             //部门树搜索
-            List<Long> deptIds = deptService.lambdaQuery()
-                .select(SysDept::getDeptId)
-                .apply(DataBaseHelper.findInSet(query.getBelongDeptId(), "ancestors"))
-                .list()
-                .stream()
-                .map(SysDept::getDeptId)
-                .collect(Collectors.toList());
+            List<SysDept> deptList = deptMapper.selectListByParentId(query.getBelongDeptId());
+            List<Long> deptIds = StreamUtils.toList(deptList, SysDept::getDeptId);
+            deptIds.add(query.getBelongDeptId());
             query.setDeptIds(deptIds);
         }
     }
