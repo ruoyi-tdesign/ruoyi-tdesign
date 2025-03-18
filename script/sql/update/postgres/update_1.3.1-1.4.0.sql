@@ -33,3 +33,8 @@ delete from sys_dict_data where dict_type in ('sys_message_type', 'sys_message_s
 ALTER TABLE sys_oss_config DROP COLUMN create_bucket;
 
 ALTER TABLE sys_social ALTER COLUMN tenant_id SET DEFAULT '000000';
+
+ALTER TABLE sys_oper_log
+ALTER COLUMN oper_param TYPE VARCHAR(5000),
+ALTER COLUMN json_result TYPE VARCHAR(5000),
+ALTER COLUMN error_msg TYPE VARCHAR(5000);
