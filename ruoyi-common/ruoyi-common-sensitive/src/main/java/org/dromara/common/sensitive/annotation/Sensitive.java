@@ -26,12 +26,12 @@ public @interface Sensitive {
     /**
      * 角色，用户登录类型如果拥有角色，则不进行脱敏
      */
-    String[] roleKey() default "";
+    String[] roleKey() default {};
 
     /**
      * 权限，用户登录类型如果拥有权限，则不进行脱敏
      */
-    String[] perms() default "";
+    String[] perms() default {};
 
     /**
      * 验证模式：AND | OR，默认AND
