@@ -334,7 +334,11 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     public List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName) {
         DynamicDataSourceContextHolder.push(dataName);
         try {
-            LinkedHashMap<String, Column> columns = ServiceProxy.metadata().columns(tableName);
+            Table<?> table = ServiceProxy.metadata().table(tableName);
+            if (ObjectUtil.isNull(table)) {
+                return new ArrayList<>();
+            }
+            LinkedHashMap<String, Column> columns = table.getColumns();
             List<GenTableColumn> tableColumns = new ArrayList<>();
             columns.forEach((columnName, column) -> {
                 GenTableColumn tableColumn = new GenTableColumn();
