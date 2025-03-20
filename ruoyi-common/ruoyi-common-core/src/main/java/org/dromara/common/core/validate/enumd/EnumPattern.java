@@ -24,13 +24,13 @@ public @interface EnumPattern {
     /**
      * 需要校验的枚举类型
      */
-    Class<? extends Enum> type() default Enum.class;
+    Class<? extends Enum<?>> type();
 
     /**
      * 枚举类型校验值字段名称
-     * TODO 需确保该字段实现了 getter 方法
+     * 需确保该字段实现了 getter 方法
      */
-    String fieldName() default "code";
+    String fieldName();
 
     String message() default "输入值不在枚举范围内";
 
