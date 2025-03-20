@@ -2,6 +2,7 @@ package org.dromara.common.mybatis.config;
 
 import cn.hutool.core.net.NetUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.baomidou.mybatisplus.core.handlers.PostInitTableInfoHandler;
 import com.baomidou.mybatisplus.core.incrementer.DefaultIdentifierGenerator;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -13,6 +14,7 @@ import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.mybatis.aspect.DataPermissionAspect;
 import org.dromara.common.mybatis.handler.InjectionMetaObjectHandler;
 import org.dromara.common.mybatis.handler.MybatisExceptionHandler;
+import org.dromara.common.mybatis.handler.PlusPostInitTableInfoHandler;
 import org.dromara.common.mybatis.interceptor.PlusDataPermissionInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.BeansException;
@@ -105,6 +107,14 @@ public class MybatisPlusConfig {
     @Bean
     public MybatisExceptionHandler mybatisExceptionHandler() {
         return new MybatisExceptionHandler();
+    }
+
+    /**
+     * 初始化表对象处理器
+     */
+    @Bean
+    public PostInitTableInfoHandler postInitTableInfoHandler() {
+        return new PlusPostInitTableInfoHandler();
     }
 
     /**
