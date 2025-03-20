@@ -2,9 +2,10 @@
 <configuration debug="false" scan="true" scanPeriod="1 seconds">
 
     <contextName>logback</contextName>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <property name="console.log.pattern"
-              value="%red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{36}%n) - %msg%n"/>
-    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
+              value="%cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %clr(${PID:- }){magenta} %green([%thread]) %clr(%-5level) %boldMagenta(%logger{39}%n) - %msg%n"/>
+    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${PID:- } [%thread] %-5level %logger{39} - %msg%n"/>
     <property name="log.path" value="./logs"/>
     <!--应用名称-->
     <springProperty scope="context" name="APP_NAME" source="spring.application.name"/>
