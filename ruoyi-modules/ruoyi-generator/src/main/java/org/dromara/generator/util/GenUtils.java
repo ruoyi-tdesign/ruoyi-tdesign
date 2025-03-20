@@ -55,6 +55,8 @@ public class GenUtils {
         genTable.setFunctionName(replaceText(genTable.getTableComment()));
         genTable.setFunctionAuthor(GenConfig.getAuthor());
         genTable.setCreateBy(operId);
+        genTable.setCreateTime(null);
+        genTable.setUpdateTime(null);
     }
 
     /**
@@ -65,6 +67,8 @@ public class GenUtils {
         String columnName = column.getColumnName();
         column.setTableId(table.getTableId());
         column.setCreateBy(table.getCreateBy());
+        column.setCreateTime(null);
+        column.setUpdateTime(null);
         // 设置java字段名
         column.setJavaField(StringUtils.toCamelCase(columnName));
         // 设置默认类型
