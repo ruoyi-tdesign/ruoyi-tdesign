@@ -47,6 +47,7 @@ logging:
     org.dromara: @logging.level@
     org.springframework: warn
     org.mybatis.spring.mapper: error
+    org.apache.fury: warn
   config: classpath:logback-spring.xml
 
 # 用户配置
