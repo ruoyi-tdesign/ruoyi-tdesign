@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.enums.NormalDisableEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.DeptService;
@@ -73,8 +74,10 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      */
     @Override
     public List<Tree<Long>> selectDeptTreeList(SysDeptQuery query) {
-        // 只查询未禁用部门
-        query.setStatus(NormalDisableEnum.NORMAL.getCode());
+        if (query.getStatus() == null) {
+            // 只查询未禁用部门
+            query.setStatus(NormalDisableEnum.NORMAL.getCode());
+        }
         List<SysDeptVo> depts = this.selectDeptList(query);
         return buildDeptTreeSelect(depts);
     }

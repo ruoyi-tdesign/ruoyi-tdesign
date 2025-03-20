@@ -1,4 +1,5 @@
 import type { R, TableDataInfo, TreeModel } from '@/api/model/resultModel';
+import type { SysDeptQuery } from '@/api/system/model/deptModel';
 import type { SysUserForm, SysUserInfoVo, SysUserQuery, SysUserVo, UserAuthRole } from '@/api/system/model/userModel';
 import { request } from '@/utils/request';
 import { parseStrEmpty } from '@/utils/ruoyi';
@@ -98,9 +99,10 @@ export function listUserByDeptId(deptId: number) {
 }
 
 // 查询部门下拉树结构
-export function deptTreeSelect() {
+export function deptTreeSelect(params?: SysDeptQuery) {
   return request.get<R<Array<TreeModel<number>>>>({
     url: '/system/user/deptTree',
+    params,
     method: 'get',
   });
 }
