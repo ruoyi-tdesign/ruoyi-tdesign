@@ -33,6 +33,14 @@ public interface ISysPostService extends IService<SysPost> {
     List<SysPostVo> selectPostList(SysPostQuery query);
 
     /**
+     * 查询用户所属岗位组
+     *
+     * @param userId 用户ID
+     * @return 岗位ID
+     */
+    List<SysPostVo> selectPostsByUserId(Long userId);
+
+    /**
      * 查询所有岗位
      *
      * @return 岗位列表

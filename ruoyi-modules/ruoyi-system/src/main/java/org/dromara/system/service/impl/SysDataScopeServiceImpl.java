@@ -35,7 +35,7 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
      * @param roleId 角色Id
      * @return 部门Id组
      */
-    @Cacheable(cacheNames = CacheNames.SYS_ROLE_CUSTOM, key = "#roleId")
+    @Cacheable(cacheNames = CacheNames.SYS_ROLE_CUSTOM, key = "#roleId", condition = "#roleId != null")
     @Override
     public String getRoleCustom(Long roleId) {
         if (ObjectUtil.isNull(roleId)) {
@@ -55,7 +55,7 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
      * @param deptId 部门Id
      * @return 部门Id组
      */
-    @Cacheable(cacheNames = CacheNames.SYS_DEPT_AND_CHILD, key = "#deptId")
+    @Cacheable(cacheNames = CacheNames.SYS_DEPT_AND_CHILD, key = "#deptId", condition = "#deptId != null")
     @Override
     public String getDeptAndChild(Long deptId) {
         if (ObjectUtil.isNull(deptId)) {

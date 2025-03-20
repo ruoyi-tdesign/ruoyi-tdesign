@@ -118,8 +118,22 @@ public class LoginHelper {
     /**
      * 获取用户id
      */
+    public static Object getLoginId() {
+        return MultipleStpUtil.SYSTEM.getLoginId();
+    }
+
+    /**
+     * 获取用户id
+     */
     public static Long getUserId() {
         return MultipleLoginBaseHelper.getUserId(MultipleStpUtil.SYSTEM);
+    }
+
+    /**
+     * 获取用户id
+     */
+    public static String getUserIdStr() {
+        return Convert.toStr(getUserId());
     }
 
     /**

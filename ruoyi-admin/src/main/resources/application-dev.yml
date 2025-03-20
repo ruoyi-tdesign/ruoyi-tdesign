@@ -149,7 +149,7 @@ justauth:
       redirect-uri: ${justauth.address}/social-callback?source=maxkey
     topiam:
       # topiam 服务器地址
-      server-url: http://127.0.0.1:1989/api/v1/authorize/y0q************spq***********8ol
+      server-url: http://127.0.0.1:1898/api/v1/authorize/y0q************spq***********8ol
       client-id: 449c4*********937************759
       client-secret: ac7***********1e0************28d
       redirect-uri: ${justauth.address}/social-callback?source=topiam
