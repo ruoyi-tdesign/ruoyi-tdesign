@@ -178,11 +178,11 @@ public class QueueUtils {
      *
      * @param queueName 队列名
      * @param capacity  容量
-     * @param destroy   已存在是否销毁
+     * @param destroy   是否销毁
      */
     public static <T> boolean trySetBoundedQueueCapacity(String queueName, int capacity, boolean destroy) {
         RBoundedBlockingQueue<T> boundedBlockingQueue = CLIENT.getBoundedBlockingQueue(queueName);
-        if (boundedBlockingQueue.isExists() && destroy) {
+        if (destroy) {
             destroyQueue(queueName);
         }
         return boundedBlockingQueue.trySetCapacity(capacity);
