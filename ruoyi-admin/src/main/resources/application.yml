@@ -274,6 +274,8 @@ springdoc:
       packages-to-scan: org.dromara.system
     - group: 4.代码生成模块
       packages-to-scan: org.dromara.generator
+    - group: 5.工作流模块
+      packages-to-scan: org.dromara.workflow
 
 # 防止XSS攻击
 xss:
