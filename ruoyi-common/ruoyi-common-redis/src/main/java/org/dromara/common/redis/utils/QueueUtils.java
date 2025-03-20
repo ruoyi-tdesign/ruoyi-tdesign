@@ -183,7 +183,7 @@ public class QueueUtils {
     public static <T> boolean trySetBoundedQueueCapacity(String queueName, int capacity, boolean destroy) {
         RBoundedBlockingQueue<T> boundedBlockingQueue = CLIENT.getBoundedBlockingQueue(queueName);
         if (destroy) {
-            destroyQueue(queueName);
+            boundedBlockingQueue.delete();
         }
         return boundedBlockingQueue.trySetCapacity(capacity);
     }
