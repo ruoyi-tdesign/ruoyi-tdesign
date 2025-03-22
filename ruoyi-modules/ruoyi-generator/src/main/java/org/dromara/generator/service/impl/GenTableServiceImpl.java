@@ -141,7 +141,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         }
         // 过滤并转换表格数据
         return tablesMap.values().stream()
-            .filter(x -> !startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
+            .filter(x -> !StringUtils.startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
             .filter(x -> {
                 if (CollUtil.isEmpty(tableNames)) {
                     return true;
@@ -173,16 +173,6 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
             }).toList();
     }
 
-    public static boolean startWithAnyIgnoreCase(CharSequence cs, CharSequence... searchCharSequences) {
-        // 判断是否是以指定字符串开头
-        for (CharSequence searchCharSequence : searchCharSequences) {
-            if (StringUtils.startsWithIgnoreCase(cs, searchCharSequence)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * 查询据库列表
      *
@@ -204,7 +194,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
             }
 
             List<Table<?>> tableList = tablesMap.values().stream()
-                .filter(x -> !startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
+                .filter(x -> !StringUtils.startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
                 .filter(x -> tableNameSet.contains(x.getName())).toList();
 
             if (CollUtil.isEmpty(tableList)) {
