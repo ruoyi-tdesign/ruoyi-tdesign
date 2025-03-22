@@ -34,7 +34,7 @@
         <redisson.version>3.45.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
-        <snailjob.version>1.2.0</snailjob.version>
+        <snailjob.version>1.3.0-beta1</snailjob.version>
         <mapstruct-plus.version>1.4.6</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.34</lombok.version>

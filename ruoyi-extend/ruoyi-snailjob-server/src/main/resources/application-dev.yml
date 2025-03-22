@@ -20,8 +20,8 @@ snail-job:
   retry-pull-page-size: 1000
   # 拉取重试数据的每批次的大小
   job-pull-page-size: 1000
-  # 服务端netty端口
-  netty-port: 17888
+  # 服务器端口
+  server-port: 17888
   # 一个客户端每秒最多接收的重试数量指令
   limiter: 1000
   # 号段模式下步长配置
@@ -34,7 +34,10 @@ snail-job:
     max-count: 288
     #间隔时间
     trigger-interval: 900
+  # 重试每次拉取的次数
   retry-max-pull-count: 10
+  # RPC通讯类型: netty,grpc
+  rpc-type: grpc
 
 --- # 监控中心配置
 spring.boot.admin.client:
