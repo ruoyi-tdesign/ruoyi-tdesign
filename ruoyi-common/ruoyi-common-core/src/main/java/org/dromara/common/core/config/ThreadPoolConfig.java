@@ -10,11 +10,11 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -51,23 +51,15 @@ public class ThreadPoolConfig {
      */
     @Bean(name = "scheduledExecutorService")
     protected ScheduledExecutorService scheduledExecutorService() {
-        ThreadFactory threadFactory;
-        // 是否启用虚拟线程
+        // daemon 必须为 true
+        BasicThreadFactory.Builder builder = new BasicThreadFactory.Builder().daemon(true);
         if (SpringUtils.isVirtual()) {
-            // 虚拟线程必须为守护线程，即 daemon 只能是 true
-            threadFactory = new BasicThreadFactory.Builder()
-                .daemon(true)
-                .namingPattern("virtual-schedule-pool-%d")
-                .wrappedFactory(Thread.ofVirtual().factory())
-                .build();
+            builder.namingPattern("virtual-schedule-pool-%d").wrappedFactory(new VirtualThreadTaskExecutor().getVirtualThreadFactory());
         } else {
-            threadFactory = new BasicThreadFactory.Builder()
-                .daemon(true)
-                .namingPattern("schedule-pool-%d")
-                .build();
+            builder.namingPattern("schedule-pool-%d");
         }
         ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(core,
-            threadFactory,
+            builder.build(),
             new ThreadPoolExecutor.CallerRunsPolicy()) {
             @Override
             protected void afterExecute(Runnable r, Throwable t) {
