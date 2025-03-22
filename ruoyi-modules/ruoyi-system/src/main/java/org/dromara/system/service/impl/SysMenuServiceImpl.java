@@ -283,11 +283,14 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         if (CollUtil.isEmpty(menus)) {
             return CollUtil.newArrayList();
         }
-        return TreeBuildUtils.build(menus, (menu, tree) ->
-            tree.setId(menu.getMenuId())
+        return TreeBuildUtils.build(menus, (menu, tree) -> {
+            Tree<Long> menuTree = tree.setId(menu.getMenuId())
                 .setParentId(menu.getParentId())
                 .setName(menu.getMenuName())
-                .setWeight(menu.getOrderNum()));
+                .setWeight(menu.getOrderNum());
+            menuTree.put("menuType", menu.getMenuType());
+            menuTree.put("icon", menu.getIcon());
+        });
     }
 
     /**
