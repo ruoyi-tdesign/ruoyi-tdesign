@@ -166,7 +166,8 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                 GenTableVo gen = new GenTableVo();
                 gen.setTableName(x.getName());
                 gen.setTableComment(x.getComment());
-                gen.setCreateTime(x.getCreateTime());
+                // postgresql的表元数据没有创建时间这个东西(好奇葩) 只能new Date代替
+                gen.setCreateTime(ObjectUtil.defaultIfNull(x.getCreateTime(), new Date()));
                 gen.setUpdateTime(x.getUpdateTime());
                 return gen;
             }).toList();
