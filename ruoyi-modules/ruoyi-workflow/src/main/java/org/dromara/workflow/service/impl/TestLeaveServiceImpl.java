@@ -17,6 +17,7 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.TestLeave;
 import org.dromara.workflow.domain.bo.TestLeaveBo;
 import org.dromara.workflow.domain.vo.TestLeaveVo;
@@ -34,6 +35,7 @@ import java.util.List;
  * @author may
  * @date 2023-07-21
  */
+@ConditionalOnEnable
 @RequiredArgsConstructor
 @Service
 @Slf4j

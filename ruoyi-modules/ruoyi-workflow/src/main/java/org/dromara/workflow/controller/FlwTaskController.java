@@ -11,6 +11,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.warm.flow.core.entity.Node;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
 import org.dromara.workflow.domain.vo.FlowTaskVo;
@@ -26,6 +27,7 @@ import java.util.Map;
  *
  * @author may
  */
+@ConditionalOnEnable
 @Validated
 @RequiredArgsConstructor
 @RestController

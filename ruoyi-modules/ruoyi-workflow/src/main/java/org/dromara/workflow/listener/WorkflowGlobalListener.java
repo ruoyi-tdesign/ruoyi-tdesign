@@ -11,6 +11,7 @@ import org.dromara.warm.flow.core.entity.Task;
 import org.dromara.warm.flow.core.listener.GlobalListener;
 import org.dromara.warm.flow.core.listener.ListenerVariable;
 import org.dromara.warm.flow.orm.entity.FlowTask;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.handler.FlowProcessEventHandler;
 import org.dromara.workflow.service.IFlwInstanceService;
 import org.dromara.workflow.service.IFlwTaskService;
@@ -23,6 +24,7 @@ import java.util.List;
  *
  * @author may
  */
+@ConditionalOnEnable
 @Component
 @Slf4j
 @RequiredArgsConstructor

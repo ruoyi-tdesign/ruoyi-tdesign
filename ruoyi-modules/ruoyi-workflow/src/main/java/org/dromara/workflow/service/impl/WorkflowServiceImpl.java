@@ -8,6 +8,7 @@ import org.dromara.common.core.domain.dto.StartProcessDTO;
 import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.bo.CompleteTaskBo;
 import org.dromara.workflow.domain.bo.StartProcessBo;
 import org.dromara.workflow.service.IFlwDefinitionService;
@@ -23,6 +24,7 @@ import java.util.Map;
  *
  * @author may
  */
+@ConditionalOnEnable
 @RequiredArgsConstructor
 @Service
 public class WorkflowServiceImpl implements WorkflowService {

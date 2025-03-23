@@ -1,5 +1,8 @@
 package org.dromara.system.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
@@ -28,6 +31,20 @@ public interface SysRoleMapper extends BaseMapperPlus<SysRole, SysRoleVo> {
         @DataColumn(key = "userName", value = "r.create_by")
     })
     List<SysRoleVo> queryList(SysRoleQuery query);
+
+    /**
+     * 分页查询角色列表
+     *
+     * @param page         分页对象
+     * @param queryWrapper 查询条件
+     * @return 包含角色信息的分页结果
+     */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "d.dept_id"),
+        @DataColumn(key = "userName", value = "r.create_by")
+    })
+    Page<SysRoleVo> selectPageRoleList(@Param("page") Page<SysRole> page, @Param(Constants.WRAPPER) Wrapper<SysRole> queryWrapper);
+
 
     /**
      * 根据用户ID查询角色

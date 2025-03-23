@@ -34,6 +34,7 @@ import org.dromara.warm.flow.orm.entity.FlowInstance;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
 import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.FlowCancelBo;
 import org.dromara.workflow.domain.bo.FlowInstanceBo;
@@ -59,6 +60,7 @@ import java.util.stream.Collectors;
  *
  * @author may
  */
+@ConditionalOnEnable
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -66,12 +68,12 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
 
     private final InsService insService;
     private final DefService defService;
+    private final TaskService taskService;
     private final FlowHisTaskMapper flowHisTaskMapper;
     private final FlowInstanceMapper flowInstanceMapper;
-    private final FlwInstanceMapper flwInstanceMapper;
-    private final TaskService taskService;
-    private final IFlwTaskService flwTaskService;
     private final FlowProcessEventHandler flowProcessEventHandler;
+    private final IFlwTaskService flwTaskService;
+    private final FlwInstanceMapper flwInstanceMapper;
     private final FlwCategoryMapper flwCategoryMapper;
 
     /**
@@ -303,7 +305,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
                 }
                 if (BusinessStatusEnum.isDraftOrCancelOrBack(flowInstance.getFlowStatus())) {
                     flowHisTaskVo.setApprover(LoginHelper.getUserIdStr());
-                    flowHisTaskVo.setApproveName(LoginHelper.getLoginUser().getNickname());
+                    flowHisTaskVo.setApproveName(LoginHelper.getUser().getNickname());
                 }
             }
             list.addAll(flowHisTaskVos);

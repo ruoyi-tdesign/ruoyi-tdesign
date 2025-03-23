@@ -50,7 +50,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
      */
     @Override
     public TaskAssigneeDTO selectRolesByTaskAssigneeList(TaskAssigneeBody taskQuery) {
-        PageQuery pageQuery = new PageQuery(taskQuery.getPageSize(), taskQuery.getPageNum());
+        PageQuery pageQuery = PageQuery.of(taskQuery.getPageSize(), taskQuery.getPageNum());
         QueryWrapper<SysRole> wrapper = Wrappers.query();
         wrapper.eq("r.del_flag", SystemConstants.NORMAL)
             .like(StringUtils.isNotBlank(taskQuery.getHandlerCode()), "r.role_name", taskQuery.getHandlerCode())
@@ -73,7 +73,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
      */
     @Override
     public TaskAssigneeDTO selectPostsByTaskAssigneeList(TaskAssigneeBody taskQuery) {
-        PageQuery pageQuery = new PageQuery(taskQuery.getPageSize(), taskQuery.getPageNum());
+        PageQuery pageQuery = PageQuery.of(taskQuery.getPageSize(), taskQuery.getPageNum());
         LambdaQueryWrapper<SysPost> wrapper = Wrappers.<SysPost>lambdaQuery()
             .like(StringUtils.isNotBlank(taskQuery.getHandlerCode()), SysPost::getPostCategory, taskQuery.getHandlerCode())
             .like(StringUtils.isNotBlank(taskQuery.getHandlerName()), SysPost::getPostName, taskQuery.getHandlerName())
@@ -103,7 +103,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
      */
     @Override
     public TaskAssigneeDTO selectDeptsByTaskAssigneeList(TaskAssigneeBody taskQuery) {
-        PageQuery pageQuery = new PageQuery(taskQuery.getPageSize(), taskQuery.getPageNum());
+        PageQuery pageQuery = PageQuery.of(taskQuery.getPageSize(), taskQuery.getPageNum());
         LambdaQueryWrapper<SysDept> wrapper = Wrappers.<SysDept>lambdaQuery()
             .eq(SysDept::getDelFlag, SystemConstants.NORMAL)
             .like(StringUtils.isNotBlank(taskQuery.getHandlerCode()), SysDept::getDeptCategory, taskQuery.getHandlerCode())
@@ -140,7 +140,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
      */
     @Override
     public TaskAssigneeDTO selectUsersByTaskAssigneeList(TaskAssigneeBody taskQuery) {
-        PageQuery pageQuery = new PageQuery(taskQuery.getPageSize(), taskQuery.getPageNum());
+        PageQuery pageQuery = PageQuery.of(taskQuery.getPageSize(), taskQuery.getPageNum());
         QueryWrapper<SysUser> wrapper = Wrappers.query();
         wrapper.eq("u.del_flag", SystemConstants.NORMAL)
             .like(StringUtils.isNotBlank(taskQuery.getHandlerCode()), "u.user_name", taskQuery.getHandlerCode())

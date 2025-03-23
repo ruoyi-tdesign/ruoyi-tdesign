@@ -13,6 +13,7 @@ import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.bo.FlowCategoryBo;
 import org.dromara.workflow.domain.vo.FlowCategoryVo;
 import org.dromara.workflow.service.IFlwCategoryService;
@@ -26,6 +27,7 @@ import java.util.List;
  *
  * @author may
  */
+@ConditionalOnEnable
 @Validated
 @RequiredArgsConstructor
 @RestController

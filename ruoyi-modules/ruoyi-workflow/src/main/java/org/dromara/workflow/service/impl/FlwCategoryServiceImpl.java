@@ -13,6 +13,7 @@ import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.service.DefService;
 import org.dromara.warm.flow.orm.entity.FlowDefinition;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.FlowCategory;
 import org.dromara.workflow.domain.bo.FlowCategoryBo;
@@ -31,12 +32,13 @@ import java.util.List;
  *
  * @author may
  */
+@ConditionalOnEnable
 @RequiredArgsConstructor
 @Service
 public class FlwCategoryServiceImpl implements IFlwCategoryService {
 
-    private final FlwCategoryMapper baseMapper;
     private final DefService defService;
+    private final FlwCategoryMapper baseMapper;
 
     /**
      * 查询流程分类

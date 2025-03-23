@@ -15,28 +15,47 @@ import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.UserService;
-import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ValidatorUtils;
+import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.dto.FlowParams;
-import org.dromara.warm.flow.core.entity.*;
+import org.dromara.warm.flow.core.entity.Definition;
+import org.dromara.warm.flow.core.entity.HisTask;
+import org.dromara.warm.flow.core.entity.Instance;
+import org.dromara.warm.flow.core.entity.Node;
+import org.dromara.warm.flow.core.entity.Task;
+import org.dromara.warm.flow.core.entity.User;
 import org.dromara.warm.flow.core.enums.NodeType;
 import org.dromara.warm.flow.core.enums.SkipType;
-import org.dromara.warm.flow.core.service.*;
-import org.dromara.warm.flow.orm.entity.*;
+import org.dromara.warm.flow.core.service.DefService;
+import org.dromara.warm.flow.core.service.HisTaskService;
+import org.dromara.warm.flow.core.service.InsService;
+import org.dromara.warm.flow.core.service.NodeService;
+import org.dromara.warm.flow.core.service.TaskService;
+import org.dromara.warm.flow.orm.entity.FlowHisTask;
+import org.dromara.warm.flow.orm.entity.FlowInstance;
+import org.dromara.warm.flow.orm.entity.FlowNode;
+import org.dromara.warm.flow.orm.entity.FlowTask;
+import org.dromara.warm.flow.orm.entity.FlowUser;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
 import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
-import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
 import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskAssigneeType;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
-import org.dromara.workflow.domain.bo.*;
+import org.dromara.workflow.domain.bo.BackProcessBo;
+import org.dromara.workflow.domain.bo.CompleteTaskBo;
+import org.dromara.workflow.domain.bo.FlowCopyBo;
+import org.dromara.workflow.domain.bo.FlowTaskBo;
+import org.dromara.workflow.domain.bo.FlowTerminationBo;
+import org.dromara.workflow.domain.bo.StartProcessBo;
+import org.dromara.workflow.domain.bo.TaskOperationBo;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
 import org.dromara.workflow.domain.vo.FlowTaskVo;
 import org.dromara.workflow.handler.FlowProcessEventHandler;
@@ -49,7 +68,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.dromara.workflow.common.constant.FlowConstant.*;
@@ -59,6 +83,7 @@ import static org.dromara.workflow.common.constant.FlowConstant.*;
  *
  * @author may
  */
+@ConditionalOnEnable
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -66,17 +91,16 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
 
     private final TaskService taskService;
     private final InsService insService;
-    private final FlowInstanceMapper flowInstanceMapper;
-    private final FlwTaskMapper flwTaskMapper;
-    private final UserService userService;
-    private final FlowTaskMapper flowTaskMapper;
-    private final FlowHisTaskMapper flowHisTaskMapper;
-    private final FlowProcessEventHandler flowProcessEventHandler;
     private final DefService defService;
     private final HisTaskService hisTaskService;
-    private final IdentifierGenerator identifierGenerator;
     private final NodeService nodeService;
-    private final FlowNodeMapper flowNodeMapper;
+    private final FlowInstanceMapper flowInstanceMapper;
+    private final FlowTaskMapper flowTaskMapper;
+    private final FlowHisTaskMapper flowHisTaskMapper;
+    private final IdentifierGenerator identifierGenerator;
+    private final FlowProcessEventHandler flowProcessEventHandler;
+    private final UserService userService;
+    private final FlwTaskMapper flwTaskMapper;
     private final FlwCategoryMapper flwCategoryMapper;
 
     /**

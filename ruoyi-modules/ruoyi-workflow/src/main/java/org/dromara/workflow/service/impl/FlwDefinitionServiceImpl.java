@@ -30,6 +30,7 @@ import org.dromara.warm.flow.orm.mapper.FlowDefinitionMapper;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
 import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
 import org.dromara.warm.flow.orm.mapper.FlowSkipMapper;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.constant.FlowConstant;
 import org.dromara.workflow.domain.FlowCategory;
 import org.dromara.workflow.domain.vo.FlowDefinitionVo;
@@ -52,6 +53,7 @@ import static org.dromara.common.core.constant.TenantConstants.DEFAULT_TENANT_ID
  *
  * @author may
  */
+@ConditionalOnEnable
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -60,9 +62,9 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
     private final DefService defService;
     private final FlowDefinitionMapper flowDefinitionMapper;
     private final FlowHisTaskMapper flowHisTaskMapper;
-    private final FlwCategoryMapper flwCategoryMapper;
     private final FlowNodeMapper flowNodeMapper;
     private final FlowSkipMapper flowSkipMapper;
+    private final FlwCategoryMapper flwCategoryMapper;
 
     /**
      * 查询流程定义列表

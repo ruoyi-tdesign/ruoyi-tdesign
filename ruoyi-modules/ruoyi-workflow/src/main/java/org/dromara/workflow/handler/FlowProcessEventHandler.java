@@ -6,6 +6,7 @@ import org.dromara.common.core.domain.event.ProcessEvent;
 import org.dromara.common.core.domain.event.ProcessTaskEvent;
 import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
  * @author may
  * @date 2024-06-02
  */
+@ConditionalOnEnable
 @Slf4j
 @Component
 public class FlowProcessEventHandler {

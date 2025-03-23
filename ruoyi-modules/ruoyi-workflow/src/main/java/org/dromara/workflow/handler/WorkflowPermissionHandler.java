@@ -4,6 +4,8 @@ import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.LoginUser;
+import org.dromara.warm.flow.core.entity.Task;
+import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskAssigneeEnum;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.dto.FlowParams;
@@ -22,6 +24,7 @@ import java.util.stream.Stream;
  *
  * @author AprilWind
  */
+@ConditionalOnEnable
 @RequiredArgsConstructor
 @Component
 @Slf4j
@@ -34,7 +37,7 @@ public class WorkflowPermissionHandler implements PermissionHandler {
      */
     @Override
     public List<String> permissions() {
-        LoginUser loginUser = LoginHelper.getLoginUser();
+        LoginUser loginUser = LoginHelper.getUser();
         if (ObjectUtil.isNull(loginUser)) {
             return new ArrayList<>();
         }

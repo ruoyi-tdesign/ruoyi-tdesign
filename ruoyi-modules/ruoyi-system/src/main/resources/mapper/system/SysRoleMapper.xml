@@ -43,6 +43,11 @@
         order by r.role_sort, r.create_time desc
     </select>
 
+    <select id="selectPageRoleList" resultMap="SysRoleResult">
+        <include refid="selectRoleVo"/>
+        ${ew.getCustomSqlSegment}
+    </select>
+
     <select id="selectRolePermissionByUserId" parameterType="Long" resultMap="SysRoleResultVo">
         <include refid="selectRoleVo"/>
         WHERE r.del_flag = '0' and sur.user_id = #{userId}

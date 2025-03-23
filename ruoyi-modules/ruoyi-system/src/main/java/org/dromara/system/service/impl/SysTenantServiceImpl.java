@@ -61,7 +61,6 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
     private final SysConfigMapper configMapper;
     private final SysDictTypeMapper dictTypeMapper;
     private final SysDictDataMapper dictDataMapper;
-    private final WorkflowService workflowService;
     @Autowired
     private ISysTenantPackageService tenantPackageService;
 
@@ -172,8 +171,13 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
             config.setTenantId(tenantId);
         }
         configMapper.insertBatch(sysConfigList);
-        //新增租户流程定义
-        workflowService.syncDef(tenantId);
+
+        // 未开启工作流不执行下方操作
+        if (SpringUtils.getProperty("warm-flow.enabled", Boolean.class, false)) {
+            WorkflowService workflowService = SpringUtils.getBean(WorkflowService.class);
+            // 新增租户流程定义
+            workflowService.syncDef(tenantId);
+        }
 
         // 发布创建事件
         SpringUtils.context().publishEvent(new TenantNewEvent(add));
