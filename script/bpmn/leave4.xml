@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<definition flowCode="leave4" flowName="请假申请-会签" version="1" category="103" formCustom="N" formPath="/workflow/leaveEdit/index">
+<definition flowCode="leave4" flowName="请假申请-会签" version="1" category="1" formCustom="N" formPath="/workflow/leaveEdit/index">
     <node nodeType="start" nodeCode="9ce8bf00-f25b-4fc6-91b8-827082fc4876" nodeName="开始" nodeRatio="0.000" coordinate="320,240|320,240" skipAnyNode="N" formCustom="N">
         <skip coordinate="340,240;410,240" skipType="PASS">e90b98ef-35b4-410c-a663-bae8b7624b9f</skip>
     </node>

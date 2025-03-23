@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<definition flowCode="leave5" flowName="请假申请-并行会签网关" version="1" category="103" formCustom="N" formPath="/workflow/leaveEdit/index">
+<definition flowCode="leave5" flowName="请假申请-并行会签网关" version="1" category="1" formCustom="N" formPath="/workflow/leaveEdit/index">
     <node nodeType="start" nodeCode="ebebaf26-9cb6-497e-8119-4c9fed4c597c" nodeName="开始" nodeRatio="0.000" coordinate="300,220|300,220" skipAnyNode="N" formCustom="N">
         <skip coordinate="320,220;350,220;350,220;340,220;340,220;370,220" skipType="PASS">e1b04e96-dc81-4858-a309-2fe945d2f374</skip>
     </node>

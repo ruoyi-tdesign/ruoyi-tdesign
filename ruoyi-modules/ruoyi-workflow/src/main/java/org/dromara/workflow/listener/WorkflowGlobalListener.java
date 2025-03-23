@@ -107,7 +107,6 @@ public class WorkflowGlobalListener implements GlobalListener {
                 log.info("流程已结束，状态更新为: {}", status);
                 return status;
             }
-            log.warn("流程未结束，实例ID: {}", instanceId);
             return null;
         }
     }
