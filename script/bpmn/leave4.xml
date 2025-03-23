@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definition flowCode="leave4" flowName="请假申请-会签" version="1" category="103" formCustom="N" formPath="/workflow/leaveEdit/index">
+    <node nodeType="start" nodeCode="9ce8bf00-f25b-4fc6-91b8-827082fc4876" nodeName="开始" nodeRatio="0.000" coordinate="320,240|320,240" skipAnyNode="N" formCustom="N">
+        <skip coordinate="340,240;410,240" skipType="PASS">e90b98ef-35b4-410c-a663-bae8b7624b9f</skip>
+    </node>
+    <node nodeType="between" nodeCode="e90b98ef-35b4-410c-a663-bae8b7624b9f" nodeName="申请人" nodeRatio="0.000" coordinate="460,240|460,240" skipAnyNode="N" formCustom="N">
+        <skip coordinate="510,240;590,240" skipType="PASS">768b5b1a-6726-4d67-8853-4cc70d5b1045</skip>
+    </node>
+    <node nodeType="between" nodeCode="768b5b1a-6726-4d67-8853-4cc70d5b1045" nodeName="百分之60通过" permissionFlag="${userList}" nodeRatio="60.000" coordinate="640,240|640,240" skipAnyNode="N" anyNodeSkip="e90b98ef-35b4-410c-a663-bae8b7624b9f" formCustom="N">
+        <skip coordinate="690,240;770,240" skipType="PASS">2f9f2e21-9bcf-42a3-a07c-13037aad22d1</skip>
+    </node>
+    <node nodeType="between" nodeCode="2f9f2e21-9bcf-42a3-a07c-13037aad22d1" nodeName="全部审批通过" permissionFlag="role:1,role:3" nodeRatio="100.000" coordinate="820,240|820,240" skipAnyNode="N" formCustom="N">
+        <skip coordinate="870,240;950,240" skipType="PASS">27461e01-3d9f-4530-8fe3-bd5ec7f9571f</skip>
+    </node>
+    <node nodeType="between" nodeCode="27461e01-3d9f-4530-8fe3-bd5ec7f9571f" nodeName="CEO" permissionFlag="1" nodeRatio="0.000" coordinate="1000,240|1000,240" skipAnyNode="N" formCustom="N">
+        <skip coordinate="1050,240;1080,240;1080,240;1070,240;1070,240;1100,240" skipType="PASS">b62b88c3-8d8d-4969-911e-2aaea219e7fc</skip>
+    </node>
+    <node nodeType="end" nodeCode="b62b88c3-8d8d-4969-911e-2aaea219e7fc" nodeName="结束" nodeRatio="0.000" coordinate="1120,240|1120,240" skipAnyNode="N" formCustom="N"/>
+</definition>

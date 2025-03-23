@@ -166,6 +166,7 @@ security:
     - /error
     - /*/api-docs
     - /*/api-docs/**
+    - /warm-flow-ui/token-name
 
 # 多租户配置
 tenant:
@@ -286,8 +287,7 @@ xss:
   # 排除链接（多个用逗号分隔）
   excludeUrls:
     - /system/notice
-    - /workflow/model/save
-    - /workflow/model/editModelXml
+    - /warm-flow/save-xml
     - /system/config/**
     - /system/messageTemplate
     - /system/messageConfig
@@ -340,24 +340,11 @@ websocket:
 sms:
   config-type: interface
 
---- #flowable配置
-flowable:
-  # 开关 用于启动/停用工作流
+--- # warm-flow工作流配置
+warm-flow:
+  # 是否开启工作流，默认true
   enabled: true
-  process.enabled: ${flowable.enabled}
-  eventregistry.enabled: ${flowable.enabled}
-  async-executor-activate: false #关闭定时任务JOB
-  #  将databaseSchemaUpdate设置为true。当Flowable发现库与数据库表结构不一致时，会自动将数据库表结构升级至新版本。
-  database-schema-update: true
-  activity-font-name: 宋体
-  label-font-name: 宋体
-  annotation-font-name: 宋体
-  # 关闭各个模块生成表，目前只使用工作流基础表
-  idm:
-    enabled: false
-  cmmn:
-    enabled: false
-  dmn:
-    enabled: false
-  app:
-    enabled: false
+  # 是否开启设计器ui
+  ui: true
+  # 默认Authorization，如果有多个token，用逗号分隔
+  token-name: ${sa-token.token-name},clientid

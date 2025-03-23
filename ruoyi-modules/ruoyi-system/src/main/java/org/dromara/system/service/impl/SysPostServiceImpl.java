@@ -229,4 +229,5 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
         SysPost post = MapstructUtils.convert(bo, SysPost.class);
         return baseMapper.updateById(post);
     }
+
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definition flowCode="leave5" flowName="请假申请-并行会签网关" version="1" category="103" formCustom="N" formPath="/workflow/leaveEdit/index">
+    <node nodeType="start" nodeCode="ebebaf26-9cb6-497e-8119-4c9fed4c597c" nodeName="开始" nodeRatio="0.000" coordinate="300,220|300,220" skipAnyNode="N" formCustom="N">
+        <skip coordinate="320,220;350,220;350,220;340,220;340,220;370,220" skipType="PASS">e1b04e96-dc81-4858-a309-2fe945d2f374</skip>
+    </node>
+    <node nodeType="between" nodeCode="e1b04e96-dc81-4858-a309-2fe945d2f374" nodeName="申请人" nodeRatio="0.000" coordinate="420,220|420,220" skipAnyNode="N" formCustom="N">
+        <skip coordinate="470,220;535,220" skipType="PASS">3e743f4f-51ca-41d4-8e94-21f5dd9b59c9</skip>
+    </node>
+    <node nodeType="parallel" nodeCode="3e743f4f-51ca-41d4-8e94-21f5dd9b59c9" nodeRatio="0.000" coordinate="560,220" skipAnyNode="N" formCustom="N">
+        <skip coordinate="560,245;560,320;650,320" skipType="PASS">c80f273e-1f17-4bd8-9ad1-04a4a94ea862</skip>
+        <skip coordinate="560,195;560,120;650,120" skipType="PASS">1e3e8d3b-18ae-4d6c-a814-ce0d724adfa4</skip>
+    </node>
+    <node nodeType="between" nodeCode="c80f273e-1f17-4bd8-9ad1-04a4a94ea862" nodeName="会签" permissionFlag="role:1,role:3" nodeRatio="100.000" coordinate="700,320|700,320" skipAnyNode="N" formCustom="N">
+        <skip coordinate="750,320;860,320;860,245" skipType="PASS">1a20169e-3d82-4926-a151-e2daad28de1b</skip>
+    </node>
+    <node nodeType="parallel" nodeCode="1a20169e-3d82-4926-a151-e2daad28de1b" nodeRatio="0.000" coordinate="860,220" skipAnyNode="N" formCustom="N">
+        <skip coordinate="885,220;950,220" skipType="PASS">7a8f0473-e409-442e-a843-5c2b813d00e9</skip>
+    </node>
+    <node nodeType="between" nodeCode="7a8f0473-e409-442e-a843-5c2b813d00e9" nodeName="CEO" permissionFlag="1" nodeRatio="0.000" coordinate="1000,220|1000,220" skipAnyNode="N" formCustom="N">
+        <skip coordinate="1050,220;1120,220" skipType="PASS">03c4d2bc-58b5-4408-a2e4-65afb046f169</skip>
+    </node>
+    <node nodeType="end" nodeCode="03c4d2bc-58b5-4408-a2e4-65afb046f169" nodeName="结束" nodeRatio="0.000" coordinate="1140,220|1140,220" skipAnyNode="N" formCustom="N"/>
+    <node nodeType="between" nodeCode="1e3e8d3b-18ae-4d6c-a814-ce0d724adfa4" nodeName="百分之60票签" permissionFlag="${userList}" nodeRatio="60.000" coordinate="700,120|700,120" skipAnyNode="N" anyNodeSkip="e1b04e96-dc81-4858-a309-2fe945d2f374" formCustom="N">
+        <skip coordinate="750,120;860,120;860,195" skipType="PASS">1a20169e-3d82-4926-a151-e2daad28de1b</skip>
+    </node>
+</definition>

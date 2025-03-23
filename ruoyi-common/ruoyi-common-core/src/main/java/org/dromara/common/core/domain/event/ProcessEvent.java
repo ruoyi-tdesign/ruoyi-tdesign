@@ -10,7 +10,6 @@ import java.io.Serializable;
  *
  * @author may
  */
-
 @Data
 public class ProcessEvent implements Serializable {
 
@@ -18,14 +17,19 @@ public class ProcessEvent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 流程定义key
+     * 租户ID
      */
-    private String key;
+    private String tenantId;
+
+    /**
+     * 流程定义编码
+     */
+    private String flowCode;
 
     /**
      * 业务id
      */
-    private String businessKey;
+    private String businessId;
 
     /**
      * 状态
@@ -36,6 +40,5 @@ public class ProcessEvent implements Serializable {
      * 当为true时为申请人节点办理
      */
     private boolean submit;
-
 
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definition flowCode="leave1" flowName="请假申请-普通" version="1" category="1" formCustom="N" formPath="/workflow/leaveEdit/index">
+    <node nodeType="start" nodeCode="d5ee3ddf-3968-4379-a86f-9ceabde5faac" nodeName="开始" nodeRatio="0.000" coordinate="200,200|200,200" skipAnyNode="N" formCustom="N">
+        <skip coordinate="220,200;310,200" skipType="PASS">dd515cdd-59f6-446f-94ca-25ca062afb42</skip>
+    </node>
+    <node nodeType="between" nodeCode="dd515cdd-59f6-446f-94ca-25ca062afb42" nodeName="申请人" nodeRatio="0.000" coordinate="360,200|360,200" skipAnyNode="N" formCustom="N">
+        <skip coordinate="410,200;490,200" skipType="PASS">78fa8e5b-e809-44ed-978a-41092409ebcf</skip>
+    </node>
+    <node nodeType="between" nodeCode="78fa8e5b-e809-44ed-978a-41092409ebcf" nodeName="组长" permissionFlag="role:1" nodeRatio="0.000" coordinate="540,200|540,200" skipAnyNode="N" formCustom="N">
+        <skip coordinate="590,200;670,200" skipType="PASS">a8abf15f-b83e-428a-86cc-033555ea9bbe</skip>
+    </node>
+    <node nodeType="between" nodeCode="a8abf15f-b83e-428a-86cc-033555ea9bbe" nodeName="部门主管" permissionFlag="role:3,role:4" nodeRatio="0.000" coordinate="720,200|720,200" skipAnyNode="N" formCustom="N">
+        <skip coordinate="770,200;880,200" skipType="PASS">8b82b7d7-8660-455e-b880-d6d22ea3eb6d</skip>
+    </node>
+    <node nodeType="end" nodeCode="8b82b7d7-8660-455e-b880-d6d22ea3eb6d" nodeName="结束" nodeRatio="0.000" coordinate="900,200|900,200" skipAnyNode="N" formCustom="N"/>
+</definition>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definition flowCode="leave2" flowName="请假申请-排他网关" version="2" category="1" formCustom="N" formPath="/workflow/leaveEdit/index">
+    <node nodeType="start" nodeCode="cef3895c-f7d8-4598-8bf3-8ec2ef6ce84a" nodeName="开始" nodeRatio="0.000" coordinate="300,240|300,240" skipAnyNode="N" formCustom="N">
+        <skip coordinate="320,240;390,240" skipType="PASS">fdcae93b-b69c-498a-b231-09255e74bcbd</skip>
+    </node>
+    <node nodeType="between" nodeCode="fdcae93b-b69c-498a-b231-09255e74bcbd" nodeName="申请人" nodeRatio="0.000" coordinate="440,240|440,240" skipAnyNode="N" formCustom="N">
+        <skip coordinate="490,240;535,240" skipType="PASS">7b8c7ead-7dc8-4951-a7f3-f0c41995909e</skip>
+    </node>
+    <node nodeType="serial" nodeCode="7b8c7ead-7dc8-4951-a7f3-f0c41995909e" nodeRatio="0.000" coordinate="560,240" skipAnyNode="N" formCustom="N">
+        <skip coordinate="560,265;560,320;670,320" skipType="PASS" skipCondition="@@le@@|leaveDays@@le@@2">b3528155-dcb7-4445-bbdf-3d00e3499e86</skip>
+        <skip coordinate="560,215;560,160;670,160|560,187" skipType="PASS" skipName="大于两天" skipCondition="@@gt@@|leaveDays@@gt@@2">5ed2362b-fc0c-4d52-831f-95208b830605</skip>
+    </node>
+    <node nodeType="between" nodeCode="b3528155-dcb7-4445-bbdf-3d00e3499e86" nodeName="组长" permissionFlag="3,4" nodeRatio="0.000" coordinate="720,320|720,320" skipAnyNode="N" formCustom="N">
+        <skip coordinate="770,320;860,320;860,280" skipType="PASS">c9fa6d7d-2a74-4e78-b947-0cad8a6af869</skip>
+    </node>
+    <node nodeType="between" nodeCode="c9fa6d7d-2a74-4e78-b947-0cad8a6af869" nodeName="总经理" permissionFlag="role:1" nodeRatio="0.000" coordinate="860,240|860,240" skipAnyNode="N" formCustom="N">
+        <skip coordinate="910,240;980,240" skipType="PASS">40aa65fd-0712-4d23-b6f7-d0432b920fd1</skip>
+    </node>
+    <node nodeType="end" nodeCode="40aa65fd-0712-4d23-b6f7-d0432b920fd1" nodeName="结束" nodeRatio="0.000" coordinate="1000,240|1000,240" skipAnyNode="N" formCustom="N"/>
+    <node nodeType="between" nodeCode="5ed2362b-fc0c-4d52-831f-95208b830605" nodeName="部门领导" permissionFlag="role:1" nodeRatio="0.000" coordinate="720,160|720,160" skipAnyNode="N" formCustom="N">
+        <skip coordinate="770,160;860,160;860,200" skipType="PASS">c9fa6d7d-2a74-4e78-b947-0cad8a6af869</skip>
+    </node>
+</definition>
