@@ -129,11 +129,15 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
      */
     @Override
     public List<UserDTO> fetchUsersByStorageId(String storageId) {
-        String[] parts = storageId.split(StrUtil.COLON, 2);
-        if (parts.length < 2) {
-            return getUsersByType(TaskAssigneeEnum.USER, List.of(Long.valueOf(parts[0])));
+        List<UserDTO> list = new ArrayList<>();
+        for (String str : storageId.split(StrUtil.COMMA)) {
+            String[] parts = str.split(StrUtil.COLON, 2);
+            if (parts.length < 2) {
+                list.addAll(getUsersByType(TaskAssigneeEnum.USER, List.of(Long.valueOf(parts[0]))));
+            }
+            list.addAll(getUsersByType(TaskAssigneeEnum.fromCode(parts[0] + StrUtil.COLON), List.of(Long.valueOf(parts[1]))));
         }
-        return getUsersByType(TaskAssigneeEnum.fromCode(parts[0] + StrUtil.COLON), List.of(Long.valueOf(parts[1])));
+        return list;
     }
 
     /**
