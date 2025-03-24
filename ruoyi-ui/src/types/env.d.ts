@@ -28,4 +28,6 @@ export interface ImportMetaEnv {
   readonly VITE_APP_ACCOUNT: string;
   /** 密码 */
   readonly VITE_APP_PASSWORD: string;
+  /** SSE开关 */
+  readonly VITE_APP_SSE: string;
 }

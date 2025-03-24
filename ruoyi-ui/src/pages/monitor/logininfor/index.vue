@@ -197,7 +197,7 @@ import {
   SearchIcon,
   SettingIcon,
 } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol, SelectOptions, TableSort } from 'tdesign-vue-next';
+import type { PageInfo, PrimaryTableCol, TableProps, TableSort } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
 import {
@@ -315,12 +315,12 @@ function handleSortChange(value?: TableSort) {
 }
 
 /** 多选框选中数据 */
-function handleSelectionChange(selection: Array<string | number>, { selectedRowData }: SelectOptions<SysLogininforVo>) {
+const handleSelectionChange: TableProps['onSelectChange'] = (selection, options) => {
   ids.value = selection;
   single.value = selection.length !== 1;
   multiple.value = !selection.length;
-  selectName.value = selectedRowData.map((item) => item.userName)[0];
-}
+  selectName.value = options.selectedRowData.map((item) => item.userName)[0];
+};
 
 /** 详情按钮操作 */
 function handleDetail(row: SysLogininforVo) {
