@@ -356,6 +356,10 @@ async function handleBeforeUpload(file: UploadFile) {
     proxy.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}图片格式文件!`);
     return false;
   }
+  if (file.name.includes(',')) {
+    proxy?.$modal.msgError('文件名不正确，不能包含英文逗号!');
+    return false;
+  }
   // 压缩图片，开启压缩并且大于指定的压缩大小时才压缩
   if (props.compressSupport && file.size / 1024 > props.compressTargetSize) {
     const blob = await compressAccurately(file.raw, props.compressTargetSize);
