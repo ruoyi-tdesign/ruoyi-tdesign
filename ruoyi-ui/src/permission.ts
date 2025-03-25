@@ -6,11 +6,16 @@ import router from '@/router';
 import { usePermissionStoreHook, useUserStore } from '@/store';
 import { useTitle } from '@/utils/doc';
 import { isRelogin } from '@/utils/request';
-import { isHttp } from '@/utils/validate';
+import { isHttp, isPathMatch } from '@/utils/validate';
 
 let errorRetry = 0;
 
 NProgress.configure({ showSpinner: false });
+
+// 路由白名单
+const isWhiteList = (path: string, whiteList: string[]) => {
+  return whiteList.some((pattern) => isPathMatch(pattern, path));
+};
 
 router.beforeEach(async (to, from, next) => {
   NProgress.start();
@@ -35,7 +40,7 @@ router.beforeEach(async (to, from, next) => {
       return;
     }
 
-    if (whiteListRouters.indexOf(to.path) !== -1) {
+    if (isWhiteList(to.path, whiteListRouters)) {
       next();
       return;
     }
