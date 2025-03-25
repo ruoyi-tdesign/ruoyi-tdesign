@@ -128,14 +128,16 @@ const emit = defineEmits(['ok']);
 
 /** 查询参数列表 */
 function show(dataName: string) {
-  getDataNameList();
-  if (dataName) {
-    queryParams.dataName = dataName;
-  } else {
-    queryParams.dataName = 'master';
-  }
-  getList();
-  visible.value = true;
+  getDataNames().then((res) => {
+    dataNameList.value = res.data;
+    if (dataName) {
+      queryParams.dataName = dataName;
+    } else {
+      queryParams.dataName = dataNameList.value[0];
+    }
+    getList();
+    visible.value = true;
+  });
 }
 /** 多选框选中数据 */
 function handleSelectionChange(selection: Array<string | number>) {
