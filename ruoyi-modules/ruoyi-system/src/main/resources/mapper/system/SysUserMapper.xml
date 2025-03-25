@@ -6,52 +6,15 @@
 
     <resultMap id="SysUserResult" autoMapping="true" type="org.dromara.system.domain.vo.SysUserVo">
         <id property="userId" column="user_id"/>
+        <collection property="roles" ofType="org.dromara.system.domain.vo.SysRoleVo">
+            <id property="roleId" column="role_id"/>
+            <result property="status" column="role_status" />
+        </collection>
     </resultMap>
 
     <resultMap id="SysUserExportResult" type="org.dromara.system.domain.vo.SysUserExportVo">
         <id property="userId" column="user_id"/>
     </resultMap>
-
-    <sql id="selectUserVo">
-        select u.user_id,
-               u.tenant_id,
-               u.dept_id,
-               u.user_name,
-               u.nick_name,
-               u.user_type,
-               u.email,
-               u.avatar,
-               u.phonenumber,
-               u.password,
-               u.sex,
-               u.status,
-               u.del_flag,
-               u.login_ip,
-               u.login_date,
-               u.create_by,
-               u.update_time,
-               u.create_time,
-               u.remark,
-               d.dept_id,
-               d.parent_id,
-               d.ancestors,
-               d.dept_name,
-               d.order_num,
-               d.leader,
-               d.status as dept_status,
-               d.email as dept_email,
-               d.create_time as dept_cteate_time,
-               r.role_id,
-               r.role_name,
-               r.role_key,
-               r.role_sort,
-               r.data_scope,
-               r.status as role_status
-        from sys_user u
-            left join sys_dept d on u.dept_id = d.dept_id
-            left join sys_user_role sur on u.user_id = sur.user_id
-            left join sys_role r on r.role_id = sur.role_id
-    </sql>
 
     <sql id="selectSysUserVo">
         select su.user_id, su.dept_id, su.user_name, su.nick_name, su.user_type, su.email, su.phonenumber, su.sex, su.avatar, su.password, su.status, su.del_flag, su.login_ip, su.login_date, su.create_by, su.create_time, su.update_by, su.update_time, su.remark from sys_user su
@@ -203,7 +166,34 @@
         order by u.user_id
     </select>
     <select id="selectSafeUserById" parameterType="Long" resultMap="SysUserResult">
-        <include refid="selectUserVo"/>
+        select u.user_id,
+               u.tenant_id,
+               u.dept_id,
+               u.user_name,
+               u.nick_name,
+               u.user_type,
+               u.email,
+               u.avatar,
+               u.phonenumber,
+               u.password,
+               u.sex,
+               u.status,
+               u.del_flag,
+               u.login_ip,
+               u.login_date,
+               u.create_by,
+               u.update_time,
+               u.create_time,
+               u.remark,
+               r.role_id,
+               r.role_name,
+               r.role_key,
+               r.role_sort,
+               r.data_scope,
+               r.status as role_status
+        from sys_user u
+                 left join sys_user_role sur on u.user_id = sur.user_id
+                 left join sys_role r on r.role_id = sur.role_id
         where u.del_flag = '0' and u.user_id = #{userId}
     </select>
     <select id="countUserById" resultType="Long">

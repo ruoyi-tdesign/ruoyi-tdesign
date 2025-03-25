@@ -138,22 +138,12 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['monitor:logininfor:query']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDetail(row)"
-            >
-              <browse-icon />详情
-            </t-link>
-            <t-link
-              v-hasPermi="['monitor:logininfor:remove']"
-              theme="danger"
-              hover="color"
-              @click.stop="handleDelete(row)"
-            >
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['monitor:logininfor:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['monitor:logininfor:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>

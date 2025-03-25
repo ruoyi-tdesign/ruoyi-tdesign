@@ -106,30 +106,15 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['system:ossConfig:query']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDetail(row)"
-            >
-              <browse-icon />详情
-            </t-link>
-            <t-link
-              v-hasPermi="['system:ossConfig:edit']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleUpdate(row)"
-            >
-              <edit-icon />修改
-            </t-link>
-            <t-link
-              v-hasPermi="['system:ossConfig:remove']"
-              theme="danger"
-              hover="color"
-              @click.stop="handleDelete(row)"
-            >
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['system:ossConfig:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:ossConfig:edit']" @click.stop="handleUpdate(row)">
+              <template #prefix-icon><edit-icon /></template>修改
+            </my-link>
+            <my-link v-hasPermi="['system:ossConfig:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>
@@ -335,8 +320,7 @@ const rules = ref<Record<string, Array<FormRule>>>({
   accessPolicy: [{ required: true, message: 'accessPolicy不能为空' }],
 });
 // 提交表单对象
-const form = ref<SysOssConfigVo & SysOssConfigForm>({
-});
+const form = ref<SysOssConfigVo & SysOssConfigForm>({});
 // 查询对象
 const queryParams = ref<SysOssConfigQuery>({
   pageNum: 1,

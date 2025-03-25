@@ -278,6 +278,7 @@ public class SysUserController extends BaseController {
     @SaCheckPermission("system:user:query")
     @GetMapping("/authRole/{userId}")
     public R<SysUserInfoVo> authRole(@PathVariable Long userId) {
+        userService.checkUserDataScope(userId);
         SysUserVo user = userService.selectSafeUserById(userId);
         List<SysRoleVo> roles = roleService.selectRolesAuthByUserId(userId);
         SysUserInfoVo userInfoVo = new SysUserInfoVo();

@@ -87,42 +87,18 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['system:dept:query']"
-              size="small"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDetail(row)"
-            >
+            <my-link v-hasPermi="['system:dept:query']" @click.stop="handleDetail(row)">
               <template #prefix-icon><browse-icon /></template>详情
-            </t-link>
-            <t-link
-              v-hasPermi="['system:dept:edit']"
-              size="small"
-              theme="primary"
-              hover="color"
-              @click.stop="handleUpdate(row)"
-            >
+            </my-link>
+            <my-link v-hasPermi="['system:dept:edit']" @click.stop="handleUpdate(row)">
               <template #prefix-icon><edit-icon /></template>修改
-            </t-link>
-            <t-link
-              v-hasPermi="['system:dept:add']"
-              size="small"
-              theme="primary"
-              hover="color"
-              @click.stop="handleAdd(row)"
-            >
+            </my-link>
+            <my-link v-hasPermi="['system:dept:add']" @click.stop="handleAdd(row)">
               <template #prefix-icon><add-icon /></template>新增
-            </t-link>
-            <t-link
-              v-hasPermi="['system:dept:remove']"
-              size="small"
-              theme="danger"
-              hover="color"
-              @click.stop="handleDelete(row)"
-            >
+            </my-link>
+            <my-link v-hasPermi="['system:dept:remove']" theme="danger" @click.stop="handleDelete(row)">
               <template #prefix-icon><delete-icon /></template>删除
-            </t-link>
+            </my-link>
           </t-space>
         </template>
       </t-enhanced-table>

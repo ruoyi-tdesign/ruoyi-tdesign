@@ -85,10 +85,10 @@
           <dict-tag :options="sys_normal_disable" :value="row.status" />
         </template>
         <template #operation="{ row }">
-          <t-link v-hasPermi="['system:role:remove']" theme="primary" hover="color" @click="cancelAuthUser(row)">
-            <close-circle-icon />
+          <my-link v-hasPermi="['system:role:remove']" theme="danger" @click="cancelAuthUser(row)">
+            <template #prefix-icon><close-circle-icon /></template>
             取消授权
-          </t-link>
+          </my-link>
         </template>
       </t-table>
     </t-space>

@@ -27,6 +27,7 @@ declare module 'vue' {
     ListenerParam: typeof import('./src/components/BpmnDesign/panel/property/ListenerParam.vue')['default']
     MultiInstanceUser: typeof import('./src/components/Process/multiInstanceUser.vue')['default']
     MyDescriptions: typeof import('./src/components/my-descriptions/index.vue')['default']
+    MyLink: typeof import('./src/components/my-link/index.vue')['default']
     MyScrollbar: typeof import('./src/components/my-scrollbar/index.vue')['default']
     Panel: typeof import('./src/components/BpmnDesign/panel/index.vue')['default']
     ParentView: typeof import('./src/components/ParentView/index.vue')['default']

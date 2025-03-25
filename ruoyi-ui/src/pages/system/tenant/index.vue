@@ -93,24 +93,22 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link v-hasPermi="['system:tenant:query']" theme="primary" hover="color" @click.stop="handleDetail(row)">
-              <browse-icon />详情
-            </t-link>
-            <t-link v-hasPermi="['system:tenant:edit']" theme="primary" hover="color" @click.stop="handleUpdate(row)">
-              <edit-icon />修改
-            </t-link>
-            <t-link
+            <my-link v-hasPermi="['system:tenant:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:tenant:edit']" @click.stop="handleUpdate(row)">
+              <template #prefix-icon><edit-icon /></template>修改
+            </my-link>
+            <my-link
               v-if="row.packageId"
               v-hasPermi="['system:tenant:edit']"
-              theme="primary"
-              hover="color"
               @click.stop="handleSyncTenantPackage(row)"
             >
-              <edit-icon />同步套餐
-            </t-link>
-            <t-link v-hasPermi="['system:tenant:remove']" theme="danger" hover="color" @click.stop="handleDelete(row)">
-              <delete-icon />删除
-            </t-link>
+              <template #prefix-icon><edit-icon /></template>同步套餐
+            </my-link>
+            <my-link v-hasPermi="['system:tenant:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>

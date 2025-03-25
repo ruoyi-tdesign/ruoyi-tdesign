@@ -101,30 +101,15 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['system:tenantApp:query']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDetail(row)"
-            >
-              <browse-icon />详情
-            </t-link>
-            <t-link
-              v-hasPermi="['system:tenantApp:edit']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleUpdate(row)"
-            >
-              <edit-icon />修改
-            </t-link>
-            <t-link
-              v-hasPermi="['system:tenantApp:remove']"
-              theme="danger"
-              hover="color"
-              @click.stop="handleDelete(row)"
-            >
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['system:tenantApp:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:tenantApp:edit']" @click.stop="handleUpdate(row)">
+              <template #prefix-icon><edit-icon /></template>修改
+            </my-link>
+            <my-link v-hasPermi="['system:tenantApp:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>
