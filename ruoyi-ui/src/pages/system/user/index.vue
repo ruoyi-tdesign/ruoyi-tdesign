@@ -419,6 +419,7 @@ import type {
   SubmitContext,
   SuccessContext,
   TableSort,
+  TreeSelectProps,
   UploadInstanceFunctions,
 } from 'tdesign-vue-next';
 import { computed, createVNode, getCurrentInstance, onMounted, reactive, ref } from 'vue';
@@ -512,6 +513,7 @@ const rules = ref<Record<string, Array<FormRule>>>({
   password: [
     { required: true, message: '用户密码不能为空' },
     { min: 5, max: 20, message: '用户密码长度必须介于 5 和 20 之间' },
+    { pattern: /^[^<>"'|\\]+$/, message: '不能包含非法字符：< > " \' \\ |', trigger: 'blur' },
   ],
   email: [{ email: true, message: '请输入正确的邮箱地址' }],
   phonenumber: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码' }],
@@ -555,15 +557,15 @@ async function getDeptFormTree() {
   });
 }
 
-function handleDeptChange(value: number | string) {
+const handleDeptChange: TreeSelectProps['onChange'] = (value) => {
   loadingPost.value = true;
   form.value.postIds = [];
-  postOptionSelect(value)
+  postOptionSelect(value as number)
     .then((res) => {
       postOptions.value = res.data;
     })
     .finally(() => (loadingPost.value = false));
-}
+};
 
 /** 查询用户列表 */
 function getList() {
