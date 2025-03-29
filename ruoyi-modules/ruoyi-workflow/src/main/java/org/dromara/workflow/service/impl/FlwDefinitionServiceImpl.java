@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
-import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
@@ -41,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,18 +145,13 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean importJson(MultipartFile file, String category) {
-        try (InputStream inputStream = file.getInputStream()) {
-            byte[] fileBytes = inputStream.readAllBytes();
-            String fileContent = new String(fileBytes, StandardCharsets.UTF_8);
-            DefJson defJson = JsonUtils.parseObject(fileContent, DefJson.class);
+        try {
+            DefJson defJson = JsonUtils.parseObject(file.getBytes(), DefJson.class);
             defJson.setCategory(category);
             defService.importDef(defJson);
         } catch (IOException e) {
             log.error("读取文件流错误: {}", e.getMessage(), e);
             throw new IllegalStateException("文件读取失败，请检查文件内容", e);
-        } catch (Exception e) {
-            log.error("导入流程定义错误: {}", e.getMessage(), e);
-            throw new IllegalStateException("导入流程定义失败", e);
         }
         return true;
     }
@@ -173,12 +166,11 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
     @Override
     public void exportDef(Long id, HttpServletResponse response) throws IOException {
         byte[] data = defService.exportJson(id).getBytes(StandardCharsets.UTF_8);
-        String filename = "workflow_export_" + DateUtils.dateTimeNow() + ".json";
         // 设置响应头和内容类型
         response.reset();
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setContentType("application/json");
-        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+        response.setContentType("application/text");
+        response.setHeader("Content-Disposition", "attachment;");
         response.addHeader("Content-Length", "" + data.length);
         IoUtil.write(response.getOutputStream(), false, data);
     }
