@@ -12,9 +12,6 @@
         <t-form-item label="分类名称" name="categoryName">
           <t-input v-model="queryParams.categoryName" placeholder="请输入分类名称" clearable @enter="handleQuery" />
         </t-form-item>
-        <t-form-item label="分类编码" name="categoryCode">
-          <t-input v-model="queryParams.categoryCode" placeholder="请输入分类编码" clearable @enter="handleQuery" />
-        </t-form-item>
         <t-form-item label-width="0px">
           <t-button theme="primary" @click="handleQuery">
             <template #icon> <search-icon /></template>
@@ -34,7 +31,7 @@
         hover
         :loading="loading"
         :data="categoryList"
-        row-key="id"
+        row-key="categoryId"
         :columns="columns"
         :column-controller="{
           hideTriggerButton: true,
@@ -133,23 +130,26 @@
           <t-form-item label="分类名称" name="categoryName">
             <t-input v-model="form.categoryName" placeholder="请输入分类名称" clearable />
           </t-form-item>
-          <t-form-item label="分类编码" name="categoryCode">
-            <t-input v-model="form.categoryCode" placeholder="请输入分类编码" clearable />
-          </t-form-item>
-          <t-form-item label="父级分类" name="parentId">
-            <t-tree-select
-              v-model="form.parentId"
-              :data="categoryOptions"
-              :tree-props="{
-                keys: { value: 'id', label: 'categoryName', children: 'children' },
-                checkStrictly: true,
-              }"
-              placeholder="请选择父级分类"
-            />
-          </t-form-item>
-          <t-form-item label="排序" name="sortNum">
-            <t-input-number v-model="form.sortNum" placeholder="请输入" :min="0" :allow-input-over-limit="false" />
-          </t-form-item>
+          <t-row :gutter="20">
+            <t-col :span="12">
+              <t-form-item label="上级分类" name="parentId">
+                <t-tree-select
+                  v-model="form.parentId"
+                  :data="categoryOptions"
+                  :tree-props="{
+                    keys: { value: 'categoryId', label: 'categoryName', children: 'children' },
+                    checkStrictly: true,
+                  }"
+                  placeholder="请选择上级分类"
+                />
+              </t-form-item>
+            </t-col>
+            <t-col :span="12">
+              <t-form-item label="排序" name="orderNum">
+                <t-input-number v-model="form.orderNum" placeholder="请输入" :min="0" :allow-input-over-limit="false" />
+              </t-form-item>
+            </t-col>
+          </t-row>
         </t-form>
       </t-loading>
     </t-dialog>
@@ -165,9 +165,8 @@
     >
       <my-descriptions :loading="openViewLoading">
         <t-descriptions-item label="分类名称">{{ form.categoryName }}</t-descriptions-item>
-        <t-descriptions-item label="分类编码">{{ form.categoryCode }}</t-descriptions-item>
-        <t-descriptions-item label="父级分类">{{ form.parentId }}</t-descriptions-item>
-        <t-descriptions-item label="排序">{{ form.sortNum }}</t-descriptions-item>
+        <t-descriptions-item label="上级分类">{{ form.parentId }}</t-descriptions-item>
+        <t-descriptions-item label="排序">{{ form.orderNum }}</t-descriptions-item>
         <t-descriptions-item label="创建时间">{{ parseTime(form.createTime) }}</t-descriptions-item>
         <t-descriptions-item label="更新时间">{{ parseTime(form.updateTime) }}</t-descriptions-item>
       </my-descriptions>
@@ -200,18 +199,18 @@ import type {
 import { computed, getCurrentInstance, ref } from 'vue';
 
 import { addCategory, delCategory, getCategory, listCategory, updateCategory } from '@/api/workflow/category';
-import type { WfCategoryForm, WfCategoryQuery, WfCategoryVo } from '@/api/workflow/model/categoryModel';
+import type { CategoryForm, CategoryQuery, CategoryVO } from '@/api/workflow/model/categoryModel';
 
 const { proxy } = getCurrentInstance();
 
 const openView = ref(false);
 const openViewLoading = ref(false);
-const categoryList = ref<WfCategoryVo[]>([]);
+const categoryList = ref<CategoryVO[]>([]);
 const loading = ref(false);
 const columnControllerVisible = ref(false);
 const showSearch = ref(true);
 const tableRef = ref<EnhancedTableInstanceFunctions>();
-const categoryOptions = ref<WfCategoryVo[]>([]);
+const categoryOptions = ref<CategoryVO[]>([]);
 const open = ref(false);
 const buttonLoading = ref(false);
 const title = ref('');
@@ -220,26 +219,27 @@ const expandedTreeNodes = ref([]);
 
 // 校验规则
 const rules = ref<Record<string, Array<FormRule>>>({
-  categoryName: [{ max: 255, message: '分类名称不能超过255个字符' }],
-  categoryCode: [{ max: 255, message: '分类编码不能超过255个字符' }],
+  parentId: [{ required: true, message: '请选择上级分类' }],
+  categoryName: [
+    { required: true, message: '请输入分类名称' },
+    { max: 255, message: '分类名称不能超过255个字符' },
+  ],
 });
 
 // 列显隐信息
 const columns = ref<Array<PrimaryTableCol>>([
-  { title: `分类名称`, colKey: 'categoryName' },
-  { title: `分类编码`, colKey: 'categoryCode', align: 'center' },
-  { title: `父级分类`, colKey: 'parentId', align: 'center' },
-  { title: `排序`, colKey: 'sortNum', align: 'center' },
+  { title: `分类名称`, colKey: 'categoryName', width: 260 },
+  { title: `上级分类`, colKey: 'parentId', align: 'center' },
+  { title: `显示顺序`, colKey: 'orderNum', align: 'center', width: 200 },
   { title: `创建时间`, colKey: 'createTime', align: 'center', minWidth: 112, width: 180 },
   { title: `更新时间`, colKey: 'updateTime', align: 'center', minWidth: 112, width: 180 },
-  { title: `操作`, colKey: 'operation', align: 'center', width: 240 },
+  { title: `操作`, colKey: 'operation', align: 'center', width: 240, fixed: 'right' },
 ]);
 // 提交表单对象
-const form = ref<WfCategoryVo & WfCategoryForm>({});
+const form = ref<CategoryVO & CategoryForm>({});
 // 查询对象
-const queryParams = ref<WfCategoryQuery>({
+const queryParams = ref<CategoryQuery>({
   categoryName: undefined,
-  categoryCode: undefined,
 });
 const isExpand = computed(() => {
   return expandedTreeNodes.value.length !== 0;
@@ -250,7 +250,7 @@ function getList() {
   loading.value = true;
   listCategory(queryParams.value)
     .then((response) => {
-      categoryList.value = proxy.handleTree(response.data, 'id', 'parentId');
+      categoryList.value = proxy.handleTree(response.data, 'categoryId', 'parentId');
     })
     .finally(() => (loading.value = false));
 }
@@ -258,7 +258,7 @@ function getList() {
 // 表单重置
 function reset() {
   form.value = {
-    sortNum: 0,
+    orderNum: 0,
   };
   proxy.resetForm('categoryRef');
 }
@@ -284,11 +284,11 @@ function toggleExpandAll() {
 }
 
 /** 详情按钮操作 */
-function handleDetail(row: WfCategoryVo) {
+function handleDetail(row: CategoryVO) {
   reset();
   openView.value = true;
   openViewLoading.value = true;
-  const id = row.id;
+  const id = row.categoryId;
   getCategory(id).then((response) => {
     form.value = response.data;
     openViewLoading.value = false;
@@ -296,11 +296,11 @@ function handleDetail(row: WfCategoryVo) {
 }
 
 /** 新增按钮操作 */
-function handleAdd(row?: WfCategoryVo) {
+function handleAdd(row?: CategoryVO) {
   reset();
   getTreeselect();
-  if (row != null && row.id) {
-    form.value.parentId = row.id;
+  if (row != null && row.categoryId) {
+    form.value.parentId = row.categoryId;
   } else {
     form.value.parentId = 0;
   }
@@ -309,13 +309,13 @@ function handleAdd(row?: WfCategoryVo) {
 }
 
 /** 修改按钮操作 */
-async function handleUpdate(row?: WfCategoryVo) {
+async function handleUpdate(row?: CategoryVO) {
   buttonLoading.value = true;
   reset();
   open.value = true;
   title.value = '修改流程分类';
   await getTreeselect();
-  getCategory(row.id).then((response) => {
+  getCategory(row.categoryId).then((response) => {
     buttonLoading.value = false;
     form.value = response.data;
   });
@@ -325,7 +325,7 @@ async function handleUpdate(row?: WfCategoryVo) {
 async function getTreeselect() {
   return listCategory().then((response) => {
     categoryOptions.value = [
-      { id: 0, categoryName: '顶级节点', children: proxy.handleTree(response.data, 'id', 'parentId') },
+      { categoryId: 0, categoryName: '顶级节点', children: proxy.handleTree(response.data, 'categoryId', 'parentId') },
     ];
   });
 }
@@ -335,7 +335,7 @@ function submitForm({ validateResult, firstError }: SubmitContext) {
   if (validateResult === true) {
     buttonLoading.value = true;
     const msgLoading = proxy.$modal.msgLoading('提交中...');
-    if (form.value.id) {
+    if (form.value.categoryId) {
       updateCategory(form.value)
         .then(() => {
           proxy.$modal.msgSuccess('修改成功');
@@ -364,10 +364,10 @@ function submitForm({ validateResult, firstError }: SubmitContext) {
 }
 
 /** 删除按钮操作 */
-function handleDelete(row: WfCategoryVo) {
-  proxy.$modal.confirm(`是否确认删除流程分类编号为${row.id}的数据项？`, () => {
+function handleDelete(row: CategoryVO) {
+  proxy.$modal.confirm(`是否确认删除"${row.categoryName}"的分类？`, () => {
     const msgLoading = proxy.$modal.msgLoading('正在删除中...');
-    return delCategory(row.id)
+    return delCategory(row.categoryId)
       .then(() => {
         getList();
         proxy.$modal.msgSuccess('删除成功');

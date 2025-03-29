@@ -61,6 +61,17 @@
     <submit-verify ref="submitVerifyRef" :task-variables="taskVariables" @submit-callback="submitCallback" />
     <!-- 审批记录 -->
     <approval-record ref="approvalRecordRef" />
+    <t-dialog v-model:visible="visible" :header="title" width="500" @before-close="handleClose">
+      <t-select v-model="flowCode" placeholder="Select" style="width: 240px">
+        <t-option v-for="item in flowCodeOptions" :key="item.value" :label="item.label" :value="item.value" />
+      </t-select>
+      <template #footer>
+        <div class="dialog-footer">
+          <t-button @click="handleClose">取消</t-button>
+          <t-button theme="primary" @click="submitFlow()"> 确认 </t-button>
+        </div>
+      </template>
+    </t-dialog>
   </div>
 </template>
 
@@ -68,14 +79,15 @@
 defineOptions({
   name: 'LeaveEdit',
 });
+
 import type { FormInstanceFunctions, FormRule } from 'tdesign-vue-next';
 import { ref } from 'vue';
 
 import type { R } from '@/api/model/resultModel';
 import { addLeave, getLeave, updateLeave } from '@/api/workflow/leave';
 import type { TestLeaveForm, TestLeaveVo } from '@/api/workflow/model/leaveModel';
+import type { StartProcessBo } from '@/api/workflow/model/taskModel';
 import { startWorkFlow } from '@/api/workflow/task';
-import type { StartProcessBo } from '@/api/workflow/workflowCommon/types';
 import ApprovalRecord from '@/components/Process/approvalRecord.vue';
 import SubmitVerify from '@/components/Process/submitVerify.vue';
 import { useTabsRouterStore } from '@/store';
@@ -107,6 +119,33 @@ const options = [
     label: '婚假',
   },
 ];
+const flowCodeOptions = [
+  {
+    value: 'leave1',
+    label: '请假申请-普通',
+  },
+  {
+    value: 'leave2',
+    label: '请假申请-排他网关',
+  },
+  {
+    value: 'leave3',
+    label: '请假申请-并行网关',
+  },
+  {
+    value: 'leave4',
+    label: '请假申请-会签',
+  },
+  {
+    value: 'leave5',
+    label: '请假申请-并行会签网关',
+  },
+];
+
+const flowCode = ref<string>('');
+
+const visible = ref(false);
+const title = ref('流程定义');
 // 提交组件
 const submitVerifyRef = ref<InstanceType<typeof SubmitVerify>>();
 // 审批记录组件
@@ -115,8 +154,8 @@ const approvalRecordRef = ref<InstanceType<typeof ApprovalRecord>>();
 const leaveFormRef = ref<FormInstanceFunctions>();
 
 const submitFormData = ref<StartProcessBo>({
-  businessKey: '',
-  tableName: '',
+  businessId: '',
+  flowCode: '',
   variables: {},
 });
 const taskVariables = ref<Record<string, any>>({});
@@ -128,6 +167,11 @@ const rules = ref<Record<string, Array<FormRule>>>({
   remark: [{ max: 255, message: '请假原因不能超过255个字符' }],
 });
 
+const handleClose = () => {
+  visible.value = false;
+  flowCode.value = '';
+  buttonLoading.value = false;
+};
 const form = ref<TestLeaveVo & TestLeaveForm>({});
 
 /** 表单重置 */
@@ -136,8 +180,8 @@ const reset = () => {
   leaveTime.value = [];
   leaveTime.value = [];
   submitFormData.value = {
-    businessKey: '',
-    tableName: '',
+    businessId: '',
+    flowCode: '',
     variables: {},
   };
   proxy.resetForm('leaveFormRef');
@@ -192,6 +236,18 @@ const submitForm = async (status: string) => {
         proxy?.$modal.msgSuccess('暂存成功');
         removeCurrentTab();
       } else {
+        if (
+          (form.value.status === 'draft' && (flowCode.value === '' || flowCode.value === null)) ||
+          routeParams.value.type === 'add'
+        ) {
+          flowCode.value = flowCodeOptions[0].value;
+          visible.value = true;
+          return;
+        }
+        // 说明启动过先随意传个参数
+        if (flowCode.value === '' || flowCode.value === null) {
+          flowCode.value = 'xx';
+        }
         await handleStartWorkFlow(res.data);
       }
     }
@@ -200,17 +256,19 @@ const submitForm = async (status: string) => {
   }
 };
 
+const submitFlow = async () => {
+  handleStartWorkFlow(form.value);
+  visible.value = false;
+};
 // 提交申请
 const handleStartWorkFlow = async (data: TestLeaveVo) => {
   try {
-    submitFormData.value.tableName = 'test_leave';
-    submitFormData.value.businessKey = data.id;
+    submitFormData.value.flowCode = flowCode.value;
+    submitFormData.value.businessId = data.id;
     // 流程变量
     taskVariables.value = {
-      entity: data,
       leaveDays: data.leaveDays,
-      userList: ['1', '3'],
-      userList2: ['1', '3'],
+      userList: ['1', '3', '4'],
     };
     submitFormData.value.variables = taskVariables.value;
     const resp = await startWorkFlow(submitFormData.value);

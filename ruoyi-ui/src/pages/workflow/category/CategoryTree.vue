@@ -25,7 +25,7 @@
             v-model:expanded="expandedTree"
             class="t-tree--block-node"
             :data="categoryOptions"
-            :keys="{ value: 'categoryCode', label: 'categoryName', children: 'children' }"
+            :keys="{ value: 'id', label: 'label', children: 'children' }"
             :filter="filterNode"
             activable
             hover
@@ -46,12 +46,11 @@ import { RefreshIcon, SearchIcon } from 'tdesign-icons-vue-next';
 import type { TreeNodeModel } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 
-import { listCategory } from '@/api/workflow/category';
-import type { WfCategoryVo } from '@/api/workflow/model/categoryModel';
+import type { TreeModel } from '@/api/model/resultModel';
+import { categoryTree } from '@/api/workflow/category';
 
-const { proxy } = getCurrentInstance();
 const loadingTree = ref(false);
-const categoryOptions = ref<WfCategoryVo[]>([]);
+const categoryOptions = ref<TreeModel<number | string>[]>([]);
 const categoryName = ref('');
 const expandedTree = ref<string[]>([]);
 const treeActived = defineModel<string[]>({
@@ -62,23 +61,21 @@ const emit = defineEmits(['active']);
 function triggerExpandedTree() {
   expandedTree.value = categoryOptions.value
     .flatMap((value) => value.children?.concat([value]) ?? [value])
-    .map((value) => value.categoryCode);
+    .map((value) => value.id);
 }
 /** 通过条件过滤节点  */
 const filterNode = computed(() => {
   const value = categoryName.value;
   return (node: TreeNodeModel) => {
-    if (!node.value || !value) return true;
+    if (!node.value || !value || data.id === '0') return true;
     return node.label.indexOf(value) >= 0;
   };
 });
 
 /** 查询流程分类下拉树结构 */
 async function getTreeselect() {
-  return listCategory().then((response) => {
-    categoryOptions.value = [
-      { categoryCode: 'ALL', categoryName: '顶级节点', children: proxy.handleTree(response.data, 'id', 'parentId') },
-    ];
+  return categoryTree().then((response) => {
+    categoryOptions.value = response.data;
   });
 }
 

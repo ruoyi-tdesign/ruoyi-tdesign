@@ -11,15 +11,15 @@
       <t-form :data="form" label-width="120px">
         <t-form-item label="消息提醒">
           <t-checkbox-group v-model="form.messageType">
-            <t-checkbox label="1" name="type" disabled>站内信</t-checkbox>
-            <t-checkbox label="2" name="type">邮件</t-checkbox>
-            <t-checkbox label="3" name="type">短信</t-checkbox>
+            <t-checkbox value="1" name="type" disabled>站内信</t-checkbox>
+            <t-checkbox value="2" name="type">邮件</t-checkbox>
+            <t-checkbox value="3" name="type">短信</t-checkbox>
           </t-checkbox-group>
         </t-form-item>
-        <t-form-item v-if="task.businessStatus === 'waiting'" label="附件">
+        <t-form-item v-if="task.flowStatus === 'waiting'" label="附件">
           <fileUpload
             v-model="form.fileId"
-            :file-type="['doc', 'xls', 'ppt', 'txt', 'pdf', 'xlsx', 'docx', 'zip']"
+            :file-type="['png', 'jpg', 'jpeg', 'doc', 'docx', 'xlsx', 'xls', 'ppt', 'txt', 'pdf']"
             :file-size="20"
           />
         </t-form-item>
@@ -34,10 +34,10 @@
             style="margin: 2px"
             @close="handleCopyCloseTag(user)"
           >
-            {{ user.userName }}
+            {{ user.nickName }}
           </t-tag>
         </t-form-item>
-        <t-form-item v-if="task.businessStatus === 'waiting'" label="审批意见">
+        <t-form-item v-if="task.flowStatus === 'waiting'" label="审批意见">
           <t-textarea v-model="form.message" />
         </t-form-item>
       </t-form>
@@ -46,7 +46,7 @@
       <span class="dialog-footer">
         <t-button :disabled="buttonDisabled" theme="primary" @click="handleCompleteTask"> 提交 </t-button>
         <t-button
-          v-if="task.businessStatus === 'waiting'"
+          v-if="task.flowStatus === 'waiting'"
           :disabled="buttonDisabled"
           theme="primary"
           @click="openDelegateTask"
@@ -54,7 +54,7 @@
           委托
         </t-button>
         <t-button
-          v-if="task.businessStatus === 'waiting'"
+          v-if="task.flowStatus === 'waiting'"
           :disabled="buttonDisabled"
           theme="primary"
           @click="openTransferTask"
@@ -62,23 +62,23 @@
           转办
         </t-button>
         <t-button
-          v-if="task.businessStatus === 'waiting' && task.multiInstance"
+          v-if="task.flowStatus === 'waiting' && Number(task.nodeRatio) > 0"
           :disabled="buttonDisabled"
           theme="primary"
-          @click="addMultiInstanceUser"
+          @click="openMultiInstanceUser"
         >
           加签
         </t-button>
         <t-button
-          v-if="task.businessStatus === 'waiting' && task.multiInstance"
+          v-if="task.flowStatus === 'waiting' && Number(task.nodeRatio) > 0"
           :disabled="buttonDisabled"
           theme="primary"
-          @click="deleteMultiInstanceUser"
+          @click="handleTaskUser"
         >
           减签
         </t-button>
         <t-button
-          v-if="task.businessStatus === 'waiting'"
+          v-if="task.flowStatus === 'waiting'"
           :disabled="buttonDisabled"
           theme="danger"
           @click="handleTerminationTask"
@@ -86,7 +86,7 @@
           终止
         </t-button>
         <t-button
-          v-if="task.businessStatus === 'waiting'"
+          v-if="task.flowStatus === 'waiting'"
           :disabled="buttonDisabled"
           theme="danger"
           @click="handleBackProcessOpen"
@@ -108,15 +108,20 @@
     <!-- 委托 -->
     <user-select ref="delegateTaskRef" :multiple="false" @confirm-call-back="handleDelegateTask"></user-select>
     <!-- 加签组件 -->
-    <multi-instance-user ref="multiInstanceUserRef" :title="title" @submit-callback="closeDialog" />
+    <user-select ref="multiInstanceUserRef" :multiple="true" @confirm-call-back="addMultiInstanceUser"></user-select>
 
     <!-- 驳回开始 -->
     <t-dialog v-model:visible="backVisible" header="驳回" width="40%" :close-on-overlay-click="false">
-      <t-form v-if="task.businessStatus === 'waiting'" :data="backForm" label-width="120px">
+      <t-form v-if="task.flowStatus === 'waiting'" :data="backForm" label-width="120px">
         <t-loading :loading="backLoading">
           <t-form-item name="驳回节点">
-            <t-select v-model="backForm.targetActivityId" clearable placeholder="请选择" style="width: 300px">
-              <t-option v-for="item in taskNodeList" :key="item.nodeId" :label="item.nodeName" :value="item.nodeId" />
+            <t-select v-model="backForm.nodeCode" clearable placeholder="请选择" style="width: 300px">
+              <t-option
+                v-for="item in taskNodeList"
+                :key="item.nodeCode"
+                :label="item.nodeName"
+                :value="item.nodeCode"
+              />
             </t-select>
           </t-form-item>
           <t-form-item name="消息提醒">
@@ -139,25 +144,45 @@
       </template>
     </t-dialog>
     <!-- 驳回结束 -->
+    <t-dialog
+      v-model="deleteSignatureVisible"
+      draggable
+      header="减签人员"
+      width="700px"
+      height="400px"
+      attach="body"
+      :close-on-overlay-click="false"
+    >
+      <div>
+        <t-table :data="deleteUserList" border :columns="deleteSignatureColumns">
+          <template #operation="{ row }">
+            <my-link theme="danger" @click.stop="deleteMultiInstanceUser(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
+          </template>
+        </t-table>
+      </div>
+    </t-dialog>
   </t-dialog>
 </template>
 
 <script lang="ts" setup>
-import { AddIcon } from 'tdesign-icons-vue-next';
+import { AddIcon, DeleteIcon } from 'tdesign-icons-vue-next';
+import type { TableProps } from 'tdesign-vue-next';
 import { ref } from 'vue';
 
-import type { SysUserVo } from '@/api/system/model/userModel';
+import type { SysUserVo, UserDTO } from '@/api/system/model/userModel';
+import type { Node } from '@/api/workflow/model/definitionModel';
+import type { FlowTaskVo, FlowTerminationBo, TaskOperationBo } from '@/api/workflow/model/taskModel';
 import {
   backProcess,
   completeTask,
-  delegateTask,
-  getTaskById,
-  getTaskNodeList,
+  currentTaskAllUser,
+  getBackTaskNode,
+  getTask,
+  taskOperation,
   terminationTask,
-  transferTask,
 } from '@/api/workflow/task';
-import type { TaskVo } from '@/api/workflow/task/types';
-import MultiInstanceUser from '@/components/Process/multiInstanceUser.vue';
 import UserSelect from '@/components/user-select/index.vue';
 
 const { proxy } = getCurrentInstance();
@@ -167,7 +192,13 @@ const transferTaskRef = ref<InstanceType<typeof UserSelect>>();
 const delegateTaskRef = ref<InstanceType<typeof UserSelect>>();
 
 // 加签组件
-const multiInstanceUserRef = ref<InstanceType<typeof MultiInstanceUser>>();
+const multiInstanceUserRef = ref<InstanceType<typeof UserSelect>>();
+
+const deleteSignatureColumns: TableProps['columns'] = [
+  { title: `任务名称`, colKey: 'nodeName', align: 'center' },
+  { title: `办理人`, colKey: 'nickName', align: 'center' },
+  { title: `操作`, colKey: 'operation', align: 'center', width: 160 },
+];
 
 const props = defineProps({
   taskVariables: {
@@ -185,66 +216,37 @@ const taskId = ref<string>('');
 const selectCopyUserList = ref<SysUserVo[]>([]);
 // 抄送人id
 const selectCopyUserIds = ref<string>(undefined);
+// 可减签的人员
+const deleteUserList = ref<UserDTO[]>([]);
 // 驳回是否显示
 const backVisible = ref(false);
 const backLoading = ref(true);
 const backButtonDisabled = ref(true);
 // 可驳回得任务节点
-const taskNodeList = ref([]);
+const taskNodeList = ref<Node[]>([]);
 
 // 任务
-const task = ref<TaskVo>({
-  id: undefined,
-  name: undefined,
-  description: undefined,
-  priority: undefined,
-  owner: undefined,
-  assignee: undefined,
-  assigneeName: undefined,
-  processInstanceId: undefined,
-  executionId: undefined,
-  taskDefinitionId: undefined,
-  processDefinitionId: undefined,
-  endTime: undefined,
-  taskDefinitionKey: undefined,
-  dueDate: undefined,
-  category: undefined,
-  parentTaskId: undefined,
-  tenantId: undefined,
-  claimTime: undefined,
-  businessStatus: undefined,
-  businessStatusName: undefined,
-  processDefinitionName: undefined,
-  processDefinitionKey: undefined,
-  participantVo: undefined,
-  multiInstance: undefined,
-  businessKey: undefined,
-  wfNodeConfigVo: undefined,
-});
-// 加签 减签标题
-const title = ref('');
+const task = ref<FlowTaskVo>({});
 const dialog = reactive({
   visible: false,
   title: '提示',
 });
-
+// 减签弹窗
+const deleteSignatureVisible = ref(false);
 const form = ref<Record<string, any>>({
   taskId: undefined,
   message: undefined,
   variables: {},
   messageType: ['1'],
-  wfCopyList: [],
+  flowCopyList: [],
 });
 const backForm = ref<Record<string, any>>({
   taskId: undefined,
-  targetActivityId: undefined,
+  nodeCode: undefined,
   message: undefined,
   variables: {},
   messageType: ['1'],
 });
-const closeDialog = () => {
-  dialog.visible = false;
-};
 // 打开弹窗
 const openDialog = (id?: string) => {
   selectCopyUserIds.value = undefined;
@@ -256,7 +258,7 @@ const openDialog = (id?: string) => {
   loading.value = true;
   buttonDisabled.value = true;
   nextTick(() => {
-    getTaskById(taskId.value).then((response) => {
+    getTask(taskId.value).then((response) => {
       task.value = response.data;
       loading.value = false;
       buttonDisabled.value = false;
@@ -272,15 +274,15 @@ const handleCompleteTask = async () => {
   form.value.taskId = taskId.value;
   form.value.taskVariables = props.taskVariables;
   if (selectCopyUserList.value && selectCopyUserList.value.length > 0) {
-    const wfCopyList: SysUserVo[] = [];
+    const flowCopyList: SysUserVo[] = [];
     selectCopyUserList.value.forEach((e) => {
       const copyUser = {
         userId: e.userId,
         userName: e.nickName,
       };
-      wfCopyList.push(copyUser);
+      flowCopyList.push(copyUser);
     });
-    form.value.wfCopyList = wfCopyList;
+    form.value.flowCopyList = flowCopyList;
   }
   proxy?.$modal.confirm('是否确认提交？', async () => {
     loading.value = true;
@@ -304,11 +306,11 @@ const handleBackProcessOpen = async () => {
   backVisible.value = true;
   backLoading.value = true;
   backButtonDisabled.value = true;
-  const data = await getTaskNodeList(task.value.processInstanceId);
+  const data = await getBackTaskNode(task.value.definitionId, task.value.nodeCode);
   taskNodeList.value = data.data;
   backLoading.value = false;
   backButtonDisabled.value = false;
-  backForm.value.targetActivityId = taskNodeList.value[0].nodeId;
+  backForm.value.nodeCode = taskNodeList.value[0].nodeCode;
 };
 /** 驳回流程 */
 const handleBackProcess = async () => {
@@ -317,7 +319,10 @@ const handleBackProcess = async () => {
     loading.value = true;
     backLoading.value = true;
     backButtonDisabled.value = true;
-    await backProcess(backForm.value).finally(() => (loading.value = false));
+    await backProcess(backForm.value).finally(() => {
+      loading.value = false;
+      buttonDisabled.value = false;
+    });
     dialog.visible = false;
     backLoading.value = false;
     backButtonDisabled.value = false;
@@ -351,18 +356,50 @@ const handleCopyCloseTag = (user: SysUserVo) => {
   selectCopyUserIds.value = selectCopyUserList.value.map((item) => item.userId).join(',');
 };
 // 加签
-const addMultiInstanceUser = () => {
-  if (multiInstanceUserRef.value) {
-    title.value = '加签人员';
-    multiInstanceUserRef.value.getAddMultiInstanceList(taskId.value, []);
+const openMultiInstanceUser = async () => {
+  multiInstanceUserRef.value.open();
+};
+// 加签
+const addMultiInstanceUser = async (data: SysUserVo[]) => {
+  if (data && data.length > 0) {
+    const taskOperationBo = reactive<TaskOperationBo>({
+      userIds: data.map((e) => e.userId),
+      taskId: taskId.value,
+      message: form.value.message,
+    });
+    proxy?.$modal.confirm('是否确认提交？', async () => {
+      loading.value = true;
+      buttonDisabled.value = true;
+      await taskOperation(taskOperationBo, 'addSignature').finally(() => {
+        loading.value = false;
+        buttonDisabled.value = false;
+      });
+      dialog.visible = false;
+      emits('submitCallback');
+      await proxy?.$modal.msgSuccess('操作成功');
+    });
+  } else {
+    await proxy?.$modal.msgWarning('请选择用户！');
   }
 };
 // 减签
-const deleteMultiInstanceUser = () => {
-  if (multiInstanceUserRef.value) {
-    title.value = '减签人员';
-    multiInstanceUserRef.value.getDeleteMultiInstanceList(taskId.value);
-  }
+const deleteMultiInstanceUser = async (row: UserDTO) => {
+  proxy?.$modal.confirm('是否确认提交？', async () => {
+    loading.value = true;
+    buttonDisabled.value = true;
+    const taskOperationBo = reactive<TaskOperationBo>({
+      userIds: [row.userId],
+      taskId: taskId.value,
+      message: form.value.message,
+    });
+    await taskOperation(taskOperationBo, 'reductionSignature').finally(() => {
+      loading.value = false;
+      buttonDisabled.value = false;
+    });
+    dialog.visible = false;
+    emits('submitCallback');
+    await proxy?.$modal.msgSuccess('操作成功');
+  });
 };
 // 打开转办
 const openTransferTask = () => {
@@ -371,21 +408,24 @@ const openTransferTask = () => {
 // 转办
 const handleTransferTask = async (data: SysUserVo[]) => {
   if (data && data.length > 0) {
-    const params = {
-      taskId: taskId.value,
+    const taskOperationBo = reactive<TaskOperationBo>({
       userId: data[0].userId,
-      comment: form.value.message,
-    };
+      taskId: taskId.value,
+      message: form.value.message,
+    });
     proxy?.$modal.confirm('是否确认提交？', async () => {
       loading.value = true;
       buttonDisabled.value = true;
-      await transferTask(params).finally(() => (loading.value = false));
+      await taskOperation(taskOperationBo, 'transferTask').finally(() => {
+        loading.value = false;
+        buttonDisabled.value = false;
+      });
       dialog.visible = false;
       emits('submitCallback');
-      proxy?.$modal.msgSuccess('操作成功');
+      await proxy?.$modal.msgSuccess('操作成功');
     });
   } else {
-    proxy?.$modal.msgWarning('请选择用户！');
+    await proxy?.$modal.msgWarning('请选择用户！');
   }
 };
 
@@ -394,40 +434,57 @@ const openDelegateTask = () => {
   delegateTaskRef.value.open();
 };
 // 委托
-const handleDelegateTask = async (data) => {
+const handleDelegateTask = async (data: SysUserVo[]) => {
   if (data && data.length > 0) {
-    const params = {
-      taskId: taskId.value,
+    const taskOperationBo = reactive<TaskOperationBo>({
       userId: data[0].userId,
-      nickName: data[0].nickName,
-    };
+      taskId: taskId.value,
+      message: form.value.message,
+    });
     proxy?.$modal.confirm('是否确认提交？', async () => {
       loading.value = true;
       buttonDisabled.value = true;
-      await delegateTask(params).finally(() => (loading.value = false));
+      await taskOperation(taskOperationBo, 'delegateTask').finally(() => {
+        loading.value = false;
+        buttonDisabled.value = false;
+      });
       dialog.visible = false;
       emits('submitCallback');
-      proxy?.$modal.msgSuccess('操作成功');
+      await proxy?.$modal.msgSuccess('操作成功');
     });
   } else {
-    proxy?.$modal.msgWarning('请选择用户！');
+    await proxy?.$modal.msgWarning('请选择用户！');
   }
 };
 
 // 终止任务
 const handleTerminationTask = async () => {
-  const params = {
+  const params: FlowTerminationBo = {
     taskId: taskId.value,
     comment: form.value.message,
   };
   proxy?.$modal.confirm('是否确认终止？', async () => {
     loading.value = true;
     buttonDisabled.value = true;
-    await terminationTask(params).finally(() => (loading.value = false));
+    await terminationTask(params).finally(() => {
+      loading.value = false;
+      buttonDisabled.value = false;
+    });
     dialog.visible = false;
     emits('submitCallback');
-    proxy?.$modal.msgSuccess('操作成功');
+    await proxy?.$modal.msgSuccess('操作成功');
   });
+};
+const handleTaskUser = async () => {
+  const data = await currentTaskAllUser(taskId.value);
+  deleteUserList.value = data.data;
+  if (deleteUserList.value && deleteUserList.value.length > 0) {
+    deleteUserList.value.forEach((e) => {
+      // @ts-ignore
+      e.nodeName = task.value.nodeName;
+    });
+  }
+  deleteSignatureVisible.value = true;
 };
 
 /**

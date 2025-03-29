@@ -2,24 +2,19 @@
   <t-card>
     <t-space direction="vertical" style="width: 100%">
       <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline" label-width="calc(6em + 12px)">
-        <t-form-item label="任务名称" name="name">
-          <t-input v-model="queryParams.name" placeholder="请输入任务名称" clearable @enter="handleQuery" />
+        <t-form-item label-width="0px">
+          <t-badge :value="userSelectCount" :max="10" class="item">
+            <t-button theme="primary" @click="openUserSelect">选择申请人</t-button>
+          </t-badge>
         </t-form-item>
-        <t-form-item label="流程定义名称" name="processDefinitionName">
-          <t-input
-            v-model="queryParams.processDefinitionName"
-            placeholder="请输入流程定义名称"
-            clearable
-            @enter="handleQuery"
-          />
+        <t-form-item label="任务名称" name="nodeName">
+          <t-input v-model="queryParams.nodeName" placeholder="请输入任务名称" clearable @enter="handleQuery" />
         </t-form-item>
-        <t-form-item label="流程定义KEY" name="processDefinitionKey">
-          <t-input
-            v-model="queryParams.processDefinitionKey"
-            placeholder="请输入流程定义KEY"
-            clearable
-            @enter="handleQuery"
-          />
+        <t-form-item label="流程定义名称" name="flowName">
+          <t-input v-model="queryParams.flowName" placeholder="请输入流程定义名称" clearable @enter="handleQuery" />
+        </t-form-item>
+        <t-form-item label="流程定义编码" name="flowCode">
+          <t-input v-model="queryParams.flowCode" placeholder="请输入流程定义编码" clearable @enter="handleQuery" />
         </t-form-item>
         <t-form-item label-width="0px">
           <t-button theme="primary" @click="handleQuery">
@@ -63,35 +58,36 @@
             </t-col>
           </t-row>
         </template>
-        <template #processDefinitionName="{ row }">
-          <span>{{ row.processDefinitionName }}v{{ row.processDefinitionVersion }}.0</span>
-        </template>
-        <template #assigneeName="{ row }">
-          <template v-if="row.participantVo && row.assignee === null">
-            <t-tag
-              v-for="(item, index) in row.participantVo.candidateName"
-              :key="index"
-              theme="success"
-              variant="light"
-            >
-              {{ item }}
+        <template #assigneeNames="{ row }">
+          <template v-if="row.assigneeNames">
+            <t-tag v-for="(name, index) in row.assigneeNames.split(',')" :key="index" type="success" variant="light">
+              {{ name }}
             </t-tag>
           </template>
           <template v-else>
-            <t-tag theme="success" variant="light">{{ row.assigneeName || '无' }}</t-tag>
+            <t-tag type="success" variant="light"> 无</t-tag>
           </template>
         </template>
-        <template #businessStatus="{ row }">
-          <dict-tag :options="wf_business_status" :value="row.businessStatus"></dict-tag>
+        <template #flowStatusName="{ row }">
+          <dict-tag :options="wf_business_status" :value="row.flowStatus"></dict-tag>
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link theme="primary" hover="color" @click.stop="handleOpen(row)"> <edit-icon />办理 </t-link>
+            <my-link @click.stop="handleOpen(row)">
+              <template #prefix-icon><edit-icon /></template>办理
+            </my-link>
           </t-space>
         </template>
       </t-table>
     </t-space>
   </t-card>
+  <!-- 申请人 -->
+  <user-select
+    ref="userSelectRef"
+    :multiple="true"
+    :data="selectUserIds"
+    @confirm-call-back="userSelectCallBack"
+  ></user-select>
 </template>
 
 <script lang="ts" setup>
@@ -99,13 +95,17 @@ import { EditIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vu
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 
-import { getPageByTaskWait } from '@/api/workflow/task';
-import type { TaskQuery, TaskVo } from '@/api/workflow/task/types';
+import type { SysUserVo } from '@/api/system/model/userModel';
+import type { FlowTaskVo, TaskQuery } from '@/api/workflow//model/taskModel';
+import type { RouterJumpVo } from '@/api/workflow/model/workflowCommonModel';
+import { pageByTaskWait } from '@/api/workflow/task';
 import { useRouterJump } from '@/api/workflow/workflowCommon';
-import type { RouterJumpVo } from '@/api/workflow/workflowCommon/types';
+import UserSelect from '@/components/user-select/index.vue';
 
 const { proxy } = getCurrentInstance();
 const { wf_business_status } = proxy.useDict('wf_business_status');
+
+const userSelectRef = ref<InstanceType<typeof UserSelect>>();
 const routerJump = useRouterJump();
 // 遮罩层
 const loading = ref(true);
@@ -120,15 +120,21 @@ const showSearch = ref(true);
 // 总条数
 const total = ref(0);
 // 模型定义表格数据
-const taskList = ref<TaskVo[]>([]);
+const taskList = ref<FlowTaskVo[]>([]);
+
+// 申请人id
+const selectUserIds = ref<Array<number | string>>([]);
+// 申请人选择数量
+const userSelectCount = ref(0);
 const columnControllerVisible = ref(false);
 // 查询参数
 const queryParams = ref<TaskQuery>({
   pageNum: 1,
   pageSize: 10,
-  name: undefined,
-  processDefinitionName: undefined,
-  processDefinitionKey: undefined,
+  nodeName: undefined,
+  flowName: undefined,
+  flowCode: undefined,
+  createByIds: [],
 });
 
 // 列显隐信息
@@ -136,11 +142,12 @@ const columns = computed<Array<PrimaryTableCol>>(() => {
   return [
     { colKey: 'row-select', type: 'multiple', width: 30, align: 'center' },
     { title: `序号`, colKey: 'serial-number', width: 70 },
-    { title: `流程定义名称`, colKey: 'processDefinitionName', ellipsis: true, align: 'center' },
-    { title: `流程定义KEY`, colKey: 'processDefinitionKey', align: 'center' },
-    { title: `任务名称`, colKey: 'name', align: 'center' },
-    { title: `办理人`, colKey: 'assigneeName', align: 'center' },
-    { title: `流程状态`, colKey: 'businessStatusName', align: 'center' },
+    { title: `流程定义名称`, colKey: 'flowName', ellipsis: true, align: 'center' },
+    { title: `流程定义编码`, colKey: 'flowCode', align: 'center' },
+    { title: `任务名称`, colKey: 'nodeName', align: 'center' },
+    { title: `申请人`, colKey: 'createByName', align: 'center' },
+    { title: `办理人`, colKey: 'assigneeNames', align: 'center' },
+    { title: `流程状态`, colKey: 'flowStatusName', align: 'center' },
     { title: `创建时间`, colKey: 'createTime', align: 'center', width: '10%', minWidth: 112 },
     { title: `操作`, colKey: 'operation', align: 'center', fixed: 'right' },
   ] as PrimaryTableCol[];
@@ -171,6 +178,8 @@ const handleQuery = () => {
 const resetQuery = () => {
   proxy.resetForm('queryRef');
   queryParams.value.pageNum = 1;
+  queryParams.value.createByIds = [];
+  userSelectCount.value = 0;
   handleQuery();
 };
 // 多选框选中数据
@@ -182,7 +191,7 @@ const handleSelectionChange = (selection: Array<string | number>) => {
 // 分页
 const getWaitingList = () => {
   loading.value = true;
-  getPageByTaskWait(queryParams.value)
+  pageByTaskWait(queryParams.value)
     .then((resp) => {
       taskList.value = resp.rows;
       total.value = resp.total;
@@ -190,14 +199,27 @@ const getWaitingList = () => {
     .finally(() => (loading.value = false));
 };
 // 办理
-const handleOpen = async (row: TaskVo) => {
+const handleOpen = async (row: FlowTaskVo) => {
   const routerJumpVo = reactive<RouterJumpVo>({
-    wfDefinitionConfigVo: row.wfDefinitionConfigVo,
-    wfNodeConfigVo: row.wfNodeConfigVo,
-    businessKey: row.businessKey,
+    businessId: row.businessId,
     taskId: row.id,
     type: 'approval',
+    formCustom: row.formCustom,
+    formPath: row.formPath,
   });
   routerJump(routerJumpVo);
+};
+// 打开申请人选择
+const openUserSelect = () => {
+  userSelectRef.value.open();
+};
+// 确认选择申请人
+const userSelectCallBack = (data: SysUserVo[]) => {
+  userSelectCount.value = 0;
+  if (data && data.length > 0) {
+    userSelectCount.value = data.length;
+    selectUserIds.value = data.map((item) => item.userId);
+    queryParams.value.createByIds = selectUserIds.value;
+  }
 };
 </script>

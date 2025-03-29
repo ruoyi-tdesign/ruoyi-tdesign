@@ -13,7 +13,7 @@ import java.io.Serial;
 import java.util.Date;
 
 /**
- * 流程分类对象 wf_category
+ * 流程分类对象 flow_category
  *
  * @author may
  * @date 2023-06-27

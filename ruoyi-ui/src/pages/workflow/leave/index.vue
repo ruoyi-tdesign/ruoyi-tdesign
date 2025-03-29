@@ -88,52 +88,35 @@
         </template>
         <template #startDate="{ row }">{{ parseTime(row.startDate, '{y}-{m}-{d}') }}</template>
         <template #endDate="{ row }">{{ parseTime(row.endDate, '{y}-{m}-{d}') }}</template>
-        <template #businessStatusName="{ row }">
+        <template #status="{ row }">
           <dict-tag :options="wf_business_status" :value="row.status"></dict-tag>
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['workflow:leave:query']"
-              size="small"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDetail(row)"
-            >
+            <my-link v-hasPermi="['workflow:leave:query']" @click.stop="handleDetail(row)">
               <template #prefix-icon><browse-icon /></template>详情
-            </t-link>
-            <t-link
+            </my-link>
+            <my-link
               v-if="row.status === 'draft' || row.status === 'cancel' || row.status === 'back'"
               v-hasPermi="['workflow:leave:edit']"
-              size="small"
-              theme="primary"
-              hover="color"
               @click.stop="handleUpdate(row)"
             >
               <template #prefix-icon><edit-icon /></template>修改
-            </t-link>
-            <t-link
+            </my-link>
+            <my-link
               v-if="row.status === 'draft' || row.status === 'cancel' || row.status === 'back'"
               v-hasPermi="['workflow:leave:remove']"
               theme="danger"
-              hover="color"
-              size="small"
               @click.stop="handleDelete(row)"
             >
               <template #prefix-icon><delete-icon /></template>删除
-            </t-link>
-            <t-link theme="primary" hover="color" size="small" @click.stop="handleView(row)">
+            </my-link>
+            <my-link @click.stop="handleView(row)">
               <template #prefix-icon><browse-icon /></template>查看
-            </t-link>
-            <t-link
-              v-if="row.status === 'waiting'"
-              theme="warning"
-              hover="color"
-              size="small"
-              @click.stop="handleCancelProcessApply(row.id)"
-            >
+            </my-link>
+            <my-link v-if="row.status === 'waiting'" theme="warning" @click.stop="handleCancelProcessApply(row.id)">
               <template #prefix-icon><rollback-icon /></template>撤销
-            </t-link>
+            </my-link>
           </t-space>
         </template>
       </t-table>
@@ -179,9 +162,9 @@ import {
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
+import { cancelProcessApply } from '@/api/workflow/instance';
 import { delLeave, getLeave, listLeave } from '@/api/workflow/leave';
 import type { TestLeaveForm, TestLeaveQuery, TestLeaveVo } from '@/api/workflow/model/leaveModel';
-import { cancelProcessApply } from '@/api/workflow/processInstance';
 import { ArrayOps } from '@/utils/array';
 
 const { proxy } = getCurrentInstance();
@@ -225,7 +208,7 @@ const columns = ref<Array<PrimaryTableCol>>([
   { title: `结束时间`, colKey: 'endDate', align: 'center', minWidth: 112, width: 180 },
   { title: `请假天数`, colKey: 'leaveDays', align: 'center' },
   { title: `请假原因`, colKey: 'remark', align: 'center', ellipsis: true },
-  { title: `流程状态`, colKey: 'businessStatusName', align: 'center' },
+  { title: `流程状态`, colKey: 'status', align: 'center' },
   { title: `操作`, colKey: 'operation', align: 'center', width: 180 },
 ]);
 // 提交表单对象
@@ -364,7 +347,11 @@ function handleDelete(row?: TestLeaveVo) {
 const handleCancelProcessApply = async (id: string) => {
   proxy?.$modal.confirm('是否确认撤销当前单据？', async () => {
     loading.value = true;
-    await cancelProcessApply(id).finally(() => (loading.value = false));
+    const data = {
+      businessId: id,
+      message: '申请人撤销流程！',
+    };
+    await cancelProcessApply(data).finally(() => (loading.value = false));
     getList();
     await proxy?.$modal.msgSuccess('撤销成功');
   });

@@ -11,7 +11,7 @@ import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.workflow.domain.FlowCategory;
 
 /**
- * 流程分类业务对象 wf_category
+ * 流程分类业务对象 flow_category
  *
  * @author may
  * @date 2023-06-27

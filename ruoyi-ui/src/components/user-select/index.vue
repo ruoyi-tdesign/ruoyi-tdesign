@@ -89,7 +89,7 @@
                   class="mb-2px"
                   @close="handleCloseTag(index)"
                 >
-                  {{ user.userName }}
+                  {{ user.nickName }}
                 </t-tag>
               </t-space>
             </template>
