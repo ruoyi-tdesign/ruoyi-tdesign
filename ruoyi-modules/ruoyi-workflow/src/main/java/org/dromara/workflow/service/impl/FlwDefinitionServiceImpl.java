@@ -3,22 +3,21 @@ package org.dromara.workflow.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.io.IoUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dom4j.Document;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.warm.flow.core.dto.FlowCombine;
-import org.dromara.warm.flow.core.entity.Definition;
+import org.dromara.warm.flow.core.dto.DefJson;
 import org.dromara.warm.flow.core.enums.NodeType;
 import org.dromara.warm.flow.core.enums.PublishStatus;
 import org.dromara.warm.flow.core.service.DefService;
@@ -42,6 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -120,6 +121,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
      * @param id 流程定义id
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean publish(Long id) {
         List<FlowNode> flowNodes = flowNodeMapper.selectList(new LambdaQueryWrapper<FlowNode>().eq(FlowNode::getDefinitionId, id));
         List<String> errorMsg = new ArrayList<>();
@@ -143,16 +145,20 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
      * @param file 文件
      */
     @Override
-    public boolean importXml(MultipartFile file, String category) {
-        try {
-            FlowCombine combine = defService.readXml(file.getInputStream());
-            // 流程定义
-            Definition definition = combine.getDefinition();
-            definition.setCategory(category);
-            defService.importFlow(combine);
+    @Transactional(rollbackFor = Exception.class)
+    public boolean importJson(MultipartFile file, String category) {
+        try (InputStream inputStream = file.getInputStream()) {
+            byte[] fileBytes = inputStream.readAllBytes();
+            String fileContent = new String(fileBytes, StandardCharsets.UTF_8);
+            DefJson defJson = JsonUtils.parseObject(fileContent, DefJson.class);
+            defJson.setCategory(category);
+            defService.importDef(defJson);
+        } catch (IOException e) {
+            log.error("读取文件流错误: {}", e.getMessage(), e);
+            throw new IllegalStateException("文件读取失败，请检查文件内容", e);
         } catch (Exception e) {
             log.error("导入流程定义错误: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
+            throw new IllegalStateException("导入流程定义失败", e);
         }
         return true;
     }
@@ -166,24 +172,15 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
      */
     @Override
     public void exportDef(Long id, HttpServletResponse response) throws IOException {
-        Document document = defService.exportXml(id);
-        // 设置生成xml的格式
-        OutputFormat of = OutputFormat.createPrettyPrint();
-        // 设置编码格式
-        of.setEncoding("UTF-8");
-        of.setIndent(true);
-        of.setIndent("    ");
-        of.setNewlines(true);
-
-        // 创建一个xml文档编辑器
-        XMLWriter writer = new XMLWriter(response.getOutputStream(), of);
-        writer.setEscapeText(false);
+        byte[] data = defService.exportJson(id).getBytes(StandardCharsets.UTF_8);
+        String filename = "workflow_export_" + DateUtils.dateTimeNow() + ".json";
+        // 设置响应头和内容类型
         response.reset();
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/x-msdownload");
-        response.setHeader("Content-Disposition", "attachment;");
-        writer.write(document);
-        writer.close();
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType("application/json");
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+        response.addHeader("Content-Length", "" + data.length);
+        IoUtil.write(response.getOutputStream(), false, data);
     }
 
     /**

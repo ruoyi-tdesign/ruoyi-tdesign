@@ -19,13 +19,14 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.warm.flow.core.FlowFactory;
+import org.dromara.warm.flow.core.FlowEngine;
 import org.dromara.warm.flow.core.constant.ExceptionCons;
 import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
 import org.dromara.warm.flow.core.enums.NodeType;
+import org.dromara.warm.flow.core.service.ChartService;
 import org.dromara.warm.flow.core.service.DefService;
 import org.dromara.warm.flow.core.service.InsService;
 import org.dromara.warm.flow.core.service.TaskService;
@@ -51,7 +52,6 @@ import org.dromara.workflow.utils.WorkflowUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,6 +68,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
 
     private final InsService insService;
     private final DefService defService;
+    private final ChartService chartService;
     private final TaskService taskService;
     private final FlowHisTaskMapper flowHisTaskMapper;
     private final FlowInstanceMapper flowInstanceMapper;
@@ -248,7 +249,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             //撤销
             WorkflowUtils.backTask(message, instance.getId(), applyNodeCode, BusinessStatusEnum.CANCEL.getStatus(), BusinessStatusEnum.CANCEL.getStatus());
             //判断或签节点是否有多个，只保留一个
-            List<Task> currentTaskList = taskService.list(FlowFactory.newTask().setInstanceId(instance.getId()));
+            List<Task> currentTaskList = taskService.list(FlowEngine.newTask().setInstanceId(instance.getId()));
             if (CollUtil.isNotEmpty(currentTaskList)) {
                 if (currentTaskList.size() > 1) {
                     currentTaskList.remove(0);
@@ -284,14 +285,14 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     public Map<String, Object> flowImage(String businessId) {
-        Map<String, Object> map = new HashMap<>(16);
         FlowInstance flowInstance = this.selectInstByBusinessId(businessId);
-        if (flowInstance == null) {
+        if (ObjectUtil.isNull(flowInstance)) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
         }
+        Long instanceId = flowInstance.getId();
         //运行中的任务
         List<FlowHisTaskVo> list = new ArrayList<>();
-        List<FlowTask> flowTaskList = flwTaskService.selectByInstId(flowInstance.getId());
+        List<FlowTask> flowTaskList = flwTaskService.selectByInstId(instanceId);
         if (CollUtil.isNotEmpty(flowTaskList)) {
             List<FlowHisTaskVo> flowHisTaskVos = BeanUtil.copyToList(flowTaskList, FlowHisTaskVo.class);
             for (FlowHisTaskVo flowHisTaskVo : flowHisTaskVos) {
@@ -312,22 +313,15 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         }
         //历史任务
         LambdaQueryWrapper<FlowHisTask> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(FlowHisTask::getInstanceId, flowInstance.getId());
+        wrapper.eq(FlowHisTask::getInstanceId, instanceId);
         wrapper.eq(FlowHisTask::getNodeType, NodeType.BETWEEN.getKey());
         wrapper.orderByDesc(FlowHisTask::getCreateTime).orderByDesc(FlowHisTask::getUpdateTime);
         List<FlowHisTask> flowHisTasks = flowHisTaskMapper.selectList(wrapper);
         if (CollUtil.isNotEmpty(flowHisTasks)) {
             list.addAll(BeanUtil.copyToList(flowHisTasks, FlowHisTaskVo.class));
         }
-
-        map.put("list", list);
-        try {
-            String flowChart = defService.flowChart(flowInstance.getId());
-            map.put("image", flowChart);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return map;
+        String flowChart = chartService.chartIns(instanceId);
+        return Map.of("list", list, "image", flowChart);
     }
 
     /**

@@ -60,7 +60,7 @@ public interface IFlwDefinitionService {
      * @param category 分类
      * @return 结果
      */
-    boolean importXml(MultipartFile file, String category);
+    boolean importJson(MultipartFile file, String category);
 
     /**
      * 删除流程定义

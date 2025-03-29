@@ -104,7 +104,6 @@ public class FlwDefinitionController extends BaseController {
     @Log(title = "流程定义", businessType = BusinessType.INSERT)
     @PutMapping("/publish/{id}")
     @RepeatSubmit()
-    @Transactional(rollbackFor = Exception.class)
     public R<Boolean> publish(@PathVariable Long id) {
         return R.ok(flwDefinitionService.publish(id));
     }
@@ -127,7 +126,6 @@ public class FlwDefinitionController extends BaseController {
      */
     @Log(title = "流程定义", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
-    @Transactional(rollbackFor = Exception.class)
     public R<Void> remove(@PathVariable List<Long> ids) {
         return toAjax(flwDefinitionService.removeDef(ids));
     }
@@ -153,9 +151,8 @@ public class FlwDefinitionController extends BaseController {
      */
     @Log(title = "流程定义", businessType = BusinessType.IMPORT)
     @PostMapping("/importDef")
-    @Transactional(rollbackFor = Exception.class)
     public R<Boolean> importDef(MultipartFile file, String category) {
-        return R.ok(flwDefinitionService.importXml(file, category));
+        return R.ok(flwDefinitionService.importJson(file, category));
     }
 
     /**
@@ -172,13 +169,13 @@ public class FlwDefinitionController extends BaseController {
     }
 
     /**
-     * 获取流程定义xml字符串
+     * 获取流程定义JSON字符串
      *
      * @param id 流程定义id
      */
     @GetMapping("/xmlString/{id}")
     public R<String> xmlString(@PathVariable Long id) {
-        return R.ok("操作成功", defService.xmlString(id));
+        return R.ok("操作成功", defService.exportJson(id));
     }
 
     /**
@@ -189,6 +186,7 @@ public class FlwDefinitionController extends BaseController {
      */
     @RepeatSubmit()
     @PutMapping("/active/{id}")
+    @Transactional(rollbackFor = Exception.class)
     public R<Boolean> active(@PathVariable Long id, @RequestParam boolean active) {
         return R.ok(active ? defService.active(id) : defService.unActive(id));
     }
