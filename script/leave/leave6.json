@@ -2,7 +2,7 @@
   "flowCode" : "leave6",
   "flowName" : "请假申请-排他并行会签",
   "category" : "100",
-  "version" : "4",
+  "version" : "1",
   "formCustom" : "N",
   "formPath" : "/workflow/leaveEdit/index",
   "nodeList" : [ {
@@ -25,7 +25,8 @@
     "nodeName" : "申请人",
     "nodeRatio" : 0.000,
     "coordinate" : "400,300|400,300",
-    "ext" : "[{\"code\":\"enum:org.dromara.workflow.common.enums.ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
+    "formCustom" : "N",
+    "ext" : "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
     "skipList" : [ {
       "nowNodeCode" : "c25a0e86-fdd1-4f03-8e22-14db70389dbd",
       "nextNodeCode" : "07ecda1d-7a0a-47b5-8a91-6186c9473742",
@@ -39,7 +40,8 @@
     "permissionFlag" : "role:1@@role:3@@role:4",
     "nodeRatio" : 0.000,
     "coordinate" : "860,200|860,200",
-    "ext" : "[{\"code\":\"enum:org.dromara.workflow.common.enums.ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
+    "formCustom" : "N",
+    "ext" : "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
     "skipList" : [ {
       "nowNodeCode" : "2bfa3919-78cf-4bc1-b59b-df463a4546f9",
       "nextNodeCode" : "394e1cc8-b8b2-4189-9f81-44448e88ac32",
@@ -54,7 +56,7 @@
     "nodeRatio" : 0.000,
     "coordinate" : "860,400|860,400",
     "formCustom" : "N",
-    "ext" : "[{\"code\":\"enum:org.dromara.workflow.common.enums.ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
+    "ext" : "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
     "skipList" : [ {
       "nowNodeCode" : "ec17f60e-94e0-4d96-a3ce-3417e9d32d60",
       "nextNodeCode" : "394e1cc8-b8b2-4189-9f81-44448e88ac32",
@@ -68,7 +70,8 @@
     "permissionFlag" : "1",
     "nodeRatio" : 0.000,
     "coordinate" : "560,300|560,300",
-    "ext" : "[{\"code\":\"enum:org.dromara.workflow.common.enums.ButtonPermissionEnum\",\"value\":\"back,termination,copy,trust,transfer\"}]",
+    "formCustom" : "N",
+    "ext" : "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination,transfer,copy,pop\"}]",
     "skipList" : [ {
       "nowNodeCode" : "07ecda1d-7a0a-47b5-8a91-6186c9473742",
       "nextNodeCode" : "48117e2c-6328-406b-b102-c4a9d115bb13",
@@ -117,7 +120,7 @@
     "nodeRatio" : 100.000,
     "coordinate" : "1180,300|1180,300",
     "formCustom" : "N",
-    "ext" : "[{\"code\":\"enum:org.dromara.workflow.common.enums.ButtonPermissionEnum\",\"value\":\"back,termination,pop,addSign,subSign\"}]",
+    "ext" : "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination,pop,addSign,subSign\"}]",
     "skipList" : [ {
       "nowNodeCode" : "9c93a195-cff2-4e17-ab0a-a4f264191496",
       "nextNodeCode" : "a1a42056-afd1-4e90-88bc-36cbf5a66992",
@@ -150,7 +153,7 @@
     "nodeRatio" : 0.000,
     "coordinate" : "1480,200|1480,200",
     "formCustom" : "N",
-    "ext" : "[{\"code\":\"enum:org.dromara.workflow.common.enums.ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
+    "ext" : "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
     "skipList" : [ {
       "nowNodeCode" : "350dfa0c-a77c-4efa-8527-10efa02d8be4",
       "nextNodeCode" : "c36a46ef-04f9-463f-bad7-4b395c818519",
@@ -165,7 +168,7 @@
     "nodeRatio" : 0.000,
     "coordinate" : "1480,400|1480,400",
     "formCustom" : "N",
-    "ext" : "[{\"code\":\"enum:org.dromara.workflow.common.enums.ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
+    "ext" : "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
     "skipList" : [ {
       "nowNodeCode" : "fcfdd9f6-f526-4c1a-b71d-88afa31aebc5",
       "nextNodeCode" : "c36a46ef-04f9-463f-bad7-4b395c818519",
@@ -193,7 +196,7 @@
     "nodeRatio" : 0.000,
     "coordinate" : "1820,300|1820,300",
     "formCustom" : "N",
-    "ext" : "[{\"code\":\"enum:org.dromara.workflow.common.enums.ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
+    "ext" : "[{\"code\":\"ButtonPermissionEnum\",\"value\":\"back,termination\"}]",
     "skipList" : [ {
       "nowNodeCode" : "3fcea762-b53a-4ae1-8365-7bec90444828",
       "nextNodeCode" : "9cfbfd3e-6c04-41d6-9fc2-6787a7d2cd31",

@@ -53,7 +53,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
      * @return boolean
      */
     public boolean eval(Integer leaveDays) {
-        if (leaveDays < 2) {
+        if (leaveDays <= 2) {
             return true;
         }
         return false;
