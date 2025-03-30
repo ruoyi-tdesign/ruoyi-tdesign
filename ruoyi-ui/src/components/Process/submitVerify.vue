@@ -23,7 +23,7 @@
             :file-size="20"
           />
         </t-form-item>
-        <t-form-item label="抄送">
+        <t-form-item v-if="task.flowStatus === 'waiting' && buttonObj.copy" label="抄送">
           <t-button theme="primary" shape="circle" @click="openUserSelectCopy">
             <template #icon><add-icon /></template>
           </t-button>
@@ -46,7 +46,7 @@
       <span class="dialog-footer">
         <t-button :disabled="buttonDisabled" theme="primary" @click="handleCompleteTask"> 提交 </t-button>
         <t-button
-          v-if="task.flowStatus === 'waiting'"
+          v-if="task.flowStatus === 'waiting' && buttonObj.trust"
           :disabled="buttonDisabled"
           theme="primary"
           @click="openDelegateTask"
@@ -54,7 +54,7 @@
           委托
         </t-button>
         <t-button
-          v-if="task.flowStatus === 'waiting'"
+          v-if="task.flowStatus === 'waiting' && buttonObj.transfer"
           :disabled="buttonDisabled"
           theme="primary"
           @click="openTransferTask"
@@ -62,7 +62,7 @@
           转办
         </t-button>
         <t-button
-          v-if="task.flowStatus === 'waiting' && Number(task.nodeRatio) > 0"
+          v-if="task.flowStatus === 'waiting' && Number(task.nodeRatio) > 0 && buttonObj.subSign"
           :disabled="buttonDisabled"
           theme="primary"
           @click="openMultiInstanceUser"
@@ -70,7 +70,7 @@
           加签
         </t-button>
         <t-button
-          v-if="task.flowStatus === 'waiting' && Number(task.nodeRatio) > 0"
+          v-if="task.flowStatus === 'waiting' && Number(task.nodeRatio) > 0 && buttonObj.subSign"
           :disabled="buttonDisabled"
           theme="primary"
           @click="handleTaskUser"
@@ -78,7 +78,7 @@
           减签
         </t-button>
         <t-button
-          v-if="task.flowStatus === 'waiting'"
+          v-if="task.flowStatus === 'waiting' && buttonObj.termination"
           :disabled="buttonDisabled"
           theme="danger"
           @click="handleTerminationTask"
@@ -86,7 +86,7 @@
           终止
         </t-button>
         <t-button
-          v-if="task.flowStatus === 'waiting'"
+          v-if="task.flowStatus === 'waiting' && buttonObj.back"
           :disabled="buttonDisabled"
           theme="danger"
           @click="handleBackProcessOpen"
@@ -229,11 +229,16 @@ const deleteUserList = ref<UserDTO[]>([]);
 const backVisible = ref(false);
 const backLoading = ref(true);
 const backButtonDisabled = ref(true);
-// 可驳回得任务节点
+// 可驳回的任务节点
 const taskNodeList = ref<Node[]>([]);
-
+const buttonObj = ref<any>({
+  code: undefined,
+  show: false,
+});
 // 任务
-const task = ref<FlowTaskVo>({});
+const task = ref<FlowTaskVo>({
+  buttonList: [],
+});
 const dialog = reactive({
   visible: false,
   title: '提示',
@@ -254,6 +259,7 @@ const backForm = ref<Record<string, any>>({
   variables: {},
   messageType: ['1'],
 });
+
 // 打开弹窗
 const openDialog = (id?: string | number) => {
   selectCopyUserIds.value = undefined;
@@ -267,6 +273,10 @@ const openDialog = (id?: string | number) => {
   nextTick(() => {
     getTask(taskId.value).then((response) => {
       task.value = response.data;
+      buttonObj.value = [];
+      task.value.buttonList.forEach((e) => {
+        buttonObj.value[e.code] = e.show;
+      });
       loading.value = false;
       buttonDisabled.value = false;
     });

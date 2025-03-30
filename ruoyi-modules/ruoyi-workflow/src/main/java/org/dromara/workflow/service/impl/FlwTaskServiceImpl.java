@@ -512,9 +512,11 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         flowTaskVo.setFlowCode(definition.getFlowCode());
         flowTaskVo.setFlowName(definition.getFlowName());
         flowTaskVo.setBusinessId(instance.getBusinessId());
+        //设置按钮权限
         List<Node> nodeList = nodeService.getByNodeCodes(Collections.singletonList(flowTaskVo.getNodeCode()), instance.getDefinitionId());
         if (CollUtil.isNotEmpty(nodeList)) {
             Node node = nodeList.get(0);
+            flowTaskVo.setButtonList(flowTaskVo.getButtonList(node.getExt()));
             flowTaskVo.setNodeRatio(node.getNodeRatio());
         }
         return flowTaskVo;

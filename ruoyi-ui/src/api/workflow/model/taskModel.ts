@@ -79,6 +79,11 @@ export interface FlowTaskVo {
   createBy?: string;
   /** 申请人名称 */
   createByName?: string;
+  buttonList?: buttonList[];
+}
+export interface buttonList {
+  code: string;
+  show: boolean;
 }
 /**
  * 历史任务视图
