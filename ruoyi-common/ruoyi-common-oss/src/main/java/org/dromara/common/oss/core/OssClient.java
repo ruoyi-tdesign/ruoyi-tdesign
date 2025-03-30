@@ -294,13 +294,13 @@ public class OssClient {
     /**
      * 获取私有URL链接
      *
-     * @param objectKey 对象KEY
-     * @param second    授权时间
+     * @param objectKey   对象KEY
+     * @param expiredTime 链接授权到期时间
      */
-    public String getPrivateUrl(String objectKey, Integer second) {
+    public String getPrivateUrl(String objectKey, Duration expiredTime) {
         // 使用 AWS S3 预签名 URL 的生成器 获取对象的预签名 URL
         URL url = presigner.presignGetObject(
-                x -> x.signatureDuration(Duration.ofSeconds(second))
+                x -> x.signatureDuration(expiredTime)
                     .getObjectRequest(
                         y -> y.bucket(properties.getBucketName())
                             .key(objectKey)
