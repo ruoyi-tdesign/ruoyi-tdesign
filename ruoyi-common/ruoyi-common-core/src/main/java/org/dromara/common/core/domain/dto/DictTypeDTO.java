@@ -7,30 +7,35 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 部门
+ * 字典类型DTO
  *
  * @author AprilWind
  */
 @Data
 @NoArgsConstructor
-public class DeptDTO implements Serializable {
+public class DictTypeDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 部门ID
+     * 字典主键
      */
-    private Long deptId;
+    private Long dictId;
 
     /**
-     * 父部门ID
+     * 字典名称
      */
-    private Long parentId;
+    private String dictName;
 
     /**
-     * 部门名称
+     * 字典类型
      */
-    private String deptName;
+    private String dictType;
+
+    /**
+     * 备注
+     */
+    private String remark;
 
 }

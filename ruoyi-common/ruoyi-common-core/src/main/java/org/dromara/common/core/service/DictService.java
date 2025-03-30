@@ -1,5 +1,9 @@
 package org.dromara.common.core.service;
 
+import org.dromara.common.core.domain.dto.DictDataDTO;
+import org.dromara.common.core.domain.dto.DictTypeDTO;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -63,5 +67,21 @@ public interface DictService {
      * @return dictValue为key，dictLabel为值组成的Map
      */
     Map<String, String> getAllDictByDictType(String dictType);
+
+    /**
+     * 根据字典类型查询详细信息
+     *
+     * @param dictType 字典类型
+     * @return 字典类型详细信息
+     */
+    DictTypeDTO getDictTypeDto(String dictType);
+
+    /**
+     * 根据字典类型查询字典数据列表
+     *
+     * @param dictType 字典类型
+     * @return 字典数据列表
+     */
+    List<DictDataDTO> getDictDataDto(String dictType);
 
 }
