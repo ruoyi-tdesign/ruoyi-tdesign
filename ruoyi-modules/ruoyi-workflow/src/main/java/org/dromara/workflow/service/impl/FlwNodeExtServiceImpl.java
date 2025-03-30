@@ -81,6 +81,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService {
      * @param sources 数据来源（枚举类或字典类型）
      * @return 构建的 `NodeExt` 对象
      */
+    @SuppressWarnings("unchecked cast")
     private NodeExt buildNodeExt(String code, String name, int type, List<Object> sources) {
         NodeExt nodeExt = new NodeExt();
         nodeExt.setCode(code);
@@ -89,7 +90,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService {
         nodeExt.setChilds(sources.stream()
             .map(source -> {
                 if (source instanceof Class<?> clazz && NodeExtEnum.class.isAssignableFrom(clazz)) {
-                    return buildChildNode((Class<? extends Enum<?>>) clazz);
+                    return buildChildNode((Class<? extends NodeExtEnum>) clazz);
                 } else if (source instanceof String dictType) {
                     return buildChildNode(dictType);
                 }
@@ -107,7 +108,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService {
      * @param enumClass 枚举类，必须实现 `NodeExtEnum` 接口
      * @return 构建的 `ChildNode` 对象
      */
-    private NodeExt.ChildNode buildChildNode(Class<? extends Enum<?>> enumClass) {
+    private NodeExt.ChildNode buildChildNode(Class<? extends NodeExtEnum> enumClass) {
         if (!enumClass.isEnum()) {
             return null;
         }
@@ -117,7 +118,6 @@ public class FlwNodeExtServiceImpl implements NodeExtService {
         childNode.setCode(simpleName);
         // 字典，下拉框和复选框时用到
         childNode.setDict(Arrays.stream(enumClass.getEnumConstants())
-            .filter(NodeExtEnum.class::isInstance)
             .map(NodeExtEnum.class::cast)
             .map(x ->
                 new NodeExt.DictItem(x.getLabel(), x.getValue(), x.isSelected())
