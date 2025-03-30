@@ -1,22 +1,21 @@
-
 create table FLOW_DEFINITION
 (
-    ID NUMBER (20) not null,
-    FLOW_CODE VARCHAR2 (40) not null,
-    FLOW_NAME VARCHAR2 (100) not null,
-    CATEGORY VARCHAR2 (100),
-    VERSION VARCHAR2 (20) not null,
-    IS_PUBLISH NUMBER (1) default 0 not null,
-    FORM_CUSTOM VARCHAR2 (1) default 'N',
-    FORM_PATH VARCHAR2 (100),
-    ACTIVITY_STATUS NUMBER (1) default 1,
-    LISTENER_TYPE VARCHAR2 (100),
-    LISTENER_PATH VARCHAR2 (500),
-    EXT VARCHAR2 (500),
-    CREATE_TIME DATE,
-    UPDATE_TIME DATE,
-    DEL_FLAG VARCHAR2 (1) default '0',
-    TENANT_ID VARCHAR2 (40)
+    ID              NUMBER(20)            not null,
+    FLOW_CODE       VARCHAR2(40)          not null,
+    FLOW_NAME       VARCHAR2(100)         not null,
+    CATEGORY        VARCHAR2(100),
+    VERSION         VARCHAR2(20)          not null,
+    IS_PUBLISH      NUMBER(1)   default 0 not null,
+    FORM_CUSTOM     VARCHAR2(1) default 'N',
+    FORM_PATH       VARCHAR2(100),
+    ACTIVITY_STATUS NUMBER(1)   default 1,
+    LISTENER_TYPE   VARCHAR2(100),
+    LISTENER_PATH   VARCHAR2(500),
+    EXT             VARCHAR2(500),
+    CREATE_TIME     DATE,
+    UPDATE_TIME     DATE,
+    DEL_FLAG        VARCHAR2(1) default '0',
+    TENANT_ID       VARCHAR2(40)
 );
 
 alter table FLOW_DEFINITION add constraint PK_FLOW_DEFINITION primary key (ID);
@@ -41,27 +40,27 @@ comment on column FLOW_DEFINITION.TENANT_ID is '租户id';
 
 create table FLOW_NODE
 (
-    ID NUMBER (20) not null,
-    NODE_TYPE NUMBER (1) not null,
-    DEFINITION_ID NUMBER (20) not null,
-    NODE_CODE VARCHAR2 (100) not null,
-    NODE_NAME VARCHAR2 (100),
-    NODE_RATIO NUMBER (6,3),
-    COORDINATE VARCHAR2 (100),
-    SKIP_ANY_NODE VARCHAR2 (100) default 'N',
-    ANY_NODE_SKIP VARCHAR2 (100),
-    LISTENER_TYPE VARCHAR2 (100),
-    LISTENER_PATH VARCHAR2 (500),
-    HANDLER_TYPE VARCHAR2 (100),
-    HANDLER_PATH VARCHAR2 (400),
-    FORM_CUSTOM VARCHAR2 (1) default 'N',
-    FORM_PATH VARCHAR2 (100),
-    VERSION VARCHAR2 (20),
-    CREATE_TIME DATE,
-    UPDATE_TIME DATE,
-    DEL_FLAG VARCHAR2 (1) default '0',
-    TENANT_ID VARCHAR2 (40),
-    PERMISSION_FLAG VARCHAR2 (200)
+    ID              NUMBER(20)    not null,
+    NODE_TYPE       NUMBER(1)     not null,
+    DEFINITION_ID   NUMBER(20)    not null,
+    NODE_CODE       VARCHAR2(100) not null,
+    NODE_NAME       VARCHAR2(100),
+    NODE_RATIO      NUMBER(6, 3),
+    COORDINATE      VARCHAR2(100),
+    SKIP_ANY_NODE   VARCHAR2(100) default 'N',
+    ANY_NODE_SKIP   VARCHAR2(100),
+    LISTENER_TYPE   VARCHAR2(100),
+    LISTENER_PATH   VARCHAR2(500),
+    HANDLER_TYPE    VARCHAR2(100),
+    HANDLER_PATH    VARCHAR2(400),
+    FORM_CUSTOM     VARCHAR2(1)   default 'N',
+    FORM_PATH       VARCHAR2(100),
+    VERSION         VARCHAR2(20),
+    CREATE_TIME     DATE,
+    UPDATE_TIME     DATE,
+    DEL_FLAG        VARCHAR2(1)   default '0',
+    TENANT_ID       VARCHAR2(40),
+    PERMISSION_FLAG VARCHAR2(200)
 );
 
 alter table FLOW_NODE add constraint PK_FLOW_NODE primary key (ID);
@@ -91,20 +90,20 @@ comment on column FLOW_NODE.PERMISSION_FLAG is '权限标识（权限类型:权�
 
 create table FLOW_SKIP
 (
-    ID NUMBER (20) not null,
-    DEFINITION_ID NUMBER (20) not null,
-    NOW_NODE_CODE VARCHAR2 (100) not null,
-    NOW_NODE_TYPE NUMBER (1),
-    NEXT_NODE_CODE VARCHAR2 (100) not null,
-    NEXT_NODE_TYPE NUMBER (1),
-    SKIP_NAME VARCHAR2 (100),
-    SKIP_TYPE VARCHAR2 (40),
-    SKIP_CONDITION VARCHAR2 (200),
-    COORDINATE VARCHAR2 (100),
-    CREATE_TIME DATE,
-    UPDATE_TIME DATE,
-    DEL_FLAG VARCHAR2 (1) default '0',
-    TENANT_ID VARCHAR2 (40)
+    ID             NUMBER(20)    not null,
+    DEFINITION_ID  NUMBER(20)    not null,
+    NOW_NODE_CODE  VARCHAR2(100) not null,
+    NOW_NODE_TYPE  NUMBER(1),
+    NEXT_NODE_CODE VARCHAR2(100) not null,
+    NEXT_NODE_TYPE NUMBER(1),
+    SKIP_NAME      VARCHAR2(100),
+    SKIP_TYPE      VARCHAR2(40),
+    SKIP_CONDITION VARCHAR2(200),
+    COORDINATE     VARCHAR2(100),
+    CREATE_TIME    DATE,
+    UPDATE_TIME    DATE,
+    DEL_FLAG       VARCHAR2(1) default '0',
+    TENANT_ID      VARCHAR2(40)
 );
 
 alter table FLOW_SKIP add constraint PK_FLOW_SKIP primary key (ID);
@@ -127,21 +126,22 @@ comment on column FLOW_SKIP.TENANT_ID is '租户id';
 
 create table FLOW_INSTANCE
 (
-    ID NUMBER not null,
-    DEFINITION_ID NUMBER not null,
-    BUSINESS_ID VARCHAR2 (40) not null,
-    NODE_TYPE NUMBER (1),
-    NODE_CODE VARCHAR2 (100),
-    NODE_NAME VARCHAR2 (100),
-    VARIABLE CLOB,
-    FLOW_STATUS VARCHAR2 (20),
-    ACTIVITY_STATUS NUMBER (1) default 1,
-    CREATE_BY VARCHAR2 (64) default '',
-    CREATE_TIME DATE,
-    UPDATE_TIME DATE,
-    EXT VARCHAR2 (500),
-    DEL_FLAG VARCHAR2 (1) default '0',
-    TENANT_ID VARCHAR2 (40)
+    ID              NUMBER       not null,
+    DEFINITION_ID   NUMBER       not null,
+    BUSINESS_ID     VARCHAR2(40) not null,
+    NODE_TYPE       NUMBER(1),
+    NODE_CODE       VARCHAR2(100),
+    NODE_NAME       VARCHAR2(100),
+    VARIABLE        CLOB,
+    FLOW_STATUS     VARCHAR2(20),
+    ACTIVITY_STATUS NUMBER(1)    default 1,
+    DEF_JSON        CLOB,
+    CREATE_BY       VARCHAR2(64) default '',
+    CREATE_TIME     DATE,
+    UPDATE_TIME     DATE,
+    EXT             VARCHAR2(500),
+    DEL_FLAG        VARCHAR2(1)  default '0',
+    TENANT_ID       VARCHAR2(40)
 );
 
 alter table FLOW_INSTANCE add constraint PK_FLOW_INSTANCE primary key (ID);
@@ -156,6 +156,7 @@ comment on column FLOW_INSTANCE.NODE_NAME is '开始节点名称';
 comment on column FLOW_INSTANCE.VARIABLE is '任务变量';
 comment on column FLOW_INSTANCE.FLOW_STATUS is '流程状态（0待提交 1审批中 2 审批通过 3自动通过 4终止 5作废 6撤销 7取回  8已完成 9已退回 10失效）';
 comment on column FLOW_INSTANCE.ACTIVITY_STATUS is '流程激活状态（0挂起 1激活）';
+comment on column FLOW_INSTANCE.DEF_JSON is '流程定义json';
 comment on column FLOW_INSTANCE.CREATE_BY is '创建者';
 comment on column FLOW_INSTANCE.CREATE_TIME is '创建时间';
 comment on column FLOW_INSTANCE.UPDATE_TIME is '更新时间';
@@ -165,18 +166,18 @@ comment on column FLOW_INSTANCE.TENANT_ID is '租户id';
 
 create table FLOW_TASK
 (
-    ID NUMBER (20) not null,
-    DEFINITION_ID NUMBER (20) not null,
-    INSTANCE_ID NUMBER (20) not null,
-    NODE_CODE VARCHAR2 (100),
-    NODE_NAME VARCHAR2 (100),
-    NODE_TYPE NUMBER (1),
-    FORM_CUSTOM VARCHAR2 (1) default 'N',
-    FORM_PATH VARCHAR2 (100),
-    CREATE_TIME DATE,
-    UPDATE_TIME DATE,
-    DEL_FLAG VARCHAR2 (1) default '0',
-    TENANT_ID VARCHAR2 (40)
+    ID            NUMBER(20) not null,
+    DEFINITION_ID NUMBER(20) not null,
+    INSTANCE_ID   NUMBER(20) not null,
+    NODE_CODE     VARCHAR2(100),
+    NODE_NAME     VARCHAR2(100),
+    NODE_TYPE     NUMBER(1),
+    FORM_CUSTOM   VARCHAR2(1) default 'N',
+    FORM_PATH     VARCHAR2(100),
+    CREATE_TIME   DATE,
+    UPDATE_TIME   DATE,
+    DEL_FLAG      VARCHAR2(1) default '0',
+    TENANT_ID     VARCHAR2(40)
 );
 
 alter table FLOW_TASK add constraint PK_FLOW_TASK primary key (ID);
@@ -197,28 +198,30 @@ comment on column FLOW_TASK.TENANT_ID is '租户id';
 
 create table FLOW_HIS_TASK
 (
-    ID NUMBER (20) not null,
-    DEFINITION_ID NUMBER (20) not null,
-    INSTANCE_ID NUMBER (20) not null,
-    TASK_ID NUMBER (20) not null,
-    NODE_CODE VARCHAR2 (100),
-    NODE_NAME VARCHAR2 (100),
-    NODE_TYPE NUMBER (1),
-    TARGET_NODE_CODE VARCHAR2 (100),
-    TARGET_NODE_NAME VARCHAR2 (100),
-    APPROVER VARCHAR2 (40),
-    COOPERATE_TYPE NUMBER (1) default 0,
-    COLLABORATOR VARCHAR2 (40),
-    SKIP_TYPE VARCHAR2 (10),
-    FLOW_STATUS VARCHAR2 (20),
-    FORM_CUSTOM VARCHAR2 (1) default 'N',
-    FORM_PATH VARCHAR2 (100),
-    MESSAGE VARCHAR2 (500),
-    EXT VARCHAR2 (500),
-    CREATE_TIME DATE,
-    UPDATE_TIME DATE,
-    DEL_FLAG VARCHAR2 (1) default '0',
-    TENANT_ID VARCHAR2 (40)
+    ID               NUMBER(20) not null,
+    DEFINITION_ID    NUMBER(20) not null,
+    INSTANCE_ID      NUMBER(20) not null,
+    TASK_ID          NUMBER(20) not null,
+    NODE_CODE        VARCHAR2(100),
+    NODE_NAME        VARCHAR2(100),
+    NODE_TYPE        NUMBER(1),
+    TARGET_NODE_CODE VARCHAR2(200),
+    TARGET_NODE_NAME VARCHAR2(200),
+    APPROVER         VARCHAR2(40),
+    COOPERATE_TYPE   NUMBER(1)   default 0,
+    COLLABORATOR     VARCHAR2(40),
+    SKIP_TYPE        VARCHAR2(10),
+    FLOW_STATUS      VARCHAR2(20),
+    FORM_CUSTOM      VARCHAR2(1) default 'N',
+    FORM_PATH        VARCHAR2(100),
+    MESSAGE          VARCHAR2(500),
+    VARIABLE         CLOB,
+    EXT              VARCHAR2(500),
+    CREATE_TIME      DATE,
+    UPDATE_TIME      DATE,
+    DEL_FLAG         VARCHAR2(1) default '0',
+    TENANT_ID        VARCHAR2(40)
+
 );
 
 alter table FLOW_HIS_TASK add constraint PK_FLOW_HIS_TASK primary key (ID);
@@ -238,6 +241,7 @@ comment on column FLOW_HIS_TASK.FLOW_STATUS is '流程状态（1审批中 2 审�
 comment on column FLOW_HIS_TASK.FORM_CUSTOM is '审批表单是否自定义 (Y是 N否)';
 comment on column FLOW_HIS_TASK.FORM_PATH is '审批表单路径';
 comment on column FLOW_HIS_TASK.MESSAGE is '审批意见';
+comment on column FLOW_HIS_TASK.VARIABLE is '任务变量';
 comment on column FLOW_HIS_TASK.EXT is '扩展字段，预留给业务系统使用';
 comment on column FLOW_HIS_TASK.CREATE_TIME is '任务开始时间';
 comment on column FLOW_HIS_TASK.UPDATE_TIME is '审批完成时间';
@@ -249,15 +253,15 @@ comment on column FLOW_HIS_TASK.COLLABORATOR is '协作人';
 
 create table FLOW_USER
 (
-    ID NUMBER (20) not null,
-    TYPE VARCHAR2 (1) not null,
-    PROCESSED_BY VARCHAR2 (80),
-    ASSOCIATED NUMBER (20) not null,
-    CREATE_TIME DATE,
-    CREATE_BY VARCHAR2 (80),
-    UPDATE_TIME DATE,
-    DEL_FLAG VARCHAR2 (1) default '0',
-    TENANT_ID VARCHAR2 (40)
+    ID           NUMBER(20)  not null,
+    TYPE         VARCHAR2(1) not null,
+    PROCESSED_BY VARCHAR2(80),
+    ASSOCIATED   NUMBER(20)  not null,
+    CREATE_TIME  DATE,
+    CREATE_BY    VARCHAR2(80),
+    UPDATE_TIME  DATE,
+    DEL_FLAG     VARCHAR2(1) default '0',
+    TENANT_ID    VARCHAR2(40)
 );
 
 alter table FLOW_USER add constraint PK_FLOW_USER primary key (ID);
@@ -312,7 +316,7 @@ COMMENT ON COLUMN flow_category.update_time IS '更新时间';
 
 INSERT INTO flow_category VALUES (100, '000000', 0, '0', 'OA审批', 0, '0', 103, 1, SYSDATE, NULL, NULL);
 INSERT INTO flow_category VALUES (101, '000000', 100, '0,100', '假勤管理', 0, '0', 103, 1, SYSDATE, NULL, NULL);
-INSERT INTO flow_category VALUES (102, '000000', 100, '0,100', '人事管理', 0, '0', 103, 1, SYSDATE, NULL, NULL);
+INSERT INTO flow_category VALUES (102, '000000', 100, '0,100', '人事管理', 1, '0', 103, 1, SYSDATE, NULL, NULL);
 INSERT INTO flow_category VALUES (103, '000000', 101, '0,100,101', '请假', 0, '0', 103, 1, SYSDATE, NULL, NULL);
 INSERT INTO flow_category VALUES (104, '000000', 101, '0,100,101', '出差', 1, '0', 103, 1, SYSDATE, NULL, NULL);
 INSERT INTO flow_category VALUES (105, '000000', 101, '0,100,101', '加班', 2, '0', 103, 1, SYSDATE, NULL, NULL);
