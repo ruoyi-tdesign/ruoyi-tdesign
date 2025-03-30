@@ -15,6 +15,8 @@ public interface IFlwCommonService {
 
     /**
      * 获取工作流用户service
+     *
+     * @return 工作流用户service
      */
     UserService getFlowUserService();
 
@@ -40,6 +42,7 @@ public interface IFlwCommonService {
      * 发送消息
      *
      * @param flowName    流程定义名称
+     * @param instId      实例id
      * @param messageType 消息类型
      * @param message     消息内容，为空则发送默认配置的消息内容
      */
