@@ -90,7 +90,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      * @param dictType 字典类型
      * @return 字典数据集合信息
      */
-    @Cacheable(cacheNames = CacheNames.SYS_DICT, key = "#dictType")
+    @Cacheable(cacheNames = CacheNames.SYS_DICT_DATA, key = "#dictType")
     @Override
     public List<SysDictDataVo> selectDictDataByType(String dictType) {
         List<SysDictDataVo> dictDatas = dictDataMapper.selectDictDataByType(dictType);
@@ -117,6 +117,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      * @param dictType 字典类型
      * @return 字典类型
      */
+    @Cacheable(cacheNames = CacheNames.SYS_DICT_TYPE, key = "#dictType")
     @Override
     public SysDictTypeVo selectDictTypeByType(String dictType) {
         return baseMapper.selectVoOne(new LambdaQueryWrapper<SysDictType>().eq(SysDictType::getDictType, dictType));
@@ -136,7 +137,8 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
                 .eq(SysDictData::getDictType, dictType.getDictType()))) {
                 throw new ServiceException(String.format("%1$s已分配,不能删除", dictType.getDictName()));
             }
-            CacheUtils.evict(CacheNames.SYS_DICT, dictType.getDictType());
+            CacheUtils.evict(CacheNames.SYS_DICT_DATA, dictType.getDictType());
+            CacheUtils.evict(CacheNames.SYS_DICT_TYPE, dictType.getDictType());
         }
         baseMapper.deleteByIds(Arrays.asList(dictIds));
         clearAllDictTypeCache();
@@ -147,7 +149,17 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      */
     @Override
     public void resetDictCache() {
-        CacheUtils.clear(CacheNames.SYS_DICT);
+        resetDictCache(null);
+    }
+
+    private void resetDictCache(String dictType) {
+        if (dictType != null) {
+            CacheUtils.evict(CacheNames.SYS_DICT_DATA, dictType);
+            CacheUtils.evict(CacheNames.SYS_DICT_TYPE, dictType);
+        } else {
+            CacheUtils.clear(CacheNames.SYS_DICT_DATA);
+            CacheUtils.clear(CacheNames.SYS_DICT_TYPE);
+        }
         clearAllDictTypeCache();
     }
 
@@ -164,7 +176,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      * @param bo 字典类型信息
      * @return 结果
      */
-    @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#bo.dictType")
+    @CachePut(cacheNames = CacheNames.SYS_DICT_DATA, key = "#bo.dictType")
     @Override
     public List<SysDictDataVo> insertDictType(SysDictTypeBo bo) {
         SysDictType dict = MapstructUtils.convert(bo, SysDictType.class);
@@ -183,7 +195,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      * @param bo 字典类型信息
      * @return 结果
      */
-    @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#bo.dictType")
+    @CachePut(cacheNames = CacheNames.SYS_DICT_DATA, key = "#bo.dictType")
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<SysDictDataVo> updateDictType(SysDictTypeBo bo) {
@@ -194,8 +206,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             .eq(SysDictData::getDictType, oldDict.getDictType()));
         int row = baseMapper.updateById(dict);
         if (row > 0) {
-            CacheUtils.evict(CacheNames.SYS_DICT, oldDict.getDictType());
-            clearAllDictTypeCache();
+            resetDictCache(oldDict.getDictType());
             return dictDataMapper.selectDictDataByType(dict.getDictType());
         }
         throw new ServiceException("操作失败");

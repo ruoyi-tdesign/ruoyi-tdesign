@@ -469,7 +469,7 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
             }
         });
         for (String tenantId : set) {
-            TenantHelper.dynamicTenant(tenantId, () -> CacheUtils.clear(CacheNames.SYS_DICT));
+            TenantHelper.dynamicTenant(tenantId, () -> CacheUtils.clear(CacheNames.SYS_DICT_DATA));
         }
     }
 
