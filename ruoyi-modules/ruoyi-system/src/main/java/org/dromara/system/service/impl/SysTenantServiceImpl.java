@@ -426,6 +426,9 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
                             data.setTenantId(tenantId);
                             data.setCreateTime(null);
                             data.setUpdateTime(null);
+                            data.setCreateDept(null);
+                            data.setCreateBy(null);
+                            data.setUpdateBy(null);
                             set.add(tenantId);
                             saveDataList.add(data);
                         }
@@ -447,6 +450,9 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
                             data.setTenantId(tenantId);
                             data.setCreateTime(null);
                             data.setUpdateTime(null);
+                            data.setCreateDept(null);
+                            data.setCreateBy(null);
+                            data.setUpdateBy(null);
                             set.add(tenantId);
                             saveDataList.add(data);
                         }

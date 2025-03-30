@@ -13,7 +13,9 @@ import org.dromara.workflow.common.ConditionalOnEnable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流程设计器-节点扩展属性
@@ -27,14 +29,14 @@ import java.util.List;
 public class FlwNodeExtServiceImpl implements NodeExtService {
 
     /**
-     * 权限页
+     * 权限页code
      */
-    private static final String BUTTON_PERMISSION_TAB = "wf_button_tab";
+    private static final String PERMISSION_TAB = "wf_button_tab";
 
     /**
-     * 权限页页签名称
+     * 权限页名称
      */
-    private static final String LIMITS_OF_AUTHORITY = "权限";
+    private static final String PERMISSION_TAB_NAME = "权限";
 
     /**
      * 字典类型逗号分隔
@@ -50,6 +52,16 @@ public class FlwNodeExtServiceImpl implements NodeExtService {
      * 新页签
      */
     private static final int TYPE_NEW_TAB = 2;
+
+    /**
+     * 存储不同 dictType 对应的配置信息
+     */
+    private static final Map<String, Map<String, Object>> CHILD_NODE_MAP = new HashMap<>();
+
+    static {
+        CHILD_NODE_MAP.put("wf_button_permission", Map.of("type", 4, "must", false, "multiple", true));
+    }
+
     private final DictService dictService;
 
     /**
@@ -61,26 +73,24 @@ public class FlwNodeExtServiceImpl implements NodeExtService {
     public List<NodeExt> getNodeExt() {
         List<NodeExt> nodeExtList = new ArrayList<>();
         // 构建按钮权限页面
-        nodeExtList.add(buildNodeExt(BUTTON_PERMISSION_TAB, TYPE_NEW_TAB, DICT_TYPES));
+        nodeExtList.add(buildNodeExt(PERMISSION_TAB, PERMISSION_TAB_NAME, TYPE_NEW_TAB, DICT_TYPES));
         return nodeExtList;
     }
 
     /**
      * 构建一个 NodeExt 对象
      *
-     * @param code 编码，此json中唯一
-     * @param type 节点类型，1：基础设置，2：新页签
+     * @param code      编码，此json中唯一
+     * @param name      名称，如果type为新页签时，作为页签名称
+     * @param type      节点类型，1：基础设置，2：新页签
+     * @param dictTypes 字典类型逗号分隔
      * @return 返回构建好的 NodeExt 对象
      */
-    private NodeExt buildNodeExt(String code, int type, String dictTypes) {
+    private NodeExt buildNodeExt(String code, String name, int type, String dictTypes) {
         NodeExt nodeExt = new NodeExt();
-        // 从系统参数配置里面获取信息构建新页面或者基础设置
-        // 编码，此json中唯一
         nodeExt.setCode(code);
-        // 1：基础设置 2：新页签
         nodeExt.setType(type);
-        // 名称，如果type为新页签时，作为页签名称
-        nodeExt.setName(LIMITS_OF_AUTHORITY);
+        nodeExt.setName(name);
         nodeExt.setChilds(StringUtils.splitList(dictTypes)
             .stream().map(this::buildChildNode).toList()
         );
@@ -108,12 +118,13 @@ public class FlwNodeExtServiceImpl implements NodeExtService {
         childNode.setLabel(dictTypeDTO.getDictName());
         // 描述
         childNode.setDesc(dictTypeDTO.getRemark());
+        Map<String, Object> map = CHILD_NODE_MAP.get(dictType);
         // 1：输入框 2：输入框 3：下拉框 4：选择框
-        childNode.setType(4);
+        childNode.setType(Convert.toInt(map.get("type"), 1));
         // 是否必填
-        childNode.setMust(false);
+        childNode.setMust(Convert.toBool(map.get("must"), false));
         // 是否多选
-        childNode.setMultiple(true);
+        childNode.setMultiple(Convert.toBool(map.get("multiple"), true));
         // 字典，下拉框和复选框时用到
         childNode.setDict(dictService.getDictDataDto(dictType)
             .stream().map(x ->
