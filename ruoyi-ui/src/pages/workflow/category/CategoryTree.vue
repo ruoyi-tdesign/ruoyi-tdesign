@@ -50,11 +50,11 @@ import type { TreeModel } from '@/api/model/resultModel';
 import { categoryTree } from '@/api/workflow/category';
 
 const loadingTree = ref(false);
-const categoryOptions = ref<TreeModel<number | string>[]>([]);
+const categoryOptions = ref<TreeModel<string>[]>([]);
 const categoryName = ref('');
 const expandedTree = ref<string[]>([]);
 const treeActived = defineModel<string[]>({
-  default: () => [],
+  default: () => [] as string[],
 });
 const emit = defineEmits(['active']);
 
@@ -67,7 +67,7 @@ function triggerExpandedTree() {
 const filterNode = computed(() => {
   const value = categoryName.value;
   return (node: TreeNodeModel) => {
-    if (!node.value || !value || data.id === '0') return true;
+    if (!node.value || !value || node.data.id === '0') return true;
     return node.label.indexOf(value) >= 0;
   };
 });

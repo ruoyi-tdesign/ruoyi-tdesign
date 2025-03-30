@@ -43,7 +43,7 @@ public interface IFlwCategoryService {
      * @param category 流程分类信息
      * @return 流程分类树信息集合
      */
-    List<Tree<Long>> selectCategoryTreeList(FlowCategoryBo category);
+    List<Tree<String>> selectCategoryTreeList(FlowCategoryBo category);
 
     /**
      * 校验流程分类是否有数据权限

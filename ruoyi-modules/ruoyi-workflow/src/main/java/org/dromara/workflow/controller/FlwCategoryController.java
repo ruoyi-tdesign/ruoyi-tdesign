@@ -125,7 +125,7 @@ public class FlwCategoryController extends BaseController {
      * @param categoryBo 流程分类
      */
     @GetMapping("/categoryTree")
-    public R<List<Tree<Long>>> categoryTree(FlowCategoryBo categoryBo) {
+    public R<List<Tree<String>>> categoryTree(FlowCategoryBo categoryBo) {
         return R.ok(flwCategoryService.selectCategoryTreeList(categoryBo));
     }
 

@@ -94,24 +94,24 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService {
      * @return 流程分类树信息集合
      */
     @Override
-    public List<Tree<Long>> selectCategoryTreeList(FlowCategoryBo category) {
+    public List<Tree<String>> selectCategoryTreeList(FlowCategoryBo category) {
         LambdaQueryWrapper<FlowCategory> lqw = buildQueryWrapper(category);
         List<FlowCategoryVo> categorys = baseMapper.selectVoList(lqw);
         if (CollUtil.isEmpty(categorys)) {
             return CollUtil.newArrayList();
         }
         // 获取当前列表中每一个节点的parentId，然后在列表中查找是否有id与其parentId对应，若无对应，则表明此时节点列表中，该节点在当前列表中属于顶级节点
-        List<Tree<Long>> treeList = CollUtil.newArrayList();
+        List<Tree<String>> treeList = CollUtil.newArrayList();
         for (FlowCategoryVo d : categorys) {
-            Long parentId = d.getParentId();
-            FlowCategoryVo categoryVo = StreamUtils.findFirst(categorys, it -> it.getCategoryId().longValue() == parentId);
+            String parentId = d.getParentId().toString();
+            FlowCategoryVo categoryVo = StreamUtils.findFirst(categorys, it -> it.getCategoryId().toString().equals(parentId));
             if (ObjectUtil.isNull(categoryVo)) {
-                List<Tree<Long>> trees = TreeBuildUtils.build(categorys, parentId, (dept, tree) ->
-                    tree.setId(dept.getCategoryId())
-                        .setParentId(dept.getParentId())
+                List<Tree<String>> trees = TreeBuildUtils.build(categorys, parentId, (dept, tree) ->
+                    tree.setId(dept.getCategoryId().toString())
+                        .setParentId(dept.getParentId().toString())
                         .setName(dept.getCategoryName())
                         .setWeight(dept.getOrderNum()));
-                Tree<Long> tree = StreamUtils.findFirst(trees, it -> it.getId().longValue() == d.getCategoryId());
+                Tree<String> tree = StreamUtils.findFirst(trees, it -> it.getId().equals(d.getCategoryId().toString()));
                 treeList.add(tree);
             }
         }

@@ -49,7 +49,7 @@ export function delCategory(categoryId: number | Array<number>) {
  * @returns
  */
 export function categoryTree(query?: CategoryForm) {
-  return request.get<R<TreeModel<number | string>[]>>({
+  return request.get<R<TreeModel<string>[]>>({
     url: `/workflow/category/categoryTree`,
     params: query,
   });
