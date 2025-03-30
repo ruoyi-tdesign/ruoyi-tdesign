@@ -123,33 +123,27 @@
           :data="form"
           :rules="rules"
           label-align="right"
-          label-width="calc(5em + 41px)"
+          label-width="calc(4em + 41px)"
           scroll-to-first-error="smooth"
           @submit="submitForm"
         >
           <t-form-item label="分类名称" name="categoryName">
             <t-input v-model="form.categoryName" placeholder="请输入分类名称" clearable />
           </t-form-item>
-          <t-row :gutter="20">
-            <t-col :span="12">
-              <t-form-item label="上级分类" name="parentId">
-                <t-tree-select
-                  v-model="form.parentId"
-                  :data="categoryOptions"
-                  :tree-props="{
-                    keys: { value: 'categoryId', label: 'categoryName', children: 'children' },
-                    checkStrictly: true,
-                  }"
-                  placeholder="请选择上级分类"
-                />
-              </t-form-item>
-            </t-col>
-            <t-col :span="12">
-              <t-form-item label="排序" name="orderNum">
-                <t-input-number v-model="form.orderNum" placeholder="请输入" :min="0" :allow-input-over-limit="false" />
-              </t-form-item>
-            </t-col>
-          </t-row>
+          <t-form-item label="上级分类" name="parentId">
+            <t-tree-select
+              v-model="form.parentId"
+              :data="categoryOptions"
+              :tree-props="{
+                keys: { value: 'categoryId', label: 'categoryName', children: 'children' },
+                checkStrictly: true,
+              }"
+              placeholder="请选择上级分类"
+            />
+          </t-form-item>
+          <t-form-item label="排序" name="orderNum">
+            <t-input-number v-model="form.orderNum" placeholder="请输入" :min="0" :allow-input-over-limit="false" />
+          </t-form-item>
         </t-form>
       </t-loading>
     </t-dialog>

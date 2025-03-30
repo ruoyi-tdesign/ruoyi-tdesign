@@ -28,89 +28,84 @@
       <t-tabs v-model="tab" @tab-click="changeTab">
         <t-tab-panel value="waiting" label="待办任务"> </t-tab-panel>
         <t-tab-panel value="finish" label="已办任务"> </t-tab-panel>
-        <t-table
-          v-model:column-controller-visible="columnControllerVisible"
-          hover
-          :loading="loading"
-          row-key="id"
-          :data="taskList"
-          :columns="columns"
-          :selected-row-keys="ids"
-          select-on-row-click
-          :pagination="pagination"
-          :column-controller="{
-            hideTriggerButton: true,
-          }"
-          @select-change="handleSelectionChange"
-        >
-          <template #topContent>
-            <t-row>
-              <t-col flex="auto">
-                <t-button
-                  v-if="tab === 'waiting'"
-                  theme="primary"
-                  variant="outline"
-                  :disabled="multiple"
-                  @click="handleUpdate"
-                >
-                  <template #icon> <edit-icon /> </template>
-                  修改办理人
-                </t-button>
-                <span class="selected-count">已选 {{ ids.length }} 项</span>
-              </t-col>
-              <t-col flex="none">
-                <t-button theme="default" shape="square" variant="outline" @click="showSearch = !showSearch">
-                  <template #icon> <search-icon /> </template>
-                </t-button>
-                <t-button theme="default" variant="outline" @click="columnControllerVisible = true">
-                  <template #icon> <setting-icon /> </template>
-                  列配置
-                </t-button>
-              </t-col>
-            </t-row>
-          </template>
-          <template #version="{ row }">
-            <span>v{{ row.version }}.0</span>
-          </template>
-          <template #assigneeNames="{ row }">
-            <template v-if="tab === 'waiting'">
-              <template v-if="row.assigneeNames">
-                <t-tag
-                  v-for="(name, index) in row.assigneeNames.split(',')"
-                  :key="index"
-                  variant="light"
-                  theme="success"
-                >
-                  {{ name }}
-                </t-tag>
-              </template>
-              <template v-else>
-                <t-tag variant="light" theme="success"> 无</t-tag>
-              </template>
+      </t-tabs>
+      <t-table
+        v-model:column-controller-visible="columnControllerVisible"
+        hover
+        :loading="loading"
+        row-key="id"
+        :data="taskList"
+        :columns="columns"
+        :selected-row-keys="ids"
+        select-on-row-click
+        :pagination="pagination"
+        :column-controller="{
+          hideTriggerButton: true,
+        }"
+        @select-change="handleSelectionChange"
+      >
+        <template #topContent>
+          <t-row>
+            <t-col flex="auto">
+              <t-button
+                v-if="tab === 'waiting'"
+                theme="primary"
+                variant="outline"
+                :disabled="multiple"
+                @click="handleUpdate"
+              >
+                <template #icon> <edit-icon /> </template>
+                修改办理人
+              </t-button>
+              <span class="selected-count">已选 {{ ids.length }} 项</span>
+            </t-col>
+            <t-col flex="none">
+              <t-button theme="default" shape="square" variant="outline" @click="showSearch = !showSearch">
+                <template #icon> <search-icon /> </template>
+              </t-button>
+              <t-button theme="default" variant="outline" @click="columnControllerVisible = true">
+                <template #icon> <setting-icon /> </template>
+                列配置
+              </t-button>
+            </t-col>
+          </t-row>
+        </template>
+        <template #version="{ row }">
+          <span>v{{ row.version }}.0</span>
+        </template>
+        <template #assigneeNames="{ row }">
+          <template v-if="tab === 'waiting'">
+            <template v-if="row.assigneeNames">
+              <t-tag v-for="(name, index) in row.assigneeNames.split(',')" :key="index" variant="light" theme="success">
+                {{ name }}
+              </t-tag>
             </template>
             <template v-else>
-              <t-tag variant="light" theme="success"> {{ row.approveName }}</t-tag>
+              <t-tag variant="light" theme="success"> 无</t-tag>
             </template>
           </template>
-          <template #flowStatus="{ row }">
-            <dict-tag v-if="tab === 'waiting'" :options="wf_business_status" :value="row.flowStatus"></dict-tag>
-            <t-tag v-else variant="light" theme="success">已完成</t-tag>
+          <template v-else>
+            <t-tag variant="light" theme="success"> {{ row.approveName }}</t-tag>
           </template>
-          <template #flowTaskStatus="{ row }">
-            <dict-tag :options="wf_task_status" :value="row.flowTaskStatus"></dict-tag>
-          </template>
-          <template #operation="{ row }">
-            <t-space :size="8" break-line>
-              <my-link v-if="tab === 'waiting' || tab === 'finish'" @click.stop="handleView(row)">
-                <template #prefix-icon><browse-icon /></template>查看
-              </my-link>
-              <my-link v-if="tab === 'waiting'" @click.stop="handleMeddle(row)">
-                <template #prefix-icon><setting1-icon /></template>流程干预
-              </my-link>
-            </t-space>
-          </template>
-        </t-table>
-      </t-tabs>
+        </template>
+        <template #flowStatus="{ row }">
+          <dict-tag v-if="tab === 'waiting'" :options="wf_business_status" :value="row.flowStatus"></dict-tag>
+          <t-tag v-else variant="light" theme="success">已完成</t-tag>
+        </template>
+        <template #flowTaskStatus="{ row }">
+          <dict-tag :options="wf_task_status" :value="row.flowTaskStatus"></dict-tag>
+        </template>
+        <template #operation="{ row }">
+          <t-space :size="8" break-line>
+            <my-link v-if="tab === 'waiting' || tab === 'finish'" @click.stop="handleView(row)">
+              <template #prefix-icon><browse-icon /></template>查看
+            </my-link>
+            <my-link v-if="tab === 'waiting'" @click.stop="handleMeddle(row)">
+              <template #prefix-icon><setting1-icon /></template>流程干预
+            </my-link>
+          </t-space>
+        </template>
+      </t-table>
     </t-space>
     <!-- 选人组件 -->
     <user-select ref="userSelectRef" :multiple="false" @confirm-call-back="submitCallback"></user-select>

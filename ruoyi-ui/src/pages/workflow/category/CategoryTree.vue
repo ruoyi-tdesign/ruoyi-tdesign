@@ -47,7 +47,7 @@ import type { TreeNodeModel } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 
 import type { TreeModel } from '@/api/model/resultModel';
-import { categoryTree } from '@/api/workflow/category';
+import { flowCategoryTree } from '@/api/workflow/category';
 
 const loadingTree = ref(false);
 const categoryOptions = ref<TreeModel<string>[]>([]);
@@ -74,7 +74,7 @@ const filterNode = computed(() => {
 
 /** 查询流程分类下拉树结构 */
 async function getTreeselect() {
-  return categoryTree().then((response) => {
+  return flowCategoryTree().then((response) => {
     categoryOptions.value = response.data;
   });
 }

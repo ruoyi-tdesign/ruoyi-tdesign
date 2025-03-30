@@ -45,88 +45,88 @@
           <t-tabs v-model="tab" @change="changeTab">
             <t-tab-panel value="running" label="运行中"></t-tab-panel>
             <t-tab-panel value="finish" label="已完成"></t-tab-panel>
-            <t-table
-              v-model:column-controller-visible="columnControllerVisible"
-              hover
-              :loading="loading"
-              row-key="id"
-              :data="processInstanceList"
-              :columns="columns"
-              :selected-row-keys="ids"
-              select-on-row-click
-              :pagination="pagination"
-              :column-controller="{
-                hideTriggerButton: true,
-              }"
-              @select-change="handleSelectionChange"
-            >
-              <template #topContent>
-                <t-row>
-                  <t-col flex="auto">
-                    <t-button theme="danger" variant="outline" :disabled="multiple" @click="handleDelete()">
-                      <template #icon> <delete-icon /> </template>
-                      删除
-                    </t-button>
-                    <span class="selected-count">已选 {{ ids.length }} 项</span>
-                  </t-col>
-                  <t-col flex="none">
-                    <t-button theme="default" shape="square" variant="outline" @click="showSearch = !showSearch">
-                      <template #icon> <search-icon /> </template>
-                    </t-button>
-                    <t-button theme="default" variant="outline" @click="columnControllerVisible = true">
-                      <template #icon> <setting-icon /> </template>
-                      列配置
-                    </t-button>
-                  </t-col>
-                </t-row>
-              </template>
-              <template #flowName="{ row }">
-                <span>{{ row.flowName }}v{{ row.version }}.0</span>
-              </template>
-              <template #version="{ row }"> v{{ row.version }}.0 </template>
-              <template #isSuspended="{ row }">
-                <t-tag v-if="!row.isSuspended" theme="success" variant="light">激活</t-tag>
-                <t-tag v-else theme="danger" variant="light">挂起</t-tag>
-              </template>
-              <template #flowStatus="{ row }">
-                <dict-tag :options="wf_business_status" :value="row.flowStatus"></dict-tag>
-              </template>
-              <template #operation="{ row, rowIndex }">
-                <t-space :size="8" break-line>
-                  <t-popup
-                    :ref="`popoverRef${rowIndex}`"
-                    trigger="click"
-                    placement="left"
-                    :overlay-style="{ width: '300px' }"
-                  >
-                    <my-link theme="danger" @click.stop="handleInvalid(row)">
-                      <template #prefix-icon><close-circle-icon /></template>作废
-                    </my-link>
-                    <template #content>
-                      <t-textarea
-                        v-model="deleteReason"
-                        :autosize="{ minRows: 3, maxRows: 3 }"
-                        placeholder="请输入作废原因"
-                      />
-                      <div style="text-align: right; margin: 5px 0 0 0">
-                        <t-button size="small" variant="text" @click="cancelPopover(rowIndex)">取消</t-button>
-                        <t-button size="small" theme="primary" @click="handleInvalid(row)">确认</t-button>
-                      </div>
-                    </template>
-                  </t-popup>
-                  <my-link theme="danger" @click.stop="handleDelete(row)">
-                    <template #prefix-icon><delete-icon /></template>删除
-                  </my-link>
-                  <my-link @click.stop="handleView(row)">
-                    <template #prefix-icon><browse-icon /></template>查看
-                  </my-link>
-                  <my-link @click.stop="handleInstanceVariable(row)">
-                    <template #prefix-icon><adjustment-icon /></template>变量
-                  </my-link>
-                </t-space>
-              </template>
-            </t-table>
           </t-tabs>
+          <t-table
+            v-model:column-controller-visible="columnControllerVisible"
+            hover
+            :loading="loading"
+            row-key="id"
+            :data="processInstanceList"
+            :columns="columns"
+            :selected-row-keys="ids"
+            select-on-row-click
+            :pagination="pagination"
+            :column-controller="{
+              hideTriggerButton: true,
+            }"
+            @select-change="handleSelectionChange"
+          >
+            <template #topContent>
+              <t-row>
+                <t-col flex="auto">
+                  <t-button theme="danger" variant="outline" :disabled="multiple" @click="handleDelete()">
+                    <template #icon> <delete-icon /> </template>
+                    删除
+                  </t-button>
+                  <span class="selected-count">已选 {{ ids.length }} 项</span>
+                </t-col>
+                <t-col flex="none">
+                  <t-button theme="default" shape="square" variant="outline" @click="showSearch = !showSearch">
+                    <template #icon> <search-icon /> </template>
+                  </t-button>
+                  <t-button theme="default" variant="outline" @click="columnControllerVisible = true">
+                    <template #icon> <setting-icon /> </template>
+                    列配置
+                  </t-button>
+                </t-col>
+              </t-row>
+            </template>
+            <template #flowName="{ row }">
+              <span>{{ row.flowName }}v{{ row.version }}.0</span>
+            </template>
+            <template #version="{ row }"> v{{ row.version }}.0 </template>
+            <template #isSuspended="{ row }">
+              <t-tag v-if="!row.isSuspended" theme="success" variant="light">激活</t-tag>
+              <t-tag v-else theme="danger" variant="light">挂起</t-tag>
+            </template>
+            <template #flowStatus="{ row }">
+              <dict-tag :options="wf_business_status" :value="row.flowStatus"></dict-tag>
+            </template>
+            <template #operation="{ row, rowIndex }">
+              <t-space :size="8" break-line>
+                <t-popup
+                  :ref="`popoverRef${rowIndex}`"
+                  trigger="click"
+                  placement="left"
+                  :overlay-style="{ width: '300px' }"
+                >
+                  <my-link theme="danger" @click.stop="handleInvalid(row)">
+                    <template #prefix-icon><close-circle-icon /></template>作废
+                  </my-link>
+                  <template #content>
+                    <t-textarea
+                      v-model="deleteReason"
+                      :autosize="{ minRows: 3, maxRows: 3 }"
+                      placeholder="请输入作废原因"
+                    />
+                    <div style="text-align: right; margin: 5px 0 0 0">
+                      <t-button size="small" variant="text" @click="cancelPopover(rowIndex)">取消</t-button>
+                      <t-button size="small" theme="primary" @click="handleInvalid(row)">确认</t-button>
+                    </div>
+                  </template>
+                </t-popup>
+                <my-link theme="danger" @click.stop="handleDelete(row)">
+                  <template #prefix-icon><delete-icon /></template>删除
+                </my-link>
+                <my-link @click.stop="handleView(row)">
+                  <template #prefix-icon><browse-icon /></template>查看
+                </my-link>
+                <my-link @click.stop="handleInstanceVariable(row)">
+                  <template #prefix-icon><adjustment-icon /></template>变量
+                </my-link>
+              </t-space>
+            </template>
+          </t-table>
         </t-space>
       </t-col>
     </t-row>
@@ -194,7 +194,7 @@ import { deleteByInstanceIds, instanceVariable, invalid, pageByFinish, pageByRun
 import type { FlowInstanceQuery, FlowInstanceVo } from '@/api/workflow/model/instanceModel';
 import type { RouterJumpVo } from '@/api/workflow/model/workflowCommonModel';
 import { useRouterJump } from '@/api/workflow/workflowCommon';
-import UserSelect from '@/components/UserSelect/index.vue';
+import UserSelect from '@/components/user-select/index.vue';
 import CategoryTree from '@/pages/workflow/category/CategoryTree.vue';
 
 const userSelectRef = ref<InstanceType<typeof UserSelect>>();

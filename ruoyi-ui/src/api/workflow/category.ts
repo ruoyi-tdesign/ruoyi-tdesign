@@ -48,7 +48,7 @@ export function delCategory(categoryId: number | Array<number>) {
  * @param query 流程实例id
  * @returns
  */
-export function categoryTree(query?: CategoryForm) {
+export function flowCategoryTree(query?: CategoryForm) {
   return request.get<R<TreeModel<string>[]>>({
     url: `/workflow/category/categoryTree`,
     params: query,

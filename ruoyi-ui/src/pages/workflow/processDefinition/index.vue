@@ -30,92 +30,92 @@
           <t-tabs v-model="activeName" class="demo-tabs" @change="handleClick">
             <t-tab-panel label="已发布" value="0"></t-tab-panel>
             <t-tab-panel label="未发布" value="1"></t-tab-panel>
-            <t-table
-              v-model:column-controller-visible="columnControllerVisible"
-              hover
-              :loading="loading"
-              row-key="id"
-              :data="processDefinitionList"
-              :columns="columns"
-              :selected-row-keys="ids"
-              select-on-row-click
-              :pagination="pagination"
-              :column-controller="{
-                hideTriggerButton: true,
-              }"
-              @select-change="handleSelectionChange"
-            >
-              <template #topContent>
-                <t-row>
-                  <t-col flex="auto">
-                    <t-button theme="primary" @click="handleAdd">
-                      <template #icon> <add-icon /></template>
-                      新增
-                    </t-button>
-                    <t-button theme="default" variant="outline" :disabled="single" @click="handleUpdate()">
-                      <template #icon> <edit-icon /> </template>
-                      修改
-                    </t-button>
-                    <t-button theme="danger" :disabled="multiple" @click="handleDelete()">
-                      <template #icon><delete-icon /></template>
-                      删除
-                    </t-button>
-                    <t-button theme="primary" @click="uploadDialog.visible = true">
-                      <template #icon> <cloud-upload-icon /></template>
-                      部署流程文件
-                    </t-button>
-                    <t-button theme="default" variant="outline" @click="handleExport">
-                      <template #icon> <download-icon /> </template>
-                      导出
-                    </t-button>
-                    <span class="selected-count">已选 {{ ids.length }} 项</span>
-                  </t-col>
-                  <t-col flex="none">
-                    <t-button theme="default" shape="square" variant="outline" @click="showSearch = !showSearch">
-                      <template #icon> <search-icon /> </template>
-                    </t-button>
-                    <t-button theme="default" variant="outline" @click="columnControllerVisible = true">
-                      <template #icon> <setting-icon /> </template>
-                      列配置
-                    </t-button>
-                  </t-col>
-                </t-row>
-              </template>
-              <template #version="{ row }">v{{ row.version }}.0</template>
-              <template #activityStatus="{ row }">
-                <t-switch
-                  v-model="row.activityStatus"
-                  :active-value="1"
-                  :inactive-value="0"
-                  @change="(status) => handleProcessDefState(row, status)"
-                />
-              </template>
-              <template #isPublish="{ row }">
-                <t-tag v-if="row.isPublish == 0" theme="danger" variant="light">未发布</t-tag>
-                <t-tag v-else-if="row.isPublish == 1" theme="success" variant="light">已发布</t-tag>
-                <t-tag v-else theme="danger" variant="light">失效</t-tag>
-              </template>
-              <template #operation="{ row }">
-                <t-space :size="8" break-line>
-                  <my-link theme="danger" @click.stop="handleDelete(row)">
-                    <template #prefix-icon><delete-icon /></template>删除流程
-                  </my-link>
-                  <my-link @click.stop="handleCopyDef(row)">
-                    <template #prefix-icon><copy-icon /></template>复制流程
-                  </my-link>
-                  <my-link v-if="row.isPublish === 0" @click.stop="design(row)">
-                    <template #prefix-icon><gesture-typing-icon /></template>流程设计
-                  </my-link>
-                  <my-link @click.stop="designView(row)">
-                    <template #prefix-icon><browse-icon /></template>查看流程
-                  </my-link>
-                  <my-link v-if="row.isPublish !== 1" @click.stop="handlePublish(row)">
-                    <template #prefix-icon><rocket-icon /></template>发布流程
-                  </my-link>
-                </t-space>
-              </template>
-            </t-table>
           </t-tabs>
+          <t-table
+            v-model:column-controller-visible="columnControllerVisible"
+            hover
+            :loading="loading"
+            row-key="id"
+            :data="processDefinitionList"
+            :columns="columns"
+            :selected-row-keys="ids"
+            select-on-row-click
+            :pagination="pagination"
+            :column-controller="{
+              hideTriggerButton: true,
+            }"
+            @select-change="handleSelectionChange"
+          >
+            <template #topContent>
+              <t-row>
+                <t-col flex="auto">
+                  <t-button theme="primary" @click="handleAdd">
+                    <template #icon> <add-icon /></template>
+                    新增
+                  </t-button>
+                  <t-button theme="default" variant="outline" :disabled="single" @click="handleUpdate()">
+                    <template #icon> <edit-icon /> </template>
+                    修改
+                  </t-button>
+                  <t-button theme="danger" :disabled="multiple" @click="handleDelete()">
+                    <template #icon><delete-icon /></template>
+                    删除
+                  </t-button>
+                  <t-button theme="primary" @click="uploadDialog.visible = true">
+                    <template #icon> <cloud-upload-icon /></template>
+                    部署流程文件
+                  </t-button>
+                  <t-button theme="default" variant="outline" @click="handleExport">
+                    <template #icon> <download-icon /> </template>
+                    导出
+                  </t-button>
+                  <span class="selected-count">已选 {{ ids.length }} 项</span>
+                </t-col>
+                <t-col flex="none">
+                  <t-button theme="default" shape="square" variant="outline" @click="showSearch = !showSearch">
+                    <template #icon> <search-icon /> </template>
+                  </t-button>
+                  <t-button theme="default" variant="outline" @click="columnControllerVisible = true">
+                    <template #icon> <setting-icon /> </template>
+                    列配置
+                  </t-button>
+                </t-col>
+              </t-row>
+            </template>
+            <template #version="{ row }">v{{ row.version }}.0</template>
+            <template #activityStatus="{ row }">
+              <t-switch
+                v-model="row.activityStatus"
+                :active-value="1"
+                :inactive-value="0"
+                @change="(status) => handleProcessDefState(row, status)"
+              />
+            </template>
+            <template #isPublish="{ row }">
+              <t-tag v-if="row.isPublish == 0" theme="danger" variant="light">未发布</t-tag>
+              <t-tag v-else-if="row.isPublish == 1" theme="success" variant="light">已发布</t-tag>
+              <t-tag v-else theme="danger" variant="light">失效</t-tag>
+            </template>
+            <template #operation="{ row }">
+              <t-space :size="8" break-line>
+                <my-link theme="danger" @click.stop="handleDelete(row)">
+                  <template #prefix-icon><delete-icon /></template>删除流程
+                </my-link>
+                <my-link @click.stop="handleCopyDef(row)">
+                  <template #prefix-icon><copy-icon /></template>复制流程
+                </my-link>
+                <my-link v-if="row.isPublish === 0" @click.stop="design(row)">
+                  <template #prefix-icon><gesture-typing-icon /></template>流程设计
+                </my-link>
+                <my-link @click.stop="designView(row)">
+                  <template #prefix-icon><browse-icon /></template>查看流程
+                </my-link>
+                <my-link v-if="row.isPublish !== 1" @click.stop="handlePublish(row)">
+                  <template #prefix-icon><rocket-icon /></template>发布流程
+                </my-link>
+              </t-space>
+            </template>
+          </t-table>
         </t-space>
       </t-col>
     </t-row>
@@ -242,6 +242,7 @@ import type {
 import { computed, ref } from 'vue';
 
 import type { TreeModel } from '@/api/model/resultModel';
+import { flowCategoryTree } from '@/api/workflow/category';
 import {
   active,
   add,
@@ -264,8 +265,8 @@ const route = useRoute();
 const treeActived = ref<string[]>([]);
 const columnControllerVisible = ref(false);
 
-const buttonLoading = ref(true);
-const loading = ref(true);
+const buttonLoading = ref(false);
+const loading = ref(false);
 const ids = ref<Array<any>>([]);
 const flowCodeList = ref<Array<any>>([]);
 const single = ref(true);
@@ -348,6 +349,11 @@ const pagination = computed(() => {
 onMounted(() => {
   handleQuery();
 });
+/** 查询流程分类下拉树结构 */
+const getTreeselect = async () => {
+  const res = await flowCategoryTree();
+  categoryOptions.value = res.data;
+};
 const handleClick: TabsProps['onChange'] = (value) => {
   // v-model处理有延迟 需要手动处理
   activeName.value = value;
@@ -547,6 +553,7 @@ const handleAdd = async () => {
   reset();
   modelDialog.visible = true;
   modelDialog.title = '新增流程';
+  await getTreeselect();
 };
 /** 修改按钮操作 */
 const handleUpdate = async (row?: FlowDefinitionVo) => {
@@ -556,6 +563,7 @@ const handleUpdate = async (row?: FlowDefinitionVo) => {
   modelDialog.visible = true;
   modelDialog.title = '修改流程';
   const res = await getInfo(id);
+  await getTreeselect();
   buttonLoading.value = false;
   Object.assign(form.value, res.data);
 };
