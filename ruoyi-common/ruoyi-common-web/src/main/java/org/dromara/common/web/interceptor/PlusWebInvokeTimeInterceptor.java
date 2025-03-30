@@ -67,7 +67,7 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
         StopWatch stopWatch = KEY_CACHE.get();
         if (ObjectUtil.isNotNull(stopWatch)) {
             stopWatch.stop();
-            log.info("[PLUS]结束请求 => URL[{}],耗时:[{}]毫秒", request.getMethod() + " " + request.getRequestURI(), stopWatch.getTime());
+            log.info("[PLUS]结束请求 => URL[{}],耗时:[{}]毫秒", request.getMethod() + " " + request.getRequestURI(), stopWatch.getDuration().toMillis());
             KEY_CACHE.remove();
         }
     }
