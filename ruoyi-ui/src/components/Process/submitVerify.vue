@@ -79,7 +79,7 @@
           转办
         </t-button>
         <t-button
-          v-if="task.flowStatus === 'waiting' && Number(task.nodeRatio) > 0 && buttonObj.subSign"
+          v-if="task.flowStatus === 'waiting' && Number(task.nodeRatio) > 0 && buttonObj.addSign"
           :disabled="buttonDisabled"
           theme="primary"
           @click="openMultiInstanceUser"
@@ -260,6 +260,12 @@ const nodeCode = ref<string>('');
 const buttonObj = ref<Record<string, boolean>>({
   code: undefined,
   show: false,
+  trust: false,
+  transfer: false,
+  addSign: false,
+  subSign: false,
+  termination: false,
+  back: false,
 });
 // 下一节点列表
 const nestNodeList = ref<FlowNode[]>([]);
