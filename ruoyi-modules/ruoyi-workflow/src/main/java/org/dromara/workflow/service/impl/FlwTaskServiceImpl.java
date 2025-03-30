@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.constant.MessageConstants;
 import org.dromara.common.core.domain.dto.StartProcessReturnDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.enums.BusinessStatusEnum;
@@ -22,9 +23,13 @@ import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
+import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.sse.dto.SseMessageDto;
+import org.dromara.common.sse.utils.SseMessageUtils;
+import org.dromara.system.helper.MessageSendHelper;
 import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.entity.HisTask;
@@ -51,6 +56,7 @@ import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
 import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
 import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
+import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.common.enums.TaskAssigneeType;
 import org.dromara.workflow.common.enums.TaskStatusEnum;
 import org.dromara.workflow.domain.bo.*;
@@ -67,13 +73,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.dromara.workflow.common.constant.FlowConstant.*;
@@ -197,7 +197,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             Instance instance = taskService.skip(taskId, flowParams);
             this.setHandler(instance, flowTask, flowCopyList);
             // 消息通知
-            WorkflowUtils.sendMessage(definition.getFlowName(), ins.getId(), messageType, notice);
+            this.sendMessage(definition.getFlowName(), ins.getId(), messageType, notice);
             //设置下一环节处理人
             setNextHandler(ins.getId());
             return true;
@@ -480,7 +480,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             Instance instance = insService.getById(inst.getId());
             this.setHandler(instance, task, null);
             // 消息通知
-            WorkflowUtils.sendMessage(definition.getFlowName(), instance.getId(), messageType, notice);
+            this.sendMessage(definition.getFlowName(), instance.getId(), messageType, notice);
             return true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -821,4 +821,52 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             .eq(FlowNode::getNodeCode, nodeCode)
             .eq(FlowNode::getDefinitionId, definitionId));
     }
+
+    /**
+     * 发送消息
+     *
+     * @param flowName    流程定义名称
+     * @param messageType 消息类型
+     * @param message     消息内容，为空则发送默认配置的消息内容
+     */
+    public void sendMessage(String flowName, Long instId, List<String> messageType, String message) {
+        List<UserDTO> userList = new ArrayList<>();
+        List<FlowTask> list = this.selectByInstId(instId);
+        if (StringUtils.isBlank(message)) {
+            message = "有新的【" + flowName + "】单据已经提交至您，请您及时处理。";
+        }
+        for (Task task : list) {
+            List<UserDTO> users = this.currentTaskAllUser(task.getId());
+            if (CollUtil.isNotEmpty(users)) {
+                userList.addAll(users);
+            }
+        }
+        if (CollUtil.isNotEmpty(userList)) {
+            for (String code : messageType) {
+                MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByCode(code);
+                if (ObjectUtil.isNotEmpty(messageTypeEnum)) {
+                    switch (messageTypeEnum) {
+                        case SYSTEM_MESSAGE:
+                            SseMessageDto dto = new SseMessageDto();
+                            dto.setUserIds(StreamUtils.toList(userList, UserDTO::getUserId).stream().distinct().collect(Collectors.toList()));
+                            dto.setMessage(message);
+                            SseMessageUtils.publishMessage(dto);
+                            break;
+                        case EMAIL_MESSAGE:
+                            Map<String, Object> param = new HashMap<>();
+                            param.put("message", message);
+                            MessageSendHelper.send(MessageConstants.WORK_FLOW, org.dromara.common.core.enums.MessageTypeEnum.MAIL, StreamUtils.toList(userList, UserDTO::getEmail), param);
+//                            MailUtils.sendText(StreamUtils.join(userList, UserDTO::getEmail), "单据审批提醒", message);
+                            break;
+                        case SMS_MESSAGE:
+                            //todo 短信发送
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected value: " + messageTypeEnum);
+                    }
+                }
+            }
+        }
+    }
+
 }
