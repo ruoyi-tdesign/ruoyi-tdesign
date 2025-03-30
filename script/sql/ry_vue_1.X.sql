@@ -874,7 +874,7 @@ create table sys_oss (
     original_name   varchar(255) not null default ''        comment '原名',
     file_suffix     varchar(10)  not null default ''        comment '文件后缀名',
     url             varchar(500) not null                   comment 'URL地址',
-    ext1            varchar(500)                  default ''        comment '扩展字段',
+    ext1            varchar(500)          default null      comment '扩展字段',
     size            bigint(20)            default null      comment '字节长度',
     content_type    varchar(255) null     default null      comment '内容类型',
     oss_category_id bigint       not null default 0         comment '分类id',
