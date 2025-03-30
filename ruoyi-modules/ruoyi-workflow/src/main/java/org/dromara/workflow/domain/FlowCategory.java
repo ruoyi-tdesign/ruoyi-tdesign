@@ -10,7 +10,9 @@ import lombok.EqualsAndHashCode;
 import org.dromara.common.tenant.core.TenantEntity;
 
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 流程分类对象 flow_category
@@ -87,4 +89,10 @@ public class FlowCategory extends TenantEntity {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
+
+    /**
+     * 子菜单
+     */
+    @TableField(exist = false)
+    private List<FlowCategory> children = new ArrayList<>();
 }
