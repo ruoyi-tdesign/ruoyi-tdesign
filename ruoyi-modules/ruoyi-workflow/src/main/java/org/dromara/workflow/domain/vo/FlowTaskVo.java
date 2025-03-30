@@ -179,6 +179,11 @@ public class FlowTaskVo implements Serializable {
     private String createByName;
 
     /**
+     * 是否为申请人节点
+     */
+    private boolean applyNode;
+
+    /**
      * 按钮权限
      */
     private List<ButtonPermission> buttonList;

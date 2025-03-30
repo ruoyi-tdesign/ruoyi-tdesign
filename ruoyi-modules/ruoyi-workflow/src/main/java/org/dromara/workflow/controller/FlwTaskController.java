@@ -12,6 +12,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.warm.flow.core.entity.Node;
+import org.dromara.warm.flow.orm.entity.FlowNode;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
@@ -125,6 +126,16 @@ public class FlwTaskController extends BaseController {
     @GetMapping("/getTask/{taskId}")
     public R<FlowTaskVo> getTask(@PathVariable Long taskId) {
         return R.ok(flwTaskService.selectById(taskId));
+    }
+
+    /**
+     * 获取下一节点信息
+     *
+     * @param bo 参数
+     */
+    @PostMapping("/getNextNodeList")
+    public R<List<FlowNode>> getNextNodeList(@RequestBody FlowNextNodeBo bo) {
+        return R.ok(flwTaskService.getNextNodeList(bo));
     }
 
     /**

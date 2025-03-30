@@ -134,6 +134,14 @@ public interface IFlwTaskService {
     FlowTaskVo selectById(Long taskId);
 
     /**
+     * 获取下一节点信息
+     *
+     * @param bo 参数
+     * @return 结果
+     */
+    List<FlowNode> getNextNodeList(FlowNextNodeBo bo);
+
+    /**
      * 按照任务id查询任务
      *
      * @param taskIdList 任务id
