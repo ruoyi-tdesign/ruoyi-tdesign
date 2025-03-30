@@ -107,7 +107,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         wrapper.like(StringUtils.isNotBlank(flowDefinition.getFlowName()), FlowDefinition::getFlowName, flowDefinition.getFlowName());
         if (StringUtils.isNotBlank(flowDefinition.getCategory())) {
             List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(Convert.toLong(flowDefinition.getCategory()));
-            wrapper.in(FlowDefinition::getCategory, categoryIds);
+            wrapper.in(FlowDefinition::getCategory, StreamUtils.toList(categoryIds, Convert::toStr));
         }
         wrapper.orderByDesc(FlowDefinition::getCreateTime);
         return wrapper;

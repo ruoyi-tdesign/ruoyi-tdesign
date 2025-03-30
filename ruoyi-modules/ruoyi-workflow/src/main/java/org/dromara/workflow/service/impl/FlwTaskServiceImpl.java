@@ -379,7 +379,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         wrapper.in(CollUtil.isNotEmpty(flowTaskBo.getCreateByIds()), "t.create_by", flowTaskBo.getCreateByIds());
         if (StringUtils.isNotBlank(flowTaskBo.getCategory())) {
             List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(Convert.toLong(flowTaskBo.getCategory()));
-            wrapper.in("t.category", categoryIds);
+            wrapper.in("t.category", StreamUtils.toList(categoryIds, Convert::toStr));
         }
         wrapper.orderByDesc("t.create_time");
         return wrapper;
