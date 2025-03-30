@@ -123,6 +123,8 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (ObjectUtil.isNotNull(flowInstance)) {
             BusinessStatusEnum.checkStartStatus(flowInstance.getFlowStatus());
             List<Task> taskList = taskService.list(new FlowTask().setInstanceId(flowInstance.getId()));
+            taskService.mergeVariable(flowInstance, variables);
+            insService.updateById(flowInstance);
             StartProcessReturnDTO dto = new StartProcessReturnDTO();
             dto.setProcessInstanceId(taskList.get(0).getInstanceId());
             dto.setTaskId(taskList.get(0).getId());
@@ -591,14 +593,15 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         Task task = taskService.getById(taskId);
         Instance instance = insService.getById(task.getInstanceId());
         Definition definition = defService.getById(task.getDefinitionId());
+        Map<String, Object> mergeVariable = MapUtil.mergeAll(instance.getVariableMap(), variables);
         //获取下一节点列表
-        List<Node> nextNodeList = nodeService.getNextNodeList(task.getDefinitionId(), task.getNodeCode(), null, SkipType.PASS.getKey(), variables);
+        List<Node> nextNodeList = nodeService.getNextNodeList(task.getDefinitionId(), task.getNodeCode(), null, SkipType.PASS.getKey(), mergeVariable);
         List<FlowNode> nextFlowNodes = BeanUtil.copyToList(nextNodeList, FlowNode.class);
         if (CollUtil.isNotEmpty(nextNodeList)) {
             //构建以下节点数据
             List<Task> buildNextTaskList = StreamUtils.toList(nextNodeList, node -> taskService.addTask(node, instance, definition, null));
             //办理人变量替换
-            ExpressionUtil.evalVariable(buildNextTaskList, MapUtil.mergeAll(instance.getVariableMap(), variables));
+            ExpressionUtil.evalVariable(buildNextTaskList, mergeVariable);
             for (FlowNode flowNode : nextFlowNodes) {
                 buildNextTaskList.stream().filter(t -> t.getNodeCode().equals(flowNode.getNodeCode())).findFirst().ifPresent(t -> {
                     if (CollUtil.isNotEmpty(t.getPermissionList())) {
