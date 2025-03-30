@@ -1,10 +1,12 @@
 package org.dromara.workflow.listener;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
@@ -84,12 +86,15 @@ public class WorkflowGlobalListener implements GlobalListener {
         String businessId = instance.getBusinessId();
         String flowStatus = instance.getFlowStatus();
         Map<String, Object> params = new HashMap<>();
-        // 历史任务扩展(通常为附件)
-        params.put("hisTaskExt", listenerVariable.getFlowParams().getHisTaskExt());
-        // 办理人
-        params.put("handler", listenerVariable.getFlowParams().getHandler());
-        // 办理意见
-        params.put("message", listenerVariable.getFlowParams().getMessage());
+        FlowParams flowParams = listenerVariable.getFlowParams();
+        if (ObjectUtil.isNotNull(flowParams)) {
+            // 历史任务扩展(通常为附件)
+            params.put("hisTaskExt", flowParams.getHisTaskExt());
+            // 办理人
+            params.put("handler", flowParams.getHandler());
+            // 办理意见
+            params.put("message", flowParams.getMessage());
+        }
         // 判断流程状态（发布：撤销，退回，作废，终止，已完成事件）
         String status = determineFlowStatus(instance, flowStatus);
         if (StringUtils.isNotBlank(status)) {

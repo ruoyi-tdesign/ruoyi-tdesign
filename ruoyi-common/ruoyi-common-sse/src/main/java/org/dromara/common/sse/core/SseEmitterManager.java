@@ -67,6 +67,9 @@ public class SseEmitterManager {
      * @param token  用户的唯一令牌，用于识别具体的连接
      */
     public void disconnect(String loginType, Long userId, String token) {
+        if (userId == null || token == null) {
+            return;
+        }
         Map<Long, Map<String, SseEmitter>> sseMap = USER_TOKEN_EMITTERS.get(loginType);
         if (sseMap == null) {
             return;

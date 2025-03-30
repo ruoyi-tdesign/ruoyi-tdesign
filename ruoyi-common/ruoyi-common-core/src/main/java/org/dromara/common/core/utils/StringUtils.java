@@ -322,6 +322,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             .stream()
             .filter(Objects::nonNull)
             .map(mapper)
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
