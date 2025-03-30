@@ -27,8 +27,6 @@
     "axios": "^1.7.9",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
-    "diagram-js": "12.3.0",
-    "didi": "9.0.2",
     "echarts": "5.4.3",
     "file-saver": "^2.0.5",
     "fuse.js": "^7.1.0",
