@@ -114,7 +114,7 @@
     </t-space>
     <!-- 选人组件 -->
     <user-select ref="userSelectRef" :multiple="false" @confirm-call-back="submitCallback"></user-select>
-    <!-- 选人组件 -->
+    <!-- 流程干预组件 -->
     <process-meddle ref="processMeddleRef" @submit-callback="getWaitingList"></process-meddle>
     <!-- 申请人 -->
     <user-select
