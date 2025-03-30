@@ -162,6 +162,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             // 获取抄送人
             List<FlowCopyBo> flowCopyList = completeTaskBo.getFlowCopyList();
             FlowTask flowTask = flowTaskMapper.selectById(taskId);
+            if (ObjectUtil.isNull(flowTask)) {
+                throw new ServiceException("流程任务不存在或任务已审批！");
+            }
             Instance ins = insService.getById(flowTask.getInstanceId());
             // 获取流程定义信息
             Definition definition = defService.getById(flowTask.getDefinitionId());
@@ -204,23 +207,30 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         this.setCopy(task, flowCopyList);
         // 根据流程实例ID查询所有关联的任务
         List<FlowTask> flowTasks = this.selectByInstId(instance.getId());
+        if (CollUtil.isEmpty(flowTasks)) {
+            return;
+        }
+        List<Long> taskIdList = StreamUtils.toList(flowTasks, FlowTask::getId);
+        // 获取与当前任务关联的用户列表
+        List<User> associatedUsers = WorkflowUtils.getFlowUserService().getByAssociateds(taskIdList);
+        if (CollUtil.isEmpty(associatedUsers)) {
+            return;
+        }
         List<User> userList = new ArrayList<>();
         // 遍历任务列表，处理每个任务的办理人
         for (FlowTask flowTask : flowTasks) {
-            // 获取与当前任务关联的用户列表
-            List<User> associatedUsers = WorkflowUtils.getFlowUserService().getByAssociateds(Collections.singletonList(flowTask.getId()));
-            if (CollUtil.isNotEmpty(associatedUsers)) {
-                userList.addAll(WorkflowUtils.buildUser(associatedUsers, flowTask.getId()));
+            List<User> users = StreamUtils.filter(associatedUsers, user -> Objects.equals(user.getAssociated(), flowTask.getId()));
+            if (CollUtil.isNotEmpty(users)) {
+                userList.addAll(WorkflowUtils.buildUser(users, flowTask.getId()));
             }
         }
         // 批量删除现有任务的办理人记录
-        if (CollUtil.isNotEmpty(flowTasks)) {
-            WorkflowUtils.getFlowUserService().deleteByTaskIds(StreamUtils.toList(flowTasks, FlowTask::getId));
-        }
+        WorkflowUtils.getFlowUserService().deleteByTaskIds(taskIdList);
         // 确保要保存的 userList 不为空
-        if (CollUtil.isNotEmpty(userList)) {
-            WorkflowUtils.getFlowUserService().saveBatch(userList);
+        if (CollUtil.isEmpty(userList)) {
+            return;
         }
+        WorkflowUtils.getFlowUserService().saveBatch(userList);
     }
 
     /**
