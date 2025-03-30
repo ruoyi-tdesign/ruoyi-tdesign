@@ -1,5 +1,6 @@
 package org.dromara.workflow.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.translation.annotation.Translation;
@@ -26,9 +27,12 @@ public class CategoryNameTranslationImpl extends SimpleTranslationImpl {
 
     @Override
     public String translation(Object key, Translation translation) {
+        Long id = null;
         if (key instanceof String categoryId) {
-            return flwCategoryService.selectCategoryNameById(categoryId);
+            id = Convert.toLong(categoryId);
+        } else if (key instanceof Long categoryId) {
+            id = categoryId;
         }
-        return null;
+        return flwCategoryService.selectCategoryNameById(id);
     }
 }

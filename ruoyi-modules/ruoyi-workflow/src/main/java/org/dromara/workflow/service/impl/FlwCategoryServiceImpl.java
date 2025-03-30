@@ -66,8 +66,8 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService {
      */
     @Cacheable(cacheNames = FlowConstant.FLOW_CATEGORY_NAME, key = "#categoryId")
     @Override
-    public String selectCategoryNameById(String categoryId) {
-        if (StringUtils.isBlank(categoryId)) {
+    public String selectCategoryNameById(Long categoryId) {
+        if (ObjectUtil.isNull(categoryId)) {
             return null;
         }
         FlowCategory category = baseMapper.selectOne(new LambdaQueryWrapper<FlowCategory>()
