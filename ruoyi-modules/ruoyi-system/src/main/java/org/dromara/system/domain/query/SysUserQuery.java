@@ -69,6 +69,6 @@ public class SysUserQuery extends BaseEntity {
     /**
      * 排除不查询的用户(工作流用)
      */
-    private String excludeUserIds;
+    private String[] excludeUserIds;
 
 }

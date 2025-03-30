@@ -40,23 +40,20 @@
         <where>
             and su.del_flag = '0'
             <if test="userId != null "> and su.user_id = #{userId}</if>
-            <if test="deptIds != null and deptIds.length != 0">
-                and su.dept_id in
-                <foreach collection="deptIds" index="index" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
+            <foreach collection="deptIds" index="index" item="item" open=" and su.dept_id in (" separator="," close=")" nullable="true">
+                #{item}
+            </foreach>
             <if test="userName != null and userName != ''"> and su.user_name like concat(concat('%', #{userName}), '%')</if>
             <if test="email != null and email != ''"> and su.email like concat(concat('%', #{email}), '%')</if>
             <if test="phonenumber != null and phonenumber != ''"> and su.phonenumber like concat(concat('%', #{phonenumber}), '%')</if>
             <if test="status != null and status != ''"> and su.status = #{status}</if>
             <if test="params.beginTime != null and params.endTime != null">and su.create_time between #{params.beginTime} and #{params.endTime}</if>
-            <if test="excludeUserIds != null and excludeUserIds != ''">
-                and su.user_id not in
-                <foreach collection="excludeUserIds.split(',')" index="index" item="item" open="(" separator="," close=")">
-                    #{item, jdbcType=BIGINT}
-                </foreach>
-            </if>
+            <foreach collection="userIds" index="index" item="item" open=" and su.user_id in(" separator="," close=")" nullable="true">
+                #{item, jdbcType=BIGINT}
+            </foreach>
+            <foreach collection="excludeUserIds" index="index" item="item" open=" and su.user_id not in(" separator="," close=")" nullable="true">
+                #{item, jdbcType=BIGINT}
+            </foreach>
         </where>
         order by su.create_time desc
     </select>
