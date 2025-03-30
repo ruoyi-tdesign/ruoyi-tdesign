@@ -17,6 +17,9 @@
         <where>
             and del_flag = '0'
             <if test="deptId != null "> and sd.dept_id = #{deptId}</if>
+            <foreach collection="deptIds" item="item" separator="," open=" and sd.dept_id in(" close=")" nullable="true">
+                #{item}
+            </foreach>
             <if test="parentId != null "> and sd.parent_id = #{parentId}</if>
             <if test="deptName != null and deptName != ''"> and sd.dept_name like concat(concat('%', #{deptName}), '%')</if>
             <if test="deptCategory != null and deptCategory != ''"> and sd.dept_category like concat(concat('%', #{deptCategory}), '%')</if>

@@ -79,12 +79,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     /**
      * 根据条件分页查询用户列表
      *
-     * @param user 用户信息
+     * @param query 用户信息
      */
     @Override
-    public TableDataInfo<SysUserVo> selectPageUserList(SysUserQuery user) {
-        setDeptIds(user);
-        return PageQuery.of(() -> baseMapper.queryList(user));
+    public TableDataInfo<SysUserVo> selectPageUserList(SysUserQuery query) {
+        setDeptIds(query);
+        return PageQuery.of(query.getPageNum(), query.getPageSize()).execute(() -> baseMapper.queryList(query));
     }
 
     /**

@@ -2,7 +2,9 @@ package org.dromara.system.domain.query;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.common.mybatis.core.domain.BasePageQuery;
+
+import java.util.List;
 
 /**
  * 部门查询对象 sys_dept
@@ -12,12 +14,17 @@ import org.dromara.common.mybatis.core.domain.BaseEntity;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysDeptQuery extends BaseEntity {
+public class SysDeptQuery extends BasePageQuery {
 
     /**
      * 部门id
      */
     private Long deptId;
+
+    /**
+     * 多部门id
+     */
+    private List<Long> deptIds;
 
     /**
      * 父部门id
@@ -38,5 +45,10 @@ public class SysDeptQuery extends BaseEntity {
      * 部门状态
      */
     private String status;
+
+    /**
+     * 归属部门id（部门树）
+     */
+    private Long belongDeptId;
 
 }

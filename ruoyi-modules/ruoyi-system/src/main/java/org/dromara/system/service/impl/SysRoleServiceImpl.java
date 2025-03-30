@@ -63,8 +63,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     private SysRoleDeptMapper roleDeptMapper;
 
     @Override
-    public TableDataInfo<SysRoleVo> selectPageRoleList(SysRoleQuery role) {
-        return PageQuery.of(() -> baseMapper.queryList(role));
+    public TableDataInfo<SysRoleVo> selectPageRoleList(SysRoleQuery query) {
+        return PageQuery.of(query.getPageNum(), query.getPageSize()).execute(() -> baseMapper.queryList(query));
     }
 
     /**

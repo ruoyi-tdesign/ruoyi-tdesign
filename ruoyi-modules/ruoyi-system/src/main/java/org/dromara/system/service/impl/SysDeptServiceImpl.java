@@ -20,7 +20,9 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.TreeBuildUtils;
 import org.dromara.common.core.utils.spring.SpringUtils;
+import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.SortQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -59,6 +61,18 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     private SysUserMapper userMapper;
 
     /**
+     * 分页查询部门管理数据
+     *
+     * @param query 部门查询对象
+     * @return 部门信息集合
+     */
+    @Override
+    public TableDataInfo<SysDeptVo> selectPageDeptList(SysDeptQuery query) {
+        buildQuery(query);
+        return PageQuery.of(query.getPageNum(), query.getPageSize()).execute(() -> baseMapper.queryList(query));
+    }
+
+    /**
      * 查询部门管理数据
      *
      * @param query 部门查询对象
@@ -66,7 +80,19 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
      */
     @Override
     public List<SysDeptVo> selectDeptList(SysDeptQuery query) {
+        buildQuery(query);
         return SortQuery.of(() -> baseMapper.queryList(query));
+    }
+
+    private void buildQuery(SysDeptQuery query) {
+        if (ObjectUtil.isNotNull(query.getBelongDeptId())) {
+            //部门树搜索
+            Long parentId = query.getBelongDeptId();
+            List<SysDept> deptList = baseMapper.selectListByParentId(parentId);
+            List<Long> deptIds = StreamUtils.toList(deptList, SysDept::getDeptId);
+            deptIds.add(parentId);
+            query.setDeptIds(deptIds);
+        }
     }
 
     /**

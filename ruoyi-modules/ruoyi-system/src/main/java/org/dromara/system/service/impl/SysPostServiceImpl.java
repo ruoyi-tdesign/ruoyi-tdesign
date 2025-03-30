@@ -45,7 +45,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     @Override
     public TableDataInfo<SysPostVo> selectPagePostList(SysPostQuery query) {
         buildQuery(query);
-        return PageQuery.of(() -> baseMapper.queryList(query));
+        return PageQuery.of(query.getPageNum(), query.getPageSize()).execute(() -> baseMapper.queryList(query));
     }
 
     /**
