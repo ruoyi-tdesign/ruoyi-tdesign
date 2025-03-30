@@ -17,7 +17,9 @@ import org.dromara.workflow.service.IFlwInstanceService;
 import org.dromara.workflow.service.IFlwTaskService;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 全局任务办理监听
@@ -81,10 +83,17 @@ public class WorkflowGlobalListener implements GlobalListener {
         Definition definition = listenerVariable.getDefinition();
         String businessId = instance.getBusinessId();
         String flowStatus = instance.getFlowStatus();
+        Map<String, Object> params = new HashMap<>();
+        // 历史任务扩展(通常为附件)
+        params.put("hisTaskExt", listenerVariable.getFlowParams().getHisTaskExt());
+        // 办理人
+        params.put("handler", listenerVariable.getFlowParams().getHandler());
+        // 办理意见
+        params.put("message", listenerVariable.getFlowParams().getMessage());
         // 判断流程状态（发布：撤销，退回，作废，终止，已完成事件）
         String status = determineFlowStatus(instance, flowStatus);
         if (StringUtils.isNotBlank(status)) {
-            flowProcessEventHandler.processHandler(definition.getFlowCode(), businessId, status, false);
+            flowProcessEventHandler.processHandler(definition.getFlowCode(), businessId, status, params, false);
         }
     }
 

@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * 总体流程监听
@@ -35,6 +36,11 @@ public class ProcessEvent implements Serializable {
      * 状态
      */
     private String status;
+
+    /**
+     * 办理参数
+     */
+    private Map<String, Object> params;
 
     /**
      * 当为true时为申请人节点办理

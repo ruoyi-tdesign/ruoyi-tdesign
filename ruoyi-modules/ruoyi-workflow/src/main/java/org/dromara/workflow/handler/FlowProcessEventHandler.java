@@ -9,6 +9,8 @@ import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * 流程监听服务
  *
@@ -28,7 +30,7 @@ public class FlowProcessEventHandler {
      * @param status     状态
      * @param submit     当为true时为申请人节点办理
      */
-    public void processHandler(String flowCode, String businessId, String status, boolean submit) {
+    public void processHandler(String flowCode, String businessId, String status, Map<String, Object> params, boolean submit) {
         String tenantId = TenantHelper.getTenantId();
         log.info("发布流程事件，租户ID: {}, 流程状态: {}, 流程编码: {}, 业务ID: {}, 是否申请人节点办理: {}", tenantId, status, flowCode, businessId, submit);
         ProcessEvent processEvent = new ProcessEvent();
@@ -36,6 +38,7 @@ public class FlowProcessEventHandler {
         processEvent.setFlowCode(flowCode);
         processEvent.setBusinessId(businessId);
         processEvent.setStatus(status);
+        processEvent.setParams(params);
         processEvent.setSubmit(submit);
         SpringUtils.context().publishEvent(processEvent);
     }

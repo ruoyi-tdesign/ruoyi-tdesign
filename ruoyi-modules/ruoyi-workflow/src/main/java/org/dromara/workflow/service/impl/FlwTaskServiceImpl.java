@@ -177,7 +177,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             Definition definition = defService.getById(flowTask.getDefinitionId());
             // 检查流程状态是否为草稿、已撤销或已退回状态，若是则执行流程提交监听
             if (BusinessStatusEnum.isDraftOrCancelOrBack(ins.getFlowStatus())) {
-                flowProcessEventHandler.processHandler(definition.getFlowCode(), ins.getBusinessId(), ins.getFlowStatus(), true);
+                flowProcessEventHandler.processHandler(definition.getFlowCode(), ins.getBusinessId(), ins.getFlowStatus(), null, true);
             }
             // 构建流程参数，包括变量、跳转类型、消息、处理人、权限等信息
             FlowParams flowParams = new FlowParams();

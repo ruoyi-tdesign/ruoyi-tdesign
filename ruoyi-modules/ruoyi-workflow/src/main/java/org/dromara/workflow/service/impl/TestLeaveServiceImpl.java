@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 请假Service业务层处理
@@ -131,6 +132,14 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         log.info("当前任务执行了{}", processEvent.toString());
         TestLeave testLeave = baseMapper.selectById(Long.valueOf(processEvent.getBusinessId()));
         testLeave.setStatus(processEvent.getStatus());
+        // 用于例如审批附件 审批意见等 存储到业务表内 自行根据业务实现存储流程
+        Map<String, Object> params = processEvent.getParams();
+        // 历史任务扩展(通常为附件)
+        String hisTaskExt = params.getOrDefault("hisTaskExt", "").toString();
+        // 办理人
+        String handler = params.getOrDefault("handler", "").toString();
+        // 办理意见
+        String message = params.getOrDefault("message", "").toString();
         if (processEvent.isSubmit()) {
             testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
         }
