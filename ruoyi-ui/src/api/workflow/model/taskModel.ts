@@ -1,5 +1,5 @@
 import type { BasePageQuery } from '@/api/model/resultModel';
-import type { User } from '@/api/workflow/model/definitionModel';
+import type { FlowUser } from '@/api/workflow/model/definitionModel';
 
 export interface TaskQuery extends BasePageQuery {
   nodeName?: string;
@@ -46,7 +46,7 @@ export interface FlowTaskVo {
   /** 权限标识 permissionFlag的list形式 */
   permissionList?: string[];
   /** 流程用户列表 */
-  userList?: User[];
+  userList?: FlowUser[];
   /** 审批表单是否自定义（Y是 N否） */
   formCustom?: string;
   /** 审批表单 */
@@ -79,11 +79,18 @@ export interface FlowTaskVo {
   createBy?: string;
   /** 申请人名称 */
   createByName?: string;
-  buttonList?: buttonList[];
+  /** 是否为申请人节点 */
+  applyNode?: boolean;
+  /** 按钮权限 */
+  buttonList?: ButtonList[];
 }
-export interface buttonList {
-  code: string;
-  show: boolean;
+export interface ButtonList {
+  /** 枚举路径 */
+  code?: string;
+  /** 按钮编码 */
+  value?: string;
+  /** 是否显示 */
+  show?: boolean;
 }
 /**
  * 历史任务视图
@@ -253,4 +260,13 @@ export interface StartProcessReturnDTO {
   processInstanceId?: number;
   /** 任务id */
   taskId?: number;
+}
+/**
+ * 下一节点信息
+ */
+export interface FlowNextNodeBo {
+  /** 任务id */
+  taskId?: string | number;
+  /** 流程变量 */
+  variables?: Record<string, any>;
 }

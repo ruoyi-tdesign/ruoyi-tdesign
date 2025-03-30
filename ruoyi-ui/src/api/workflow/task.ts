@@ -1,13 +1,15 @@
 import type { R, TableDataInfo } from '@/api/model/resultModel';
 import type { UserDTO } from '@/api/system/model/userModel';
-import type { Node } from '@/api/workflow/model/definitionModel';
+import type { FlowNode } from '@/api/workflow/model/definitionModel';
 import type {
   BackProcessBo,
   CompleteTaskBo,
   FlowHisTaskVo,
+  FlowNextNodeBo,
   FlowTaskVo,
   FlowTerminationBo,
-  StartProcessBo, StartProcessReturnDTO,
+  StartProcessBo,
+  StartProcessReturnDTO,
   TaskOperationBo,
   TaskQuery,
 } from '@/api/workflow/model/taskModel';
@@ -142,7 +144,7 @@ export function terminationTask(data: FlowTerminationBo) {
  * @param nodeCode     当前节点
  */
 export function getBackTaskNode(definitionId: string | number, nodeCode: string) {
-  return request.get<R<Node[]>>({
+  return request.get<R<FlowNode[]>>({
     url: `/workflow/task/getBackTaskNode/${definitionId}/${nodeCode}`,
   });
 }
@@ -169,5 +171,17 @@ export function taskOperation(
 export function currentTaskAllUser(taskId: string | number) {
   return request.get<R<UserDTO[]>>({
     url: `/workflow/task/currentTaskAllUser/${taskId}`,
+  });
+}
+
+/**
+ * 获取下一节点
+ * @param data 参数
+ * @returns
+ */
+export function getNextNodeList(data: FlowNextNodeBo): any {
+  return request.post<R<FlowNode[]>>({
+    url: '/workflow/task/getNextNodeList',
+    data,
   });
 }

@@ -66,10 +66,10 @@ export interface Definition {
   ext?: string;
   /** 审批表单是否自定义（Y是 2否） */
   xmlString?: string;
-  nodeList?: Node[];
-  userList?: User[];
+  nodeList?: FlowNode[];
+  userList?: FlowUser[];
 }
-export interface User {
+export interface FlowUser {
   /** 主键 */
   id?: number;
   /** 创建时间 */
@@ -89,7 +89,7 @@ export interface User {
   /** 创建人：比如作为委托的人保存 */
   createBy?: string;
 }
-export interface Node {
+export interface FlowNode {
   /** 主键 */
   id?: number;
   /** 创建时间 */
@@ -133,9 +133,9 @@ export interface Node {
   /** 审批表单是否自定义（Y是 2否） */
   formPath?: string;
   /** 跳转条件 */
-  skipList?: Skip[];
+  skipList?: FlowSkip[];
 }
-export interface Skip {
+export interface FlowSkip {
   /** 主键 */
   id?: number;
   /** 创建时间 */
