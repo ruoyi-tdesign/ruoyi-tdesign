@@ -1,13 +1,13 @@
 import type { R, TableDataInfo } from '@/api/model/resultModel';
-import type { TestLeaveForm, TestLeaveQuery, TestLeaveVo } from '@/api/workflow/model/leaveModel';
+import type { LeaveForm, LeaveQuery, LeaveVo } from '@/api/workflow/model/leaveModel';
 import { request } from '@/utils/request';
 
 /**
  * 查询请假列表
  * @param query
  */
-export function listLeave(query?: TestLeaveQuery) {
-  return request.get<TableDataInfo<TestLeaveVo>>({
+export function listLeave(query?: LeaveQuery) {
+  return request.get<TableDataInfo<LeaveVo>>({
     url: '/workflow/leave/list',
     params: query,
   });
@@ -18,7 +18,7 @@ export function listLeave(query?: TestLeaveQuery) {
  * @param id
  */
 export function getLeave(id: string | number) {
-  return request.get<R<TestLeaveVo>>({
+  return request.get<R<LeaveVo>>({
     url: `/workflow/leave/${id}`,
   });
 }
@@ -27,8 +27,8 @@ export function getLeave(id: string | number) {
  * 新增请假
  * @param data
  */
-export function addLeave(data: TestLeaveForm) {
-  return request.post<R<TestLeaveVo>>({
+export function addLeave(data: LeaveForm) {
+  return request.post<R<LeaveVo>>({
     url: '/workflow/leave',
     data,
   });
@@ -38,8 +38,8 @@ export function addLeave(data: TestLeaveForm) {
  * 修改请假
  * @param data
  */
-export function updateLeave(data: TestLeaveForm) {
-  return request.put<R<TestLeaveVo>>({
+export function updateLeave(data: LeaveForm) {
+  return request.put<R<LeaveVo>>({
     url: '/workflow/leave',
     data,
   });

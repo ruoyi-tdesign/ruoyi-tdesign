@@ -164,7 +164,7 @@ import { computed, getCurrentInstance, ref } from 'vue';
 
 import { cancelProcessApply } from '@/api/workflow/instance';
 import { delLeave, getLeave, listLeave } from '@/api/workflow/leave';
-import type { TestLeaveForm, TestLeaveQuery, TestLeaveVo } from '@/api/workflow/model/leaveModel';
+import type { LeaveForm, LeaveQuery, LeaveVo } from '@/api/workflow/model/leaveModel';
 import { ArrayOps } from '@/utils/array';
 
 const { proxy } = getCurrentInstance();
@@ -173,7 +173,7 @@ const { wf_business_status } = proxy.useDict('wf_business_status');
 const router = useRouter();
 const openView = ref(false);
 const openViewLoading = ref(false);
-const leaveList = ref<TestLeaveVo[]>([]);
+const leaveList = ref<LeaveVo[]>([]);
 const loading = ref(false);
 const columnControllerVisible = ref(false);
 const showSearch = ref(true);
@@ -212,9 +212,9 @@ const columns = ref<Array<PrimaryTableCol>>([
   { title: `操作`, colKey: 'operation', align: 'center', width: 180 },
 ]);
 // 提交表单对象
-const form = ref<TestLeaveVo & TestLeaveForm>({});
+const form = ref<LeaveVo & LeaveForm>({});
 // 查询对象
-const queryParams = ref<TestLeaveQuery>({
+const queryParams = ref<LeaveQuery>({
   pageNum: 1,
   pageSize: 10,
 });
@@ -292,7 +292,7 @@ function handleAdd() {
 }
 
 /** 详情按钮操作 */
-function handleDetail(row: TestLeaveVo) {
+function handleDetail(row: LeaveVo) {
   reset();
   openView.value = true;
   openViewLoading.value = true;
@@ -304,7 +304,7 @@ function handleDetail(row: TestLeaveVo) {
 }
 
 /** 修改按钮操作 */
-function handleUpdate(row?: TestLeaveVo) {
+function handleUpdate(row?: LeaveVo) {
   // proxy.$tab.closePage(proxy.$route);
   router.push({
     path: `/workflow/leaveEdit/index`,
@@ -316,7 +316,7 @@ function handleUpdate(row?: TestLeaveVo) {
 }
 
 /** 查看按钮操作 */
-function handleView(row?: TestLeaveVo) {
+function handleView(row?: LeaveVo) {
   // proxy.$tab.closePage(proxy.$route);
   router.push({
     path: `/workflow/leaveEdit/index`,
@@ -328,7 +328,7 @@ function handleView(row?: TestLeaveVo) {
 }
 
 /** 删除按钮操作 */
-function handleDelete(row?: TestLeaveVo) {
+function handleDelete(row?: LeaveVo) {
   const $ids = row?.id || ids.value;
   proxy.$modal.confirm(`是否确认删除请假申请编号为${$ids}的数据项？`, () => {
     const msgLoading = proxy.$modal.msgLoading('正在删除中...');

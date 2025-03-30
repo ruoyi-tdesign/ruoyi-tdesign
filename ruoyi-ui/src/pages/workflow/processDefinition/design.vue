@@ -33,7 +33,7 @@ const open = async (definitionId: string | number, disabled: boolean | string) =
 };
 /** 关闭按钮 */
 function close() {
-  removeCurrentTab('/workflow/processDefinition');
+  removeCurrentTab({ path: '/workflow/processDefinition', query: { activeName: route.query.activeName } });
 }
 
 onMounted(() => {

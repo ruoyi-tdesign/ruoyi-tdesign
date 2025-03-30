@@ -85,7 +85,7 @@ import { ref } from 'vue';
 
 import type { R } from '@/api/model/resultModel';
 import { addLeave, getLeave, updateLeave } from '@/api/workflow/leave';
-import type { TestLeaveForm, TestLeaveVo } from '@/api/workflow/model/leaveModel';
+import type { LeaveForm, LeaveVo } from '@/api/workflow/model/leaveModel';
 import type { StartProcessBo } from '@/api/workflow/model/taskModel';
 import { startWorkFlow } from '@/api/workflow/task';
 import ApprovalRecord from '@/components/Process/approvalRecord.vue';
@@ -172,7 +172,7 @@ const handleClose = () => {
   flowCode.value = '';
   buttonLoading.value = false;
 };
-const form = ref<TestLeaveVo & TestLeaveForm>({});
+const form = ref<LeaveVo & LeaveForm>({});
 
 /** 表单重置 */
 const reset = () => {
@@ -224,7 +224,7 @@ const submitForm = async (status: string) => {
     const result = await leaveFormRef.value?.validate();
     if (result === true) {
       buttonLoading.value = true;
-      let res: R<TestLeaveVo>;
+      let res: R<LeaveVo>;
       if (form.value.id) {
         res = await updateLeave(form.value);
       } else {
@@ -261,7 +261,7 @@ const submitFlow = async () => {
   visible.value = false;
 };
 // 提交申请
-const handleStartWorkFlow = async (data: TestLeaveVo) => {
+const handleStartWorkFlow = async (data: LeaveForm) => {
   try {
     submitFormData.value.flowCode = flowCode.value;
     submitFormData.value.businessId = data.id;

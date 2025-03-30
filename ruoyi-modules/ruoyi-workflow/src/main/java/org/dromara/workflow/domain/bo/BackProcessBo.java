@@ -31,6 +31,11 @@ public class BackProcessBo implements Serializable {
     private Long taskId;
 
     /**
+     * 附件id
+     */
+    private String fileId;
+
+    /**
      * 消息类型
      */
     private List<String> messageType;

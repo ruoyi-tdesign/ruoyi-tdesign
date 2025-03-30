@@ -412,6 +412,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             flowParams.skipType(SkipType.REJECT.getKey());
             flowParams.flowStatus(applyNodeCode.equals(bo.getNodeCode()) ? TaskStatusEnum.BACK.getStatus() : TaskStatusEnum.WAITING.getStatus())
                 .hisStatus(TaskStatusEnum.BACK.getStatus());
+            flowParams.hisTaskExt(bo.getFileId());
             taskService.skip(task.getId(), flowParams);
 
             Instance instance = insService.getById(inst.getId());

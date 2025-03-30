@@ -131,6 +131,13 @@
               <t-checkbox label="3" name="type">短信</t-checkbox>
             </t-checkbox-group>
           </t-form-item>
+          <t-form-item v-if="task.flowStatus === 'waiting'" name="附件">
+            <file-upload
+              v-model="backForm.fileId"
+              :file-type="['png', 'jpg', 'jpeg', 'doc', 'docx', 'xlsx', 'xls', 'ppt', 'txt', 'pdf']"
+              :file-size="20"
+            />
+          </t-form-item>
           <t-form-item name="审批意见">
             <t-textarea v-model="backForm.message" />
           </t-form-item>
@@ -211,7 +218,7 @@ const loading = ref(true);
 // 按钮
 const buttonDisabled = ref(true);
 // 任务id
-const taskId = ref<string>('');
+const taskId = ref<string | number>('');
 // 抄送人
 const selectCopyUserList = ref<SysUserVo[]>([]);
 // 抄送人id

@@ -259,6 +259,7 @@ import CategoryTree from '@/pages/workflow/category/CategoryTree.vue';
 
 const { proxy } = getCurrentInstance();
 const router = useRouter();
+const route = useRoute();
 
 const treeActived = ref<string[]>([]);
 const columnControllerVisible = ref(false);
@@ -386,6 +387,9 @@ const handleSelectionChange: TableProps['onSelectChange'] = (selection, options)
 const getList = async () => {
   loading.value = true;
   queryParams.value.category = treeActived.value.at(0);
+  if (route.query.activeName) {
+    activeName.value = route.query.activeName as string;
+  }
   const resp = await listDefinition(queryParams.value);
   processDefinitionList.value = resp.rows;
   total.value = resp.total;
@@ -506,6 +510,7 @@ const design = async (row: FlowDefinitionVo) => {
     query: {
       definitionId: row.id,
       disabled: 'false',
+      activeName: activeName.value,
     },
   });
 };
@@ -520,6 +525,7 @@ const designView = async (row: FlowDefinitionVo) => {
     query: {
       definitionId: row.id,
       disabled: 'true',
+      activeName: activeName.value,
     },
   });
 };
