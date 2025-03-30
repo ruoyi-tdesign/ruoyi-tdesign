@@ -301,7 +301,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      * @return 字典类型详细信息
      */
     @Override
-    public DictTypeDTO getDictTypeDto(String dictType) {
+    public DictTypeDTO getDictType(String dictType) {
         SysDictTypeVo vo = SpringUtils.getAopProxy(this).selectDictTypeByType(dictType);
         return BeanUtil.toBean(vo, DictTypeDTO.class);
     }
@@ -313,7 +313,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
      * @return 字典数据列表
      */
     @Override
-    public List<DictDataDTO> getDictDataDto(String dictType) {
+    public List<DictDataDTO> getDictData(String dictType) {
         List<SysDictDataVo> list = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
         return BeanUtil.copyToList(list, DictDataDTO.class);
     }

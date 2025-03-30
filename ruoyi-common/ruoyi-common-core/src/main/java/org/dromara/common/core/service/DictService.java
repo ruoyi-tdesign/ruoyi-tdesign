@@ -74,7 +74,7 @@ public interface DictService {
      * @param dictType 字典类型
      * @return 字典类型详细信息
      */
-    DictTypeDTO getDictTypeDto(String dictType);
+    DictTypeDTO getDictType(String dictType);
 
     /**
      * 根据字典类型查询字典数据列表
@@ -82,6 +82,6 @@ public interface DictService {
      * @param dictType 字典类型
      * @return 字典数据列表
      */
-    List<DictDataDTO> getDictDataDto(String dictType);
+    List<DictDataDTO> getDictData(String dictType);
 
 }

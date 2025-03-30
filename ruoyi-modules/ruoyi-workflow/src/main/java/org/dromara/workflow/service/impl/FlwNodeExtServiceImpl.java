@@ -147,7 +147,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService {
      * @return 返回构建好的 ChildNode 对象
      */
     private NodeExt.ChildNode buildChildNodeFromDict(String dictType) {
-        DictTypeDTO dictTypeDTO = dictService.getDictTypeDto(dictType);
+        DictTypeDTO dictTypeDTO = dictService.getDictType(dictType);
         if (ObjectUtil.isNull(dictTypeDTO)) {
             return null;
         }
@@ -159,7 +159,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService {
         // 描述
         childNode.setDesc(dictTypeDTO.getRemark());
         // 字典，下拉框和复选框时用到
-        childNode.setDict(dictService.getDictDataDto(dictType)
+        childNode.setDict(dictService.getDictData(dictType)
             .stream().map(x ->
                 new NodeExt.DictItem(x.getDictLabel(), x.getDictValue(), Convert.toBool(x.getIsDefault(), false))
             ).toList());
