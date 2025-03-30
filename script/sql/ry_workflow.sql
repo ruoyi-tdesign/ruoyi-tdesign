@@ -202,30 +202,30 @@ create table test_leave
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '请假申请表';
 
-insert into sys_menu values ('11616', '工作流', '0', '6', 'workflow', '', '', '', '1', '0', 'M', '0', '0', '', 'workflow', null, null, 103, 1, sysdate(),NULL, NULL, '');
-insert into sys_menu values ('11618', '我的任务', '0', '7', 'task', '', '', '', '1', '0', 'M', '0', '0', '', 'my-task', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11619', '我的待办', '11618', '2', 'taskWaiting', 'workflow/task/taskWaiting', '', '', '1', '1', 'C', '0', '0', '', 'waiting', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11632', '我的已办', '11618', '3', 'taskFinish', 'workflow/task/taskFinish', '', '', '1', '1', 'C', '0', '0', '', 'finish', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11633', '我的抄送', '11618', '4', 'taskCopyList', 'workflow/task/taskCopyList', '', '', '1', '1', 'C', '0', '0', '', 'my-copy', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11620', '流程定义', '11616', '3', 'processDefinition', 'workflow/processDefinition/index', '', '', '1', '1', 'C', '0', '0', '', 'process-definition', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11621', '流程实例', '11630', '1', 'processInstance', 'workflow/processInstance/index', '', '', '1', '1', 'C', '0', '0', '', 'tree-table', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11622', '流程分类', '11616', '1', 'category', 'workflow/category/index', '', '', '1', '0', 'C', '0', '0', 'workflow:category:list', 'category', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11629', '我发起的', '11618', '1', 'myDocument', 'workflow/task/myDocument', '', '', '1', '1', 'C', '0', '0', '', 'guide', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11630', '流程监控', '11616', '4', 'monitor', '', '', '', '1', '0', 'M', '0', '0', '', 'monitor', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11631', '待办任务', '11630', '2', 'allTaskWaiting', 'workflow/task/allTaskWaiting', '', '', '1', '1', 'C', '0', '0', '', 'waiting', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11616', '工作流', '0', '6', 'tree-round-dot-vertical', '', '', '', '0', '1', 'M', '1', '1', '', 'workflow', null, null, 103, 1, sysdate(),NULL, NULL, '');
+insert into sys_menu values ('11618', '我的任务', '0', '7', 'task', '', '', '', '0', '1', 'M', '1', '1', '', 'my-task', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11619', '我的待办', '11618', '2', 'task-visible', 'workflow/task/taskWaiting', '', '', '0', '0', 'C', '1', '1', '', 'waiting', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11632', '我的已办', '11618', '3', 'task-checked', 'workflow/task/taskFinish', '', '', '0', '0', 'C', '1', '1', '', 'finish', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11633', '我的抄送', '11618', '4', 'user-arrow-left', 'workflow/task/taskCopyList', '', '', '0', '0', 'C', '1', '1', '', 'my-copy', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11620', '流程定义', '11616', '3', 'system-components', 'workflow/processDefinition/index', '', '', '0', '0', 'C', '1', '1', '', 'process-definition', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11621', '流程实例', '11630', '1', 'tree-round-dot', 'workflow/processInstance/index', '', '', '0', '0', 'C', '1', '1', '', 'tree-table', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11622', '流程分类', '11616', '1', 'app', 'workflow/category/index', '', '', '0', '1', 'C', '1', '1', 'workflow:category:list', 'category', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11629', '我发起的', '11618', '1', 'send', 'workflow/task/myDocument', '', '', '0', '0', 'C', '1', '1', '', 'guide', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11630', '流程监控', '11616', '4', 'chart-analytics', '', '', '', '0', '1', 'M', '1', '1', '', 'monitor', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11631', '待办任务', '11630', '2', 'task-visible', 'workflow/task/allTaskWaiting', '', '', '0', '0', 'C', '1', '1', '', 'waiting', null, null, 103, 1, sysdate(), NULL, NULL, '');
 -- 流程分类管理相关按钮
-insert into sys_menu values ('11623', '流程分类查询', '11622', '1', '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:category:query', '#', null, null, 103, 1,sysdate(), null, null, '');
-insert into sys_menu values ('11624', '流程分类新增', '11622', '2', '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:category:add', '#', null, null, 103, 1,sysdate(), null, null, '');
-insert into sys_menu values ('11625', '流程分类修改', '11622', '3', '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:category:edit', '#', null, null, 103, 1,sysdate(), null, null, '');
-insert into sys_menu values ('11626', '流程分类删除', '11622', '4', '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:category:remove', '#', null, null, 103,1, sysdate(), null, null, '');
-insert into sys_menu values ('11627', '流程分类导出', '11622', '5', '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:category:export', '#', null, null, 103,1, sysdate(), null, null, '');
+insert into sys_menu values ('11623', '流程分类查询', '11622', '1', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:query', '#', null, null, 103, 1,sysdate(), null, null, '');
+insert into sys_menu values ('11624', '流程分类新增', '11622', '2', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:add', '#', null, null, 103, 1,sysdate(), null, null, '');
+insert into sys_menu values ('11625', '流程分类修改', '11622', '3', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:edit', '#', null, null, 103, 1,sysdate(), null, null, '');
+insert into sys_menu values ('11626', '流程分类删除', '11622', '4', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:remove', '#', null, null, 103,1, sysdate(), null, null, '');
+insert into sys_menu values ('11627', '流程分类导出', '11622', '5', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:export', '#', null, null, 103,1, sysdate(), null, null, '');
 -- 请假测试相关按钮
-insert into sys_menu VALUES (11638, '请假申请',     5,    1, 'leave', 'workflow/leave/index', '', '', 1, 0, 'C', '0', '0', 'workflow:leave:list', '#', null, null, 103, 1, sysdate(), NULL, NULL, '请假申请菜单');
-insert into sys_menu VALUES (11639, '请假申请查询', 11638, 1, '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:leave:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu VALUES (11640, '请假申请新增', 11638, 2, '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:leave:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu VALUES (11641, '请假申请修改', 11638, 3, '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:leave:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu VALUES (11642, '请假申请删除', 11638, 4, '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:leave:remove', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu VALUES (11643, '请假申请导出', 11638, 5, '#', '', '', '', 1, 0, 'F', '0', '0', 'workflow:leave:export', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES (11638, '请假申请',     5,    1, 'leave', 'workflow/leave/index', '', '', '0', '1', 'C', '1', '1', 'workflow:leave:list', '#', null, null, 103, 1, sysdate(), NULL, NULL, '请假申请菜单');
+insert into sys_menu VALUES (11639, '请假申请查询', 11638, 1, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES (11640, '请假申请新增', 11638, 2, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES (11641, '请假申请修改', 11638, 3, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES (11642, '请假申请删除', 11638, 4, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:remove', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES (11643, '请假申请导出', 11638, 5, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:export', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
 
 INSERT INTO sys_dict_type VALUES (18, '000000', '业务状态', 'wf_business_status', 103, 1, sysdate(), NULL, NULL, '业务状态列表');
 INSERT INTO sys_dict_type VALUES (19, '000000', '表单类型', 'wf_form_type', 103, 1, sysdate(), NULL, NULL, '表单类型列表');
