@@ -26,7 +26,7 @@
         <easyexcel.version>4.0.3</easyexcel.version>
         <velocity.version>2.3</velocity.version>
         <satoken.version>1.40.0</satoken.version>
-        <mybatis-plus.version>3.5.10.1</mybatis-plus.version>
+        <mybatis-plus.version>3.5.11</mybatis-plus.version>
         <pagehelper.version>2.1.0</pagehelper.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.35</hutool.version>
@@ -34,7 +34,7 @@
         <redisson.version>3.45.1</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
-        <snailjob.version>1.4.0-beta2</snailjob.version>
+        <snailjob.version>1.4.0</snailjob.version>
         <mapstruct-plus.version>1.4.6</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <lombok.version>1.18.36</lombok.version>
