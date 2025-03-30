@@ -186,8 +186,7 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
         OssClient storage = OssFactory.instance(sysOss.getService());
-        long contentLength = storage.download(sysOss.getFileName(), response.getOutputStream());
-        response.setContentLengthLong(contentLength);
+        storage.download(sysOss.getFileName(), response.getOutputStream(), response::setContentLengthLong);
     }
 
     /**

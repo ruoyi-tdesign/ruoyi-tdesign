@@ -42,6 +42,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.function.Consumer;
 
 /**
  * S3 存储协议 所有兼容S3协议的云厂商均支持
@@ -249,10 +250,11 @@ public class OssClient {
      *
      * @param key 文件在 Amazon S3 中的对象键
      * @param out 输出流
+     * @param consumer 自定义处理逻辑
      * @return 输出流中写入的字节数（长度）
      * @throws OssException 如果下载失败，抛出自定义异常
      */
-    public long download(String key, OutputStream out) {
+    public void download(String key, OutputStream out, Consumer<Long> consumer) {
         try {
             // 构建下载请求
             DownloadRequest<ResponseInputStream<GetObjectResponse>> downloadRequest = DownloadRequest.builder()
@@ -268,7 +270,10 @@ public class OssClient {
             Download<ResponseInputStream<GetObjectResponse>> responseFuture = transferManager.download(downloadRequest);
             // 输出到流中
             try (ResponseInputStream<GetObjectResponse> responseStream = responseFuture.completionFuture().join().result()) { // auto-closeable stream
-                return responseStream.transferTo(out); // 阻塞调用线程 blocks the calling thread
+                if (consumer != null) {
+                    consumer.accept(responseStream.response().contentLength());
+                }
+                responseStream.transferTo(out); // 阻塞调用线程 blocks the calling thread
             }
         } catch (Exception e) {
             throw new OssException("文件下载失败，错误信息:[" + e.getMessage() + "]");
