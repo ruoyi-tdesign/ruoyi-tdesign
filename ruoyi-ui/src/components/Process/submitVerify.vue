@@ -42,24 +42,16 @@
           label="下一步审批人"
           prop="assigneeMap"
         >
-          <div
-            v-for="(item, index) in nestNodeList"
-            :key="index"
-            style="display: flex; justify-content: space-between; margin-bottom: 5px"
-          >
-            <div>
-              <span>【{{ item.nodeName }}】：</span>
-              <t-input v-if="false" v-model="form.assigneeMap[item.nodeCode]" />
-            </div>
-            <div>
-              <t-input placeholder="请选择审批人" readonly>
-                <template #suffix>
-                  <t-button @click="choosePeople(item)">
-                    <template #icon><search-icon /></template>选择
-                  </t-button>
-                </template>
-              </t-input>
-            </div>
+          <div v-for="(item, index) in nestNodeList" :key="index" style="margin-bottom: 5px">
+            <div>【{{ item.nodeName }}】：</div>
+            <t-input v-if="false" v-model="form.assigneeMap[item.nodeCode]" />
+            <t-input v-model="nickName[item.nodeCode]" placeholder="请选择审批人" style="width: 500px" readonly>
+              <template #suffix>
+                <t-button @click="choosePeople(item)">
+                  <template #icon><search-icon /></template>选择
+                </t-button>
+              </template>
+            </t-input>
           </div>
         </t-form-item>
         <t-form-item v-if="task.flowStatus === 'waiting'" label="审批意见">
@@ -255,13 +247,16 @@ const selectCopyUserIds = ref<string>(undefined);
 // 可减签的人员
 const deleteUserList = ref<UserDTO[]>([]);
 // 弹窗可选择的人员id
-const popUserIds = ref<string | string[]>([]);
+const popUserIds = ref<string>();
 // 驳回是否显示
 const backVisible = ref(false);
 const backLoading = ref(true);
 const backButtonDisabled = ref(true);
 // 可驳回的任务节点
 const taskNodeList = ref<FlowNode[]>([]);
+const nickName = ref<Record<string, any>>({});
+// 节点编码
+const nodeCode = ref<string>('');
 const buttonObj = ref<Record<string, boolean>>({
   code: undefined,
   show: false,
@@ -282,6 +277,7 @@ const deleteSignatureVisible = ref(false);
 const form = ref<Record<string, any>>({
   taskId: undefined,
   message: undefined,
+  assigneeMap: {},
   variables: {},
   messageType: ['1'],
   flowCopyList: [],
@@ -311,7 +307,6 @@ const openDialog = async (id?: string | number) => {
     buttonObj.value[e.code] = e.show;
   });
   buttonObj.value.applyNode = task.value.applyNode;
-  loading.value = false;
   buttonDisabled.value = false;
   const data = {
     taskId: taskId.value,
@@ -319,6 +314,7 @@ const openDialog = async (id?: string | number) => {
   };
   const nextData = await getNextNodeList(data);
   nestNodeList.value = nextData.data;
+  loading.value = false;
 };
 
 onMounted(() => {});
@@ -328,6 +324,9 @@ const emits = defineEmits(['submitCallback', 'cancelCallback']);
 const handleCompleteTask = async () => {
   form.value.taskId = taskId.value;
   form.value.taskVariables = props.taskVariables;
+  if (!buttonObj.value.pop) {
+    form.value.assigneeMap = {};
+  }
   if (selectCopyUserList.value && selectCopyUserList.value.length > 0) {
     const flowCopyList: SysUserVo[] = [];
     selectCopyUserList.value.forEach((e) => {
@@ -546,11 +545,21 @@ const choosePeople = async (data: FlowNode) => {
   if (!data.permissionFlag) {
     proxy?.$modal.msgError('没有可选择的人员，请联系管理员！');
   }
-  popUserIds.value = data.permissionFlag?.split(',');
+  popUserIds.value = data.permissionFlag;
+  nodeCode.value = data.nodeCode;
   porUserRef.value.open();
 };
-const handlePopUser = async () => {};
-
+// 确认选择
+const handlePopUser = async (userList: SysUserVo[]) => {
+  const userIds = userList.map((item) => {
+    return item.userId;
+  });
+  const nickNames = userList.map((item) => {
+    return item.nickName;
+  });
+  form.value.assigneeMap[nodeCode.value] = userIds.join(',');
+  nickName.value[nodeCode.value] = nickNames.join(',');
+};
 /**
  * 对外暴露子组件方法
  */
