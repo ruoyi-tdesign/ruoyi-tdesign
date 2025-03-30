@@ -160,7 +160,7 @@ create table flow_category
     ancestors     varchar(500) default '' comment '祖级列表',
     category_name varchar(30) not null comment '流程分类名称',
     order_num     int(4)       default 0 comment '显示顺序',
-    del_flag      char(1)      default '0' comment '删除标志（0代表存在 2代表删除）',
+    del_flag      char(1)      default '0' comment '删除标志（0代表存在 1代表删除）',
     create_dept   bigint(20)  null comment '创建部门',
     create_by     bigint(20)  null comment '创建者',
     create_time   datetime    null comment '创建时间',

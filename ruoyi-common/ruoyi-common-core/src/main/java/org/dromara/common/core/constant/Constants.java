@@ -63,7 +63,7 @@ public interface Constants {
     Integer CAPTCHA_EXPIRATION = 2;
 
     /**
-     * 顶级部门id
+     * 顶级父级id
      */
     Long TOP_PARENT_ID = 0L;
 

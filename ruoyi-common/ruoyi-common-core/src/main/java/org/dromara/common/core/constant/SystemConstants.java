@@ -1,7 +1,7 @@
 package org.dromara.common.core.constant;
 
 /**
- * 用户常量信息
+ * 系统常量信息
  *
  * @author Lion Li
  */
@@ -21,6 +21,11 @@ public interface SystemConstants {
      * 是否为系统默认（是）
      */
     String YES = "Y";
+
+    /**
+     * 是否为系统默认（否）
+     */
+    String NO = "N";
 
     /**
      * 是否菜单外链（是）

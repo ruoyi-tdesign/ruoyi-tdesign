@@ -307,7 +307,7 @@ COMMENT ON COLUMN flow_category.parent_id IS '父流程分类id';
 COMMENT ON COLUMN flow_category.ancestors IS '祖级列表';
 COMMENT ON COLUMN flow_category.category_name IS '流程分类名称';
 COMMENT ON COLUMN flow_category.order_num IS '显示顺序';
-COMMENT ON COLUMN flow_category.del_flag IS '删除标志（0代表存在 2代表删除）';
+COMMENT ON COLUMN flow_category.del_flag IS '删除标志（0代表存在 1代表删除）';
 COMMENT ON COLUMN flow_category.create_dept IS '创建部门';
 COMMENT ON COLUMN flow_category.create_by IS '创建者';
 COMMENT ON COLUMN flow_category.create_time IS '创建时间';
