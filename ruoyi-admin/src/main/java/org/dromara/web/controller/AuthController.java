@@ -119,7 +119,7 @@ public class AuthController {
     }
 
     /**
-     * 第三方登录请求
+     * 第三方登录请求获取跳转URL
      *
      * @param source 登录来源
      * @return 结果
@@ -137,7 +137,7 @@ public class AuthController {
     }
 
     /**
-     * 第三方登录回调业务处理 绑定授权
+     * 前端回调绑定授权(需要token)
      *
      * @param loginBody 请求体
      * @return 结果
@@ -157,7 +157,7 @@ public class AuthController {
 
 
     /**
-     * 取消授权
+     * 取消授权(需要token)
      *
      * @param socialId socialId
      */
