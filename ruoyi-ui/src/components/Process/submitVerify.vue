@@ -248,7 +248,7 @@ const backForm = ref<Record<string, any>>({
   messageType: ['1'],
 });
 // 打开弹窗
-const openDialog = (id?: string) => {
+const openDialog = (id?: string | number) => {
   selectCopyUserIds.value = undefined;
   selectCopyUserList.value = [];
   form.value.fileId = undefined;

@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.dto.CompleteTaskDTO;
 import org.dromara.common.core.domain.dto.StartProcessDTO;
+import org.dromara.common.core.domain.dto.StartProcessReturnDTO;
 import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
@@ -105,7 +106,7 @@ public class WorkflowServiceImpl implements WorkflowService {
      * @param startProcess 参数
      */
     @Override
-    public Map<String, Object> startWorkFlow(StartProcessDTO startProcess) {
+    public StartProcessReturnDTO startWorkFlow(StartProcessDTO startProcess) {
         return flwTaskService.startWorkFlow(BeanUtil.toBean(startProcess, StartProcessBo.class));
     }
 

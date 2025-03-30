@@ -2,6 +2,7 @@ package org.dromara.common.core.service;
 
 import org.dromara.common.core.domain.dto.CompleteTaskDTO;
 import org.dromara.common.core.domain.dto.StartProcessDTO;
+import org.dromara.common.core.domain.dto.StartProcessReturnDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,7 @@ public interface WorkflowService {
      * @param startProcess 参数
      * @return 结果
      */
-    Map<String, Object> startWorkFlow(StartProcessDTO startProcess);
+    StartProcessReturnDTO startWorkFlow(StartProcessDTO startProcess);
 
     /**
      * 办理任务

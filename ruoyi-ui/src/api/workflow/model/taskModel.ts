@@ -240,3 +240,12 @@ export interface FlowCopyBo {
   /** 用户名称 */
   userName?: string;
 }
+/**
+ * 启动流程返回对象
+ */
+export interface StartProcessReturnDTO {
+  /** 流程实例id */
+  processInstanceId?: number;
+  /** 任务id */
+  taskId?: number;
+}

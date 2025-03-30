@@ -1,5 +1,6 @@
 package org.dromara.workflow.service;
 
+import org.dromara.common.core.domain.dto.StartProcessReturnDTO;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -26,7 +27,7 @@ public interface IFlwTaskService {
      * @param startProcessBo 启动流程参数
      * @return 结果
      */
-    Map<String, Object> startWorkFlow(StartProcessBo startProcessBo);
+    StartProcessReturnDTO startWorkFlow(StartProcessBo startProcessBo);
 
     /**
      * 办理任务

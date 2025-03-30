@@ -7,7 +7,7 @@ import type {
   FlowHisTaskVo,
   FlowTaskVo,
   FlowTerminationBo,
-  StartProcessBo,
+  StartProcessBo, StartProcessReturnDTO,
   TaskOperationBo,
   TaskQuery,
 } from '@/api/workflow/model/taskModel';
@@ -73,7 +73,7 @@ export function pageByAllTaskFinish(query: TaskQuery) {
  * @param data
  */
 export function startWorkFlow(data: StartProcessBo) {
-  return request.post<R<Record<string, any>>>({
+  return request.post<R<StartProcessReturnDTO>>({
     url: '/workflow/task/startWorkFlow',
     data,
   });
