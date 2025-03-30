@@ -117,7 +117,7 @@ spring:
 # redisson 配置
 redisson:
   # redis key前缀
-  keyPrefix: ${ruoyi.name}
+  keyPrefix: ${spring.application.name}
   # 线程池数量
   threads: 4
   # Netty线程池数量
@@ -125,7 +125,7 @@ redisson:
   # 单节点配置
   singleServerConfig:
     # 客户端名称
-    clientName: ${ruoyi.name}
+    clientName: ${spring.application.name}
     # 最小空闲连接数
     connectionMinimumIdleSize: 8
     # 连接池大小

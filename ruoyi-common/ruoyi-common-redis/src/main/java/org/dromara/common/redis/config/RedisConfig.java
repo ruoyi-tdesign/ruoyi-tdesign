@@ -139,7 +139,7 @@ public class RedisConfig {
      *   # 集群配置
      *   clusterServersConfig:
      *     # 客户端名称
-     *     clientName: ${ruoyi.name}
+     *     clientName: ${spring.application.name}
      *     # master最小空闲连接数
      *     masterConnectionMinimumIdleSize: 32
      *     # master连接池大小

@@ -1,12 +1,12 @@
 package org.dromara.common.sse.listener;
 
 import lombok.RequiredArgsConstructor;
-import org.dromara.common.core.config.RuoYiConfig;
 import org.dromara.common.core.events.LoginEvent;
 import org.dromara.common.core.events.LogoutEvent;
 import org.dromara.common.core.events.NoticeInsertEvent;
 import org.dromara.common.core.service.DictService;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.sse.core.SseEmitterManager;
 import org.dromara.common.sse.utils.SseMessageUtils;
 import org.springframework.context.event.EventListener;
@@ -27,7 +27,6 @@ public class SystemEventsListener {
 
     private final ScheduledExecutorService scheduledExecutorService;
     private final DictService dictService;
-    private final RuoYiConfig ruoyiConfig;
     private final SseEmitterManager sseEmitterManager;
 
     /**
@@ -36,7 +35,7 @@ public class SystemEventsListener {
     @EventListener
     public void login(LoginEvent loginEvent) {
         scheduledExecutorService.schedule(() -> {
-            String message = StringUtils.format("[登录] 欢迎登录{}后台管理系统", ruoyiConfig.getName());
+            String message = StringUtils.format("[登录] 欢迎登录{}后台管理系统", SpringUtils.getApplicationName());
             SseMessageUtils.sendMessage(loginEvent.getLoginType(), loginEvent.getUserId(), message);
         }, 5, TimeUnit.SECONDS);
     }
