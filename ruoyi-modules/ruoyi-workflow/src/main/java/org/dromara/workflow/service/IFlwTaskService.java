@@ -6,6 +6,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.warm.flow.core.entity.Node;
 import org.dromara.warm.flow.orm.entity.FlowHisTask;
+import org.dromara.warm.flow.orm.entity.FlowNode;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.workflow.domain.bo.*;
 import org.dromara.workflow.domain.vo.FlowHisTaskVo;
@@ -188,4 +189,13 @@ public interface IFlwTaskService {
      * @return 结果
      */
     List<UserDTO> currentTaskAllUser(Long taskId);
+
+    /**
+     * 按照节点编码查询节点
+     *
+     * @param nodeCode     节点编码
+     * @param definitionId 流程定义id
+     * @return 节点
+     */
+    FlowNode getByNodeCode(String nodeCode, Long definitionId);
 }

@@ -46,6 +46,7 @@ import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.warm.flow.orm.entity.FlowUser;
 import org.dromara.warm.flow.orm.mapper.FlowHisTaskMapper;
 import org.dromara.warm.flow.orm.mapper.FlowInstanceMapper;
+import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
 import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.TaskAssigneeType;
@@ -104,6 +105,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     private final UserService userService;
     private final FlwTaskMapper flwTaskMapper;
     private final FlwCategoryMapper flwCategoryMapper;
+    private final FlowNodeMapper flowNodeMapper;
 
     /**
      * 启动任务
@@ -513,11 +515,10 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         flowTaskVo.setFlowName(definition.getFlowName());
         flowTaskVo.setBusinessId(instance.getBusinessId());
         //设置按钮权限
-        List<Node> nodeList = nodeService.getByNodeCodes(Collections.singletonList(flowTaskVo.getNodeCode()), instance.getDefinitionId());
-        if (CollUtil.isNotEmpty(nodeList)) {
-            Node node = nodeList.get(0);
-            flowTaskVo.setButtonList(flowTaskVo.getButtonList(node.getExt()));
-            flowTaskVo.setNodeRatio(node.getNodeRatio());
+        FlowNode flowNode = getByNodeCode(flowTaskVo.getNodeCode(), instance.getDefinitionId());
+        if (ObjectUtil.isNotNull(flowNode)) {
+            flowTaskVo.setButtonList(flowTaskVo.getButtonList(flowNode.getExt()));
+            flowTaskVo.setNodeRatio(flowNode.getNodeRatio());
         }
         return flowTaskVo;
     }
@@ -710,5 +711,18 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             return Collections.emptyList();
         }
         return userService.selectListByIds(StreamUtils.toList(userList, e -> Long.valueOf(e.getProcessedBy())));
+    }
+
+    /**
+     * 按照节点编码查询节点
+     *
+     * @param nodeCode     节点编码
+     * @param definitionId 流程定义id
+     */
+    @Override
+    public FlowNode getByNodeCode(String nodeCode, Long definitionId) {
+        return flowNodeMapper.selectOne(new LambdaQueryWrapper<FlowNode>()
+            .eq(FlowNode::getNodeCode, nodeCode)
+            .eq(FlowNode::getDefinitionId, definitionId));
     }
 }
