@@ -180,6 +180,11 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             if (BusinessStatusEnum.isDraftOrCancelOrBack(ins.getFlowStatus())) {
                 flowProcessEventHandler.processHandler(definition.getFlowCode(), ins.getBusinessId(), ins.getFlowStatus(), null, true);
             }
+            // 设置弹窗处理人
+            Map<String, Object> assigneeMap = setPopAssigneeMap(completeTaskBo.getAssigneeMap(), ins.getVariableMap());
+            if (CollUtil.isNotEmpty(assigneeMap)) {
+                completeTaskBo.getVariables().putAll(assigneeMap);
+            }
             // 构建流程参数，包括变量、跳转类型、消息、处理人、权限等信息
             FlowParams flowParams = new FlowParams();
             flowParams.variable(completeTaskBo.getVariables());
@@ -193,11 +198,67 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             this.setHandler(instance, flowTask, flowCopyList);
             // 消息通知
             WorkflowUtils.sendMessage(definition.getFlowName(), ins.getId(), messageType, notice);
+            //设置下一环节处理人
+            setNextHandler(ins.getId());
             return true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new ServiceException(e.getMessage());
         }
+    }
+
+    /**
+     * 设置下一环节处理人
+     *
+     * @param instanceId 实例ID
+     */
+    private void setNextHandler(Long instanceId) {
+        Instance inst = insService.getById(instanceId);
+        List<FlowTask> flowTaskList = selectByInstId(instanceId);
+        Map<String, Object> variableMap = inst.getVariableMap();
+        for (FlowTask task : flowTaskList) {
+            if (variableMap != null && variableMap.containsKey(task.getNodeCode())) {
+                String userIds = variableMap.get(task.getNodeCode()).toString();
+                // 批量删除现有任务的办理人记录
+                WorkflowUtils.getFlowUserService().deleteByTaskIds(List.of(task.getId()));
+                // 批量新增任务办理人记录
+                Set<User> users = WorkflowUtils.buildFlowUser(List.of(userIds.split(StringUtils.SEPARATOR)), task.getId());
+                WorkflowUtils.getFlowUserService().saveBatch(new ArrayList<>(users));
+                variableMap.remove(task.getNodeCode());
+            }
+        }
+        taskService.mergeVariable(inst, variableMap);
+    }
+
+    /**
+     * 设置弹窗处理人
+     *
+     * @param assigneeMap  处理人
+     * @param variablesMap 变量
+     */
+    private Map<String, Object> setPopAssigneeMap(Map<String, Object> assigneeMap, Map<String, Object> variablesMap) {
+        Map<String, Object> map = new HashMap<>();
+        if (CollUtil.isEmpty(assigneeMap)) {
+            return map;
+        }
+        for (Map.Entry<String, Object> entry : assigneeMap.entrySet()) {
+            if (variablesMap.containsKey(entry.getKey())) {
+                String userIds = variablesMap.get(entry.getKey()).toString();
+                if (StringUtils.isNotBlank(userIds)) {
+                    Set<String> hashSet = new HashSet<>();
+                    //弹窗传入的选人
+                    List<String> popUserIds = Arrays.asList(entry.getValue().toString().split(StringUtils.SEPARATOR));
+                    //已有的选人
+                    List<String> variableUserIds = Arrays.asList(userIds.split(StringUtils.SEPARATOR));
+                    hashSet.addAll(popUserIds);
+                    hashSet.addAll(variableUserIds);
+                    map.put(entry.getKey(), String.join(StringUtils.SEPARATOR, hashSet));
+                }
+            } else {
+                map.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return map;
     }
 
     /**
@@ -545,9 +606,11 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             ExpressionUtil.evalVariable(buildNextTaskList, MapUtil.mergeAll(instance.getVariableMap(), variables));
             for (FlowNode flowNode : nextFlowNodes) {
                 buildNextTaskList.stream().filter(t -> t.getNodeCode().equals(flowNode.getNodeCode())).findFirst().ifPresent(t -> {
-                    List<UserDTO> users = flwTaskAssigneeService.fetchUsersByStorageId(flowNode.getPermissionFlag());
-                    if (CollUtil.isNotEmpty(users)) {
-                        flowNode.setPermissionFlag(StreamUtils.join(users, e -> String.valueOf(e.getUserId())));
+                    if (CollUtil.isNotEmpty(t.getPermissionList())) {
+                        List<UserDTO> users = flwTaskAssigneeService.fetchUsersByStorageId(String.join(StringUtils.SEPARATOR, t.getPermissionList()));
+                        if (CollUtil.isNotEmpty(users)) {
+                            flowNode.setPermissionFlag(StreamUtils.join(users, e -> String.valueOf(e.getUserId())));
+                        }
                     }
                 });
             }

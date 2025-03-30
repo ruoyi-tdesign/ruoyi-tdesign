@@ -30,6 +30,7 @@ import org.dromara.warm.flow.orm.entity.FlowUser;
 import org.dromara.warm.flow.orm.mapper.FlowNodeMapper;
 import org.dromara.warm.flow.orm.mapper.FlowTaskMapper;
 import org.dromara.workflow.common.enums.MessageTypeEnum;
+import org.dromara.workflow.common.enums.TaskAssigneeType;
 import org.dromara.workflow.service.IFlwTaskAssigneeService;
 import org.dromara.workflow.service.IFlwTaskService;
 
@@ -94,6 +95,32 @@ public class WorkflowUtils {
                         processedBySet.add(processedBy);
                     }
                 });
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 构建工作流用户
+     *
+     * @param userIdList 办理用户
+     * @param taskId     任务ID
+     * @return 用户
+     */
+    public static Set<User> buildFlowUser(List<String> userIdList, Long taskId) {
+        if (CollUtil.isEmpty(userIdList)) {
+            return Set.of();
+        }
+        Set<User> list = new HashSet<>();
+        Set<String> processedBySet = new HashSet<>();
+        for (String userId : userIdList) {
+            if (!processedBySet.contains(userId)) {
+                FlowUser flowUser = new FlowUser();
+                flowUser.setType(TaskAssigneeType.APPROVER.getCode());
+                flowUser.setProcessedBy(String.valueOf(userId));
+                flowUser.setAssociated(taskId);
+                list.add(flowUser);
+                processedBySet.add(String.valueOf(userId));
             }
         }
         return list;
