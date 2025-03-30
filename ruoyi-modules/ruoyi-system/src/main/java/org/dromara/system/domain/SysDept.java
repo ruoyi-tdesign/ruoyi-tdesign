@@ -10,7 +10,9 @@ import lombok.EqualsAndHashCode;
 import org.dromara.common.tenant.core.TenantEntity;
 
 import java.io.Serial;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 部门表 sys_dept
@@ -112,4 +114,11 @@ public class SysDept extends TenantEntity {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
+
+    /**
+     * 子部门
+     */
+    @TableField(exist = false)
+    private List<SysDept> children = new ArrayList<>();
+
 }
