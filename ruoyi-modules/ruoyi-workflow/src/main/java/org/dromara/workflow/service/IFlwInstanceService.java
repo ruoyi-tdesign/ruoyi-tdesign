@@ -123,7 +123,7 @@ public interface IFlwInstanceService {
      * @param instanceId 实例id
      * @return 结果
      */
-    Map<String, Object> instanceVariable(String instanceId);
+    Map<String, Object> instanceVariable(Long instanceId);
 
     /**
      * 设置流程变量

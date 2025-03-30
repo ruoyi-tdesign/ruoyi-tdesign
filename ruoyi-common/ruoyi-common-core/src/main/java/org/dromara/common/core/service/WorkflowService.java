@@ -47,6 +47,13 @@ public interface WorkflowService {
     void setVariable(Long instanceId, Map<String, Object> variable);
 
     /**
+     * 获取流程变量
+     *
+     * @param instanceId 流程实例id
+     */
+    Map<String, Object> instanceVariable(Long instanceId);
+
+    /**
      * 按照业务id查询流程实例id
      *
      * @param businessId 业务id

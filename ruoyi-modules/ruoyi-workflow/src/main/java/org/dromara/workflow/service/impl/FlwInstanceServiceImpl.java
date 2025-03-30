@@ -344,7 +344,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * @param instanceId 实例id
      */
     @Override
-    public Map<String, Object> instanceVariable(String instanceId) {
+    public Map<String, Object> instanceVariable(Long instanceId) {
         Map<String, Object> map = new HashMap<>();
         FlowInstance flowInstance = flowInstanceMapper.selectById(instanceId);
         Map<String, Object> variableMap = flowInstance.getVariableMap();

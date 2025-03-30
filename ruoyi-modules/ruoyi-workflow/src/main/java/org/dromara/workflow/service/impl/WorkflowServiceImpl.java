@@ -79,6 +79,16 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     /**
+     * 获取流程变量
+     *
+     * @param instanceId 流程实例id
+     */
+    @Override
+    public Map<String, Object> instanceVariable(Long instanceId) {
+        return flwInstanceService.instanceVariable(instanceId);
+    }
+
+    /**
      * 办理任务
      *
      * @param businessId 业务id

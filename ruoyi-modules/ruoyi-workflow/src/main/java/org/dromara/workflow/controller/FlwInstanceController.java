@@ -138,7 +138,7 @@ public class FlwInstanceController extends BaseController {
      * @param instanceId 流程实例id
      */
     @GetMapping("/instanceVariable/{instanceId}")
-    public R<Map<String, Object>> instanceVariable(@PathVariable String instanceId) {
+    public R<Map<String, Object>> instanceVariable(@PathVariable Long instanceId) {
         return R.ok(flwInstanceService.instanceVariable(instanceId));
     }
 
