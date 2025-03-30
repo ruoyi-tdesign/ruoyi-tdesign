@@ -53,6 +53,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         PageQuery pageQuery = PageQuery.of(taskQuery.getPageSize(), taskQuery.getPageNum());
         QueryWrapper<SysRole> wrapper = Wrappers.query();
         wrapper.eq("r.del_flag", SystemConstants.NORMAL)
+            .eq("r.status", SystemConstants.NORMAL)
             .like(StringUtils.isNotBlank(taskQuery.getHandlerCode()), "r.role_name", taskQuery.getHandlerCode())
             .like(StringUtils.isNotBlank(taskQuery.getHandlerName()), "r.role_key", taskQuery.getHandlerName())
             .between(StringUtils.isNotBlank(taskQuery.getBeginTime()) && StringUtils.isNotBlank(taskQuery.getEndTime()),
@@ -75,6 +76,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
     public TaskAssigneeDTO selectPostsByTaskAssigneeList(TaskAssigneeBody taskQuery) {
         PageQuery pageQuery = PageQuery.of(taskQuery.getPageSize(), taskQuery.getPageNum());
         LambdaQueryWrapper<SysPost> wrapper = Wrappers.<SysPost>lambdaQuery()
+            .eq(SysPost::getStatus, SystemConstants.NORMAL)
             .like(StringUtils.isNotBlank(taskQuery.getHandlerCode()), SysPost::getPostCategory, taskQuery.getHandlerCode())
             .like(StringUtils.isNotBlank(taskQuery.getHandlerName()), SysPost::getPostName, taskQuery.getHandlerName())
             .between(StringUtils.isNotBlank(taskQuery.getBeginTime()) && StringUtils.isNotBlank(taskQuery.getEndTime()),
@@ -106,6 +108,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         PageQuery pageQuery = PageQuery.of(taskQuery.getPageSize(), taskQuery.getPageNum());
         LambdaQueryWrapper<SysDept> wrapper = Wrappers.<SysDept>lambdaQuery()
             .eq(SysDept::getDelFlag, SystemConstants.NORMAL)
+            .eq(SysDept::getStatus, SystemConstants.NORMAL)
             .like(StringUtils.isNotBlank(taskQuery.getHandlerCode()), SysDept::getDeptCategory, taskQuery.getHandlerCode())
             .like(StringUtils.isNotBlank(taskQuery.getHandlerName()), SysDept::getDeptName, taskQuery.getHandlerName())
             .between(StringUtils.isNotBlank(taskQuery.getBeginTime()) && StringUtils.isNotBlank(taskQuery.getEndTime()),
@@ -143,6 +146,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         PageQuery pageQuery = PageQuery.of(taskQuery.getPageSize(), taskQuery.getPageNum());
         QueryWrapper<SysUser> wrapper = Wrappers.query();
         wrapper.eq("u.del_flag", SystemConstants.NORMAL)
+            .eq("u.status", SystemConstants.NORMAL)
             .like(StringUtils.isNotBlank(taskQuery.getHandlerCode()), "u.user_name", taskQuery.getHandlerCode())
             .like(StringUtils.isNotBlank(taskQuery.getHandlerName()), "u.nick_name", taskQuery.getHandlerName())
             .between(taskQuery.getBeginTime() != null && taskQuery.getEndTime() != null,
