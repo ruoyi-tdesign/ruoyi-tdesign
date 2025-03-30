@@ -1217,6 +1217,7 @@ create table if not exists sys_oss
     original_name   varchar(255) default ''::varchar not null,
     file_suffix     varchar(10)  default ''::varchar not null,
     url             varchar(500) default ''::varchar not null,
+    ext1            varchar(500) default ''::varchar,
     size            int8         default ''::varchar not null,
     content_type    varchar(255),
     oss_category_id int8         default 0           not null,
@@ -1241,6 +1242,7 @@ comment on column sys_oss.file_name         is '文件名';
 comment on column sys_oss.original_name     is '原名';
 comment on column sys_oss.file_suffix       is '文件后缀名';
 comment on column sys_oss.url               is 'URL地址';
+comment on column sys_oss.ext1              is '扩展字段';
 comment on column sys_oss.size              is '字节长度';
 comment on column sys_oss.content_type      is '内容类型';
 comment on column sys_oss.oss_category_id   is '分类id';

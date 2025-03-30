@@ -45,6 +45,11 @@ public class SysOssBo extends BaseEntity {
     private Long ossCategoryId = 0L;
 
     /**
+     * 扩展字段
+     */
+    private String ext1;
+
+    /**
      * 用户类型
      */
     private UserType userTypeEnum;

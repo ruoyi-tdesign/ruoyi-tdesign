@@ -1216,6 +1216,7 @@ create table sys_oss (
   user_type         varchar2(20)    default ''       not null,
   is_lock           number(4)       default 0       not null,
   service           varchar2(20)    default 'minio' not null,
+  ext1              varchar2(500)   default '',
   create_dept       number(20)      default null,
   create_by         number(20)      default null,
   create_time       date,
@@ -1239,6 +1240,7 @@ comment on column sys_oss.oss_category_id   is '分类id';
 comment on column sys_oss.user_type         is '用户类型';
 comment on column sys_oss.is_lock           is '是否锁定状态';
 comment on column sys_oss.service           is '服务商';
+comment on column sys_oss.ext1              is '扩展字段';
 comment on column sys_oss.create_dept       is '创建部门';
 comment on column sys_oss.create_time       is '创建时间';
 comment on column sys_oss.create_by         is '上传者';
