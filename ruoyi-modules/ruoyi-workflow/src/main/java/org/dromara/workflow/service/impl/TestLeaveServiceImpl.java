@@ -1,6 +1,8 @@
 package org.dromara.workflow.service.impl;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -14,7 +16,6 @@ import org.dromara.common.core.enums.BusinessStatusEnum;
 import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.workflow.common.ConditionalOnEnable;
@@ -134,12 +135,14 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         testLeave.setStatus(processEvent.getStatus());
         // 用于例如审批附件 审批意见等 存储到业务表内 自行根据业务实现存储流程
         Map<String, Object> params = processEvent.getParams();
-        // 历史任务扩展(通常为附件)
-        String hisTaskExt = params.getOrDefault("hisTaskExt", "").toString();
-        // 办理人
-        String handler = params.getOrDefault("handler", "").toString();
-        // 办理意见
-        String message = params.getOrDefault("message", "").toString();
+        if (MapUtil.isNotEmpty(params)) {
+            // 历史任务扩展(通常为附件)
+            String hisTaskExt = Convert.toStr(params.get("hisTaskExt"));
+            // 办理人
+            String handler = Convert.toStr(params.get("handler"));
+            // 办理意见
+            String message = Convert.toStr(params.get("message"));
+        }
         if (processEvent.isSubmit()) {
             testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
         }
