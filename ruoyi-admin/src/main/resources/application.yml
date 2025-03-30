@@ -278,7 +278,6 @@ xss:
   # 排除链接（多个用逗号分隔）
   excludeUrls:
     - /system/notice
-    - /warm-flow/save-xml
     - /system/config/**
     - /system/messageTemplate
     - /system/messageConfig
