@@ -202,7 +202,7 @@
         <t-form-item label="流程名称" name="flowName">
           <t-input v-model="form.flowName" placeholder="请输入流程名称" maxlength="100" show-limit-number />
         </t-form-item>
-        <t-form-item label="表单路径" name="flowName">
+        <t-form-item label="表单路径" name="formPath">
           <t-input v-model="form.formPath" placeholder="请输入表单路径" maxlength="100" show-limit-number />
         </t-form-item>
       </t-form>
