@@ -94,7 +94,7 @@ export const useUserStore = defineStore('user', {
   persist: {
     storage: localStorage,
     key: 'Admin-Token',
-    paths: ['token'],
+    pick: ['token'],
     // afterRestore: (ctx) => {
     //   if (ctx.store.roles && ctx.store.roles.length > 0) {
     //     const permissionStore = usePermissionStore();
