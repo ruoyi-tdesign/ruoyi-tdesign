@@ -26,17 +26,21 @@
           <!-- 全局通知 -->
           <notice />
 
-          <t-tooltip placement="bottom" :content="$t('layout.header.code')">
+          <!-- github -->
+          <t-tooltip placement="bottom" :content="t('layout.header.code')">
             <t-button theme="default" shape="square" variant="text" @click="navToGitHub">
               <logo-github-icon />
             </t-button>
           </t-tooltip>
-          <t-tooltip placement="bottom" :content="$t('layout.header.help')">
+          <!-- 帮助 -->
+          <t-tooltip placement="bottom" :content="t('layout.header.help')">
             <t-button theme="default" shape="square" variant="text" @click="navToHelper">
               <help-circle-icon />
             </t-button>
           </t-tooltip>
+          <!-- 多语言 -->
           <translate-select />
+          <!-- 用户头像、下拉选项 -->
           <t-dropdown :min-column-width="120" :max-column-width="180" trigger="click">
             <template #dropdown>
               <t-dropdown-menu>
@@ -45,16 +49,17 @@
                   class="operations-dropdown-container-item"
                   @click="handleNav('/profile/index')"
                 >
-                  <user-circle-icon />{{ $t('layout.header.user') }}
+                  <user-circle-icon />{{ t('layout.header.user') }}
                 </t-dropdown-item>
                 <t-dropdown-item class="operations-dropdown-container-item" @click="openModifyPassword = true">
-                  <secured-icon />{{ $t('layout.header.modifyPassword') }}
+                  <secured-icon />{{ t('layout.header.modifyPassword') }}
                 </t-dropdown-item>
                 <t-dropdown-item class="operations-dropdown-container-item" @click="handleLogout">
-                  <poweroff-icon />{{ $t('layout.header.signOut') }}
+                  <poweroff-icon />{{ t('layout.header.signOut') }}
                 </t-dropdown-item>
               </t-dropdown-menu>
             </template>
+            <!-- 用户头像 -->
             <t-button class="header-user-btn" theme="default" variant="text">
               <template #icon>
                 <t-avatar
@@ -72,7 +77,7 @@
               <template #suffix><chevron-down-icon /></template>
             </t-button>
           </t-dropdown>
-          <t-tooltip placement="bottom" :content="$t('layout.header.setting')">
+          <t-tooltip placement="bottom" :content="t('layout.header.setting')">
             <t-button theme="default" shape="square" variant="text" @click="toggleSettingPanel">
               <setting-icon />
             </t-button>
@@ -103,6 +108,7 @@ import LogoFull from '@/assets/icons/assets-logo-full.svg?component';
 import TranslateSelect from '@/components/translate-select/index.vue';
 import { prefix } from '@/config/global';
 import ModifyPassword from '@/layouts/components/ModifyPassword.vue';
+import { t } from '@/locales';
 import { getActive } from '@/router';
 import { useSettingStore, useUserStore } from '@/store';
 import type { ComplexRoute, ModeType } from '@/types/interface';

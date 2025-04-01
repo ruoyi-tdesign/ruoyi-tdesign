@@ -37,22 +37,22 @@
               <t-dropdown-menu>
                 <t-dropdown-item @click="() => handleRefresh(routeItem, index)">
                   <refresh-icon />
-                  {{ $t('layout.tagTabs.refresh') }}
+                  {{ t('layout.tagTabs.refresh') }}
                 </t-dropdown-item>
                 <t-dropdown-item v-if="index > 1" @click="() => handleCloseAhead(routeItem.path, index)">
                   <arrow-left-icon />
-                  {{ $t('layout.tagTabs.closeLeft') }}
+                  {{ t('layout.tagTabs.closeLeft') }}
                 </t-dropdown-item>
                 <t-dropdown-item
                   v-if="index < tabRouters.length - 1"
                   @click="() => handleCloseBehind(routeItem.path, index)"
                 >
                   <arrow-right-icon />
-                  {{ $t('layout.tagTabs.closeRight') }}
+                  {{ t('layout.tagTabs.closeRight') }}
                 </t-dropdown-item>
                 <t-dropdown-item v-if="tabRouters.length > 2" @click="() => handleCloseOther(routeItem.path, index)">
                   <close-circle-icon />
-                  {{ $t('layout.tagTabs.closeOther') }}
+                  {{ t('layout.tagTabs.closeOther') }}
                 </t-dropdown-item>
               </t-dropdown-menu>
             </template>
@@ -77,6 +77,7 @@ import { computed, nextTick, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { prefix } from '@/config/global';
+import { t } from '@/locales';
 import { useSettingStore, useTabsRouterStore } from '@/store';
 import type { TRouterInfo, TTabRemoveOptions } from '@/types/interface';
 

@@ -3,7 +3,7 @@
     <t-auto-complete
       v-model="searchData"
       :class="['header-search', { 'hover-active': isSearchFocus }]"
-      :placeholder="$t('layout.searchPlaceholder')"
+      :placeholder="t('layout.searchPlaceholder')"
       :options="options"
       :filterable="false"
       :popup-props="{
@@ -35,7 +35,7 @@
     <t-auto-complete
       v-model="searchData"
       :class="['header-search', { 'width-zero': !isSearchFocus }]"
-      :placeholder="$t('layout.searchPlaceholder')"
+      :placeholder="t('layout.searchPlaceholder')"
       :autofocus="isSearchFocus"
       :options="options"
       :filterable="false"
@@ -62,6 +62,7 @@ import { SearchIcon } from 'tdesign-icons-vue-next';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { t } from '@/locales';
 import { usePermissionStore } from '@/store';
 import type { MenuRoute } from '@/types/interface';
 

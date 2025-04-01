@@ -1,15 +1,15 @@
 <template>
   <result
-    :title="$t('pages.result.browserIncompatible.title')"
+    :title="t('pages.result.browserIncompatible.title')"
     type="ie"
-    :tip="$t('pages.result.browserIncompatible.subtitle')"
+    :tip="t('pages.result.browserIncompatible.subtitle')"
   >
     <div class="result-slot-container">
       <t-button class="result-button" @click="() => $router.push('/')">{{
-        $t('pages.result.browserIncompatible.back')
+        t('pages.result.browserIncompatible.back')
       }}</t-button>
       <div class="recommend-container">
-        <div>{{ $t('pages.result.browserIncompatible.recommend') }}</div>
+        <div>{{ t('pages.result.browserIncompatible.recommend') }}</div>
         <div class="recommend-browser">
           <div>
             <thumbnail class="browser-icon" :url="Chorme" />
@@ -32,6 +32,7 @@ import Chorme from '@/assets/images/chorme.png';
 import QQBrowser from '@/assets/images/qq-browser.png';
 import Result from '@/components/result/index.vue';
 import Thumbnail from '@/components/thumbnail/index.vue';
+import { t } from '@/locales';
 </script>
 
 <style lang="less" scoped>
