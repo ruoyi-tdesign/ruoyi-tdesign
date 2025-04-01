@@ -128,9 +128,13 @@ const task = ref<FlowTaskVo>({
   nodeName: undefined,
   flowCode: undefined,
   flowStatus: undefined,
+  formCustom: undefined,
+  formPath: undefined,
   nodeType: undefined,
   nodeRatio: undefined,
   version: undefined,
+  applyNode: undefined,
+  buttonList: [],
 });
 
 const open = (taskId: string | number) => {
