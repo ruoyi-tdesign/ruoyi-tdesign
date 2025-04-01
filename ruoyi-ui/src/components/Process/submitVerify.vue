@@ -311,7 +311,6 @@ const openDialog = async (id?: string | number) => {
   task.value.buttonList.forEach((e) => {
     buttonObj.value[e.code] = e.show;
   });
-  buttonObj.value.applyNode = task.value.applyNode;
   buttonDisabled.value = false;
   const data = {
     taskId: taskId.value,
