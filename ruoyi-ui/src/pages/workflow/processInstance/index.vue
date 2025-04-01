@@ -238,6 +238,7 @@ const columns = computed<Array<PrimaryTableCol>>(() => {
       { title: `流程定义名称`, colKey: 'flowName', ellipsis: true, align: 'center' },
       { title: `任务名称`, colKey: 'nodeName', align: 'center' },
       { title: `流程定义编码`, colKey: 'flowCode', align: 'center' },
+      { title: `流程分类`, colKey: 'categoryName', align: 'center' },
       { title: `申请人`, colKey: 'createByName', align: 'center' },
       { title: `版本号`, colKey: 'version', align: 'center' },
       { title: `状态`, colKey: 'isSuspended', align: 'center' },

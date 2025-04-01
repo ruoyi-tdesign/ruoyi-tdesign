@@ -12,8 +12,8 @@
             <t-form-item label="流程定义名称" name="flowName">
               <t-input v-model="queryParams.flowName" placeholder="请输入流程定义名称" clearable @enter="handleQuery" />
             </t-form-item>
-            <t-form-item label="流程定义KEY" name="flowCode">
-              <t-input v-model="queryParams.flowCode" placeholder="请输入流程定义KEY" clearable @enter="handleQuery" />
+            <t-form-item label="流程定义编码" name="flowCode">
+              <t-input v-model="queryParams.flowCode" placeholder="请输入流程定义编码" clearable @enter="handleQuery" />
             </t-form-item>
             <t-form-item label-width="0px">
               <t-button theme="primary" @click="handleQuery">
@@ -415,7 +415,7 @@ const getUnPublishList = async () => {
 const handleDelete = (row?: FlowDefinitionVo) => {
   const id = row?.id || ids.value;
   const defList = processDefinitionList.value.filter((x) => id.indexOf(x.id) !== -1).map((x) => x.flowCode);
-  proxy?.$modal.confirm(`是否确认删除流程定义KEY为【${defList}】的数据项？`, async () => {
+  proxy?.$modal.confirm(`是否确认删除流程定义编码为【${defList}】的数据项？`, async () => {
     loading.value = true;
     await deleteDefinition(id).finally(() => (loading.value = false));
     handleQuery();
@@ -426,7 +426,7 @@ const handleDelete = (row?: FlowDefinitionVo) => {
 /** 发布流程定义 */
 const handlePublish = (row?: FlowDefinitionVo) => {
   proxy?.$modal.confirm(
-    `是否确认发布流程定义KEY为【${row.flowCode}】版本为【${row.version}】的数据项？，发布后会将已发布流程定义改为失效！`,
+    `是否确认发布流程定义编码为【${row.flowCode}】版本为【${row.version}】的数据项？，发布后会将已发布流程定义改为失效！`,
     async () => {
       loading.value = true;
       await publish(row.id).finally(() => (loading.value = false));
