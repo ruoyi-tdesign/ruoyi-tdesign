@@ -258,8 +258,7 @@ const nickName = ref<Record<string, any>>({});
 // 节点编码
 const nodeCode = ref<string>('');
 const buttonObj = ref<Record<string, boolean>>({
-  code: undefined,
-  show: false,
+  pop: false,
   trust: false,
   transfer: false,
   addSign: false,
@@ -330,7 +329,23 @@ const emits = defineEmits(['submitCallback', 'cancelCallback']);
 const handleCompleteTask = async () => {
   form.value.taskId = taskId.value;
   form.value.taskVariables = props.taskVariables;
-  if (!buttonObj.value.pop) {
+  let verify = false;
+  if (buttonObj.value.pop && nestNodeList.value && nestNodeList.value.length > 0) {
+    nestNodeList.value.forEach((e) => {
+      if (
+        Object.keys(form.value.assigneeMap).length === 0 ||
+        form.value.assigneeMap[e.nodeCode] === '' ||
+        form.value.assigneeMap[e.nodeCode] === null ||
+        form.value.assigneeMap[e.nodeCode] === undefined
+      ) {
+        verify = true;
+      }
+    });
+    if (verify) {
+      proxy?.$modal.msgWarning('请选择审批人！');
+      return;
+    }
+  } else {
     form.value.assigneeMap = {};
   }
   if (selectCopyUserList.value && selectCopyUserList.value.length > 0) {
@@ -394,6 +409,8 @@ const handleBackProcess = async () => {
 const cancel = async () => {
   dialog.visible = false;
   buttonDisabled.value = false;
+  nickName.value = {};
+  form.value.assigneeMap = {};
   emits('cancelCallback');
 };
 // 打开抄送人员
