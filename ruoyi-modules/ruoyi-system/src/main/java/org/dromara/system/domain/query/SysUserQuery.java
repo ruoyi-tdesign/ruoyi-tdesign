@@ -2,7 +2,7 @@ package org.dromara.system.domain.query;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.common.mybatis.core.domain.BasePageQuery;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysUserQuery extends BaseEntity {
+public class SysUserQuery extends BasePageQuery {
 
     /**
      * 用户ID
@@ -69,6 +69,6 @@ public class SysUserQuery extends BaseEntity {
     /**
      * 排除不查询的用户(工作流用)
      */
-    private String excludeUserIds;
+    private String[] excludeUserIds;
 
 }

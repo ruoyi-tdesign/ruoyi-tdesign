@@ -5,6 +5,7 @@ import cn.dev33.satoken.context.model.SaStorage;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.mybatis.annotation.DataPermission;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,33 @@ import java.util.function.Supplier;
 public class DataPermissionHelper {
 
     private static final String DATA_PERMISSION_KEY = "data:permission";
+
+    private static final ThreadLocal<DataPermission> PERMISSION_CACHE = new ThreadLocal<>();
+
+    /**
+     * 获取当前执行mapper权限注解
+     *
+     * @return 返回当前执行mapper权限注解
+     */
+    public static DataPermission getPermission() {
+        return PERMISSION_CACHE.get();
+    }
+
+    /**
+     * 设置当前执行mapper权限注解
+     *
+     * @param dataPermission   数据权限注解
+     */
+    public static void setPermission(DataPermission dataPermission) {
+        PERMISSION_CACHE.set(dataPermission);
+    }
+
+    /**
+     * 删除当前执行mapper权限注解
+     */
+    public static void removePermission() {
+        PERMISSION_CACHE.remove();
+    }
 
     /**
      * 从上下文中获取指定键的变量值，并将其转换为指定的类型

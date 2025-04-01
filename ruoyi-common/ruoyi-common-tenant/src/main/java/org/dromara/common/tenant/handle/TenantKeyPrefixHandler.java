@@ -55,13 +55,13 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
             return null;
         }
         if (StringUtils.startsWith(name, GlobalConstants.GLOBAL_REDIS_KEY) || TenantHelper.isIgnoreCache()) {
-            return super.unmap(name);
+            return unmap;
         }
         // 报错问题 https://github.com/redisson/redisson/issues/5727
         String tenantId = TenantHelper.getTenantId();
         if (StringUtils.isBlank(tenantId)) {
             // 程序员应该处理特殊情况，例如getKeys方法不在主线程，所以会进入此处
-            return super.unmap(name);
+            return unmap;
 //            throw new ServiceException("未能识别到有效tenantId");
         }
         if (StringUtils.startsWith(unmap, PREFIX + tenantId)) {

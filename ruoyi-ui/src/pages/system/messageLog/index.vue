@@ -36,12 +36,7 @@
         </t-form-item>
         <t-form-item label="平台标识" name="supplierType">
           <t-select v-model="queryParams.supplierType" placeholder="请选择平台标识" clearable>
-            <t-option
-              v-for="dict in supplierTypeOptions"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            />
+            <t-option v-for="dict in supplierTypeOptions" :key="dict.value" :label="dict.label" :value="dict.value" />
           </t-select>
         </t-form-item>
         <t-form-item label="是否成功" name="isSuccess">
@@ -143,22 +138,12 @@
         <template #costTime="{ row }"> {{ row.costTime }}毫秒 </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['system:messageLog:query']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDetail(row)"
-            >
-              <browse-icon />详情
-            </t-link>
-            <t-link
-              v-hasPermi="['system:messageLog:remove']"
-              theme="danger"
-              hover="color"
-              @click.stop="handleDelete(row)"
-            >
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['system:messageLog:query']" theme="primary" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:messageLog:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>

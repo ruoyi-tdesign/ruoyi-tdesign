@@ -209,4 +209,6 @@ public interface ISysRoleService extends IService<SysRole> {
      */
     void cleanOnlineUserByRole(Long roleId);
 
+    void cleanOnlineUser(List<Long> userIds);
+
 }

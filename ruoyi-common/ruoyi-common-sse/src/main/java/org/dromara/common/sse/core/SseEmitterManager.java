@@ -1,5 +1,6 @@
 package org.dromara.common.sse.core;
 
+import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.sse.dto.SseMessageDto;
@@ -66,17 +67,24 @@ public class SseEmitterManager {
      * @param token  用户的唯一令牌，用于识别具体的连接
      */
     public void disconnect(String loginType, Long userId, String token) {
+        if (userId == null || token == null) {
+            return;
+        }
         Map<Long, Map<String, SseEmitter>> sseMap = USER_TOKEN_EMITTERS.get(loginType);
         if (sseMap == null) {
             return;
         }
         Map<String, SseEmitter> emitters = sseMap.get(userId);
-        if (emitters != null) {
+        if (MapUtil.isNotEmpty(emitters)) {
             try {
-                emitters.get(token).send(SseEmitter.event().comment("disconnected"));
+                SseEmitter sseEmitter = emitters.get(token);
+                sseEmitter.send(SseEmitter.event().comment("disconnected"));
+                sseEmitter.complete();
             } catch (Exception ignore) {
             }
             emitters.remove(token);
+        } else {
+            sseMap.remove(userId);
         }
     }
 
@@ -102,7 +110,7 @@ public class SseEmitterManager {
             return;
         }
         Map<String, SseEmitter> emitters = sseMap.get(userId);
-        if (emitters != null) {
+        if (MapUtil.isNotEmpty(emitters)) {
             for (Map.Entry<String, SseEmitter> entry : emitters.entrySet()) {
                 SseEmitter emitter = entry.getValue();
                 try {
@@ -114,6 +122,8 @@ public class SseEmitterManager {
                     emitter.completeWithError(e);
                 }
             }
+        } else {
+            sseMap.remove(userId);
         }
     }
 

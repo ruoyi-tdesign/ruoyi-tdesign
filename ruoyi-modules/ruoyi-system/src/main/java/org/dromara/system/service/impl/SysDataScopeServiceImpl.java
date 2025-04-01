@@ -3,10 +3,12 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.system.service.ISysDataScopeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,7 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
      * @param roleId 角色Id
      * @return 部门Id组
      */
+    @Cacheable(cacheNames = CacheNames.SYS_ROLE_CUSTOM, key = "#roleId", condition = "#roleId != null")
     @Override
     public String getRoleCustom(Long roleId) {
         if (ObjectUtil.isNull(roleId)) {
@@ -52,6 +55,7 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
      * @param deptId 部门Id
      * @return 部门Id组
      */
+    @Cacheable(cacheNames = CacheNames.SYS_DEPT_AND_CHILD, key = "#deptId", condition = "#deptId != null")
     @Override
     public String getDeptAndChild(Long deptId) {
         if (ObjectUtil.isNull(deptId)) {

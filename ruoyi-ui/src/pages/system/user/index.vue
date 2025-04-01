@@ -127,54 +127,29 @@
             <template #operation="{ row }">
               <t-space :size="8" break-line>
                 <t-tooltip content="详情" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:query']"
-                    theme="primary"
-                    hover="color"
-                    @click.stop="handleDetail(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:query']" @click.stop="handleDetail(row)">
                     <browse-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
                 <t-tooltip v-if="row.userId !== 1" content="修改" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:edit']"
-                    theme="primary"
-                    hover="color"
-                    @click.stop="handleUpdate(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:edit']" @click.stop="handleUpdate(row)">
                     <edit-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
                 <t-tooltip v-if="row.userId !== 1" content="删除" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:remove']"
-                    theme="danger"
-                    hover="color"
-                    @click.stop="handleDelete(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:remove']" theme="danger" @click.stop="handleDelete(row)">
                     <delete-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
                 <t-tooltip v-if="row.userId !== 1" content="重置密码" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:resetPwd']"
-                    theme="primary"
-                    hover="color"
-                    @click.stop="handleResetPwd(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:resetPwd']" @click.stop="handleResetPwd(row)">
                     <user-password-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
                 <t-tooltip v-if="row.userId !== 1" content="分配角色" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:edit']"
-                    theme="primary"
-                    hover="color"
-                    @click.stop="handleAuthRole(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:edit']" @click.stop="handleAuthRole(row)">
                     <user-safety-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
               </t-space>
             </template>
@@ -419,6 +394,7 @@ import type {
   SubmitContext,
   SuccessContext,
   TableSort,
+  TreeSelectProps,
   UploadInstanceFunctions,
 } from 'tdesign-vue-next';
 import { computed, createVNode, getCurrentInstance, onMounted, reactive, ref } from 'vue';
@@ -512,6 +488,7 @@ const rules = ref<Record<string, Array<FormRule>>>({
   password: [
     { required: true, message: '用户密码不能为空' },
     { min: 5, max: 20, message: '用户密码长度必须介于 5 和 20 之间' },
+    { pattern: /^[^<>"'|\\]+$/, message: '不能包含非法字符：< > " \' \\ |', trigger: 'blur' },
   ],
   email: [{ email: true, message: '请输入正确的邮箱地址' }],
   phonenumber: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码' }],
@@ -555,15 +532,15 @@ async function getDeptFormTree() {
   });
 }
 
-function handleDeptChange(value: number | string) {
+const handleDeptChange: TreeSelectProps['onChange'] = (value) => {
   loadingPost.value = true;
   form.value.postIds = [];
-  postOptionSelect(value)
+  postOptionSelect(value as number)
     .then((res) => {
       postOptions.value = res.data;
     })
     .finally(() => (loadingPost.value = false));
-}
+};
 
 /** 查询用户列表 */
 function getList() {

@@ -8,7 +8,7 @@ import java.util.Date;
 import org.dromara.common.mybatis.core.domain.BasePageQuery;
 
 /**
- * 流程分类查询对象 wf_category
+ * 流程分类查询对象 flow_category
  *
  * @author yixiacoco
  * @date 2024-10-07

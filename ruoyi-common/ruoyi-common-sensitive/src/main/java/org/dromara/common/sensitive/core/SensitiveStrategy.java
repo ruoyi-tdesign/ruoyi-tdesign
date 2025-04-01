@@ -80,12 +80,12 @@ public enum SensitiveStrategy {
     FIRST_MASK(DesensitizedUtil::firstMask),
 
     /**
-     * 清空为null
+     * 清空为""
      */
     CLEAR(s -> DesensitizedUtil.clear()),
 
     /**
-     * 清空为""
+     * 清空为null
      */
     CLEAR_TO_NULL(s -> DesensitizedUtil.clearToNull());
 

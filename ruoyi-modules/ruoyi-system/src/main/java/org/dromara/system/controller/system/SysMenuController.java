@@ -15,7 +15,6 @@ import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
-import org.dromara.system.domain.SysMenu;
 import org.dromara.system.domain.bo.SysMenuBo;
 import org.dromara.system.domain.query.SysMenuQuery;
 import org.dromara.system.domain.vo.MenuTreeSelectVo;

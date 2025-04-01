@@ -238,8 +238,8 @@
                 {{ form.url }}
               </div>
               <t-space>
-                <t-link theme="primary" @click="handleDownload(form.ossId)">下载</t-link>
-                <t-link theme="primary" @click="copyText(form.url)">复制链接URL</t-link>
+                <my-link @click="handleDownload(form.ossId)">下载</my-link>
+                <my-link @click="copyText(form.url)">复制链接URL</my-link>
               </t-space>
             </t-space>
           </t-form-item>

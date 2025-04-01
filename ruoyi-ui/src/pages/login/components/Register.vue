@@ -210,7 +210,7 @@ function getCode() {
  * 获取租户列表
  */
 function initTenantList() {
-  getTenantList().then((res) => {
+  getTenantList(false).then((res) => {
     const vo = res.data;
     tenantEnabled.value = !!vo.tenantEnabled;
     if (tenantEnabled.value) {

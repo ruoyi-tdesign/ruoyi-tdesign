@@ -11,18 +11,18 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
-import org.dromara.common.core.constant.UserConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.enums.NormalDisableEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.domain.SysDept;
 import org.dromara.system.domain.SysUser;
@@ -35,6 +35,7 @@ import org.dromara.system.domain.vo.SysPostVo;
 import org.dromara.system.domain.vo.SysRoleVo;
 import org.dromara.system.domain.vo.SysUserExportVo;
 import org.dromara.system.domain.vo.SysUserVo;
+import org.dromara.system.mapper.SysDeptMapper;
 import org.dromara.system.mapper.SysPostMapper;
 import org.dromara.system.mapper.SysRoleMapper;
 import org.dromara.system.mapper.SysUserMapper;
@@ -72,16 +73,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private SysUserRoleMapper userRoleMapper;
     @Autowired
     private SysUserPostMapper userPostMapper;
+    @Autowired
+    private SysDeptMapper deptMapper;
 
     /**
      * 根据条件分页查询用户列表
      *
-     * @param user 用户信息
+     * @param query 用户信息
      */
     @Override
-    public TableDataInfo<SysUserVo> selectPageUserList(SysUserQuery user) {
-        setDeptIds(user);
-        return PageQuery.of(() -> baseMapper.queryList(user));
+    public TableDataInfo<SysUserVo> selectPageUserList(SysUserQuery query) {
+        setDeptIds(query);
+        return PageQuery.of(query.getPageNum(), query.getPageSize()).execute(() -> baseMapper.queryList(query));
     }
 
     /**
@@ -98,10 +101,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     private void setDeptIds(SysUserQuery user) {
         if (user.getDeptId() != null) {
-            List<SysDept> deptList = deptService.lambdaQuery()
-                .select(SysDept::getDeptId)
-                .apply(DataBaseHelper.findInSet(user.getDeptId(), "ancestors"))
-                .list();
+            List<SysDept> deptList = deptMapper.selectListByParentId(user.getDeptId());
             List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
             ids.add(user.getDeptId());
             user.setDeptIds(ids.toArray(Long[]::new));
@@ -480,7 +480,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (ArrayUtil.isNotEmpty(roleIds)) {
             List<Long> roleList = new ArrayList<>(List.of(roleIds));
             if (!LoginHelper.isSuperAdmin(userId)) {
-                roleList.remove(UserConstants.SUPER_ADMIN_ID);
+                roleList.remove(SystemConstants.SUPER_ADMIN_ID);
             }
             // 判断是否具有此角色的操作权限
             SysRoleQuery query = new SysRoleQuery();
@@ -584,7 +584,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public String selectUserNameById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getUserName).eq(SysUser::getUserId, userId));
-        return ObjectUtil.isNull(sysUser) ? null : sysUser.getUserName();
+        return ObjectUtils.notNullGetter(sysUser, SysUser::getUserName);
     }
 
     /**
@@ -598,7 +598,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public String selectNicknameById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getNickName).eq(SysUser::getUserId, userId));
-        return ObjectUtil.isNull(sysUser) ? null : sysUser.getNickName();
+        return ObjectUtils.notNullGetter(sysUser, SysUser::getNickName);
     }
 
     /**
@@ -629,7 +629,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public String selectPhonenumberById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getPhonenumber).eq(SysUser::getUserId, userId));
-        return ObjectUtil.isNull(sysUser) ? null : sysUser.getPhonenumber();
+        return ObjectUtils.notNullGetter(sysUser, SysUser::getPhonenumber);
     }
 
     /**
@@ -642,7 +642,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public String selectEmailById(Long userId) {
         SysUser sysUser = baseMapper.selectOne(new LambdaQueryWrapper<SysUser>()
             .select(SysUser::getEmail).eq(SysUser::getUserId, userId));
-        return ObjectUtil.isNull(sysUser) ? null : sysUser.getEmail();
+        return ObjectUtils.notNullGetter(sysUser, SysUser::getEmail);
     }
 
     /**
@@ -718,4 +718,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             .in(SysUser::getDeptId, deptIds));
         return BeanUtil.copyToList(list, UserDTO.class);
     }
+
+    /**
+     * 通过岗位ID查询用户
+     *
+     * @param postIds 岗位ids
+     * @return 用户
+     */
+    @Override
+    public List<UserDTO> selectUsersByPostIds(List<Long> postIds) {
+        if (CollUtil.isEmpty(postIds)) {
+            return List.of();
+        }
+
+        // 通过岗位ID获取用户岗位信息
+        List<SysUserPost> userPosts = userPostMapper.selectList(
+            new LambdaQueryWrapper<SysUserPost>().in(SysUserPost::getPostId, postIds));
+
+        // 获取用户ID列表
+        Set<Long> userIds = StreamUtils.toSet(userPosts, SysUserPost::getUserId);
+
+        return selectListByIds(new ArrayList<>(userIds));
+    }
+
 }

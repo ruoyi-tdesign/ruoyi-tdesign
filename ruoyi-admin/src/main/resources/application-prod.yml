@@ -19,17 +19,19 @@ snail-job:
   enabled: true
   # 需要在 SnailJob 后台组管理创建对应名称的组,然后创建任务的时候选择对应的组,才能正确分派任务
   group: "ruoyi_group"
-  # SnailJob 接入验证令牌 详见 script/sql/snail_job.sql `sj_group_config` 表
+  # SnailJob 接入验证令牌 详见 script/sql/ry_job.sql `sj_group_config`表
   token: "SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT"
   server:
     host: 127.0.0.1
     port: 17888
-  # 详见 script/sql/snail_job.sql `sj_namespace` 表
+  # 命名空间UUID 详见 script/sql/ry_job.sql `sj_namespace`表`unique_id`字段
   namespace: ${spring.profiles.active}
-  # 随主应用端口飘逸
+  # 随主应用端口漂移
   port: 2${server.port}
   # 客户端ip指定
   host:
+  # RPC类型: netty, grpc
+  rpc-type: grpc
 
 --- # 数据源配置
 spring:
@@ -54,13 +56,13 @@ spring:
           username: ruoyi-tdesign
           password: 48yRLcjPkJcDFyWj
         # 从库数据源
-        slave:
-          lazy: true
-          type: ${spring.datasource.type}
-          driverClassName: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/ruoyi-tdesign?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
-          username:
-          password:
+#        slave:
+#          lazy: true
+#          type: ${spring.datasource.type}
+#          driverClassName: com.mysql.cj.jdbc.Driver
+#          url: jdbc:mysql://localhost:3306/ruoyi-tdesign?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+#          username:
+#          password:
 #        oracle:
 #          type: ${spring.datasource.type}
 #          driverClassName: oracle.jdbc.OracleDriver
@@ -118,7 +120,7 @@ spring:
 # redisson 配置
 redisson:
   # redis key前缀
-  keyPrefix: ${ruoyi.name}
+  keyPrefix: ${spring.application.name}
   # 线程池数量
   threads: 16
   # Netty线程池数量
@@ -126,7 +128,7 @@ redisson:
   # 单节点配置
   singleServerConfig:
     # 客户端名称
-    clientName: ${ruoyi.name}
+    clientName: ${spring.application.name}
     # 最小空闲连接数
     connectionMinimumIdleSize: 32
     # 连接池大小

@@ -5,7 +5,7 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import org.dromara.common.core.constant.Constants;
-import org.dromara.common.core.constant.UserConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.enums.MenuTypeEnum;
 import org.dromara.common.core.enums.YesNoFrameEnum;
 import org.dromara.common.core.utils.StringUtils;
@@ -208,13 +208,13 @@ public class SysMenuVo implements Serializable {
      * 获取组件信息
      */
     public String getComponentInfo() {
-        String component = UserConstants.LAYOUT;
+        String component = SystemConstants.LAYOUT;
         if (StringUtils.isNotEmpty(this.component) && !isMenuFrame()) {
             component = this.component;
         } else if (StringUtils.isEmpty(this.component) && getParentId() != 0L && isInnerLink()) {
-            component = UserConstants.INNER_LINK;
+            component = SystemConstants.INNER_LINK;
         } else if (StringUtils.isEmpty(this.component) && isParentView()) {
-            component = UserConstants.PARENT_VIEW;
+            component = SystemConstants.PARENT_VIEW;
         }
         return component;
     }

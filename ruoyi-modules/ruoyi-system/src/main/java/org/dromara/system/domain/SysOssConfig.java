@@ -82,11 +82,6 @@ public class SysOssConfig extends BaseEntity {
     private String status;
 
     /**
-     * 创建桶（1=是,0=否）
-     */
-    private Integer createBucket;
-
-    /**
      * 扩展字段
      */
     private String ext1;

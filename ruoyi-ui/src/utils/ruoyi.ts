@@ -198,51 +198,28 @@ export function handleTree<T, ID extends keyof T & string, PID extends keyof T &
   children?: C,
 ): T[] {
   const config = {
-    id: id || 'id',
-    parentId: parentId || 'parentId',
-    childrenList: children || 'children',
+    id: id || ('id' as ID),
+    parentId: parentId || ('parentId' as PID),
+    childrenList: children || ('children' as C),
   };
 
-  const childrenListMap: Record<any, any> = {};
-  const nodeIds = {};
-  const tree = <T[]>[];
-
+  const childrenListMap: any = {};
+  const tree: T[] = [];
   for (const d of data) {
-    // @ts-ignore
-    const parentId = d[config.parentId];
-    if (childrenListMap[parentId] == null) {
-      childrenListMap[parentId] = [];
+    const id = d[config.id];
+    childrenListMap[id] = d;
+    if (!d[config.childrenList]) {
+      d[config.childrenList] = [] as T[C];
     }
-    // @ts-ignore
-    nodeIds[d[config.id]] = d;
-    childrenListMap[parentId].push(d);
   }
 
   for (const d of data) {
-    // @ts-ignore
     const parentId = d[config.parentId];
-    // @ts-ignore
-    if (nodeIds[parentId] == null) {
+    const parentObj = childrenListMap[parentId];
+    if (!parentObj) {
       tree.push(d);
-    }
-  }
-
-  for (const t of tree) {
-    adaptToChildrenList(t);
-  }
-
-  function adaptToChildrenList(o: T) {
-    // @ts-ignore
-    if (childrenListMap[o[config.id]] !== null) {
-      // @ts-ignore
-      o[config.childrenList] = childrenListMap[o[config.id]];
-    }
-    // @ts-ignore
-    if (o[config.childrenList]) {
-      // @ts-ignore
-      for (const c of o[config.childrenList]) {
-        adaptToChildrenList(c);
-      }
+    } else {
+      parentObj[config.childrenList].push(d);
     }
   }
   return tree;

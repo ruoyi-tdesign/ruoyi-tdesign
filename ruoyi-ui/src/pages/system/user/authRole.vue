@@ -1,6 +1,5 @@
 <template>
-  <t-card>
-    <h4 class="form-header h4">基本信息</h4>
+  <t-card title="基本信息" header-bordered>
     <t-form :data="form" label-width="calc(4em + 12px)">
       <t-row>
         <t-col :span="4" :offset="1">
@@ -15,8 +14,11 @@
         </t-col>
       </t-row>
     </t-form>
+  </t-card>
 
-    <h4 class="form-header h4">角色信息</h4>
+  <br />
+
+  <t-card title="角色信息" header-bordered>
     <t-table
       hover
       :loading="loading"
@@ -31,7 +33,7 @@
     </t-table>
 
     <t-form label-width="100px">
-      <div style="text-align: center; margin-left: -120px; margin-top: 30px">
+      <div style="text-align: center; margin-top: 30px">
         <t-button theme="primary" @click="submitForm()">提交</t-button>
         <t-button theme="default" variant="outline" @click="close()">返回</t-button>
       </div>

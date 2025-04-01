@@ -39,8 +39,6 @@ export interface SysOssConfigForm {
   accessPolicy?: string;
   /** 是否默认（1=是,0=否） */
   status?: string;
-  /** 创建桶（1=是,0=否） */
-  createBucket?: number;
   /** 扩展字段 */
   ext1?: string;
   /** 备注 */
@@ -74,8 +72,6 @@ export interface SysOssConfigVo {
   accessPolicy?: string;
   /** 是否默认（1=是,0=否） */
   status?: string;
-  /** 创建桶（1=是,0=否） */
-  createBucket?: number;
   /** 扩展字段 */
   ext1?: string;
   /** 创建时间 */

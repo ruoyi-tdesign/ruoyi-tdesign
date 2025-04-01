@@ -8,10 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.constant.GrantTypeConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.model.EmailLoginBody;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.LoginType;
-import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.user.CaptchaExpireException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
@@ -94,7 +94,7 @@ public class EmailAuthStrategy implements IAuthStrategy<EmailLoginBody> {
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", email);
             throw new UserException("user.not.exists", email);
-        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+        } else if (SystemConstants.DISABLE.equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", email);
             throw new UserException("user.blocked", email);
         }

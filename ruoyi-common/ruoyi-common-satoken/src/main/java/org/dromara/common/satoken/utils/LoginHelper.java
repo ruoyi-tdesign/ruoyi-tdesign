@@ -6,8 +6,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.constant.TenantConstants;
-import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
 
@@ -118,8 +118,22 @@ public class LoginHelper {
     /**
      * 获取用户id
      */
+    public static Object getLoginId() {
+        return MultipleStpUtil.SYSTEM.getLoginId();
+    }
+
+    /**
+     * 获取用户id
+     */
     public static Long getUserId() {
         return MultipleLoginBaseHelper.getUserId(MultipleStpUtil.SYSTEM);
+    }
+
+    /**
+     * 获取用户id
+     */
+    public static String getUserIdStr() {
+        return Convert.toStr(getUserId());
     }
 
     /**
@@ -172,7 +186,7 @@ public class LoginHelper {
      * @return 结果
      */
     public static boolean isSuperAdmin(Long userId) {
-        return UserConstants.SUPER_ADMIN_ID.equals(userId);
+        return SystemConstants.SUPER_ADMIN_ID.equals(userId);
     }
 
     /**

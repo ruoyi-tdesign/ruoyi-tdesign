@@ -4,10 +4,18 @@ import cn.dev33.satoken.stp.SaLoginModel;
 import cn.hutool.core.util.ObjectUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.zhyd.oauth.config.AuthConfig;
+import me.zhyd.oauth.model.AuthCallback;
+import me.zhyd.oauth.model.AuthResponse;
+import me.zhyd.oauth.model.AuthToken;
+import me.zhyd.oauth.model.AuthUser;
+import me.zhyd.oauth.request.AuthRequest;
+import me.zhyd.oauth.request.AuthWechatMiniProgramRequest;
 import org.dromara.common.core.constant.GrantTypeConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.model.XcxLoginBody;
 import org.dromara.common.core.domain.model.XcxLoginUser;
-import org.dromara.common.core.enums.UserStatus;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.satoken.utils.MultipleStpUtil;
 import org.dromara.common.tenant.annotation.IgnoreTenant;
@@ -39,12 +47,24 @@ public class XcxAuthStrategy implements IAuthStrategy<XcxLoginBody> {
         String appid = loginBody.getAppid();
         String clientId = client.getClientId();
 
-        // todo 以下自行实现
         // 校验 appid + appsrcret + xcxCode 调用登录凭证校验接口 获取 session_key 与 openid
-        String openid = "";
+        AuthRequest authRequest = new AuthWechatMiniProgramRequest(AuthConfig.builder()
+            .clientId(appid).clientSecret("自行填写密钥 可根据不同appid填入不同密钥")
+            .ignoreCheckRedirectUri(true).ignoreCheckState(true).build());
+        AuthCallback authCallback = new AuthCallback();
+        authCallback.setCode(xcxCode);
+        AuthResponse<AuthUser> resp = authRequest.login(authCallback);
+        String openid, unionId;
+        if (resp.ok()) {
+            AuthToken token = resp.getData().getToken();
+            openid = token.getOpenId();
+            // 微信小程序只有关联到微信开放平台下之后才能获取到 unionId，因此unionId不一定能返回。
+            unionId = token.getUnionId();
+        } else {
+            throw new ServiceException(resp.getMsg());
+        }
         // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
         SysUserVo user = loadUserByOpenid(openid);
-
         // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
         XcxLoginUser loginUser = new XcxLoginUser();
         loginUser.setTenantId(user.getTenantId());
@@ -84,7 +104,7 @@ public class XcxAuthStrategy implements IAuthStrategy<XcxLoginBody> {
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", openid);
             // todo 用户不存在 业务逻辑自行实现
-        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+        } else if (SystemConstants.DISABLE.equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", openid);
             // todo 用户已被停用 业务逻辑自行实现
         }

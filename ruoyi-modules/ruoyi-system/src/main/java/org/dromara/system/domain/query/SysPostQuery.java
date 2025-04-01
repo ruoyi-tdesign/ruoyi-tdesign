@@ -2,7 +2,7 @@ package org.dromara.system.domain.query;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.common.mybatis.core.domain.BasePageQuery;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysPostQuery extends BaseEntity {
+public class SysPostQuery extends BasePageQuery {
 
     /**
      * 岗位编码

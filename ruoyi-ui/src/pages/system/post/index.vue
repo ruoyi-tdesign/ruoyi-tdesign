@@ -119,33 +119,15 @@
             </template>
             <template #operation="{ row }">
               <t-space :size="8" break-line>
-                <t-link
-                  v-hasPermi="['system:post:query']"
-                  size="small"
-                  theme="primary"
-                  hover="color"
-                  @click.stop="handleDetail(row)"
-                >
+                <my-link v-hasPermi="['system:post:query']" @click.stop="handleDetail(row)">
                   <template #prefix-icon><browse-icon /></template>详情
-                </t-link>
-                <t-link
-                  v-hasPermi="['system:post:edit']"
-                  size="small"
-                  theme="primary"
-                  hover="color"
-                  @click.stop="handleUpdate(row)"
-                >
+                </my-link>
+                <my-link v-hasPermi="['system:post:edit']" @click.stop="handleUpdate(row)">
                   <template #prefix-icon><edit-icon /></template>修改
-                </t-link>
-                <t-link
-                  v-hasPermi="['system:post:remove']"
-                  size="small"
-                  theme="danger"
-                  hover="color"
-                  @click.stop="handleDelete(row)"
-                >
+                </my-link>
+                <my-link v-hasPermi="['system:post:remove']" theme="danger" @click.stop="handleDelete(row)">
                   <template #prefix-icon><delete-icon /></template>删除
-                </t-link>
+                </my-link>
               </t-space>
             </template>
           </t-table>

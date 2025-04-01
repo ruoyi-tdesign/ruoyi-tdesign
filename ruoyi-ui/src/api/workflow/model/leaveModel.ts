@@ -3,7 +3,7 @@ import type { BaseEntity } from '@/api/model/resultModel';
 /**
  * 请假申请查询对象
  */
-export interface TestLeaveQuery extends BaseEntity {
+export interface LeaveQuery extends BaseEntity {
   /** 开始时间 */
   startLeaveDays?: number;
   /** 结束时间 */
@@ -12,7 +12,7 @@ export interface TestLeaveQuery extends BaseEntity {
 /**
  * 请假申请业务对象
  */
-export interface TestLeaveForm {
+export interface LeaveForm {
   /** 主键 */
   id?: number;
   /** 请假类型 */
@@ -31,7 +31,7 @@ export interface TestLeaveForm {
 /**
  * 请假申请视图对象
  */
-export interface TestLeaveVo {
+export interface LeaveVo {
   /** 主键 */
   id?: number;
   /** 请假类型 */

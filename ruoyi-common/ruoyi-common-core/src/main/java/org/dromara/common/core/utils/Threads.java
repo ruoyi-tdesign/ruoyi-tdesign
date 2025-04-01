@@ -18,18 +18,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Threads {
-
-    /**
-     * sleep等待,单位为毫秒
-     */
-    public static void sleep(long milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            return;
-        }
-    }
-
     /**
      * 停止线程池
      * 先使用shutdown, 停止接收新任务并尝试完成所有已存在任务.

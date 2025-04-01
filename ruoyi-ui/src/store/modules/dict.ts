@@ -1,60 +1,69 @@
 import { defineStore } from 'pinia';
 
-import type { DictModel } from '@/utils/dict';
+import type { StringDictModel } from '@/utils/dict';
 
-const useDictStore = defineStore('dict', {
-  state: () => ({
-    dict: [],
-  }),
-  actions: {
-    // 获取字典
-    getDict(_key: string) {
-      if (_key == null && _key === '') {
-        return null;
-      }
-      try {
-        for (let i = 0; i < this.dict.length; i++) {
-          if (this.dict[i].key === _key) {
-            return this.dict[i].value;
-          }
-        }
-      } catch (e) {
-        return null;
-      }
+const useDictStore = defineStore('dict', () => {
+  const dict = ref<Map<string, StringDictModel[]>>(new Map());
+
+  /**
+   * 获取字典
+   * @param _key 字典key
+   */
+  const getDict = (_key: string): StringDictModel[] | null => {
+    if (!_key) {
       return null;
-    },
-    // 设置字典
-    setDict(_key: string, value: DictModel[]) {
-      if (_key !== null && _key !== '') {
-        this.dict.push({
-          key: _key,
-          value,
-        });
-      }
-    },
-    // 删除字典
-    removeDict(_key: string) {
-      let bln = false;
-      try {
-        for (let i = 0; i < this.dict.length; i++) {
-          if (this.dict[i].key === _key) {
-            this.dict.splice(i, 1);
-            return true;
-          }
-        }
-      } catch (e) {
-        bln = false;
-      }
-      return bln;
-    },
-    // 清空字典
-    cleanDict() {
-      this.dict = [];
-    },
-    // 初始字典
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    initDict() {},
-  },
+    }
+    return dict.value.get(_key) || null;
+  };
+
+  /**
+   * 设置字典
+   * @param _key 字典key
+   * @param _value 字典value
+   */
+  const setDict = (_key: string, _value: StringDictModel[]) => {
+    if (!_key) {
+      return false;
+    }
+    try {
+      dict.value.set(_key, _value);
+      return true;
+    } catch (e) {
+      console.error('Error in setDict:', e);
+      return false;
+    }
+  };
+
+  /**
+   * 删除字典
+   * @param _key
+   */
+  const removeDict = (_key: string): boolean => {
+    if (!_key) {
+      return false;
+    }
+    try {
+      return dict.value.delete(_key);
+    } catch (e) {
+      console.error('Error in removeDict:', e);
+      return false;
+    }
+  };
+
+  /**
+   * 清空字典
+   */
+  const cleanDict = (): void => {
+    dict.value.clear();
+  };
+
+  return {
+    dict,
+    getDict,
+    setDict,
+    removeDict,
+    cleanDict,
+  };
 });
 
 export default useDictStore;

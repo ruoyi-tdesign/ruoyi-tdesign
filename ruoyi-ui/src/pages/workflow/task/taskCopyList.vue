@@ -2,24 +2,14 @@
   <t-card>
     <t-space direction="vertical" style="width: 100%">
       <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline" label-width="calc(6em + 12px)">
-        <t-form-item label="任务名称" name="name">
-          <t-input v-model="queryParams.name" placeholder="请输入任务名称" clearable @enter="handleQuery" />
+        <t-form-item label="任务名称" name="nodeName">
+          <t-input v-model="queryParams.nodeName" placeholder="请输入任务名称" clearable @enter="handleQuery" />
         </t-form-item>
-        <t-form-item label="流程定义名称" name="processDefinitionName">
-          <t-input
-            v-model="queryParams.processDefinitionName"
-            placeholder="请输入流程定义名称"
-            clearable
-            @enter="handleQuery"
-          />
+        <t-form-item label="流程定义名称" name="flowName">
+          <t-input v-model="queryParams.flowName" placeholder="请输入流程定义名称" clearable @enter="handleQuery" />
         </t-form-item>
-        <t-form-item label="流程定义KEY" name="processDefinitionKey">
-          <t-input
-            v-model="queryParams.processDefinitionKey"
-            placeholder="请输入流程定义KEY"
-            clearable
-            @enter="handleQuery"
-          />
+        <t-form-item label="流程定义编码" name="flowCode">
+          <t-input v-model="queryParams.flowCode" placeholder="请输入流程定义编码" clearable @enter="handleQuery" />
         </t-form-item>
         <t-form-item label-width="0px">
           <t-button theme="primary" @click="handleQuery">
@@ -63,28 +53,11 @@
             </t-col>
           </t-row>
         </template>
-        <template #processDefinitionName="{ row }">
-          <span>{{ row.processDefinitionName }}v{{ row.processDefinitionVersion }}.0</span>
+        <template #version="{ row }">
+          <span>v{{ row.version }}.0</span>
         </template>
-        <template #assigneeName="{ row }">
-          <template v-if="row.participantVo && row.assignee === null">
-            <t-tag
-              v-for="(item, index) in row.participantVo.candidateName"
-              :key="index"
-              theme="success"
-              variant="light"
-            >
-              {{ item }}
-            </t-tag>
-          </template>
-          <template v-else>
-            <t-tag theme="success" variant="light">
-              {{ row.assigneeName || '无' }}
-            </t-tag>
-          </template>
-        </template>
-        <template #businessStatus="{ row }">
-          <dict-tag :options="wf_business_status" :value="row.businessStatus"></dict-tag>
+        <template #flowStatus="{ row }">
+          <dict-tag :options="wf_business_status" :value="row.flowStatus"></dict-tag>
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
@@ -101,10 +74,10 @@ import { BrowseIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 
-import { getPageByTaskCopy } from '@/api/workflow/task';
-import type { TaskQuery, TaskVo } from '@/api/workflow/task/types';
+import type { FlowTaskVo, TaskQuery } from '@/api/workflow/model/taskModel';
+import type { RouterJumpVo } from '@/api/workflow/model/workflowCommonModel';
+import { pageByTaskCopy } from '@/api/workflow/task';
 import { useRouterJump } from '@/api/workflow/workflowCommon';
-import type { RouterJumpVo } from '@/api/workflow/workflowCommon/types';
 
 const routerJump = useRouterJump();
 const { proxy } = getCurrentInstance();
@@ -122,15 +95,15 @@ const showSearch = ref(true);
 // 总条数
 const total = ref(0);
 // 模型定义表格数据
-const taskList = ref<TaskVo[]>([]);
+const taskList = ref<FlowTaskVo[]>([]);
 const columnControllerVisible = ref(false);
 // 查询参数
 const queryParams = ref<TaskQuery>({
   pageNum: 1,
   pageSize: 10,
-  name: undefined,
-  processDefinitionName: undefined,
-  processDefinitionKey: undefined,
+  nodeName: undefined,
+  flowName: undefined,
+  flowCode: undefined,
 });
 
 // 列显隐信息
@@ -138,11 +111,12 @@ const columns = computed<Array<PrimaryTableCol>>(() => {
   return [
     { colKey: 'row-select', type: 'multiple', width: 30, align: 'center' },
     { title: `序号`, colKey: 'serial-number', width: 70 },
-    { title: `流程定义名称`, colKey: 'processDefinitionName', ellipsis: true, align: 'center' },
-    { title: `流程定义KEY`, colKey: 'processDefinitionKey', align: 'center' },
-    { title: `任务名称`, colKey: 'name', align: 'center' },
-    { title: `办理人`, colKey: 'assigneeName', align: 'center' },
-    { title: `流程状态`, colKey: 'businessStatus', align: 'center' },
+    { title: `流程定义名称`, colKey: 'flowName', ellipsis: true, align: 'center' },
+    { title: `流程定义编码`, colKey: 'flowCode', align: 'center' },
+    { title: `流程分类`, colKey: 'categoryName', align: 'center' },
+    { title: `版本号`, colKey: 'version', align: 'center' },
+    { title: `任务名称`, colKey: 'nodeName', align: 'center' },
+    { title: `流程状态`, colKey: 'flowStatus', align: 'center' },
     { title: `操作`, colKey: 'operation', align: 'center', fixed: 'right' },
   ] as PrimaryTableCol[];
 });
@@ -180,7 +154,7 @@ const handleSelectionChange = (selection: Array<string | number>) => {
 // 分页
 const getTaskCopyList = () => {
   loading.value = true;
-  getPageByTaskCopy(queryParams.value)
+  pageByTaskCopy(queryParams.value)
     .then((resp) => {
       taskList.value = resp.rows;
       total.value = resp.total;
@@ -189,13 +163,13 @@ const getTaskCopyList = () => {
 };
 
 /** 查看按钮操作 */
-const handleView = (row: TaskVo) => {
+const handleView = (row: FlowTaskVo) => {
   const routerJumpVo = reactive<RouterJumpVo>({
-    wfDefinitionConfigVo: row.wfDefinitionConfigVo,
-    wfNodeConfigVo: row.wfNodeConfigVo,
-    businessKey: row.businessKey,
+    businessId: row.businessId,
     taskId: row.id,
     type: 'view',
+    formCustom: row.formCustom,
+    formPath: row.formPath,
   });
   routerJump(routerJumpVo);
 };

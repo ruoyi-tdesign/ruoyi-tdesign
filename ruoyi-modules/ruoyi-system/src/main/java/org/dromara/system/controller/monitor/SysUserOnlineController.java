@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +51,8 @@ public class SysUserOnlineController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<SysUserOnline> list(String ipaddr, String userName) {
         // 获取所有未过期的 token
-        List<String> keys = MultipleStpUtil.SYSTEM.searchTokenValue("", 0, -1, false);
+//        List<String> keys = MultipleStpUtil.SYSTEM.searchTokenValue("", 0, -1, false);
+        Collection<String> keys = RedisUtils.keys(CacheConstants.ONLINE_TOKEN_KEY + "*");
         List<UserOnlineDTO> userOnlineDTOList = new ArrayList<>();
         for (String key : keys) {
             String token = StringUtils.substringAfterLast(key, ":");
@@ -132,7 +134,7 @@ public class SysUserOnlineController extends BaseController {
      * @param tokenId token值
      */
     @Log(title = "在线设备", businessType = BusinessType.FORCE)
-    @PostMapping("/{tokenId}")
+    @DeleteMapping("/myself/{tokenId}")
     public R<Void> remove(@PathVariable("tokenId") String tokenId) {
         StpLogic logic = MultipleStpUtil.SYSTEM;
         try {

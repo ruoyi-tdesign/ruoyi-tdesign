@@ -2,8 +2,10 @@ package org.dromara.common.websocket.holder;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -54,6 +56,12 @@ public class WebSocketSessionHolder {
             return;
         }
         sessions.remove(session);
+        if (session != null) {
+            try {
+                session.close(CloseStatus.BAD_DATA);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     /**
@@ -72,7 +80,16 @@ public class WebSocketSessionHolder {
         if (sessions == null) {
             return;
         }
-        sessions.removeIf(webSocketSession -> webSocketSession.getId().equals(sessionId));
+        sessions.removeIf(webSocketSession -> {
+            if (webSocketSession.getId().equals(sessionId)) {
+                try {
+                    webSocketSession.close(CloseStatus.BAD_DATA);
+                } catch (Exception ignored) {
+                }
+                return true;
+            }
+            return false;
+        });
     }
 
     /**
@@ -84,7 +101,13 @@ public class WebSocketSessionHolder {
     public static void removeSession(String loginType, Long sessionKey) {
         Map<Long, Set<WebSocketSession>> map = USER_SESSION_MAP.get(loginType);
         if (map != null) {
-            map.remove(sessionKey);
+            Set<WebSocketSession> sessions = map.remove(sessionKey);
+            for (WebSocketSession session : sessions) {
+                try {
+                    session.close(CloseStatus.BAD_DATA);
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 

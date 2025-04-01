@@ -98,6 +98,11 @@ public class SysOssVo implements Serializable {
     private Long createDept;
 
     /**
+     * 扩展字段
+     */
+    private String ext1;
+
+    /**
      * 创建时间
      */
     @ExcelProperty(value = "创建时间")

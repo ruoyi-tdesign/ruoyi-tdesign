@@ -99,12 +99,6 @@ public class SysOssConfigVo implements Serializable {
     private String status;
 
     /**
-     * 创建桶（1=是,0=否）
-     */
-    @ExcelProperty(value = "创建桶")
-    private Integer createBucket;
-
-    /**
      * 扩展字段
      */
     @ExcelProperty(value = "扩展字段")

@@ -6,52 +6,15 @@
 
     <resultMap id="SysUserResult" autoMapping="true" type="org.dromara.system.domain.vo.SysUserVo">
         <id property="userId" column="user_id"/>
+        <collection property="roles" ofType="org.dromara.system.domain.vo.SysRoleVo">
+            <id property="roleId" column="role_id"/>
+            <result property="status" column="role_status" />
+        </collection>
     </resultMap>
 
     <resultMap id="SysUserExportResult" type="org.dromara.system.domain.vo.SysUserExportVo">
         <id property="userId" column="user_id"/>
     </resultMap>
-
-    <sql id="selectUserVo">
-        select u.user_id,
-               u.tenant_id,
-               u.dept_id,
-               u.user_name,
-               u.nick_name,
-               u.user_type,
-               u.email,
-               u.avatar,
-               u.phonenumber,
-               u.password,
-               u.sex,
-               u.status,
-               u.del_flag,
-               u.login_ip,
-               u.login_date,
-               u.create_by,
-               u.update_time,
-               u.create_time,
-               u.remark,
-               d.dept_id,
-               d.parent_id,
-               d.ancestors,
-               d.dept_name,
-               d.order_num,
-               d.leader,
-               d.status as dept_status,
-               d.email as dept_email,
-               d.create_time as dept_cteate_time,
-               r.role_id,
-               r.role_name,
-               r.role_key,
-               r.role_sort,
-               r.data_scope,
-               r.status as role_status
-        from sys_user u
-            left join sys_dept d on u.dept_id = d.dept_id
-            left join sys_user_role sur on u.user_id = sur.user_id
-            left join sys_role r on r.role_id = sur.role_id
-    </sql>
 
     <sql id="selectSysUserVo">
         select su.user_id, su.dept_id, su.user_name, su.nick_name, su.user_type, su.email, su.phonenumber, su.sex, su.avatar, su.password, su.status, su.del_flag, su.login_ip, su.login_date, su.create_by, su.create_time, su.update_by, su.update_time, su.remark from sys_user su
@@ -77,26 +40,37 @@
         <where>
             and su.del_flag = '0'
             <if test="userId != null "> and su.user_id = #{userId}</if>
-            <if test="deptIds != null and deptIds.length != 0">
-                and su.dept_id in
-                <foreach collection="deptIds" index="index" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
+            <foreach collection="deptIds" index="index" item="item" open=" and su.dept_id in (" separator="," close=")" nullable="true">
+                #{item}
+            </foreach>
             <if test="userName != null and userName != ''"> and su.user_name like concat(concat('%', #{userName}), '%')</if>
             <if test="email != null and email != ''"> and su.email like concat(concat('%', #{email}), '%')</if>
             <if test="phonenumber != null and phonenumber != ''"> and su.phonenumber like concat(concat('%', #{phonenumber}), '%')</if>
             <if test="status != null and status != ''"> and su.status = #{status}</if>
             <if test="params.beginTime != null and params.endTime != null">and su.create_time between #{params.beginTime} and #{params.endTime}</if>
-            <if test="excludeUserIds != null and excludeUserIds != ''">
-                and su.user_id not in
-                <foreach collection="excludeUserIds.split(',')" index="index" item="item" open="(" separator="," close=")">
-                    #{item, jdbcType=BIGINT}
-                </foreach>
-            </if>
+            <foreach collection="userIds" index="index" item="item" open=" and su.user_id in(" separator="," close=")" nullable="true">
+                #{item, jdbcType=BIGINT}
+            </foreach>
+            <foreach collection="excludeUserIds" index="index" item="item" open=" and su.user_id not in(" separator="," close=")" nullable="true">
+                #{item, jdbcType=BIGINT}
+            </foreach>
         </where>
         order by su.create_time desc
     </select>
+
+    <select id="selectPageUserList" resultMap="SysUserResult">
+        select
+        <if test="ew.getSqlSelect != null">
+            ${ew.getSqlSelect}
+        </if>
+        <if test="ew.getSqlSelect == null">
+            u.user_id, u.dept_id, u.nick_name, u.user_name, u.email, u.avatar, u.phonenumber, u.sex,
+            u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark
+        </if>
+        from sys_user u
+        ${ew.getCustomSqlSegment}
+    </select>
+
     <select id="selectUserExportList" parameterType="org.dromara.system.domain.query.SysUserQuery" resultMap="SysUserExportResult">
         select su.user_id,
                su.dept_id,
@@ -189,7 +163,34 @@
         order by u.user_id
     </select>
     <select id="selectSafeUserById" parameterType="Long" resultMap="SysUserResult">
-        <include refid="selectUserVo"/>
+        select u.user_id,
+               u.tenant_id,
+               u.dept_id,
+               u.user_name,
+               u.nick_name,
+               u.user_type,
+               u.email,
+               u.avatar,
+               u.phonenumber,
+               u.password,
+               u.sex,
+               u.status,
+               u.del_flag,
+               u.login_ip,
+               u.login_date,
+               u.create_by,
+               u.update_time,
+               u.create_time,
+               u.remark,
+               r.role_id,
+               r.role_name,
+               r.role_key,
+               r.role_sort,
+               r.data_scope,
+               r.status as role_status
+        from sys_user u
+                 left join sys_user_role sur on u.user_id = sur.user_id
+                 left join sys_role r on r.role_id = sur.role_id
         where u.del_flag = '0' and u.user_id = #{userId}
     </select>
     <select id="countUserById" resultType="Long">

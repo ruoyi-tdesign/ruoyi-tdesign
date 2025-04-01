@@ -88,52 +88,35 @@
         </template>
         <template #startDate="{ row }">{{ parseTime(row.startDate, '{y}-{m}-{d}') }}</template>
         <template #endDate="{ row }">{{ parseTime(row.endDate, '{y}-{m}-{d}') }}</template>
-        <template #businessStatusName="{ row }">
+        <template #status="{ row }">
           <dict-tag :options="wf_business_status" :value="row.status"></dict-tag>
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['workflow:leave:query']"
-              size="small"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDetail(row)"
-            >
+            <my-link v-hasPermi="['workflow:leave:query']" @click.stop="handleDetail(row)">
               <template #prefix-icon><browse-icon /></template>详情
-            </t-link>
-            <t-link
+            </my-link>
+            <my-link
               v-if="row.status === 'draft' || row.status === 'cancel' || row.status === 'back'"
               v-hasPermi="['workflow:leave:edit']"
-              size="small"
-              theme="primary"
-              hover="color"
               @click.stop="handleUpdate(row)"
             >
               <template #prefix-icon><edit-icon /></template>修改
-            </t-link>
-            <t-link
+            </my-link>
+            <my-link
               v-if="row.status === 'draft' || row.status === 'cancel' || row.status === 'back'"
               v-hasPermi="['workflow:leave:remove']"
               theme="danger"
-              hover="color"
-              size="small"
               @click.stop="handleDelete(row)"
             >
               <template #prefix-icon><delete-icon /></template>删除
-            </t-link>
-            <t-link theme="primary" hover="color" size="small" @click.stop="handleView(row)">
+            </my-link>
+            <my-link @click.stop="handleView(row)">
               <template #prefix-icon><browse-icon /></template>查看
-            </t-link>
-            <t-link
-              v-if="row.status === 'waiting'"
-              theme="warning"
-              hover="color"
-              size="small"
-              @click.stop="handleCancelProcessApply(row.id)"
-            >
+            </my-link>
+            <my-link v-if="row.status === 'waiting'" theme="warning" @click.stop="handleCancelProcessApply(row.id)">
               <template #prefix-icon><rollback-icon /></template>撤销
-            </t-link>
+            </my-link>
           </t-space>
         </template>
       </t-table>
@@ -179,9 +162,9 @@ import {
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
+import { cancelProcessApply } from '@/api/workflow/instance';
 import { delLeave, getLeave, listLeave } from '@/api/workflow/leave';
-import type { TestLeaveForm, TestLeaveQuery, TestLeaveVo } from '@/api/workflow/model/leaveModel';
-import { cancelProcessApply } from '@/api/workflow/processInstance';
+import type { LeaveForm, LeaveQuery, LeaveVo } from '@/api/workflow/model/leaveModel';
 import { ArrayOps } from '@/utils/array';
 
 const { proxy } = getCurrentInstance();
@@ -190,7 +173,7 @@ const { wf_business_status } = proxy.useDict('wf_business_status');
 const router = useRouter();
 const openView = ref(false);
 const openViewLoading = ref(false);
-const leaveList = ref<TestLeaveVo[]>([]);
+const leaveList = ref<LeaveVo[]>([]);
 const loading = ref(false);
 const columnControllerVisible = ref(false);
 const showSearch = ref(true);
@@ -225,13 +208,13 @@ const columns = ref<Array<PrimaryTableCol>>([
   { title: `结束时间`, colKey: 'endDate', align: 'center', minWidth: 112, width: 180 },
   { title: `请假天数`, colKey: 'leaveDays', align: 'center' },
   { title: `请假原因`, colKey: 'remark', align: 'center', ellipsis: true },
-  { title: `流程状态`, colKey: 'businessStatusName', align: 'center' },
+  { title: `流程状态`, colKey: 'status', align: 'center' },
   { title: `操作`, colKey: 'operation', align: 'center', width: 180 },
 ]);
 // 提交表单对象
-const form = ref<TestLeaveVo & TestLeaveForm>({});
+const form = ref<LeaveVo & LeaveForm>({});
 // 查询对象
-const queryParams = ref<TestLeaveQuery>({
+const queryParams = ref<LeaveQuery>({
   pageNum: 1,
   pageSize: 10,
 });
@@ -309,7 +292,7 @@ function handleAdd() {
 }
 
 /** 详情按钮操作 */
-function handleDetail(row: TestLeaveVo) {
+function handleDetail(row: LeaveVo) {
   reset();
   openView.value = true;
   openViewLoading.value = true;
@@ -321,7 +304,7 @@ function handleDetail(row: TestLeaveVo) {
 }
 
 /** 修改按钮操作 */
-function handleUpdate(row?: TestLeaveVo) {
+function handleUpdate(row?: LeaveVo) {
   // proxy.$tab.closePage(proxy.$route);
   router.push({
     path: `/workflow/leaveEdit/index`,
@@ -333,7 +316,7 @@ function handleUpdate(row?: TestLeaveVo) {
 }
 
 /** 查看按钮操作 */
-function handleView(row?: TestLeaveVo) {
+function handleView(row?: LeaveVo) {
   // proxy.$tab.closePage(proxy.$route);
   router.push({
     path: `/workflow/leaveEdit/index`,
@@ -345,7 +328,7 @@ function handleView(row?: TestLeaveVo) {
 }
 
 /** 删除按钮操作 */
-function handleDelete(row?: TestLeaveVo) {
+function handleDelete(row?: LeaveVo) {
   const $ids = row?.id || ids.value;
   proxy.$modal.confirm(`是否确认删除请假申请编号为${$ids}的数据项？`, () => {
     const msgLoading = proxy.$modal.msgLoading('正在删除中...');
@@ -364,7 +347,11 @@ function handleDelete(row?: TestLeaveVo) {
 const handleCancelProcessApply = async (id: string) => {
   proxy?.$modal.confirm('是否确认撤销当前单据？', async () => {
     loading.value = true;
-    await cancelProcessApply(id).finally(() => (loading.value = false));
+    const data = {
+      businessId: id,
+      message: '申请人撤销流程！',
+    };
+    await cancelProcessApply(data).finally(() => (loading.value = false));
     getList();
     await proxy?.$modal.msgSuccess('撤销成功');
   });

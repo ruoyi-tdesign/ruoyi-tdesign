@@ -10,7 +10,9 @@ import org.dromara.system.domain.SysDept;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 部门视图对象 sys_dept
@@ -109,5 +111,10 @@ public class SysDeptVo implements Serializable {
      */
     @ExcelProperty(value = "更新时间")
     private Date updateTime;
+
+    /**
+     * 子部门
+     */
+    private List<SysDept> children = new ArrayList<>();
 
 }

@@ -26,7 +26,7 @@ public interface ISysUserService extends IService<SysUser> {
     TableDataInfo<SysUserVo> selectPageUserList(SysUserQuery user);
 
     /**
-     * 根据条件查询用户列表
+     * 导出用户列表
      *
      * @param user 用户信息
      * @return 用户信息集合信息

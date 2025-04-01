@@ -16,6 +16,7 @@ import org.dromara.common.core.enums.NormalDisableEnum;
 import org.dromara.common.core.enums.YesNoEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.TenantService;
+import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.spring.SpringUtils;
@@ -104,8 +105,7 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(SysTenantBo bo) {
         // 检查用户是否存在
-        boolean existsUser = userMapper.exists(new LambdaQueryWrapper<SysUser>()
-            .eq(SysUser::getUserName, bo.getUsername()));
+        boolean existsUser = userMapper.exists(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, bo.getUsername()));
         if (existsUser) {
             throw new ServiceException("新增用户名'" + bo.getUsername() + "'失败，用户名已被占用");
         }
@@ -113,10 +113,9 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
         SysTenant add = MapstructUtils.convert(bo, SysTenant.class);
 
         // 获取所有租户编号
-        List<String> tenantIds = baseMapper.selectObjs(
-            new LambdaQueryWrapper<SysTenant>().select(SysTenant::getTenantId), x -> {
-                return Convert.toStr(x);
-            });
+        List<String> tenantIds = baseMapper.selectObjs(new LambdaQueryWrapper<SysTenant>().select(SysTenant::getTenantId), x -> {
+            return Convert.toStr(x);
+        });
         String tenantId = generateTenantId(tenantIds);
         add.setTenantId(tenantId);
         boolean flag = baseMapper.insert(add) > 0;
@@ -166,16 +165,19 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
         String defaultTenantId = TenantConstants.DEFAULT_TENANT_ID;
         // 字典不再支持多租户操作，转为通用表
 
-        List<SysConfig> sysConfigList = configMapper.selectList(
-            new LambdaQueryWrapper<SysConfig>()
-                .eq(SysConfig::getTenantId, defaultTenantId)
-                .eq(SysConfig::getIsGlobal, YesNoEnum.NO.getCodeNum())
-        );
+        List<SysConfig> sysConfigList = configMapper.selectList(new LambdaQueryWrapper<SysConfig>().eq(SysConfig::getTenantId, defaultTenantId).eq(SysConfig::getIsGlobal, YesNoEnum.NO.getCodeNum()));
         for (SysConfig config : sysConfigList) {
             config.setConfigId(null);
             config.setTenantId(tenantId);
         }
         configMapper.insertBatch(sysConfigList);
+
+        // 未开启工作流不执行下方操作
+        if (SpringUtils.getProperty("warm-flow.enabled", Boolean.class, false)) {
+            WorkflowService workflowService = SpringUtils.getBean(WorkflowService.class);
+            // 新增租户流程定义
+            workflowService.syncDef(tenantId);
+        }
 
         // 发布创建事件
         SpringUtils.context().publishEvent(new TenantNewEvent(add));
@@ -303,9 +305,7 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
      */
     @Override
     public boolean checkCompanyNameUnique(SysTenantBo bo) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysTenant>()
-            .eq(SysTenant::getCompanyName, bo.getCompanyName())
-            .ne(ObjectUtil.isNotNull(bo.getTenantId()), SysTenant::getTenantId, bo.getTenantId()));
+        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysTenant>().eq(SysTenant::getCompanyName, bo.getCompanyName()).ne(ObjectUtil.isNotNull(bo.getTenantId()), SysTenant::getTenantId, bo.getTenantId()));
         return !exist;
     }
 
@@ -346,8 +346,7 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
     @Transactional(rollbackFor = Exception.class)
     public Boolean syncTenantPackage(String tenantId, Long packageId) {
         SysTenantPackageVo tenantPackage = tenantPackageService.queryById(packageId);
-        List<SysRole> roles = roleMapper.selectList(
-            new LambdaQueryWrapper<SysRole>().eq(SysRole::getTenantId, tenantId));
+        List<SysRole> roles = roleMapper.selectList(new LambdaQueryWrapper<SysRole>().eq(SysRole::getTenantId, tenantId));
         List<Long> roleIds = new ArrayList<>(roles.size() - 1);
         List<Long> menuIds = tenantPackage.getMenuIds();
         roles.forEach(item -> {
@@ -366,8 +365,7 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
             }
         });
         if (!roleIds.isEmpty()) {
-            roleMenuMapper.delete(
-                new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, roleIds).notIn(!menuIds.isEmpty(), SysRoleMenu::getMenuId, menuIds));
+            roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, roleIds).notIn(!menuIds.isEmpty(), SysRoleMenu::getMenuId, menuIds));
         }
         return true;
     }
@@ -398,16 +396,15 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
             dictDataList.addAll(dictDataMapper.selectList());
         });
         Map<String, List<SysDictType>> typeMap = StreamUtils.groupByKey(dictTypeList, TenantEntity::getTenantId);
-        Map<String, Map<String, List<SysDictData>>> typeDataMap = StreamUtils.groupBy2Key(
-            dictDataList, TenantEntity::getTenantId, SysDictData::getDictType);
+        Map<String, Map<String, List<SysDictData>>> typeDataMap = StreamUtils.groupBy2Key(dictDataList, TenantEntity::getTenantId, SysDictData::getDictType);
         // 管理租户字典数据
         List<SysDictType> defaultTypeMap = typeMap.get(TenantConstants.DEFAULT_TENANT_ID);
         Map<String, List<SysDictData>> defaultTypeDataMap = typeDataMap.get(TenantConstants.DEFAULT_TENANT_ID);
 
         // 获取所有租户编号
-        List<String> tenantIds = baseMapper.selectObjs(
-            new LambdaQueryWrapper<SysTenant>().select(SysTenant::getTenantId)
-                .eq(SysTenant::getStatus, NormalDisableEnum.NORMAL.getCode()), x -> {return Convert.toStr(x);});
+        List<String> tenantIds = baseMapper.selectObjs(new LambdaQueryWrapper<SysTenant>().select(SysTenant::getTenantId).eq(SysTenant::getStatus, NormalDisableEnum.NORMAL.getCode()), x -> {
+            return Convert.toStr(x);
+        });
         List<SysDictType> saveTypeList = new ArrayList<>();
         List<SysDictData> saveDataList = new ArrayList<>();
         Set<String> set = new HashSet<>();
@@ -429,6 +426,9 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
                             data.setTenantId(tenantId);
                             data.setCreateTime(null);
                             data.setUpdateTime(null);
+                            data.setCreateDept(null);
+                            data.setCreateBy(null);
+                            data.setUpdateBy(null);
                             set.add(tenantId);
                             saveDataList.add(data);
                         }
@@ -450,6 +450,9 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
                             data.setTenantId(tenantId);
                             data.setCreateTime(null);
                             data.setUpdateTime(null);
+                            data.setCreateDept(null);
+                            data.setCreateBy(null);
+                            data.setUpdateBy(null);
                             set.add(tenantId);
                             saveDataList.add(data);
                         }
@@ -466,7 +469,7 @@ public class SysTenantServiceImpl extends ServiceImpl<SysTenantMapper, SysTenant
             }
         });
         for (String tenantId : set) {
-            TenantHelper.dynamicTenant(tenantId, () -> CacheUtils.clear(CacheNames.SYS_DICT));
+            TenantHelper.dynamicTenant(tenantId, () -> CacheUtils.clear(CacheNames.SYS_DICT_DATA));
         }
     }
 

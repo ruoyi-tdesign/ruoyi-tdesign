@@ -73,7 +73,6 @@ public class CaptchaController {
      *
      * @param email 邮箱
      */
-    @RateLimiter(key = "#email", time = 60, count = 1)
     @GetMapping("/resource/email/code")
     public R<Void> emailCode(@NotBlank(message = "{user.email.not.blank}") String email) {
         String key = GlobalConstants.CAPTCHA_CODE_KEY + email;
@@ -90,15 +89,23 @@ public class CaptchaController {
     /**
      * 生成验证码
      */
-    @RateLimiter(time = 60, count = 10, limitType = LimitType.IP)
     @GetMapping("/auth/code")
     public R<CaptchaVo> getCode() {
-        CaptchaVo captchaVo = new CaptchaVo();
         boolean captchaEnabled = captchaProperties.getEnable();
         if (!captchaEnabled) {
+            CaptchaVo captchaVo = new CaptchaVo();
             captchaVo.setCaptchaEnabled(false);
             return R.ok(captchaVo);
         }
+        return R.ok(SpringUtils.getAopProxy(this).getCodeImpl());
+    }
+
+    /**
+     * 生成验证码
+     * 独立方法避免验证码关闭之后仍然走限流
+     */
+    @RateLimiter(time = 60, count = 10, limitType = LimitType.IP)
+    public CaptchaVo getCodeImpl() {
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
         String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + uuid;
@@ -118,9 +125,10 @@ public class CaptchaController {
             code = exp.getValue(String.class);
         }
         RedisUtils.setObject(verifyKey, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));
+        CaptchaVo captchaVo = new CaptchaVo();
         captchaVo.setUuid(uuid);
         captchaVo.setImg(captcha.getImageBase64());
-        return R.ok(captchaVo);
+        return captchaVo;
     }
 
 }

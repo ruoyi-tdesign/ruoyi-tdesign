@@ -5,7 +5,7 @@ create table sys_social
 (
     id                 bigint           not null        comment '主键',
     user_id            bigint           not null        comment '用户ID',
-    tenant_id          varchar(20)      default null    comment '租户id',
+    tenant_id          varchar(20)      default '000000' comment '租户id',
     auth_id            varchar(255)     not null        comment '平台+平台唯一id',
     source             varchar(255)     not null        comment '用户来源',
     open_id            varchar(255)     default null    comment '平台编号唯一id',
@@ -215,7 +215,7 @@ create table sys_role (
     role_name            varchar(30)     not null                   comment '角色名称',
     role_key             varchar(100)    not null                   comment '角色权限字符串',
     role_sort            int(4)          not null                   comment '显示顺序',
-    data_scope           char(1)         default '1'                comment '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）',
+    data_scope           char(1)         default '1'                comment '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限 5：仅本人数据权限 6：部门及以下或本人数据权限）',
     menu_check_strictly  tinyint(1)      default 1                  comment '菜单树选择项是否关联显示',
     dept_check_strictly  tinyint(1)      default 1                  comment '部门树选择项是否关联显示',
     status               char(1)         not null                   comment '角色状态（1正常 0停用）',
@@ -613,10 +613,10 @@ create table sys_oper_log (
     oper_url          varchar(255)    default ''                 comment '请求URL',
     oper_ip           varchar(128)    default ''                 comment '主机地址',
     oper_location     varchar(255)    default ''                 comment '操作地点',
-    oper_param        varchar(2000)   default ''                 comment '请求参数',
-    json_result       varchar(2000)   default ''                 comment '返回参数',
+    oper_param        varchar(4000)   default ''                 comment '请求参数',
+    json_result       varchar(4000)   default ''                 comment '返回参数',
     status            int(1)          default 0                  comment '操作状态（1正常 0异常）',
-    error_msg         varchar(2000)   default ''                 comment '错误消息',
+    error_msg         varchar(4000)   default ''                 comment '错误消息',
     oper_time         datetime                                   comment '操作时间',
     cost_time         bigint(20)      default 0                  comment '消耗时间',
     primary key (oper_id),
@@ -874,6 +874,7 @@ create table sys_oss (
     original_name   varchar(255) not null default ''        comment '原名',
     file_suffix     varchar(10)  not null default ''        comment '文件后缀名',
     url             varchar(500) not null                   comment 'URL地址',
+    ext1            varchar(500)          default null      comment '扩展字段',
     size            bigint(20)            default null      comment '字节长度',
     content_type    varchar(255) null     default null      comment '内容类型',
     oss_category_id bigint       not null default 0         comment '分类id',
@@ -925,7 +926,6 @@ create table sys_oss_config (
     region          varchar(255)            default ''      comment '域',
     access_policy   char(1)       not null  default '1'     comment '桶权限类型(0=private 1=public 2=custom)',
     status          char(1)                 default '0'     comment '是否默认（1=是,0=否）',
-    create_bucket   tinyint(1)    not null  default '0'     comment '创建桶（1=是,0=否）',
     ext1            varchar(255)            default ''      comment '扩展字段',
     create_dept     bigint(20)              default null    comment '创建部门',
     create_by       bigint(20)              default null    comment '创建者',
@@ -936,11 +936,11 @@ create table sys_oss_config (
     primary key (oss_config_id)
 ) engine=innodb comment='对象存储配置表';
 
-insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',             '1' ,'1', 0,'', 103, 1, sysdate(), 1, sysdate(), null);
-insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',             '1' ,'0', 0,'', 103, 1, sysdate(), 1, sysdate(), null);
-insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',             '1' ,'0', 0,'', 103, 1, sysdate(), 1, sysdate(), null);
-insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',   '1' ,'0', 0,'', 103, 1, sysdate(), 1, sysdate(), null);
-insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',             '1' ,'0', 0,'', 103, 1, sysdate(), 1, sysdate(), null);
+insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',             '1' ,'1', null,103, 1, sysdate(), 1, sysdate(), null);
+insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',             '1' ,'0', null,103, 1, sysdate(), 1, sysdate(), null);
+insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',             '1' ,'0', null,103, 1, sysdate(), 1, sysdate(), null);
+insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',   '1' ,'0', null,103, 1, sysdate(), 1, sysdate(), null);
+insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',             '1' ,'0', null,103, 1, sysdate(), 1, sysdate(), null);
 
 -- ----------------------------
 -- 系统授权表

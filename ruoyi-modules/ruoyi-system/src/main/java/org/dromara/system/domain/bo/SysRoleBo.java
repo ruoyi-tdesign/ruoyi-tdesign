@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.constant.UserConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
@@ -52,7 +52,7 @@ public class SysRoleBo extends BaseEntity {
     private Integer roleSort;
 
     /**
-     * 数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）
+     * 数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限 5：仅本人数据权限 6：部门及以下或本人数据权限）
      */
     private String dataScope;
 
@@ -91,7 +91,7 @@ public class SysRoleBo extends BaseEntity {
     }
 
     public boolean isSuperAdmin() {
-        return UserConstants.SUPER_ADMIN_ID.equals(this.roleId);
+        return SystemConstants.SUPER_ADMIN_ID.equals(this.roleId);
     }
 
 }

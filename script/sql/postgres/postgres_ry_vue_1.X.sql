@@ -5,7 +5,7 @@ create table sys_social
 (
     id                 int8             not null,
     user_id            int8             not null,
-    tenant_id          varchar(20)      default null::varchar,
+    tenant_id          varchar(20)      default '000000'::varchar,
     auth_id            varchar(255)     not null,
     source             varchar(255)     not null,
     open_id            varchar(255)     default null::varchar,
@@ -364,7 +364,7 @@ comment on column sys_role.tenant_id            is '租户编号';
 comment on column sys_role.role_name            is '角色名称';
 comment on column sys_role.role_key             is '角色权限字符串';
 comment on column sys_role.role_sort            is '显示顺序';
-comment on column sys_role.data_scope           is '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）';
+comment on column sys_role.data_scope           is '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限 5：仅本人数据权限 6：部门及以下或本人数据权限）';
 comment on column sys_role.menu_check_strictly  is '菜单树选择项是否关联显示';
 comment on column sys_role.dept_check_strictly  is '部门树选择项是否关联显示';
 comment on column sys_role.status               is '角色状态（1正常 0停用）';
@@ -806,10 +806,10 @@ create table if not exists sys_oper_log
     oper_url       varchar(255)  default ''::varchar,
     oper_ip        varchar(128)  default ''::varchar,
     oper_location  varchar(255)  default ''::varchar,
-    oper_param     varchar(2000) default ''::varchar,
-    json_result    varchar(2000) default ''::varchar,
+    oper_param     varchar(4000) default ''::varchar,
+    json_result    varchar(4000) default ''::varchar,
     status         int4          default 1,
-    error_msg      varchar(2000) default ''::varchar,
+    error_msg      varchar(4000) default ''::varchar,
     oper_time      timestamp,
     cost_time      int8          default 0,
     constraint sys_oper_log_pk primary key (oper_id)
@@ -1217,6 +1217,7 @@ create table if not exists sys_oss
     original_name   varchar(255) default ''::varchar not null,
     file_suffix     varchar(10)  default ''::varchar not null,
     url             varchar(500) default ''::varchar not null,
+    ext1            varchar(500) default ''::varchar,
     size            int8         default ''::varchar not null,
     content_type    varchar(255),
     oss_category_id int8         default 0           not null,
@@ -1241,6 +1242,7 @@ comment on column sys_oss.file_name         is '文件名';
 comment on column sys_oss.original_name     is '原名';
 comment on column sys_oss.file_suffix       is '文件后缀名';
 comment on column sys_oss.url               is 'URL地址';
+comment on column sys_oss.ext1              is '扩展字段';
 comment on column sys_oss.size              is '字节长度';
 comment on column sys_oss.content_type      is '内容类型';
 comment on column sys_oss.oss_category_id   is '分类id';
@@ -1300,7 +1302,6 @@ create table if not exists sys_oss_config
     region        varchar(255) default ''::varchar,
     access_policy char(1)      default '1'::bpchar not null,
     status        char         default '0'::bpchar,
-    create_bucket int2         default 0 not null,
     ext1          varchar(255) default ''::varchar,
     create_dept   int8,
     create_by     int8,
@@ -1325,7 +1326,6 @@ comment on column sys_oss_config.is_https       is '是否https（Y=是,N=否）
 comment on column sys_oss_config.region         is '域';
 comment on column sys_oss_config.access_policy  is '桶权限类型(0=private 1=public 2=custom)';
 comment on column sys_oss_config.status         is '是否默认（1=是,0=否）';
-comment on column sys_oss_config.create_bucket  is '创建桶（1=是,0=否）';
 comment on column sys_oss_config.ext1           is '扩展字段';
 comment on column sys_oss_config.create_dept    is '创建部门';
 comment on column sys_oss_config.create_by      is '创建者';
@@ -1334,11 +1334,11 @@ comment on column sys_oss_config.update_by      is '更新者';
 comment on column sys_oss_config.update_time    is '更新时间';
 comment on column sys_oss_config.remark         is '备注';
 
-insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                      '','N', '',            '1', '1', 0,'', 103, 1, now(), 1, now(), null);
-insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',           '','N', '',            '1', '0', 0,'', 103, 1, now(), 1, now(), null);
-insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',         '','N', '',            '1', '0', 0,'', 103, 1, now(), 1, now(), null);
-insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',         '','N', 'ap-beijing',  '1', '0', 0,'', 103, 1, now(), 1, now(), null);
-insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',                 '','N', '',            '1', '0', 0,'', 103, 1, now(), 1, now(), NULL);
+insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',             '1' ,'1', null,103, 1, now(), 1, now(), null);
+insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',             '1' ,'0', null,103, 1, now(), 1, now(), null);
+insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',             '1' ,'0', null,103, 1, now(), 1, now(), null);
+insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',   '1' ,'0', null,103, 1, now(), 1, now(), null);
+insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',             '1' ,'0', null,103, 1, now(), 1, now(), null);
 
 -- ----------------------------
 -- 系统授权表

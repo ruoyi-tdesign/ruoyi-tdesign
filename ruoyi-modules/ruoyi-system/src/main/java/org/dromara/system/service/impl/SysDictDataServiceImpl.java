@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.redis.utils.CacheUtils;
@@ -83,7 +84,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
         for (Long dictCode : dictCodes) {
             SysDictData data = baseMapper.selectById(dictCode);
             baseMapper.deleteById(dictCode);
-            CacheUtils.evict(CacheNames.SYS_DICT, data.getDictType());
+            CacheUtils.evict(CacheNames.SYS_DICT_DATA, data.getDictType());
         }
     }
 
@@ -93,7 +94,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      * @param bo 字典数据信息
      * @return 结果
      */
-    @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#bo.dictType")
+    @CachePut(cacheNames = CacheNames.SYS_DICT_DATA, key = "#bo.dictType")
     @Override
     public List<SysDictDataVo> insertDictData(SysDictDataBo bo) {
         SysDictData data = MapstructUtils.convert(bo, SysDictData.class);
@@ -110,7 +111,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      * @param bo 字典数据信息
      * @return 结果
      */
-    @CachePut(cacheNames = CacheNames.SYS_DICT, key = "#bo.dictType")
+    @CachePut(cacheNames = CacheNames.SYS_DICT_DATA, key = "#bo.dictType")
     @Override
     public List<SysDictDataVo> updateDictData(SysDictDataBo bo) {
         SysDictData data = MapstructUtils.convert(bo, SysDictData.class);
@@ -129,7 +130,7 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
      */
     @Override
     public boolean checkDictDataUnique(SysDictDataBo dict) {
-        Long dictCode = ObjectUtil.isNull(dict.getDictCode()) ? -1L : dict.getDictCode();
+        Long dictCode = ObjectUtils.notNull(dict.getDictCode(), -1L);
         SysDictData entity = baseMapper.selectOne(new LambdaQueryWrapper<SysDictData>()
             .eq(SysDictData::getDictType, dict.getDictType()).eq(SysDictData::getDictValue, dict.getDictValue()));
         if (ObjectUtil.isNotNull(entity) && !dictCode.equals(entity.getDictCode())) {

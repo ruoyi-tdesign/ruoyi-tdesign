@@ -111,29 +111,29 @@
         <template #operation="{ row }">
           <t-space :size="8">
             <t-tooltip content="预览" placement="top">
-              <t-link v-hasPermi="['tool:gen:preview']" theme="primary" hover="color" @click.stop="handlePreview(row)">
-                <browse-icon />
-              </t-link>
+              <my-link v-hasPermi="['tool:gen:preview']" @click.stop="handlePreview(row)">
+                <template #prefix-icon><browse-icon /></template>
+              </my-link>
             </t-tooltip>
             <t-tooltip content="编辑" placement="top">
-              <t-link v-hasPermi="['tool:gen:edit']" theme="primary" hover="color" @click.stop="handleEditTable(row)">
-                <edit-icon />
-              </t-link>
+              <my-link v-hasPermi="['tool:gen:edit']" @click.stop="handleEditTable(row)">
+                <template #prefix-icon><edit-icon /></template>
+              </my-link>
             </t-tooltip>
             <t-tooltip content="删除" placement="top">
-              <t-link v-hasPermi="['tool:gen:remove']" theme="danger" hover="color" @click.stop="handleDelete(row)">
-                <delete-icon />
-              </t-link>
+              <my-link v-hasPermi="['tool:gen:remove']" theme="danger" @click.stop="handleDelete(row)">
+                <template #prefix-icon><delete-icon /></template>
+              </my-link>
             </t-tooltip>
             <t-tooltip content="同步" placement="top">
-              <t-link v-hasPermi="['tool:gen:edit']" theme="primary" hover="color" @click.stop="handleSyncDb(row)">
-                <refresh-icon />
-              </t-link>
+              <my-link v-hasPermi="['tool:gen:edit']" @click.stop="handleSyncDb(row)">
+                <template #prefix-icon><refresh-icon /></template>
+              </my-link>
             </t-tooltip>
             <t-tooltip content="生成代码" placement="top">
-              <t-link v-hasPermi="['tool:gen:code']" theme="primary" hover="color" @click.stop="handleGenTable(row)">
-                <download-icon />
-              </t-link>
+              <my-link v-hasPermi="['tool:gen:code']" @click.stop="handleGenTable(row)">
+                <template #prefix-icon><download-icon /></template>
+              </my-link>
             </t-tooltip>
           </t-space>
         </template>

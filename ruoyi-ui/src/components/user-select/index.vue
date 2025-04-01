@@ -22,7 +22,7 @@
             <t-loading :loading="loadingDept" size="small">
               <t-tree
                 ref="deptTreeRef"
-                v-model:actived="deptActived"
+                v-model:actived="actived"
                 v-model:expanded="expandedDept"
                 class="t-tree--block-node"
                 :data="deptOptions"
@@ -89,7 +89,7 @@
                   class="mb-2px"
                   @close="handleCloseTag(index)"
                 >
-                  {{ user.userName }}
+                  {{ user.nickName }}
                 </t-tag>
               </t-space>
             </template>
@@ -100,7 +100,7 @@
               row-key="userId"
               :data="userList"
               :columns="columns"
-              :selected-row-keys="userIds"
+              :selected-row-keys="effectiveUserIds"
               select-on-row-click
               row-selection-allow-uncheck
               :pagination="pagination"
@@ -163,6 +163,7 @@ const props = defineProps({
     default: true,
   },
   data: [String, Number, Array] as PropType<string | number | Array<string | number>>,
+  userIds: [String, Number, Array] as PropType<string | number | Array<string | number>>,
 });
 
 const modelValue = defineModel<SysUserVo[]>({
@@ -199,7 +200,7 @@ const deptName = ref('');
 const deptOptions = ref<Array<TreeModel<number>>>([]);
 const deptFormOptions = ref<Array<TreeModel<number>>>([]);
 const expandedDept = ref<number[]>([]);
-const deptActived = ref<number[]>([]);
+const actived = ref<number[]>([]);
 const sort = ref<TableSort>();
 const userDialog = useDialog({
   title: '用户选择',
@@ -225,6 +226,7 @@ const queryParams = ref<SysUserQuery>({
   email: undefined,
   status: undefined,
   deptId: undefined,
+  userIds: undefined,
 });
 
 const pagination = computed(() => {
@@ -240,7 +242,7 @@ const pagination = computed(() => {
     },
   };
 });
-const userIds = computed<number[]>(() => selectUserList.value?.map((item) => item.userId) ?? []);
+const effectiveUserIds = computed<number[]>(() => selectUserList.value?.map((item) => item.userId) ?? []);
 
 watchEffect(() => {
   selectUserList.value = modelValue.value ?? [];
@@ -271,7 +273,8 @@ function triggerExpandedDept() {
 /** 查询用户列表 */
 function getList() {
   loading.value = true;
-  queryParams.value.deptId = deptActived.value.at(0);
+  queryParams.value.deptId = actived.value.at(0);
+  queryParams.value.userIds = props.userIds?.split(',');
   listUser(queryParams.value).then((res) => {
     loading.value = false;
     userList.value = res.rows;
@@ -286,7 +289,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   proxy.resetForm('queryRef');
-  deptActived.value = [];
+  actived.value = [];
   queryParams.value.deptId = undefined;
   queryParams.value.pageNum = 1;
   handleSortChange(null);
@@ -314,7 +317,7 @@ const handleSelectionChange: TableProps['onSelectChange'] = (selection, options)
   if (options.type === 'check' && options.currentRowKey === 'CHECK_ALL_BOX') {
     // 全选
     userList.value
-      .filter((value) => !userIds.value.includes(value.userId))
+      .filter((value) => !effectiveUserIds.value.includes(value.userId))
       .forEach((value) => {
         selectUserList.value.push(value);
       });

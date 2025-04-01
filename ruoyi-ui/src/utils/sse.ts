@@ -5,6 +5,10 @@ import { useNoticeStore, useUserStore } from '@/store';
 
 // 初始化
 export const initSSE = (url: string) => {
+  if (import.meta.env.VITE_APP_SSE === 'false') {
+    return;
+  }
+
   url = `${url}?Authorization=Bearer ${useUserStore().token}&clientid=${import.meta.env.VITE_CLIENT_ID}`;
   const { data, error, close } = useEventSource(url, [], {
     autoReconnect: {

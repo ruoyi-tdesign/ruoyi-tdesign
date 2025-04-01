@@ -22,6 +22,10 @@ export interface SysUserQuery extends BaseEntity {
   status?: string;
   /** 数据权限 当前角色ID */
   roleId?: number;
+  /** 用户id */
+  userIds?: string[];
+  /** 排除不查询的用户(工作流用) */
+  excludeUserIds?: string[];
 }
 /**
  * 用户信息业务对象
@@ -152,4 +156,29 @@ export interface SysUserInfoVo {
   user?: SysUserVo;
   postIds?: Array<number>;
   roleIds?: Array<number>;
+}
+/**
+ * 用户
+ */
+export interface UserDTO {
+  /** 用户ID */
+  userId: number;
+  /** 部门ID */
+  deptId: number;
+  /** 用户账号 */
+  userName?: string;
+  /** 用户昵称 */
+  nickName?: string;
+  /** 用户类型（sys_user系统用户） */
+  userType?: string;
+  /** 用户邮箱 */
+  email?: string;
+  /** 手机号码 */
+  phonenumber?: string;
+  /** 用户性别（0男 1女 2未知） */
+  sex?: string;
+  /** 帐号状态（0正常 1停用） */
+  status?: string;
+  /** 创建时间 */
+  createTime?: string;
 }

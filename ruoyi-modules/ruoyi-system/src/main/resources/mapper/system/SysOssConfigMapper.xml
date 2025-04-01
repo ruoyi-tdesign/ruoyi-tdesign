@@ -10,7 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
      <sql id="selectSysOssConfigVo">
-        select soc.oss_config_id, soc.tenant_id, soc.config_key, soc.access_key, soc.secret_key, soc.bucket_name, soc.prefix, soc.endpoint, soc.domain, soc.is_https, soc.region, soc.access_policy, soc.status, soc.create_bucket, soc.ext1, soc.create_dept, soc.create_by, soc.create_time, soc.update_by, soc.update_time, soc.remark from sys_oss_config soc
+        select soc.oss_config_id, soc.tenant_id, soc.config_key, soc.access_key, soc.secret_key, soc.bucket_name, soc.prefix, soc.endpoint, soc.domain, soc.is_https, soc.region, soc.access_policy, soc.status, soc.ext1, soc.create_dept, soc.create_by, soc.create_time, soc.update_by, soc.update_time, soc.remark from sys_oss_config soc
     </sql>
     <select id="queryList" parameterType="org.dromara.system.domain.query.SysOssConfigQuery" resultMap="SysOssConfigResultVo">
         <include refid="selectSysOssConfigVo"/>

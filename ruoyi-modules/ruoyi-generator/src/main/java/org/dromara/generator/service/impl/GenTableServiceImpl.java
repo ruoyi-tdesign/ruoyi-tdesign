@@ -73,7 +73,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     @Autowired
     private IdentifierGenerator identifierGenerator;
 
-    private static final String[] TABLE_IGNORE = new String[]{"sj_", "act_", "flw_", "gen_"};
+    private static final String[] TABLE_IGNORE = new String[]{"sj_", "flow_", "gen_"};
 
     /**
      * 查询业务字段列表
@@ -141,7 +141,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         }
         // 过滤并转换表格数据
         return tablesMap.values().stream()
-            .filter(x -> !startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
+            .filter(x -> !StringUtils.startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
             .filter(x -> {
                 if (CollUtil.isEmpty(tableNames)) {
                     return true;
@@ -166,20 +166,11 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                 GenTableVo gen = new GenTableVo();
                 gen.setTableName(x.getName());
                 gen.setTableComment(x.getComment());
-                gen.setCreateTime(x.getCreateTime());
+                // postgresql的表元数据没有创建时间这个东西(好奇葩) 只能new Date代替
+                gen.setCreateTime(ObjectUtil.defaultIfNull(x.getCreateTime(), new Date()));
                 gen.setUpdateTime(x.getUpdateTime());
                 return gen;
             }).toList();
-    }
-
-    public static boolean startWithAnyIgnoreCase(CharSequence cs, CharSequence... searchCharSequences) {
-        // 判断是否是以指定字符串开头
-        for (CharSequence searchCharSequence : searchCharSequences) {
-            if (StringUtils.startsWithIgnoreCase(cs, searchCharSequence)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -203,7 +194,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
             }
 
             List<Table<?>> tableList = tablesMap.values().stream()
-                .filter(x -> !StringUtils.containsAnyIgnoreCase(x.getName(), TABLE_IGNORE))
+                .filter(x -> !StringUtils.startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
                 .filter(x -> tableNameSet.contains(x.getName())).toList();
 
             if (CollUtil.isEmpty(tableList)) {
@@ -334,14 +325,18 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     public List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName) {
         DynamicDataSourceContextHolder.push(dataName);
         try {
-            LinkedHashMap<String, Column> columns = ServiceProxy.metadata().columns(tableName);
+            Table<?> table = ServiceProxy.metadata().table(tableName);
+            if (ObjectUtil.isNull(table)) {
+                return new ArrayList<>();
+            }
+            LinkedHashMap<String, Column> columns = table.getColumns();
             List<GenTableColumn> tableColumns = new ArrayList<>();
             columns.forEach((columnName, column) -> {
                 GenTableColumn tableColumn = new GenTableColumn();
                 tableColumn.setIsPk(column.isPrimaryKey() == 1 ? "1" : "0");
                 tableColumn.setColumnName(column.getName());
                 tableColumn.setColumnComment(column.getComment());
-                tableColumn.setColumnType(column.getTypeName().toLowerCase());
+                tableColumn.setColumnType(column.getOriginType().toLowerCase());
                 tableColumn.setSort(column.getPosition());
                 tableColumn.setIsRequired(column.isNullable() == 0 || column.isPrimaryKey() == 1 ? "1" : "0");
                 tableColumn.setIsIncrement(column.isAutoIncrement() == 1 ? "1" : "0");

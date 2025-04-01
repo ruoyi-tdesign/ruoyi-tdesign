@@ -5,7 +5,7 @@ create table sys_social
 (
     id                 number(20)        not null,
     user_id            number(20)        not null,
-    tenant_id          varchar2(20)      default null,
+    tenant_id          varchar2(20)      default '000000',
     auth_id            varchar2(255)     not null,
     source             varchar2(255)     not null,
     open_id            varchar2(255)     default null,
@@ -362,7 +362,7 @@ comment on column sys_role.tenant_id             is '租户编号';
 comment on column sys_role.role_name             is '角色名称';
 comment on column sys_role.role_key              is '角色权限字符串';
 comment on column sys_role.role_sort             is '显示顺序';
-comment on column sys_role.data_scope            is '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限）';
+comment on column sys_role.data_scope            is '数据范围（1：全部数据权限 2：自定数据权限 3：本部门数据权限 4：本部门及以下数据权限 5：仅本人数据权限 6：部门及以下或本人数据权限）';
 comment on column sys_role.menu_check_strictly   is '菜单树选择项是否关联显示';
 comment on column sys_role.dept_check_strictly   is '部门树选择项是否关联显示';
 comment on column sys_role.status                is '角色状态（1正常 0停用）';
@@ -800,10 +800,10 @@ create table sys_oper_log (
   oper_url          varchar2(255)   default '',
   oper_ip           varchar2(128)   default '',
   oper_location     varchar2(255)   default '',
-  oper_param        varchar2(2100)  default '',
-  json_result       varchar2(2100)  default '',
+  oper_param        varchar2(4000)  default '',
+  json_result       varchar2(4000)  default '',
   status            number(1)       default 1,
-  error_msg         varchar2(2100)  default '',
+  error_msg         varchar2(4000)  default '',
   oper_time         date,
   cost_time         number(20)      default 0
 );
@@ -1216,6 +1216,7 @@ create table sys_oss (
   user_type         varchar2(20)    default ''       not null,
   is_lock           number(4)       default 0       not null,
   service           varchar2(20)    default 'minio' not null,
+  ext1              varchar2(500)   default '',
   create_dept       number(20)      default null,
   create_by         number(20)      default null,
   create_time       date,
@@ -1239,6 +1240,7 @@ comment on column sys_oss.oss_category_id   is '分类id';
 comment on column sys_oss.user_type         is '用户类型';
 comment on column sys_oss.is_lock           is '是否锁定状态';
 comment on column sys_oss.service           is '服务商';
+comment on column sys_oss.ext1              is '扩展字段';
 comment on column sys_oss.create_dept       is '创建部门';
 comment on column sys_oss.create_time       is '创建时间';
 comment on column sys_oss.create_by         is '上传者';
@@ -1291,7 +1293,6 @@ create table sys_oss_config (
   region          varchar2(255)  default '',
   access_policy   char(1)        default '1' not null,
   status          char(1)        default '0',
-  create_bucket   number(1)      default 0 not null,
   ext1            varchar2(255)  default '',
   remark          varchar2(500)  default null,
   create_dept     number(20)     default null,
@@ -1317,7 +1318,6 @@ comment on column sys_oss_config.is_https       is '是否https（Y=是,N=否）
 comment on column sys_oss_config.region         is '域';
 comment on column sys_oss_config.access_policy  is '桶权限类型(0=private 1=public 2=custom)';
 comment on column sys_oss_config.status         is '是否默认（1=是,0=否）';
-comment on column sys_oss_config.create_bucket  is '创建桶（1=是,0=否）';
 comment on column sys_oss_config.ext1           is '扩展字段';
 comment on column sys_oss_config.remark         is '备注';
 comment on column sys_oss_config.create_dept    is '创建部门';
@@ -1326,11 +1326,11 @@ comment on column sys_oss_config.create_time    is '创建时间';
 comment on column sys_oss_config.update_by      is '更新者';
 comment on column sys_oss_config.update_time    is '更新时间';
 
-insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',            '1', '1', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
-insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',            '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
-insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',            '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
-insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',  '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
-insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',            '1', '0', 0,'', NULL, 103, 1, sysdate, 1, sysdate);
+insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',             '1' ,'1', null,103, 1, sysdate, 1, sysdate, null);
+insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',             '1' ,'0', null,103, 1, sysdate, 1, sysdate, null);
+insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',             '1' ,'0', null,103, 1, sysdate, 1, sysdate, null);
+insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',   '1' ,'0', null,103, 1, sysdate, 1, sysdate, null);
+insert into sys_oss_config values (5, '000000', 'image',  'ruoyi',            'ruoyi123',        'ruoyi',             'image', '127.0.0.1:9000',           '','N', '',             '1' ,'0', null,103, 1, sysdate, 1, sysdate, null);
 
 -- ----------------------------
 -- 系统授权表

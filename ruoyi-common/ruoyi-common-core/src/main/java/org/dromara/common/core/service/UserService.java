@@ -82,4 +82,13 @@ public interface UserService {
      * @return 用户
      */
     List<UserDTO> selectUsersByDeptIds(List<Long> deptIds);
+
+    /**
+     * 通过岗位ID查询用户
+     *
+     * @param postIds 岗位ids
+     * @return 用户
+     */
+    List<UserDTO> selectUsersByPostIds(List<Long> postIds);
+
 }

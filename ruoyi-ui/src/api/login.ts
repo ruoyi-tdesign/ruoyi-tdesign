@@ -108,13 +108,13 @@ export function getCodeSms() {
 }
 
 // 获取租户列表
-export function getTenantList() {
+export function getTenantList(withToken: boolean) {
   return request.get<R<LoginTenantVo>>(
     {
       url: '/auth/tenant/list',
     },
     {
-      withToken: false,
+      withToken,
     },
   );
 }

@@ -87,11 +87,11 @@ public class SysRegisterService {
         String captcha = RedisUtils.getObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
-            recordLogininfor(tenantId, null, username, Constants.REGISTER, MessageUtils.message("user.jcaptcha.expire"));
+            recordLogininfor(tenantId, null, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         if (!code.equalsIgnoreCase(captcha)) {
-            recordLogininfor(tenantId, null, username, Constants.REGISTER, MessageUtils.message("user.jcaptcha.error"));
+            recordLogininfor(tenantId, null, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
             throw new CaptchaException();
         }
     }

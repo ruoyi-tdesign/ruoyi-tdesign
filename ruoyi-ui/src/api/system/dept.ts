@@ -10,6 +10,16 @@ export function listDept(query?: SysDeptQuery) {
   });
 }
 
+/**
+ * 通过deptIds查询部门
+ * @param deptIds
+ */
+export function optionSelect(deptIds: (number | string)[]) {
+  return request.get<R<SysDeptVo[]>>({
+    url: `/system/dept/optionselect?deptIds=${deptIds}`,
+  });
+}
+
 // 查询部门列表（排除节点）
 export function listDeptExcludeChild(deptId: number) {
   return request.get<R<Array<SysDeptVo>>>({

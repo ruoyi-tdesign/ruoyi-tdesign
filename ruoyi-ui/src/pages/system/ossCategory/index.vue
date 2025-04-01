@@ -33,14 +33,7 @@
             >
               <template #label="{ node }"> {{ node.data.categoryName }} ({{ node.data.fileCount ?? 0 }})</template>
               <template #empty>
-                <t-link
-                  v-hasPermi="['system:ossCategory:add']"
-                  theme="primary"
-                  hover="color"
-                  @click.stop="handleCategoryAdd()"
-                >
-                  新建分类
-                </t-link>
+                <my-link v-hasPermi="['system:ossCategory:add']" @click.stop="handleCategoryAdd()"> 新建分类 </my-link>
               </template>
               <template #operations="{ node }">
                 <t-dropdown
