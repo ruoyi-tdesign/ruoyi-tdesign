@@ -163,7 +163,7 @@ const props = defineProps({
     default: true,
   },
   data: [String, Number, Array] as PropType<string | number | Array<string | number>>,
-  userIds: String,
+  userIds: [String, Number, Array] as PropType<string | number | Array<string | number>>,
 });
 
 const modelValue = defineModel<SysUserVo[]>({

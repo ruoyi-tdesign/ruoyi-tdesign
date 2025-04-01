@@ -42,10 +42,10 @@
           label="下一步审批人"
           prop="assigneeMap"
         >
-          <div v-for="(item, index) in nestNodeList" :key="index" style="margin-bottom: 5px">
-            <div>【{{ item.nodeName }}】：</div>
+          <div v-for="(item, index) in nestNodeList" :key="index" style="margin-bottom: 5px; width: 500px">
+            <span>【{{ item.nodeName }}】：</span>
             <t-input v-if="false" v-model="form.assigneeMap[item.nodeCode]" />
-            <t-input v-model="nickName[item.nodeCode]" placeholder="请选择审批人" style="width: 500px" readonly>
+            <t-input v-model="nickName[item.nodeCode]" placeholder="请选择审批人" readonly>
               <template #suffix>
                 <t-button @click="choosePeople(item)">
                   <template #icon><search-icon /></template>选择
