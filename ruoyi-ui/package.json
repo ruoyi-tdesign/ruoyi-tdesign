@@ -1,7 +1,7 @@
 {
   "private": "true",
   "name": "@tencent/tdesign-vue-next-starter",
-  "version": "0.10.0",
+  "version": "0.12.0",
   "description": "Ruoyi-Tdesign多租户管理系统",
   "type": "module",
   "scripts": {
@@ -35,8 +35,8 @@
     "jsencrypt": "^3.3.2",
     "lodash": "^4.17.21",
     "nprogress": "^0.2.0",
-    "pinia": "~2.2.4",
-    "pinia-plugin-persistedstate": "~3.2.3",
+    "pinia": "~3.0.1",
+    "pinia-plugin-persistedstate": "~4.2.0",
     "prismjs": "^1.30.0",
     "qrcode.vue": "^3.6.0",
     "qs": "^6.14.0",
@@ -44,11 +44,11 @@
     "tdesign-vue-next": "1.11.5",
     "tinymce": "^7.3.0",
     "tvision-color": "^1.6.0",
-    "vue": "~3.3.13",
+    "vue": "~3.5.13",
     "vue-cropper": "^1.1.4",
     "vue-i18n": "^9.14.0",
     "vue-json-pretty": "^2.4.0",
-    "vue-router": "^4.4.3"
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.4.1",
@@ -89,12 +89,12 @@
     "unocss": "^0.62.3",
     "unplugin-auto-import": "^0.18.2",
     "unplugin-vue-components": "^0.27.4",
-    "vite": "~5.4.11",
+    "vite": "6.2.4",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-mock": "^3.0.2",
     "vite-plugin-prismjs": "^0.0.11",
     "vite-svg-loader": "^5.1.0",
-    "vue-tsc": "^2.0.29"
+    "vue-tsc": "2.2.8"
   },
   "config": {
     "commitizen": {
