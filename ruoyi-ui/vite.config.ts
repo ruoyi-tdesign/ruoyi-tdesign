@@ -98,16 +98,6 @@ export default ({ mode }: ConfigEnv): UserConfig => {
         theme: 'default', // 主题名称
         css: true,
       }),
-      {
-        name: 'singleHMR',
-        handleHotUpdate({ modules }) {
-          modules.forEach((m) => {
-            m.importedModules?.clear();
-            m.importers = new Set();
-          });
-          return modules;
-        },
-      },
       vue({
         script: {
           defineModel: true,

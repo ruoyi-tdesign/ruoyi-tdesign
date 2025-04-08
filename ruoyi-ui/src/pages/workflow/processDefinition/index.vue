@@ -61,7 +61,7 @@
                     <template #icon><delete-icon /></template>
                     删除
                   </t-button>
-                  <t-button theme="primary" @click="uploadDialog.visible = true">
+                  <t-button theme="primary" @click="handleImportDefinition">
                     <template #icon> <cloud-upload-icon /></template>
                     部署流程文件
                   </t-button>
@@ -551,9 +551,11 @@ const reset = () => {
  */
 const handleAdd = async () => {
   reset();
+  buttonLoading.value = true;
   modelDialog.visible = true;
   modelDialog.title = '新增流程';
   await getTreeselect();
+  buttonLoading.value = false;
 };
 /** 修改按钮操作 */
 const handleUpdate = async (row?: FlowDefinitionVo) => {
@@ -566,6 +568,12 @@ const handleUpdate = async (row?: FlowDefinitionVo) => {
   await getTreeselect();
   buttonLoading.value = false;
   Object.assign(form.value, res.data);
+};
+const handleImportDefinition = async () => {
+  uploadDialog.visible = true;
+  buttonLoading.value = true;
+  await getTreeselect();
+  buttonLoading.value = false;
 };
 
 const handleSubmit: FormProps['onSubmit'] = ({ validateResult, firstError }) => {

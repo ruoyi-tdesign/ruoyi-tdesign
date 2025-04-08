@@ -68,7 +68,7 @@
         where sm.menu_type in ('M', 'C')
           and sm.status = '1'
           and ro.role_id in (select role_id from sys_user_role where user_id = #{userId})
-        order by sm.parent_id, sm.order_num
+        order by sm.order_num, sm.parent_id
     </select>
 
     <select id="selectMenuListByRoleId" resultType="Long">

@@ -1,3 +1,4 @@
+import cloneDeep from 'lodash/cloneDeep';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { RouteRecordRaw } from 'vue-router';
@@ -8,6 +9,7 @@ import Layout from '@/layouts/index.vue';
 import auth from '@/plugins/auth';
 import router, { defaultRouterList, dynamicRoutes } from '@/router';
 import { store } from '@/store';
+import { isHttp } from '@/utils/validate';
 
 const modules = import.meta.glob('./../../pages/**/*.vue');
 
@@ -21,115 +23,62 @@ export const usePermissionStore = defineStore('permission', () => {
     '/register*',
     '/register/*',
   ]);
-  const routers = ref<RouteRecordRaw[]>([]);
-  const addRoutes = ref<RouteRecordRaw[]>([]);
-  const defaultRoutes = ref<RouteRecordRaw[]>([]);
-  const topbarRouters = ref<RouteRecordRaw[]>([]);
-  const sidebarRouters = ref<RouteRecordRaw[]>([]);
-
-  function setRouters(newRoutes: RouteRecordRaw[]) {
-    addRoutes.value = newRoutes;
-    routers.value = defaultRouterList.concat(newRoutes);
-  }
-  function setDefaultRoutes(routes: RouteRecordRaw[]) {
-    defaultRoutes.value = defaultRouterList.concat(routes);
-  }
-  function setTopbarRoutes(routes: RouteRecordRaw[]) {
-    topbarRouters.value = routes;
-  }
-
-  function setSidebarRouters(routes: RouteRecordRaw[]) {
-    sidebarRouters.value = routes;
-  }
+  const menus = ref<RouteRecordRaw[]>([]);
+  const allMenus = ref<RouteRecordRaw[]>([]);
 
   async function generateRoutes() {
     // 向后端请求路由数据
     const res = await getRouters();
-    const sdata = JSON.parse(JSON.stringify(res.data));
-    const rdata = JSON.parse(JSON.stringify(res.data));
-    const defaultData = JSON.parse(JSON.stringify(res.data));
-    const sidebarRoutes = filterAsyncRouter(sdata);
-    const rewriteRoutes = filterAsyncRouter(rdata, undefined, true);
-    const defaultRoutes = filterAsyncRouter(defaultData);
+    const asyncRouter = filterAsyncRouter(cloneDeep(res.data) as any);
+    menus.value = asyncRouter;
+    // 动态添加可访问路由表
     const asyncRoutes = filterDynamicRoutes(dynamicRoutes);
+    allMenus.value = defaultRouterList.concat(asyncRouter);
+
     asyncRoutes.forEach((route) => {
       router.addRoute(route);
     });
-    setRouters(rewriteRoutes);
-    setSidebarRouters(defaultRouterList.concat(sidebarRoutes));
-    setDefaultRoutes(sidebarRoutes);
-    setTopbarRoutes(defaultRouterList.concat(defaultRoutes));
-    return defaultRoutes;
+
+    // 根据后台路由数据生成可访问路由表
+    asyncRouter.forEach((route) => {
+      if (!isHttp(route.path)) {
+        router.addRoute(route); // 动态添加可访问路由表
+      }
+    });
   }
 
   return {
+    menus,
+    allMenus,
     whiteListRouters,
-    routers,
-    setRouters,
     generateRoutes,
-    setSidebarRouters,
-    topbarRouters,
-    sidebarRouters,
-    defaultRoutes,
   };
 });
 
 /**
  * 遍历后台传来的路由字符串，转换为组件对象
- * @param asyncRouterMap 后台传来的路由字符串
- * @param lastRouter 上一级路由
- * @param type 是否是重写路由
+ * @param routers 后台传来的路由字符串
  */
-function filterAsyncRouter(asyncRouterMap: RouteRecordRaw[], lastRouter?: RouteRecordRaw, type = false) {
-  return asyncRouterMap.filter((route) => {
-    if (type && route.children) {
-      route.children = filterChildren(route.children);
-    }
+function filterAsyncRouter(routers: RouteRecordRaw[]) {
+  return routers.filter((route) => {
     if (route.component) {
       // Layout ParentView 组件特殊处理
       if (route.component?.toString() === 'Layout') {
         route.component = Layout;
-      } else if (route.component?.toString() === 'ParentView') {
-        // route.component = ParentView;
-        route.component = null;
       } else if (route.component?.toString() === 'InnerLink') {
         route.component = InnerLink;
       } else {
         route.component = loadView(route.component);
       }
     }
-    if (route.children && route.children.length) {
-      route.children = filterAsyncRouter(route.children, route, type);
+    if (route.children?.length) {
+      route.children = filterAsyncRouter(route.children);
     } else {
       delete route.children;
       delete route.redirect;
     }
     return true;
   });
-}
-
-function filterChildren(childrenMap: RouteRecordRaw[], lastRouter?: RouteRecordRaw) {
-  let children: RouteRecordRaw[] = [];
-  childrenMap.forEach((el) => {
-    if (el.children && el.children.length) {
-      if (el.component?.toString() === 'ParentView' && !lastRouter) {
-        el.children.forEach((c) => {
-          c.path = `${el.path}/${c.path}`;
-          if (c.children && c.children.length) {
-            children = children.concat(filterChildren(c.children, c));
-            return;
-          }
-          children.push(c);
-        });
-        return;
-      }
-    }
-    if (lastRouter) {
-      el.path = `${lastRouter.path}/${el.path}`;
-    }
-    children = children.concat(el);
-  });
-  return children;
 }
 
 /** 展开路由地址 */
@@ -149,7 +98,10 @@ export function unfoldRoutesPath(routes: RouteRecordRaw[], parentPath?: string) 
   return newRoutes;
 }
 
-// 动态路由遍历，验证是否具备权限
+/**
+ * 动态路由遍历，验证是否具备权限
+ * @param routes
+ */
 export function filterDynamicRoutes(routes: RouteRecordRaw[]) {
   const res: RouteRecordRaw[] = [];
   routes.forEach((route) => {
@@ -166,6 +118,10 @@ export function filterDynamicRoutes(routes: RouteRecordRaw[]) {
   return res;
 }
 
+/**
+ * 加载组件
+ * @param view 组件名称
+ */
 export const loadView = (view: any) => {
   let res;
   for (const path in modules) {
@@ -176,9 +132,14 @@ export const loadView = (view: any) => {
   }
   return res;
 };
+
 // 非setup
 export const usePermissionStoreHook = () => {
   return usePermissionStore(store);
 };
 
 export default usePermissionStore;
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(usePermissionStore, import.meta.hot));
+}

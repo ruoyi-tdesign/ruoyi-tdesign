@@ -6,7 +6,7 @@ import router from '@/router';
 import { usePermissionStoreHook, useUserStore } from '@/store';
 import { useTitle } from '@/utils/doc';
 import { isRelogin } from '@/utils/request';
-import { isHttp, isPathMatch } from '@/utils/validate';
+import { isPathMatch } from '@/utils/validate';
 
 let errorRetry = 0;
 
@@ -56,16 +56,11 @@ router.beforeEach(async (to, from, next) => {
 
         isRelogin.show = false;
 
-        const accessRoutes = await permissionStore.generateRoutes();
-        // 根据roles权限生成可访问的路由表
-        accessRoutes.forEach((route) => {
-          if (!isHttp(route.path)) {
-            router.addRoute(route); // 动态添加可访问路由表
-          }
-        });
+        await permissionStore.generateRoutes();
         next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
         errorRetry = 0;
       } catch (error) {
+        console.error(error);
         errorRetry++;
         // await userStore.logout();
         next({

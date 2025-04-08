@@ -18,6 +18,11 @@ import java.io.Serializable;
 public class MetaVo implements Serializable {
 
     /**
+     * 菜单id
+     */
+    private Long menuId;
+
+    /**
      * 设置该路由在侧边栏和面包屑中展示的名字
      */
     private String title;

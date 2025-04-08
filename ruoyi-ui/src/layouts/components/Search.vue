@@ -77,7 +77,7 @@ interface SearchOption {
 }
 
 const permissionStore = usePermissionStore();
-const { defaultRoutes: menuRouters } = storeToRefs(permissionStore);
+const { allMenus: menuRouters } = storeToRefs(permissionStore);
 const router = useRouter();
 
 const isSearchFocus = ref(false);
@@ -167,6 +167,9 @@ function getLeftMenus(menus: Array<MenuRoute>, parent?: MenuRoute): MenuRoute[] 
 <style lang="less" scoped>
 :global(.search-popup) {
   width: auto !important;
+}
+:global(.search-popup .t-auto-complete__panel--empty) {
+  padding: 0 16px !important;
 }
 
 .header-menu-search {

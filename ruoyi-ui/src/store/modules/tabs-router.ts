@@ -107,10 +107,10 @@ export const useTabsRouterStore = defineStore('tabsRouter', {
     },
   },
   persist: {
-    afterRestore: (ctx) => {
+    afterHydrate: (ctx) => {
       const permissionStore = usePermissionStore();
       const routerList = ctx.store.tabRouterList as Array<TRouterInfo>;
-      const routesPath = unfoldRoutesPath(permissionStore.defaultRoutes as RouteRecordRaw[]);
+      const routesPath = unfoldRoutesPath(permissionStore.menus as RouteRecordRaw[]);
       routerList.forEach((routerInfo) => {
         for (const route of routesPath) {
           // 地址相同，更新meta和query信息
