@@ -121,6 +121,7 @@ sa-token:
         - /resource/**
         - /demo/**
         - /workflow/**
+        - /warm-flow/**
     user:
       # 允许动态设置 token 有效期
       dynamic-active-timeout: true
@@ -257,7 +258,7 @@ springdoc:
       apiKey:
         type: APIKEY
         in: HEADER
-        name: ${sa-token.token-name}
+        name: ${sa-token.multiple.login.token-name}
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块
@@ -337,7 +338,7 @@ warm-flow:
   # 是否开启设计器ui
   ui: true
   # 默认Authorization，如果有多个token，用逗号分隔
-  token-name: ${sa-token.token-name},clientid
+  token-name: ${sa-token.multiple.login.token-name},clientid
   # 流程状态对应的三元色
   chart-status-color:
     ## 未办理

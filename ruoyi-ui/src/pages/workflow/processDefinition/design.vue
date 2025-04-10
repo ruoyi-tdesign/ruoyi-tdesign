@@ -29,7 +29,7 @@ const iframeLoaded = () => {
 };
 const open = async (definitionId: string | number, disabled: boolean | string) => {
   const url = `${baseUrl}/warm-flow-ui/index.html?id=${definitionId}&disabled=${disabled}`;
-  iframeUrl.value = `${url}&Authorization=Bearer ${useUserStore().token}&clientid=${import.meta.env.VITE_APP_CLIENT_ID}`;
+  iframeUrl.value = `${url}&Authorization=Bearer ${useUserStore().token}&clientid=${import.meta.env.VITE_CLIENT_ID}`;
 };
 /** 关闭按钮 */
 function close() {

@@ -2,7 +2,7 @@
   <t-card>
     <t-space direction="vertical" style="width: 100%">
       <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline" label-width="calc(6em + 12px)">
-        <t-form-item label-width="0px">
+        <t-form-item label-width="0px" style="min-width: 0; margin-right: 0">
           <t-badge :count="userSelectCount" :max-count="10" class="item">
             <t-button theme="primary" @click="openUserSelect">选择申请人</t-button>
           </t-badge>

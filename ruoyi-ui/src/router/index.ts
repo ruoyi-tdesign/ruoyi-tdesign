@@ -196,6 +196,26 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: '/workflow/design',
+    component: Layout,
+    meta: {
+      hidden: true,
+      permissions: ['workflow:leave:edit'],
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/pages/workflow/processDefinition/design.vue'),
+        name: 'design',
+        meta: {
+          title: '流程设计',
+          activeMenu: '/workflow/processDefinition',
+          key: (route) => (route.name as string) + (route.params.definitionId ?? ''),
+        },
+      },
+    ],
+  },
 ];
 
 export const allRoutes = [...defaultRouterList, ...asyncRouterList];

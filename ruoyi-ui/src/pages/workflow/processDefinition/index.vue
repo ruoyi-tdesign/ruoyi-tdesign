@@ -88,6 +88,7 @@
                 v-model="row.activityStatus"
                 :active-value="1"
                 :inactive-value="0"
+                @click.stop
                 @change="(status) => handleProcessDefState(row, status)"
               />
             </template>
@@ -98,20 +99,20 @@
             </template>
             <template #operation="{ row }">
               <t-space :size="8" break-line>
-                <my-link theme="danger" @click.stop="handleDelete(row)">
-                  <template #prefix-icon><delete-icon /></template>删除流程
-                </my-link>
-                <my-link @click.stop="handleCopyDef(row)">
-                  <template #prefix-icon><copy-icon /></template>复制流程
-                </my-link>
                 <my-link v-if="row.isPublish === 0" @click.stop="design(row)">
                   <template #prefix-icon><gesture-typing-icon /></template>流程设计
                 </my-link>
                 <my-link @click.stop="designView(row)">
                   <template #prefix-icon><browse-icon /></template>查看流程
                 </my-link>
+                <my-link @click.stop="handleCopyDef(row)">
+                  <template #prefix-icon><copy-icon /></template>复制流程
+                </my-link>
                 <my-link v-if="row.isPublish !== 1" @click.stop="handlePublish(row)">
                   <template #prefix-icon><rocket-icon /></template>发布流程
+                </my-link>
+                <my-link theme="danger" @click.stop="handleDelete(row)">
+                  <template #prefix-icon><delete-icon /></template>删除流程
                 </my-link>
               </t-space>
             </template>
@@ -311,7 +312,7 @@ const columns = ref<Array<PrimaryTableCol>>([
   { title: `版本号`, colKey: 'version', align: 'center' },
   { title: `激活状态`, colKey: 'activityStatus', align: 'center' },
   { title: `发布状态`, colKey: 'isPublish', align: 'center' },
-  { title: `操作`, colKey: 'operation', align: 'center', fixed: 'right', width: 170 },
+  { title: `操作`, colKey: 'operation', align: 'center', fixed: 'right', width: 180 },
 ]);
 
 // 流程定义参数
@@ -446,19 +447,25 @@ const handleProcessDefState = async (row: FlowDefinitionVo, status: number | str
     msg = `启动后，此流程下的所有任务都允许往后流转，您确定激活【${row.flowName || row.flowCode}】吗？`;
   }
 
-  loading.value = true;
-  proxy?.$modal.confirm(msg, async () => {
-    try {
-      await active(row.id, !!status);
-      await handleQuery();
-      proxy?.$modal.msgSuccess('操作成功');
-    } catch (error) {
+  proxy?.$modal.confirm(
+    msg,
+    async () => {
+      loading.value = true;
+      try {
+        await active(row.id, !!status);
+        handleQuery();
+        await proxy?.$modal.msgSuccess('操作成功');
+      } catch (error) {
+        row.activityStatus = status === 0 ? 1 : 0;
+        console.error(error);
+      } finally {
+        loading.value = false;
+      }
+    },
+    () => {
       row.activityStatus = status === 0 ? 1 : 0;
-      console.error(error);
-    } finally {
-      loading.value = false;
-    }
-  });
+    },
+  );
 };
 // 上传文件前的钩子
 const handlerBeforeUpload = () => {
