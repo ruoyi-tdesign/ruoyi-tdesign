@@ -221,7 +221,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 meta.setHidden(ShowHiddenEnum.HIDDEN.getCode().equals(menu.getVisible()));
             }
             if (MenuTypeEnum.MENU.getType().equals(menu.getMenuType())) {
-                meta.setComponentName(StringUtils.blankToDefault(menu.getComponentName(), router.getName()));
+                meta.setComponentName(StringUtils.blankToDefault(menu.getComponentName(), menu.getRouteName()));
             }
 
             router.setMeta(meta);

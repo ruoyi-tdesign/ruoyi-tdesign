@@ -80,17 +80,15 @@
         </template>
       </t-table>
     </t-space>
+    <!-- 申请人 -->
+    <user-select ref="userSelectRef" :multiple="true" :data="selectUserIds" @confirm-call-back="userSelectCallBack" />
   </t-card>
-  <!-- 申请人 -->
-  <user-select
-    ref="userSelectRef"
-    :multiple="true"
-    :data="selectUserIds"
-    @confirm-call-back="userSelectCallBack"
-  ></user-select>
 </template>
 
 <script lang="ts" setup>
+defineOptions({
+  name: 'TaskWaiting',
+});
 import { EditIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';

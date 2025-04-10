@@ -110,7 +110,7 @@
       destroy-on-close
       :close-on-overlay-click="false"
       placement="center"
-      width="680px"
+      width="min(780px, 100%)"
       attach="body"
       :confirm-btn="{
         loading: eLoading,

@@ -70,6 +70,9 @@
 </template>
 
 <script lang="ts" setup>
+defineOptions({
+  name: 'TaskCopyList',
+});
 import { BrowseIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';

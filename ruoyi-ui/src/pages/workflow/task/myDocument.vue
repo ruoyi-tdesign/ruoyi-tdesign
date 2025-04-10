@@ -95,6 +95,9 @@
 </template>
 
 <script lang="ts" setup>
+defineOptions({
+  name: 'MyDocument',
+});
 import {
   BrowseIcon,
   DeleteIcon,

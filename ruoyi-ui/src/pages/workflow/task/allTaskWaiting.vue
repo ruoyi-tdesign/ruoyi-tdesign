@@ -122,6 +122,9 @@
 </template>
 
 <script lang="ts" setup>
+defineOptions({
+  name: 'AllTaskWaiting',
+});
 import { BrowseIcon, EditIcon, RefreshIcon, SearchIcon, Setting1Icon, SettingIcon } from 'tdesign-icons-vue-next';
 import type { PageInfo, PrimaryTableCol, TabsProps } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
