@@ -85,9 +85,9 @@
             <template #version="{ row }">v{{ row.version }}.0</template>
             <template #activityStatus="{ row }">
               <t-switch
+                :key="row"
                 v-model="row.activityStatus"
-                :active-value="1"
-                :inactive-value="0"
+                :custom-value="[1, 0]"
                 @click.stop
                 @change="(status) => handleProcessDefState(row, status)"
               />
@@ -281,6 +281,9 @@ const categoryOptions = ref<TreeModel<number | string>[]>([]);
 const selectCategory = ref();
 const defFormRef = ref<FormInstanceFunctions>();
 const activeName = ref<number | string>('0');
+if (route.query.activeName) {
+  activeName.value = route.query.activeName as string;
+}
 const uploadDialog = reactive({
   visible: false,
   title: '部署流程文件',
@@ -394,9 +397,6 @@ const handleSelectionChange: TableProps['onSelectChange'] = (selection, options)
 const getList = async () => {
   loading.value = true;
   queryParams.value.category = treeActived.value.at(0);
-  if (route.query.activeName) {
-    activeName.value = route.query.activeName as string;
-  }
   const resp = await listDefinition(queryParams.value);
   processDefinitionList.value = resp.rows;
   total.value = resp.total;

@@ -36,7 +36,7 @@
                 <t-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
               </t-select>
             </t-form-item>
-            <t-form-item label="请假时间">
+            <t-form-item label="请假时间" required-mark>
               <t-date-range-picker
                 v-model="leaveTime"
                 value-type="YYYY-MM-DD HH:mm:ss"
@@ -61,13 +61,19 @@
     <submit-verify ref="submitVerifyRef" :task-variables="taskVariables" @submit-callback="submitCallback" />
     <!-- 审批记录 -->
     <approval-record ref="approvalRecordRef" />
-    <t-dialog v-model:visible="visible" :header="title" width="500" @before-close="handleClose">
+    <t-dialog
+      v-model:visible="visible"
+      :header="title"
+      width="500"
+      :close-on-overlay-click="false"
+      @before-close="handleClose"
+    >
       <t-select v-model="flowCode" placeholder="Select" style="width: 240px">
         <t-option v-for="item in flowCodeOptions" :key="item.value" :label="item.label" :value="item.value" />
       </t-select>
       <template #footer>
         <div class="dialog-footer">
-          <t-button @click="handleClose">取消</t-button>
+          <t-button theme="default" @click="handleClose">取消</t-button>
           <t-button theme="primary" @click="submitFlow()"> 确认 </t-button>
         </div>
       </template>
@@ -258,7 +264,6 @@ const submitForm = async (status: string) => {
 
 const submitFlow = async () => {
   handleStartWorkFlow(form.value);
-  visible.value = false;
 };
 // 提交申请
 const handleStartWorkFlow = async (data: LeaveForm) => {
@@ -272,6 +277,7 @@ const handleStartWorkFlow = async (data: LeaveForm) => {
     };
     submitFormData.value.variables = taskVariables.value;
     const resp = await startWorkFlow(submitFormData.value);
+    visible.value = false;
     if (submitVerifyRef.value) {
       buttonLoading.value = false;
       submitVerifyRef.value.openDialog(resp.data.taskId);
