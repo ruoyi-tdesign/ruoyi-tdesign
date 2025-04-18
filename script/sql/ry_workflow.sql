@@ -202,8 +202,8 @@ create table test_leave
     PRIMARY KEY (id) USING BTREE
 ) ENGINE = InnoDB COMMENT = '请假申请表';
 
-insert into sys_menu values ('11616', '工作流', '0', '6', 'tree-round-dot-vertical', '', '', '', '0', '1', 'M', '1', '1', '', 'workflow', null, null, 103, 1, sysdate(),NULL, NULL, '');
-insert into sys_menu values ('11618', '我的任务', '0', '7', 'task', '', '', '', '0', '1', 'M', '1', '1', '', 'my-task', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11616', '工作流', '0', '6', 'tree-round-dot-vertical', '', '', '', '0', '1', 'M', '1', '1', '', 'workflow', null, '!getProperty(''warm-flow.enabled'')', 103, 1, sysdate(),NULL, NULL, '');
+insert into sys_menu values ('11618', '我的任务', '0', '7', 'task', '', '', '', '0', '1', 'M', '1', '1', '', 'my-task', null, '!getProperty(''warm-flow.enabled'')', 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11619', '我的待办', '11618', '2', 'task-visible', 'workflow/task/taskWaiting', '', '', '0', '0', 'C', '1', '1', '', 'waiting', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11632', '我的已办', '11618', '3', 'task-checked', 'workflow/task/taskFinish', '', '', '0', '0', 'C', '1', '1', '', 'finish', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11633', '我的抄送', '11618', '4', 'user-arrow-left', 'workflow/task/taskCopyList', '', '', '0', '0', 'C', '1', '1', '', 'my-copy', null, null, 103, 1, sysdate(), NULL, NULL, '');
@@ -220,7 +220,7 @@ insert into sys_menu values ('11625', '流程分类修改', '11622', '3', '#', '
 insert into sys_menu values ('11626', '流程分类删除', '11622', '4', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:remove', '#', null, null, 103,1, sysdate(), null, null, '');
 insert into sys_menu values ('11627', '流程分类导出', '11622', '5', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:export', '#', null, null, 103,1, sysdate(), null, null, '');
 -- 请假测试相关按钮
-insert into sys_menu VALUES (11638, '请假申请',     5,    1, 'leave', 'workflow/leave/index', '', '', '0', '1', 'C', '1', '1', 'workflow:leave:list', '#', null, null, 103, 1, sysdate(), NULL, NULL, '请假申请菜单');
+insert into sys_menu VALUES (11638, '请假申请',    11618,    1, 'leave', 'workflow/leave/index', '', '', '0', '1', 'C', '1', '1', 'workflow:leave:list', '#', null, null, 103, 1, sysdate(), NULL, NULL, '请假申请菜单');
 insert into sys_menu VALUES (11639, '请假申请查询', 11638, 1, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu VALUES (11640, '请假申请新增', 11638, 2, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu VALUES (11641, '请假申请修改', 11638, 3, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
