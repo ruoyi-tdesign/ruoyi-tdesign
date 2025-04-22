@@ -21,7 +21,7 @@ import LHeader from './Header.vue';
 
 const permissionStore = usePermissionStore();
 const settingStore = useSettingStore();
-const { topbarRouters: menuRouters } = storeToRefs(permissionStore);
+const { menus: menuRouters } = storeToRefs(permissionStore);
 const headerMenu = computed<ComplexRoute[]>(() => {
   if (settingStore.layout === 'mix') {
     if (settingStore.splitMenu) {

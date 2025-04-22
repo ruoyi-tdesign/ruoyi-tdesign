@@ -11,27 +11,32 @@
 
     <h3>你可以绑定以下第三方帐号</h3>
     <t-space>
-      <t-button shape="circle" variant="outline" @click="authUrl('wechat_open')">
+      <t-button shape="circle" variant="outline" title="使用 微信 账号授权登录" @click="authUrl('wechat_open')">
         <template #icon>
-          <logo-wechat-icon />
+          <logo-wechat-stroke-filled-icon style="color: #1aad19" />
         </template>
       </t-button>
-      <t-button shape="circle" variant="outline" @click="authUrl('qq')">
+      <t-button shape="circle" variant="outline" title="使用 QQ 账号授权登录" @click="authUrl('qq')">
         <template #icon>
           <logo-qq-icon />
         </template>
       </t-button>
-      <t-button shape="circle" variant="outline" @click="authUrl('maxkey')">
+      <t-button shape="circle" variant="outline" title="使用 MaxKey 账号授权登录" @click="authUrl('maxkey')">
         <template #icon>
           <max-key class="t-icon" />
         </template>
       </t-button>
-      <t-button shape="circle" variant="outline" @click="authUrl('gitee')">
+      <t-button shape="circle" variant="outline" title="使用 TopIam 账号授权登录" @click="authUrl('topiam')">
+        <template #icon>
+          <img :src="TopIam" class="t-icon" alt="使用 TopIam 账号授权登录" />
+        </template>
+      </t-button>
+      <t-button shape="circle" variant="outline" title="使用 Gitee 账号授权登录" @click="authUrl('gitee')">
         <template #icon>
           <gitee-svg class="t-icon" />
         </template>
       </t-button>
-      <t-button shape="circle" variant="outline" @click="authUrl('github')">
+      <t-button shape="circle" variant="outline" title="使用 GitHub 账号授权登录" @click="authUrl('github')">
         <template #icon>
           <logo-github-filled-icon />
         </template>
@@ -44,7 +49,7 @@
 defineOptions({
   name: 'ThirdParty',
 });
-import { LogoGithubFilledIcon, LogoQqIcon, LogoWechatIcon } from 'tdesign-icons-vue-next';
+import { LogoGithubFilledIcon, LogoQqIcon, LogoWechatStrokeFilledIcon } from 'tdesign-icons-vue-next';
 import type { PrimaryTableCol } from 'tdesign-vue-next';
 import { getCurrentInstance, onMounted, ref } from 'vue';
 
@@ -52,6 +57,7 @@ import type { SysSocialVo } from '@/api/system/model/socialModel';
 import { authBinding, authUnlock, getAuthList } from '@/api/system/social';
 import GiteeSvg from '@/assets/icons/svg/gitee.svg?component';
 import MaxKey from '@/assets/icons/svg/maxkey.svg?component';
+import TopIam from '@/assets/icons/svg/topiam.svg?url';
 
 const { proxy } = getCurrentInstance();
 const loading = ref(false);

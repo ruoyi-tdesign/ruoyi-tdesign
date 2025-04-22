@@ -26,7 +26,7 @@ export function getMessageTemplate(messageTemplateId: number) {
 
 // 新增消息模板
 export function addMessageTemplate(data: SysMessageTemplateForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/messageTemplate',
     data,
   });
@@ -34,7 +34,7 @@ export function addMessageTemplate(data: SysMessageTemplateForm) {
 
 // 修改消息模板
 export function updateMessageTemplate(data: SysMessageTemplateForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/messageTemplate',
     data,
   });
@@ -42,7 +42,7 @@ export function updateMessageTemplate(data: SysMessageTemplateForm) {
 
 // 删除消息模板
 export function delMessageTemplate(messageTemplateIds: number | Array<number>) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/messageTemplate/${messageTemplateIds}`,
   });
 }
@@ -64,7 +64,7 @@ export function getMessageKeys() {
 
 // 发送测试消息
 export function sendMessageTest(data: SysMessageTemplateTest) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: `/system/messageTemplate/sendTest`,
     data,
   });
@@ -72,7 +72,7 @@ export function sendMessageTest(data: SysMessageTemplateTest) {
 
 // 刷新消息模板缓存
 export function refreshCache() {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: '/system/messageTemplate/refreshCache',
   });
 }

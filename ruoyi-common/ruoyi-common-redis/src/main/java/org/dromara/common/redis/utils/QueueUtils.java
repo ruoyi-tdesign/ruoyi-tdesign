@@ -9,8 +9,9 @@ import org.redisson.api.RDelayedQueue;
 import org.redisson.api.RPriorityBlockingQueue;
 import org.redisson.api.RedissonClient;
 
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * 分布式队列工具
@@ -177,12 +178,12 @@ public class QueueUtils {
      *
      * @param queueName 队列名
      * @param capacity  容量
-     * @param destroy   已存在是否销毁
+     * @param destroy   是否销毁
      */
     public static <T> boolean trySetBoundedQueueCapacity(String queueName, int capacity, boolean destroy) {
         RBoundedBlockingQueue<T> boundedBlockingQueue = CLIENT.getBoundedBlockingQueue(queueName);
-        if (boundedBlockingQueue.isExists() && destroy) {
-            destroyQueue(queueName);
+        if (destroy) {
+            boundedBlockingQueue.delete();
         }
         return boundedBlockingQueue.trySetCapacity(capacity);
     }
@@ -228,7 +229,7 @@ public class QueueUtils {
     /**
      * 订阅阻塞队列(可订阅所有实现类 例如: 延迟 优先 有界 等)
      */
-    public static <T> void subscribeBlockingQueue(String queueName, Consumer<T> consumer, boolean isDelayed) {
+    public static <T> void subscribeBlockingQueue(String queueName, Function<T, CompletionStage<Void>> consumer, boolean isDelayed) {
         RBlockingQueue<T> queue = CLIENT.getBlockingQueue(queueName);
         if (isDelayed) {
             // 订阅延迟队列

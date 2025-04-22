@@ -25,16 +25,17 @@ import org.redisson.api.RateType;
 public class RateLimiterAspect {
 
     @Before("@annotation(rateLimiter)")
-    public void doBefore(JoinPoint point, RateLimiter rateLimiter) throws Throwable {
+    public void doBefore(JoinPoint point, RateLimiter rateLimiter) {
         int time = rateLimiter.time();
         int count = rateLimiter.count();
-        String combineKey = getCombineKey(rateLimiter, point);
+        int timeout = rateLimiter.timeout();
         try {
+            String combineKey = getCombineKey(rateLimiter, point);
             RateType rateType = RateType.OVERALL;
             if (rateLimiter.limitType() == LimitType.CLUSTER) {
                 rateType = RateType.PER_CLIENT;
             }
-            long number = RedisUtils.rateLimiter(combineKey, rateType, count, time, time);
+            long number = RedisUtils.rateLimiter(combineKey, rateType, count, time, timeout);
             if (number == -1) {
                 String message = rateLimiter.message();
                 if (StringUtils.startsWith(message, "{") && StringUtils.endsWith(message, "}")) {
@@ -47,25 +48,27 @@ public class RateLimiterAspect {
             if (e instanceof ServiceException) {
                 throw e;
             } else {
-                throw new RuntimeException("服务器限流异常，请稍候再试");
+                throw new RuntimeException("服务器限流异常，请稍候再试", e);
             }
         }
     }
 
-    public String getCombineKey(RateLimiter rateLimiter, JoinPoint point) {
+    private String getCombineKey(RateLimiter rateLimiter, JoinPoint point) {
         // SpEL表达式
         // 解析返回给key
         String key = rateLimiter.key();
         String split = ":";
-        // 判断是否是spel格式
-        try {
-            if (StringUtils.containsAny(key, "#{") && StringUtils.containsAny(key, "}")) {
-                key = SpringExpressionCreated.createStandardTemplate(point).getValueString(rateLimiter.key()) + split;
-            } else if (StringUtils.containsAny(key, "#")) {
-                key = SpringExpressionCreated.createStandard(point).getValueString(rateLimiter.key()) + split;
+        if (StringUtils.isNotBlank(key)) {
+            // 判断是否是spel格式
+            try {
+                if (StringUtils.containsAny(key, "#{") && StringUtils.containsAny(key, "}")) {
+                    key = SpringExpressionCreated.createStandardTemplate(point).getValueString(rateLimiter.key()) + split;
+                } else if (StringUtils.containsAny(key, "#")) {
+                    key = SpringExpressionCreated.createStandard(point).getValueString(rateLimiter.key()) + split;
+                }
+            } catch (Exception e) {
+                throw new ServiceException("限流key解析异常，请联系管理员!");
             }
-        } catch (Exception e) {
-            throw new ServiceException("限流key解析异常，请联系管理员!");
         }
         StringBuilder stringBuffer = new StringBuilder(GlobalConstants.RATE_LIMIT_KEY);
         stringBuffer.append(ServletUtils.getRequest().getRequestURI()).append(split);

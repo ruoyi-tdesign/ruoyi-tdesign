@@ -5,35 +5,46 @@
 <mapper namespace="org.dromara.system.mapper.SysPostMapper">
 
     <resultMap id="SysPostResult" autoMapping="true" type="org.dromara.system.domain.SysPost">
+        <id property="postId" column="post_id"/>
     </resultMap>
     <resultMap id="SysPostResultVo" autoMapping="true" type="org.dromara.system.domain.vo.SysPostVo">
+        <id property="postId" column="post_id"/>
     </resultMap>
 
-    <select id="selectPostListByUserId" parameterType="Long" resultType="Long">
-        select p.post_id
+    <sql id="selectSysPostVo">
+        select sp.post_id, sp.tenant_id, sp.dept_id, sp.post_code, sp.post_category, sp.post_name, sp.post_sort, sp.status, sp.create_dept, sp.create_by, sp.create_time, sp.update_by, sp.update_time, sp.remark from sys_post sp
+    </sql>
+
+    <select id="selectPagePostList" resultMap="SysPostResult">
+        select
+        <if test="ew.getSqlSelect != null">
+            ${ew.getSqlSelect}
+        </if>
+        <if test="ew.getSqlSelect == null">
+            *
+        </if>
+        from sys_post ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="selectPostsByUserId" parameterType="Long" resultMap="SysPostResultVo">
+        select p.post_id, p.dept_id, p.post_name, p.post_code, p.post_category
         from sys_post p
                  left join sys_user_post up on up.post_id = p.post_id
                  left join sys_user u on u.user_id = up.user_id
         where u.user_id = #{userId}
     </select>
 
-    <select id="selectPostsByUserName" parameterType="String" resultMap="SysPostResultVo">
-        select p.post_id, p.post_name, p.post_code
-        from sys_post p
-                 left join sys_user_post up on up.post_id = p.post_id
-                 left join sys_user u on u.user_id = up.user_id
-        where u.user_name = #{userName}
-    </select>
-
-    <sql id="selectSysPostVo">
-        select sp.post_id, sp.post_code, sp.post_name, sp.post_sort, sp.status, sp.create_by, sp.create_time, sp.update_by, sp.update_time, sp.remark from sys_post sp
-    </sql>
     <select id="queryList" parameterType="org.dromara.system.domain.query.SysPostQuery" resultMap="SysPostResultVo">
         <include refid="selectSysPostVo"/>
         <where>
+            <if test="deptId != null"> and sp.dept_id = #{deptId}</if>
             <if test="postCode != null and postCode != ''"> and sp.post_code like concat(concat('%', #{postCode}), '%')</if>
+            <if test="postCategory != null and postCategory != ''"> and sp.post_category like concat(concat('%', #{postCategory}), '%')</if>
             <if test="postName != null and postName != ''"> and sp.post_name like concat(concat('%', #{postName}), '%')</if>
             <if test="status != null and status != ''"> and sp.status = #{status}</if>
+            <foreach collection="deptIds" item="item" index="index" open="and sp.dept_id in (" separator="," close=")" nullable="true">
+                #{item}
+            </foreach>
         </where>
         order by create_time desc
     </select>

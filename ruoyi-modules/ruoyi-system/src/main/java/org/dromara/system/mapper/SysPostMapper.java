@@ -1,6 +1,11 @@
 package org.dromara.system.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
+import org.dromara.common.mybatis.annotation.DataColumn;
+import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysPost;
 import org.dromara.system.domain.query.SysPostQuery;
@@ -16,20 +21,25 @@ import java.util.List;
 public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
 
     /**
-     * 根据用户ID获取岗位选择框列表
+     * 分页查询岗位列表
      *
-     * @param userId 用户ID
-     * @return 选中岗位ID列表
+     * @param page         分页对象
+     * @param queryWrapper 查询条件
+     * @return 包含岗位信息的分页结果
      */
-    List<Long> selectPostListByUserId(@Param("userId") Long userId);
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "create_by")
+    })
+    Page<SysPostVo> selectPagePostList(@Param("page") Page<SysPostVo> page, @Param(Constants.WRAPPER) Wrapper<SysPost> queryWrapper);
 
     /**
      * 查询用户所属岗位组
      *
-     * @param userName 用户名
+     * @param userId 用户ID
      * @return 结果
      */
-    List<SysPostVo> selectPostsByUserName(@Param("userName") String userName);
+    List<SysPostVo> selectPostsByUserId(@Param("userId") Long userId);
 
     /**
      * 查询岗位信息列表
@@ -37,5 +47,9 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
      * @param query 查询对象
      * @return {@link SysPost}
      */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "create_by")
+    })
     List<SysPostVo> queryList(SysPostQuery query);
 }

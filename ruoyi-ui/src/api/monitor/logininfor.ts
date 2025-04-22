@@ -19,21 +19,21 @@ export function getLogininfor(infoId: number) {
 
 // 删除登录日志
 export function delLogininfor(infoId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/monitor/logininfor/${infoId}`,
   });
 }
 
 // 解锁用户登录状态
 export function unlockLogininfor(userName: string) {
-  return request.get<R<void>>({
+  return request.get<R>({
     url: `/monitor/logininfor/unlock/${userName}`,
   });
 }
 
 // 清空登录日志
 export function cleanLogininfor() {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: '/monitor/logininfor/clean',
   });
 }

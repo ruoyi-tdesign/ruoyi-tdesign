@@ -119,45 +119,26 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link v-hasPermi="['system:role:query']" theme="primary" hover="color" @click.stop="handleDetail(row)">
-              <browse-icon />详情
-            </t-link>
-            <t-link
-              v-if="row.roleId !== 1"
-              v-hasPermi="['system:role:edit']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleUpdate(row)"
-            >
-              <edit-icon />修改
-            </t-link>
-            <t-link
+            <my-link v-hasPermi="['system:role:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-if="row.roleId !== 1" v-hasPermi="['system:role:edit']" @click.stop="handleUpdate(row)">
+              <template #prefix-icon><edit-icon /></template>修改
+            </my-link>
+            <my-link
               v-if="row.roleId !== 1"
               v-hasPermi="['system:role:remove']"
               theme="danger"
-              hover="color"
               @click.stop="handleDelete(row)"
             >
-              <delete-icon />删除
-            </t-link>
-            <t-link
-              v-if="row.roleId !== 1"
-              v-hasPermi="['system:role:edit']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDataScope(row)"
-            >
-              <check-circle-icon />数据权限
-            </t-link>
-            <t-link
-              v-if="row.roleId !== 1"
-              v-hasPermi="['system:role:edit']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleAuthUser(row)"
-            >
-              <user-icon />分配用户
-            </t-link>
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
+            <my-link v-if="row.roleId !== 1" v-hasPermi="['system:role:edit']" @click.stop="handleDataScope(row)">
+              <template #prefix-icon><check-circle-icon /></template>数据权限
+            </my-link>
+            <my-link v-if="row.roleId !== 1" v-hasPermi="['system:role:edit']" @click.stop="handleAuthUser(row)">
+              <template #prefix-icon><user-icon /></template>分配用户
+            </my-link>
           </t-space>
         </template>
       </t-table>
@@ -325,8 +306,12 @@
         <t-descriptions-item label="角色状态">
           <dict-tag :options="sys_normal_disable" :value="form.status" />
         </t-descriptions-item>
-        <t-descriptions-item label="菜单树选择项是否关联显示" :span="2">{{ form.menuCheckStrictly }}</t-descriptions-item>
-        <t-descriptions-item label="部门树选择项是否关联显示" :span="2">{{ form.deptCheckStrictly }}</t-descriptions-item>
+        <t-descriptions-item label="菜单树选择项是否关联显示" :span="2">
+          {{ form.menuCheckStrictly }}
+        </t-descriptions-item>
+        <t-descriptions-item label="部门树选择项是否关联显示" :span="2">
+          {{ form.deptCheckStrictly }}
+        </t-descriptions-item>
         <t-descriptions-item label="备注" :span="2">{{ form.remark }}</t-descriptions-item>
         <t-descriptions-item label="更新时间">{{ parseTime(form.updateTime) }}</t-descriptions-item>
         <t-descriptions-item label="创建时间">{{ parseTime(form.createTime) }}</t-descriptions-item>
@@ -422,6 +407,7 @@ const dataScopeOptions = ref([
   { value: '3', label: '本部门数据权限' },
   { value: '4', label: '本部门及以下数据权限' },
   { value: '5', label: '仅本人数据权限' },
+  { value: '6', label: '部门及以下或本人数据权限' },
 ]);
 // 列显隐信息
 const columns = ref<Array<PrimaryTableCol>>([

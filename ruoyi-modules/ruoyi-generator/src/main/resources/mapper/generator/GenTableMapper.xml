@@ -29,214 +29,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
         order by gt.create_time desc
     </select>
-
-    <select id="selectDbTableList" resultMap="GenTableResultVo">
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isMySql()">
-            select table_name, table_comment, create_time, update_time
-            from information_schema.tables
-            where table_schema = database()
-            AND table_name NOT LIKE 'pj_%'
-            <foreach collection="genTableNames" open="AND table_name NOT IN(" close=")" separator="," item="item" nullable="true">
-                #{item}
-            </foreach>
-            <if test="tableName != null and tableName != ''">
-                AND lower(table_name) like lower(concat(concat('%', #{tableName}), '%'))
-            </if>
-            <if test="tableComment != null and tableComment != ''">
-                AND lower(table_comment) like lower(concat(concat('%', #{tableComment}), '%'))
-            </if>
-            order by create_time desc
-        </if>
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isOracle()">
-            select lower(dt.table_name) as table_name, dtc.comments as table_comment, uo.created as create_time, uo.last_ddl_time as update_time
-            from user_tables dt, user_tab_comments dtc, user_objects uo
-            where dt.table_name = dtc.table_name
-            and dt.table_name = uo.object_name
-            and uo.object_type = 'TABLE'
-            AND dt.table_name NOT LIKE 'pj_%'
-            <foreach collection="genTableNames" open="AND lower(dt.table_name) NOT IN(" close=")" separator="," item="item" nullable="true">
-                #{item}
-            </foreach>
-            <if test="tableName != null and tableName != ''">
-                AND lower(dt.table_name) like lower(concat(concat('%', #{tableName}), '%'))
-            </if>
-            <if test="tableComment != null and tableComment != ''">
-                AND lower(dtc.comments) like lower(concat(concat('%', #{tableComment}), '%'))
-            </if>
-            order by create_time desc
-        </if>
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isPostgerSql()">
-            select table_name, table_comment, create_time, update_time
-            from (
-                SELECT c.relname AS table_name,
-                        obj_description(c.oid) AS table_comment,
-                        CURRENT_TIMESTAMP AS create_time,
-                        CURRENT_TIMESTAMP AS update_time
-                FROM pg_class c
-                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
-                    AND c.relname != 'spatial_%'::text
-                    AND n.nspname = 'public'::name
-                    AND n.nspname <![CDATA[ <> ]]> ''::name
-            ) list_table
-            where table_name NOT LIKE 'pj_%'
-            <foreach collection="genTableNames" open="AND table_name NOT IN(" close=")" separator="," item="item" nullable="true">
-                #{item}
-            </foreach>
-            <if test="tableName != null and tableName != ''">
-                AND lower(table_name) like lower(concat(concat('%', #{tableName}), '%'))
-            </if>
-            <if test="tableComment != null and tableComment != ''">
-                AND lower(table_comment) like lower(concat(concat('%', #{tableComment}), '%'))
-            </if>
-            order by create_time desc
-        </if>
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isSqlServer()">
-            SELECT cast(D.NAME as nvarchar) as table_name,
-                   cast(F.VALUE as nvarchar) as table_comment,
-                   crdate as create_time,
-                   refdate as update_time
-            FROM SYSOBJECTS D
-                INNER JOIN SYS.EXTENDED_PROPERTIES F ON D.ID = F.MAJOR_ID
-                    AND F.MINOR_ID = 0 AND D.XTYPE = 'U' AND D.NAME != 'DTPROPERTIES'
-                    AND D.NAME NOT LIKE 'pj_%'
-            <foreach collection="genTableNames" open="AND D.NAME NOT IN(" close=")" separator="," item="item" nullable="true">
-                #{item}
-            </foreach>
-            <if test="tableName != null and tableName != ''">
-                AND lower(D.NAME) like lower(concat(N'%', N'${tableName}', N'%'))
-            </if>
-            <if test="tableComment != null and tableComment != ''">
-                AND lower(CAST(F.VALUE AS nvarchar)) like lower(concat(N'%', N'${tableComment}', N'%'))
-            </if>
-            order by crdate desc
-        </if>
-    </select>
-
-    <select id="selectDbTableListByNames" resultMap="GenTableResultVo">
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isMySql()">
-            select table_name, table_comment, create_time, update_time from information_schema.tables
-            where table_name NOT LIKE 'pj_%' and table_schema = (select database())
-            and table_name in
-            <foreach collection="array" item="name" open="(" separator="," close=")">
-                 #{name}
-            </foreach>
-        </if>
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isOracle()">
-            select lower(dt.table_name) as table_name, dtc.comments as table_comment, uo.created as create_time, uo.last_ddl_time as update_time
-            from user_tables dt, user_tab_comments dtc, user_objects uo
-            where dt.table_name = dtc.table_name
-            and dt.table_name = uo.object_name
-            and uo.object_type = 'TABLE'
-            AND dt.table_name NOT LIKE 'pj_%'
-            and lower(dt.table_name) in
-            <foreach collection="array" item="name" open="(" separator="," close=")">
-                #{name}
-            </foreach>
-        </if>
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isPostgerSql()">
-            select table_name, table_comment, create_time, update_time
-            from (
-                SELECT c.relname AS table_name,
-                        obj_description(c.oid) AS table_comment,
-                        CURRENT_TIMESTAMP AS create_time,
-                        CURRENT_TIMESTAMP AS update_time
-                FROM pg_class c
-                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
-                    AND c.relname != 'spatial_%'::text
-                    AND n.nspname = 'public'::name
-                    AND n.nspname <![CDATA[ <> ]]> ''::name
-            ) list_table
-            where table_name NOT LIKE 'pj_%'
-            and table_name in
-            <foreach collection="array" item="name" open="(" separator="," close=")">
-                #{name}
-            </foreach>
-        </if>
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isSqlServer()">
-            SELECT cast(D.NAME as nvarchar) as table_name,
-                   cast(F.VALUE as nvarchar) as table_comment,
-                   crdate as create_time,
-                   refdate as update_time
-            FROM SYSOBJECTS D
-                INNER JOIN SYS.EXTENDED_PROPERTIES F ON D.ID = F.MAJOR_ID
-                    AND F.MINOR_ID = 0 AND D.XTYPE = 'U' AND D.NAME != 'DTPROPERTIES'
-                    AND D.NAME NOT LIKE 'pj_%'
-                    AND D.NAME in
-                    <foreach collection="array" item="name" open="(" separator="," close=")">
-                        #{name}
-                    </foreach>
-        </if>
-    </select>
-
-    <select id="selectTableByName" parameterType="String" resultMap="GenTableResult">
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isMySql()">
-            select table_name, table_comment, create_time, update_time from information_schema.tables
-            where table_name NOT LIKE 'pj_%' and table_schema = (select database())
-            and table_name = #{tableName}
-        </if>
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isOracle()">
-            select lower(dt.table_name) as table_name, dtc.comments as table_comment, uo.created as create_time, uo.last_ddl_time as update_time
-            from user_tables dt, user_tab_comments dtc, user_objects uo
-            where dt.table_name = dtc.table_name
-            and dt.table_name = uo.object_name
-            and uo.object_type = 'TABLE'
-            AND dt.table_name NOT LIKE 'pj_%'
-            AND dt.table_name NOT IN (select table_name from gen_table)
-            and lower(dt.table_name) = #{tableName}
-        </if>
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isPostgerSql()">
-            select table_name, table_comment, create_time, update_time
-            from (
-                SELECT c.relname AS table_name,
-                        obj_description(c.oid) AS table_comment,
-                        CURRENT_TIMESTAMP AS create_time,
-                        CURRENT_TIMESTAMP AS update_time
-                FROM pg_class c
-                    LEFT JOIN pg_namespace n ON n.oid = c.relnamespace
-                WHERE (c.relkind = ANY (ARRAY ['r'::"char", 'p'::"char"]))
-                    AND c.relname != 'spatial_%'::text
-                    AND n.nspname = 'public'::name
-                    AND n.nspname <![CDATA[ <> ]]> ''::name
-            ) list_table
-            where table_name NOT LIKE 'pj_%'
-            and table_name = #{tableName}
-        </if>
-        <if test="@org.dromara.common.mybatis.helper.DataBaseHelper@isSqlServer()">
-            SELECT cast(D.NAME as nvarchar) as table_name,
-                   cast(F.VALUE as nvarchar) as table_comment,
-                   crdate as create_time,
-                   refdate as update_time
-            FROM SYSOBJECTS D
-                INNER JOIN SYS.EXTENDED_PROPERTIES F ON D.ID = F.MAJOR_ID
-                    AND F.MINOR_ID = 0 AND D.XTYPE = 'U' AND D.NAME != 'DTPROPERTIES'
-                    AND D.NAME NOT LIKE 'pj_%'
-                    AND D.NAME = #{tableName}
-        </if>
-    </select>
-
-    <select id="selectGenTableById" parameterType="Long" resultMap="GenTableResultVo">
+    <sql id="genSelect">
         SELECT t.table_id, t.data_name, t.table_name, t.table_comment, t.class_name, t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author, t.gen_type, t.gen_path, t.options, t.remark,
                c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query, c.is_detail, c.is_sort, c.query_type, c.html_type, c.dict_type, c.sort
         FROM gen_table t
-             LEFT JOIN gen_table_column c ON t.table_id = c.table_id
+                 LEFT JOIN gen_table_column c ON t.table_id = c.table_id
+    </sql>
+
+    <select id="selectGenTableById" parameterType="Long" resultMap="GenTableResultVo">
+        <include refid="genSelect"/>
         where t.table_id = #{tableId} order by c.sort
     </select>
 
     <select id="selectGenTableByName" parameterType="String" resultMap="GenTableResultVo">
-        SELECT t.table_id, t.data_name, t.table_name, t.table_comment, t.class_name, t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author, t.gen_type, t.gen_path, t.options, t.remark,
-               c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query,c.is_detail, c.is_sort, c.query_type, c.html_type, c.dict_type, c.sort
-        FROM gen_table t
-             LEFT JOIN gen_table_column c ON t.table_id = c.table_id
+        <include refid="genSelect"/>
         where t.table_name = #{tableName} order by c.sort
     </select>
 
     <select id="selectGenTableAll" parameterType="String" resultMap="GenTableResultVo">
-        SELECT t.table_id, t.data_name, t.table_name, t.table_comment, t.class_name, t.tpl_category, t.package_name, t.module_name, t.business_name, t.function_name, t.function_author, t.options, t.remark,
-               c.column_id, c.column_name, c.column_comment, c.column_type, c.java_type, c.java_field, c.is_pk, c.is_increment, c.is_required, c.is_insert, c.is_edit, c.is_list, c.is_query,c.is_detail, c.is_sort, c.query_type, c.html_type, c.dict_type, c.sort
-        FROM gen_table t
-             LEFT JOIN gen_table_column c ON t.table_id = c.table_id
+        <include refid="genSelect"/>
         order by c.sort
     </select>
 

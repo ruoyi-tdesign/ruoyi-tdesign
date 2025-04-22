@@ -8,10 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.constant.GrantTypeConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.domain.model.SmsLoginBody;
 import org.dromara.common.core.enums.LoginType;
-import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.user.CaptchaExpireException;
 import org.dromara.common.core.exception.user.UserException;
 import org.dromara.common.core.utils.MessageUtils;
@@ -20,8 +20,8 @@ import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.satoken.utils.MultipleStpUtil;
 import org.dromara.common.tenant.annotation.IgnoreTenant;
-import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.web.domain.vo.LoginVo;
@@ -44,7 +44,7 @@ public class SmsAuthStrategy implements IAuthStrategy<SmsLoginBody> {
 
     @Override
     @IgnoreTenant
-    public LoginVo login(SmsLoginBody loginBody, SysClient client) {
+    public LoginVo login(SmsLoginBody loginBody, SysClientVo client) {
         String phonenumber = loginBody.getPhonenumber();
         String smsCode = loginBody.getSmsCode();
         String clientId = client.getClientId();
@@ -91,19 +91,16 @@ public class SmsAuthStrategy implements IAuthStrategy<SmsLoginBody> {
     }
 
     private SysUserVo loadUserByPhonenumber(String phonenumber) {
-        userMapper.selectUserByPhonenumber(phonenumber);
-        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getPhonenumber, SysUser::getStatus)
-//            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
+        SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>()
             .eq(SysUser::getPhonenumber, phonenumber));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", phonenumber);
             throw new UserException("user.not.exists", phonenumber);
-        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+        } else if (SystemConstants.DISABLE.equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", phonenumber);
             throw new UserException("user.blocked", phonenumber);
         }
-        return userMapper.selectUserByPhonenumber(phonenumber);
+        return user;
     }
 
 }

@@ -6,11 +6,16 @@ import router from '@/router';
 import { usePermissionStoreHook, useUserStore } from '@/store';
 import { useTitle } from '@/utils/doc';
 import { isRelogin } from '@/utils/request';
-import { isHttp } from '@/utils/validate';
+import { isPathMatch } from '@/utils/validate';
 
 let errorRetry = 0;
 
 NProgress.configure({ showSpinner: false });
+
+// 路由白名单
+const isWhiteList = (path: string, whiteList: string[]) => {
+  return whiteList.some((pattern) => isPathMatch(pattern, path));
+};
 
 router.beforeEach(async (to, from, next) => {
   NProgress.start();
@@ -35,7 +40,7 @@ router.beforeEach(async (to, from, next) => {
       return;
     }
 
-    if (whiteListRouters.indexOf(to.path) !== -1) {
+    if (isWhiteList(to.path, whiteListRouters)) {
       next();
       return;
     }
@@ -51,16 +56,11 @@ router.beforeEach(async (to, from, next) => {
 
         isRelogin.show = false;
 
-        const accessRoutes = await permissionStore.generateRoutes();
-        // 根据roles权限生成可访问的路由表
-        accessRoutes.forEach((route) => {
-          if (!isHttp(route.path)) {
-            router.addRoute(route); // 动态添加可访问路由表
-          }
-        });
+        await permissionStore.generateRoutes();
         next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
         errorRetry = 0;
       } catch (error) {
+        console.error(error);
         errorRetry++;
         // await userStore.logout();
         next({

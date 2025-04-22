@@ -25,7 +25,7 @@ export function getSensitiveWord(wordId: number) {
 
 // 新增敏感词
 export function addSensitiveWord(data: SysSensitiveWordForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/sensitiveWord',
     data,
   });
@@ -33,7 +33,7 @@ export function addSensitiveWord(data: SysSensitiveWordForm) {
 
 // 修改敏感词
 export function updateSensitiveWord(data: SysSensitiveWordForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/sensitiveWord',
     data,
   });
@@ -41,14 +41,14 @@ export function updateSensitiveWord(data: SysSensitiveWordForm) {
 
 // 删除敏感词
 export function delSensitiveWord(wordIds: number | Array<number>) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/sensitiveWord/${wordIds}`,
   });
 }
 
 // 刷新缓存
 export function refreshSensitiveWordCache() {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: '/system/sensitiveWord/refreshCache',
   });
 }

@@ -31,6 +31,13 @@ public class JsonUtils {
         return OBJECT_MAPPER;
     }
 
+    /**
+     * 将对象转换为JSON格式的字符串
+     *
+     * @param object 要转换的对象
+     * @return JSON格式的字符串，如果对象为null，则返回null
+     * @throws RuntimeException 如果转换过程中发生JSON处理异常，则抛出运行时异常
+     */
     public static String toJsonString(Object object) {
         if (ObjectUtil.isNull(object)) {
             return null;
@@ -42,6 +49,15 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 将JSON格式的字符串转换为指定类型的对象
+     *
+     * @param text  JSON格式的字符串
+     * @param clazz 要转换的目标对象类型
+     * @param <T>   目标对象的泛型类型
+     * @return 转换后的对象，如果字符串为空则返回null
+     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
+     */
     public static <T> T parseObject(String text, Class<T> clazz) {
         if (StringUtils.isEmpty(text)) {
             return null;
@@ -53,6 +69,15 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 将字节数组转换为指定类型的对象
+     *
+     * @param bytes 字节数组
+     * @param clazz 要转换的目标对象类型
+     * @param <T>   目标对象的泛型类型
+     * @return 转换后的对象，如果字节数组为空则返回null
+     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
+     */
     public static <T> T parseObject(byte[] bytes, Class<T> clazz) {
         if (ArrayUtil.isEmpty(bytes)) {
             return null;
@@ -64,6 +89,15 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 将JSON格式的字符串转换为指定类型的对象，支持复杂类型
+     *
+     * @param text          JSON格式的字符串
+     * @param typeReference 指定类型的TypeReference对象
+     * @param <T>           目标对象的泛型类型
+     * @return 转换后的对象，如果字符串为空则返回null
+     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
+     */
     public static <T> T parseObject(String text, TypeReference<T> typeReference) {
         if (StringUtils.isBlank(text)) {
             return null;
@@ -75,6 +109,13 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 将JSON格式的字符串转换为Dict对象
+     *
+     * @param text JSON格式的字符串
+     * @return 转换后的Dict对象，如果字符串为空或者不是JSON格式则返回null
+     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
+     */
     public static Dict parseMap(String text) {
         if (StringUtils.isBlank(text)) {
             return null;
@@ -89,6 +130,13 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 将JSON格式的字符串转换为Dict对象的列表
+     *
+     * @param text JSON格式的字符串
+     * @return 转换后的Dict对象的列表，如果字符串为空则返回null
+     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
+     */
     public static List<Dict> parseArrayMap(String text) {
         if (StringUtils.isBlank(text)) {
             return null;
@@ -100,6 +148,15 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 将JSON格式的字符串转换为指定类型对象的列表
+     *
+     * @param text  JSON格式的字符串
+     * @param clazz 要转换的目标对象类型
+     * @param <T>   目标对象的泛型类型
+     * @return 转换后的对象的列表，如果字符串为空则返回空列表
+     * @throws RuntimeException 如果转换过程中发生IO异常，则抛出运行时异常
+     */
     public static <T> List<T> parseArray(String text, Class<T> clazz) {
         if (StringUtils.isEmpty(text)) {
             return new ArrayList<>();
@@ -111,6 +168,11 @@ public class JsonUtils {
         }
     }
 
+    /**
+     * 将Object对象转为Map
+     * @param obj Object对象
+     * @return 转换后的Map,如果为null则返回null
+     */
     public static Map<String, Object> convertMap(Object obj) {
         if (obj != null) {
             return OBJECT_MAPPER.convertValue(obj, new TypeReference<>() {
@@ -119,6 +181,11 @@ public class JsonUtils {
         return null;
     }
 
+    /**
+     * 将Object对象转为List&lt;Map&gt;
+     * @param obj Object对象
+     * @return 转换后的List&lt;Map&gt;,如果为null则返回null
+     */
     public static List<Map<String, Object>> convertListMap(Object obj) {
         if (obj != null) {
             return OBJECT_MAPPER.convertValue(obj, new TypeReference<>() {

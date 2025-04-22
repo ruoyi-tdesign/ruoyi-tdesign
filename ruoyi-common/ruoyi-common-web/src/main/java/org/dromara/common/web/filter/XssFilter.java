@@ -9,11 +9,12 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.spring.SpringUtils;
+import org.dromara.common.web.config.properties.XssProperties;
 import org.springframework.http.HttpMethod;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,11 +30,8 @@ public class XssFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        String tempExcludes = filterConfig.getInitParameter("excludes");
-        if (StringUtils.isNotEmpty(tempExcludes)) {
-            String[] url = tempExcludes.split(StringUtils.SEPARATOR);
-            excludes.addAll(Arrays.asList(url));
-        }
+        XssProperties properties = SpringUtils.getBean(XssProperties.class);
+        excludes.addAll(properties.getExcludeUrls());
     }
 
     @Override

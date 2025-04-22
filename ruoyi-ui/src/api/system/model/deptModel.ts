@@ -10,7 +10,9 @@ export interface SysDeptQuery extends BaseEntity {
   parentId?: number;
   /** 部门名称 */
   deptName?: string;
-  /** 部门状态 */
+  /** 部门类别编码 */
+  deptCategory?: string;
+  /** 部门状态（1正常 0停用） */
   status?: string;
 }
 
@@ -24,6 +26,8 @@ export interface SysDeptForm {
   parentId?: number;
   /** 部门名称 */
   deptName?: string;
+  /** 部门类别编码 */
+  deptCategory?: string;
   /** 显示顺序 */
   orderNum?: number;
   /** 负责人 */
@@ -47,6 +51,8 @@ export interface SysDeptVo {
   ancestors?: string;
   /** 部门名称 */
   deptName?: string;
+  /** 部门类别编码 */
+  deptCategory?: string;
   /** 显示顺序 */
   orderNum?: number;
   /** 负责人 */

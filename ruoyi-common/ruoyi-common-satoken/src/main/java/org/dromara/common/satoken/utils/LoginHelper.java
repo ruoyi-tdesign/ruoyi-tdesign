@@ -2,10 +2,12 @@ package org.dromara.common.satoken.utils;
 
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpLogic;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.constant.TenantConstants;
-import org.dromara.common.core.constant.UserConstants;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
 
@@ -116,8 +118,29 @@ public class LoginHelper {
     /**
      * 获取用户id
      */
+    public static Object getLoginId() {
+        return MultipleStpUtil.SYSTEM.getLoginId();
+    }
+
+    /**
+     * 获取用户id
+     */
     public static Long getUserId() {
         return MultipleLoginBaseHelper.getUserId(MultipleStpUtil.SYSTEM);
+    }
+
+    /**
+     * 获取用户id
+     */
+    public static String getUserIdStr() {
+        return Convert.toStr(getUserId());
+    }
+
+    /**
+     * 获取用户账户
+     */
+    public static String getUsername() {
+        return getUserOptional().map(LoginUser::getUsername).orElse(null);
     }
 
     /**
@@ -135,10 +158,17 @@ public class LoginHelper {
     }
 
     /**
-     * 获取用户账户
+     * 获取部门名
      */
-    public static String getUsername() {
-        return getUserOptional().map(LoginUser::getUsername).orElse(null);
+    public static String getDeptName() {
+        return Convert.toStr(getUserOptional().map(LoginUser::getDeptName));
+    }
+
+    /**
+     * 获取部门类别编码
+     */
+    public static String getDeptCategory() {
+        return Convert.toStr(getUserOptional().map(LoginUser::getDeptCategory));
     }
 
     /**
@@ -156,25 +186,33 @@ public class LoginHelper {
      * @return 结果
      */
     public static boolean isSuperAdmin(Long userId) {
-        return UserConstants.SUPER_ADMIN_ID.equals(userId);
-    }
-
-    public static boolean isSuperAdmin() {
-        return isSuperAdmin(getUserId());
+        return SystemConstants.SUPER_ADMIN_ID.equals(userId);
     }
 
     /**
      * 是否为超级管理员
      *
+     * @return 结果
+     */
+    public static boolean isSuperAdmin() {
+        return isSuperAdmin(getUserId());
+    }
+
+    /**
+     * 是否为租户管理员
+     *
      * @param rolePermission 角色权限标识组
      * @return 结果
      */
     public static boolean isTenantAdmin(Set<String> rolePermission) {
+        if (CollUtil.isEmpty(rolePermission)) {
+            return false;
+        }
         return rolePermission.contains(TenantConstants.TENANT_ADMIN_ROLE_KEY);
     }
 
     /**
-     * 当前用户是否为超级管理员
+     * 当前用户是否为租户管理员
      *
      * @return 结果
      */

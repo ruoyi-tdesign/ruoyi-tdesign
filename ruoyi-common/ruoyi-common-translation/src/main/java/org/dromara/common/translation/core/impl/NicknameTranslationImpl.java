@@ -20,7 +20,9 @@ public class NicknameTranslationImpl extends SimpleTranslationImpl {
     @Override
     public Object translation(Object key, Translation translation) {
         if (key instanceof Long id) {
-            return userService.selectNicknameById(id);
+            return userService.selectNicknameByIds(id.toString());
+        } else if (key instanceof String ids) {
+            return userService.selectNicknameByIds(ids);
         }
         return null;
     }

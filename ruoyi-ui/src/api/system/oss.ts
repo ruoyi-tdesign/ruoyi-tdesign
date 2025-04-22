@@ -43,7 +43,7 @@ export function getOss(ossId: number) {
 
 // 修改OSS对象存储
 export function updateOss(data: SysOssForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/resource/oss',
     data,
   });
@@ -51,14 +51,14 @@ export function updateOss(data: SysOssForm) {
 
 // 删除OSS对象存储
 export function delOss(ossId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/resource/oss/${ossId}`,
   });
 }
 
 // 删除我的OSS对象存储
 export function delMyOss(ossId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/resource/oss/my/${ossId}`,
   });
 }
@@ -75,7 +75,7 @@ export function uploader(formData: FormData) {
 
 // 移动到分类
 export function moveOss(categoryId: number, ossId: number[]) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: `/resource/oss/${categoryId}/move`,
     data: ossId,
   });

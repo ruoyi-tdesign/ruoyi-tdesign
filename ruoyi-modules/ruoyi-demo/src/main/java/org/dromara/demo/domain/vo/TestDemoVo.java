@@ -4,6 +4,8 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import org.dromara.common.excel.annotation.ExcelNotation;
+import org.dromara.common.excel.annotation.ExcelRequired;
 import org.dromara.common.translation.annotation.Translation;
 import org.dromara.common.translation.constant.TransConstant;
 import org.dromara.demo.domain.TestDemo;
@@ -36,30 +38,35 @@ public class TestDemoVo implements Serializable {
     /**
      * 部门id
      */
+    @ExcelRequired
     @ExcelProperty(value = "部门id")
     private Long deptId;
 
     /**
      * 用户id
      */
+    @ExcelRequired
     @ExcelProperty(value = "用户id")
     private Long userId;
 
     /**
      * 排序号
      */
+    @ExcelRequired
     @ExcelProperty(value = "排序号")
     private Integer orderNum;
 
     /**
      * key键
      */
+    @ExcelNotation(value = "测试key")
     @ExcelProperty(value = "key键")
     private String testKey;
 
     /**
      * 值
      */
+    @ExcelNotation(value = "测试value")
     @ExcelProperty(value = "值")
     private String value;
 

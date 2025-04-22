@@ -28,12 +28,22 @@ public interface CacheNames {
     /**
      * 数据字典
      */
-    String SYS_DICT = GlobalConstants.GLOBAL_REDIS_KEY + "sys_dict";
+    String SYS_DICT_DATA = GlobalConstants.GLOBAL_REDIS_KEY + "sys_dict_data";
+
+    /**
+     * 数据字典类型
+     */
+    String SYS_DICT_TYPE = GlobalConstants.GLOBAL_REDIS_KEY + "sys_dict_type";
 
     /**
      * 租户
      */
     String SYS_TENANT = GlobalConstants.GLOBAL_REDIS_KEY + "sys_tenant#30d";
+
+    /**
+     * 客户端
+     */
+    String SYS_CLIENT = GlobalConstants.GLOBAL_REDIS_KEY + "sys_client#30d";
 
     /**
      * 用户账户
@@ -48,12 +58,22 @@ public interface CacheNames {
     /**
      * 部门
      */
-    String SYS_DEPT = "sys_dept#30d";
+    String SYS_DEPT = GlobalConstants.GLOBAL_REDIS_KEY + "sys_dept#30d";
 
     /**
      * OSS内容
      */
     String SYS_OSS = "sys_oss#30d#1h#10000";
+
+    /**
+     * 角色自定义权限
+     */
+    String SYS_ROLE_CUSTOM = "sys_role_custom#30d";
+
+    /**
+     * 部门及以下权限
+     */
+    String SYS_DEPT_AND_CHILD = "sys_dept_and_child#30d";
 
     /**
      * OSS配置

@@ -185,7 +185,12 @@ export default {
     });
   },
   // 确认窗体
-  confirm(content: string | VNode, onConfirm: Function, onClose?: Function) {
+  confirm(
+    content: string | VNode,
+    onConfirm: Function,
+    onClose?: Function,
+    options?: Omit<DialogOptions, 'onClose' | 'body' | 'confirmBtn'>,
+  ) {
     const btn = reactive({
       content: '确定',
       loading: false,
@@ -212,6 +217,7 @@ export default {
         }
         instance.destroy();
       },
+      ...(options ?? {}),
     });
     return instance;
   },

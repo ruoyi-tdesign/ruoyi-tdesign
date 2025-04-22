@@ -13,7 +13,7 @@
     </description>
 
     <properties>
-        <revision>1.3.1</revision>
+        <revision>1.4.0</revision>
     </properties>
 
     <dependencyManagement>
@@ -175,6 +175,13 @@
             <dependency>
                 <groupId>org.dromara</groupId>
                 <artifactId>ruoyi-common-amqp</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- SSE模块 -->
+            <dependency>
+                <groupId>org.dromara</groupId>
+                <artifactId>ruoyi-common-sse</artifactId>
                 <version>${revision}</version>
             </dependency>
 

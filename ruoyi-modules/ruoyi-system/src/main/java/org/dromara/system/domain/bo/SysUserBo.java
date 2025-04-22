@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.constant.UserConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.validation.Mobile;
 import org.dromara.common.core.xss.Xss;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
@@ -103,11 +103,6 @@ public class SysUserBo extends BaseEntity {
     private Long updateBy;
 
     /**
-     * 部门组
-     */
-    private Long[] deptIds;
-
-    /**
      * 角色组
      */
     @Size(min = 1, message = "用户角色不能为空")
@@ -128,7 +123,7 @@ public class SysUserBo extends BaseEntity {
     }
 
     public boolean isSuperAdmin() {
-        return UserConstants.SUPER_ADMIN_ID.equals(this.userId);
+        return SystemConstants.SUPER_ADMIN_ID.equals(this.userId);
     }
 
 }

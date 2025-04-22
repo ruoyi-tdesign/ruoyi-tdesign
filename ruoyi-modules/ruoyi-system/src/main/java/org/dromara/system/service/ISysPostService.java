@@ -19,10 +19,10 @@ public interface ISysPostService extends IService<SysPost> {
     /**
      * 获取岗位列表
      *
-     * @param post 岗位信息
+     * @param query 岗位信息
      * @return 岗位列表
      */
-    TableDataInfo<SysPostVo> selectPagePostList(SysPostQuery post);
+    TableDataInfo<SysPostVo> selectPagePostList(SysPostQuery query);
 
     /**
      * 查询岗位信息集合
@@ -31,6 +31,14 @@ public interface ISysPostService extends IService<SysPost> {
      * @return 岗位列表
      */
     List<SysPostVo> selectPostList(SysPostQuery query);
+
+    /**
+     * 查询用户所属岗位组
+     *
+     * @param userId 用户ID
+     * @return 岗位ID
+     */
+    List<SysPostVo> selectPostsByUserId(Long userId);
 
     /**
      * 查询所有岗位
@@ -56,6 +64,14 @@ public interface ISysPostService extends IService<SysPost> {
     List<Long> selectPostListByUserId(Long userId);
 
     /**
+     * 通过岗位ID串查询岗位
+     *
+     * @param postIds 岗位id串
+     * @return 岗位列表信息
+     */
+    List<SysPostVo> selectPostByIds(List<Long> postIds);
+
+    /**
      * 校验岗位名称
      *
      * @param post 岗位信息
@@ -78,6 +94,14 @@ public interface ISysPostService extends IService<SysPost> {
      * @return 结果
      */
     long countUserPostById(Long postId);
+
+    /**
+     * 通过部门ID查询岗位使用数量
+     *
+     * @param deptId 部门id
+     * @return 结果
+     */
+    long countPostByDeptId(Long deptId);
 
     /**
      * 删除岗位信息

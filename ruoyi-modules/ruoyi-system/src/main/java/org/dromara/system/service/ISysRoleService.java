@@ -43,6 +43,14 @@ public interface ISysRoleService extends IService<SysRole> {
     List<SysRoleVo> selectRolesByUserId(Long userId);
 
     /**
+     * 根据用户ID查询角色列表(包含被授权状态)
+     *
+     * @param userId 用户ID
+     * @return 角色列表
+     */
+    List<SysRoleVo> selectRolesAuthByUserId(Long userId);
+
+    /**
      * 根据用户ID查询角色权限
      *
      * @param userId 用户ID
@@ -72,6 +80,14 @@ public interface ISysRoleService extends IService<SysRole> {
      * @return 角色对象信息
      */
     SysRoleVo selectRoleById(Long roleId);
+
+    /**
+     * 通过角色ID串查询角色
+     *
+     * @param roleIds 角色ID串
+     * @return 角色列表信息
+     */
+    List<SysRoleVo> selectRoleByIds(List<Long> roleIds);
 
     /**
      * 校验角色名称是否唯一
@@ -192,4 +208,7 @@ public interface ISysRoleService extends IService<SysRole> {
      * @param roleId 角色id
      */
     void cleanOnlineUserByRole(Long roleId);
+
+    void cleanOnlineUser(List<Long> userIds);
+
 }

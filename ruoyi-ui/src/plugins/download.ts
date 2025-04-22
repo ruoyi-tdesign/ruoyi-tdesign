@@ -10,7 +10,7 @@ import { blobValidate } from '@/utils/ruoyi';
 const baseURL = import.meta.env.VITE_APP_BASE_API;
 
 export default {
-  oss(ossId: number) {
+  oss(ossId: number | string) {
     const { token } = useUserStore();
     const url = `${baseURL}/resource/oss/download/${ossId}`;
     const downloadLoadingInstance = LoadingPlugin({

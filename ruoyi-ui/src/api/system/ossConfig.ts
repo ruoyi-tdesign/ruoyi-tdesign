@@ -19,7 +19,7 @@ export function getOssConfig(ossConfigId: number) {
 
 // 新增对象存储配置
 export function addOssConfig(data: SysOssConfigForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/resource/oss/config',
     data,
   });
@@ -27,7 +27,7 @@ export function addOssConfig(data: SysOssConfigForm) {
 
 // 修改对象存储配置
 export function updateOssConfig(data: SysOssConfigForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/resource/oss/config',
     data,
   });
@@ -35,7 +35,7 @@ export function updateOssConfig(data: SysOssConfigForm) {
 
 // 删除对象存储配置
 export function delOssConfig(ossConfigId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/resource/oss/config/${ossConfigId}`,
   });
 }
@@ -47,7 +47,7 @@ export function changeOssConfigStatus(ossConfigId: number, status: string, confi
     status,
     configKey,
   };
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/resource/oss/config/changeStatus',
     data,
   });

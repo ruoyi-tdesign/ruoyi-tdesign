@@ -21,6 +21,7 @@ import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.config.properties.CaptchaProperties;
+import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysUserBo;
 import org.dromara.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,11 +62,12 @@ public class SysRegisterService {
         sysUser.setUserType(userType);
 
         // 忽略租户，在全局中做校验是否重复
-        TenantHelper.ignore(() -> {
-            if (!userService.checkUserNameUnique(sysUser)) {
-                throw new UserException("user.register.save.error", username);
-            }
-        });
+        Boolean exist = TenantHelper.ignore(() -> userService.lambdaQuery()
+            .eq(SysUser::getUserName, sysUser.getUserName())
+            .exists());
+        if (exist) {
+            throw new UserException("user.register.save.error", username);
+        }
         boolean regFlag = userService.registerUser(sysUser, tenantId);
         if (!regFlag) {
             throw new UserException("user.register.error");
@@ -81,15 +83,15 @@ public class SysRegisterService {
      * @param uuid     唯一标识
      */
     public void validateCaptcha(String tenantId, String username, String code, String uuid) {
-        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
+        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.blankToDefault(uuid, "");
         String captcha = RedisUtils.getObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
-            recordLogininfor(tenantId, null, username, Constants.REGISTER, MessageUtils.message("user.jcaptcha.expire"));
+            recordLogininfor(tenantId, null, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         if (!code.equalsIgnoreCase(captcha)) {
-            recordLogininfor(tenantId, null, username, Constants.REGISTER, MessageUtils.message("user.jcaptcha.error"));
+            recordLogininfor(tenantId, null, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
             throw new CaptchaException();
         }
     }

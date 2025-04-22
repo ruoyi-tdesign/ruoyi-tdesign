@@ -93,6 +93,9 @@ public class SysDictDataController extends BaseController {
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
     @PostMapping
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysDictDataBo dict) {
+        if (!dictDataService.checkDictDataUnique(dict)) {
+            return R.fail("新增字典数据'" + dict.getDictValue() + "'失败，字典键值已存在");
+        }
         dictDataService.insertDictData(dict);
         return R.ok();
     }
@@ -104,6 +107,9 @@ public class SysDictDataController extends BaseController {
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
     @PutMapping
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysDictDataBo dict) {
+        if (!dictDataService.checkDictDataUnique(dict)) {
+            return R.fail("修改字典数据'" + dict.getDictValue() + "'失败，字典键值已存在");
+        }
         dictDataService.updateDictData(dict);
         return R.ok();
     }

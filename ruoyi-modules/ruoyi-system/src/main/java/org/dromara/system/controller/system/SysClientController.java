@@ -98,7 +98,7 @@ public class SysClientController extends BaseController {
     @Log(title = "客户端管理", businessType = BusinessType.UPDATE)
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysClientBo bo) {
-        return toAjax(sysClientService.updateUserStatus(bo.getId(), bo.getStatus()));
+        return toAjax(sysClientService.updateClientStatus(bo.getClientId(), bo.getStatus()));
     }
 
     /**

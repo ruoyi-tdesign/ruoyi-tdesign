@@ -30,6 +30,11 @@ public class SysClientBo extends BaseEntity {
     private Long id;
 
     /**
+     * 客户端id
+     */
+    private String clientId;
+
+    /**
      * 客户端key
      */
     @NotBlank(message = "客户端key不能为空", groups = {AddGroup.class, EditGroup.class})

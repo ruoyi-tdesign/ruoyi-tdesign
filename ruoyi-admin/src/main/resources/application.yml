@@ -1,24 +1,3 @@
-# 项目相关配置
-ruoyi:
-  # 名称
-  name: ruoyi-tdesign
-  # 版本
-  version: ${revision}
-  # 版权年份
-  copyrightYear: 2023
-
-captcha:
-  enable: true
-  # 页面 <参数设置> 可开启关闭 验证码校验
-  # 验证码类型 math 数组计算 char 字符验证
-  type: MATH
-  # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
-  category: CIRCLE
-  # 数字验证码位数
-  numberLength: 1
-  # 字符验证码长度
-  charLength: 4
-
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
@@ -41,12 +20,25 @@ server:
       # 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载
       worker: 256
 
+captcha:
+  enable: true
+  # 页面 <参数设置> 可开启关闭 验证码校验
+  # 验证码类型 math 数组计算 char 字符验证
+  type: MATH
+  # line 线段干扰 circle 圆圈干扰 shear 扭曲干扰
+  category: CIRCLE
+  # 数字验证码位数
+  numberLength: 1
+  # 字符验证码长度
+  charLength: 4
+
 # 日志配置
 logging:
   level:
     org.dromara: @logging.level@
     org.springframework: warn
-    tech.powerjob.worker.background: warn
+    org.mybatis.spring.mapper: error
+    org.apache.fury: warn
   config: classpath:logback-spring.xml
 
 # 用户配置
@@ -60,7 +52,11 @@ user:
 # Spring配置
 spring:
   application:
-    name: ${ruoyi.name}
+    name: ruoyi-tdesign
+  threads:
+    # 开启虚拟线程 仅jdk21可用
+    virtual:
+      enabled: false
   main:
     allow-circular-references: true
   # 资源信息
@@ -77,6 +73,8 @@ spring:
       # 设置总上传的文件大小
       max-request-size: 20MB
   mvc:
+    # 设置静态资源路径 防止所有请求都去查静态资源
+    static-path-pattern: /static/**
     format:
       date-time: yyyy-MM-dd HH:mm:ss
   jackson:
@@ -122,6 +120,8 @@ sa-token:
         - /monitor/**
         - /resource/**
         - /demo/**
+        - /workflow/**
+        - /warm-flow/**
     user:
       # 允许动态设置 token 有效期
       dynamic-active-timeout: true
@@ -144,25 +144,21 @@ sa-token:
       token-prefix: "Bearer"
       match:
         - /user/**
+        - /resource/**
 
 # security配置
 security:
   # 排除路径
   excludes:
-    # 静态资源
     - /*.html
     - /**/*.html
     - /**/*.css
     - /**/*.js
-    # 公共路径
     - /favicon.ico
     - /error
-    # swagger 文档配置
     - /*/api-docs
     - /*/api-docs/**
-    # actuator 监控配置
-    - /actuator
-    - /actuator/**
+    - /warm-flow-ui/token-name
 
 # 多租户配置
 tenant:
@@ -193,8 +189,9 @@ tenant:
 # MyBatisPlus配置
 # https://baomidou.com/config/
 mybatis-plus:
-  # 不支持多包, 如有需要可在注解配置 或 提升扫包等级
-  # 例如 com.**.**.mapper
+  # 自定义配置 是否全局开启逻辑删除 关闭后 所有逻辑删除功能将失效
+  enableLogicDelete: true
+  # 多包名使用 例如 org.dromara.**.mapper,org.xxx.**.mapper
   mapperPackage: org.dromara.**.mapper
   # 对应的 XML 文件位置
   mapperLocations: classpath*:mapper/**/*Mapper.xml
@@ -245,7 +242,7 @@ springdoc:
 #    persistAuthorization: true
   info:
     # 标题
-    title: '标题：${ruoyi.name}多租户管理系统_接口文档'
+    title: '标题：${spring.application.name}多租户管理系统_接口文档'
     # 描述
     description: '描述：用于管理集团旗下公司的人员信息,具体包括XXX,XXX模块...'
     # 版本
@@ -261,7 +258,7 @@ springdoc:
       apiKey:
         type: APIKEY
         in: HEADER
-        name: ${sa-token.token-name}
+        name: ${sa-token.multiple.login.token-name}
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块
@@ -272,17 +269,22 @@ springdoc:
       packages-to-scan: org.dromara.system
     - group: 4.代码生成模块
       packages-to-scan: org.dromara.generator
+    - group: 5.工作流模块
+      packages-to-scan: org.dromara.workflow
 
 # 防止XSS攻击
 xss:
   # 过滤开关
   enabled: true
   # 排除链接（多个用逗号分隔）
-  excludes: /system/notice,/system/config/**,/system/messageTemplate,/system/messageConfig
-  # 匹配链接
-  urlPatterns: /system/*,/monitor/*,/tool/*
+  excludeUrls:
+    - /system/notice
+    - /system/config/**
+    - /system/messageTemplate
+    - /system/messageConfig
 
 # 全局线程池相关配置
+# 如使用JDK21请直接使用虚拟线程 不要开启此配置
 thread-pool:
   # 是否开启线程池
   enabled: false
@@ -308,12 +310,16 @@ management:
     health:
       show-details: ALWAYS
     logfile:
-      external-file: ./logs/${ruoyi.name}-console.log
+      external-file: ./logs/${spring.application.name}-console.log
+
+--- # 默认/推荐使用sse推送
+sse:
+  enabled: true
 
 --- # websocket
 websocket:
   # 如果关闭 需要和前端开关一起关闭
-  enabled: true
+  enabled: false
   multiple:
     login:
       # 路径
@@ -324,3 +330,20 @@ websocket:
 --- #SMS4J 短信
 sms:
   config-type: interface
+
+--- # warm-flow工作流配置
+warm-flow:
+  # 是否开启工作流，默认true
+  enabled: true
+  # 是否开启设计器ui
+  ui: true
+  # 默认Authorization，如果有多个token，用逗号分隔
+  token-name: ${sa-token.multiple.login.token-name},clientid
+  # 流程状态对应的三元色
+  chart-status-color:
+    ## 未办理
+    - 62,62,62
+    ## 待办理
+    - 255,205,23
+    ## 已办理
+    - 157,255,0

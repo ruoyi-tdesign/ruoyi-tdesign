@@ -1,13 +1,14 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.domain.dto.OssDTO;
 import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.enums.YesNoEnum;
 import org.dromara.common.core.exception.ServiceException;
@@ -21,7 +22,7 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.oss.core.OssClient;
 import org.dromara.common.oss.entity.UploadResult;
-import org.dromara.common.oss.enumd.AccessPolicyType;
+import org.dromara.common.oss.enums.AccessPolicyType;
 import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.system.domain.SysOss;
@@ -42,7 +43,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -95,9 +97,10 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
     }
 
     /**
-     * 查询OSS对象基于id串
+     * 根据一组 ossIds 获取对应的 SysOssVo 列表
      *
      * @param ossIds OSS对象ID串
+     * @return 包含 SysOssVo 对象的列表
      */
     @Override
     public List<SysOssVo> listVoByIds(Collection<Long> ossIds) {
@@ -124,10 +127,10 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
     }
 
     /**
-     * 通过ossId查询对应的url
+     * 根据一组 ossIds 获取对应文件的 URL 列表
      *
-     * @param ossIds ossId串逗号分隔
-     * @return
+     * @param ossIds ossIds 以逗号分隔的 ossId 字符串
+     * @return 以逗号分隔的文件 URL 字符串
      */
     @Override
     public String selectUrlByIds(String ossIds) {
@@ -135,6 +138,26 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
         List<SysOssVo> ossVos = listVoByIds(ids);
         return StreamUtils.join(ossVos, SysOssVo::getUrl);
     }
+
+    @Override
+    public List<OssDTO> selectByIds(String ossIds) {
+        List<OssDTO> list = new ArrayList<>();
+        SysOssServiceImpl ossService = SpringUtils.getAopProxy(this);
+        for (Long id : StringUtils.splitTo(ossIds, Convert::toLong)) {
+            SysOssVo vo = ossService.getById(id);
+            if (ObjectUtil.isNotNull(vo)) {
+                try {
+                    vo.setUrl(this.matchingUrl(vo).getUrl());
+                    list.add(BeanUtil.toBean(vo, OssDTO.class));
+                } catch (Exception ignored) {
+                    // 如果oss异常无法连接则将数据直接返回
+                    list.add(BeanUtil.toBean(vo, OssDTO.class));
+                }
+            }
+        }
+        return list;
+    }
+
 
     /**
      * 通过id获取oss对象
@@ -149,7 +172,7 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
     }
 
     /**
-     * 上传OSS对象存储
+     * 文件下载方法，支持一次性下载完整文件
      *
      * @param ossId OSS对象ID
      * @return
@@ -163,21 +186,16 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
         OssClient storage = OssFactory.instance(sysOss.getService());
-        try (InputStream inputStream = storage.getObjectContent(sysOss.getUrl())) {
-            int available = inputStream.available();
-            IoUtil.copy(inputStream, response.getOutputStream(), available);
-            response.setContentLength(available);
-        } catch (Exception e) {
-            throw new ServiceException(e.getMessage());
-        }
+        storage.download(sysOss.getFileName(), response.getOutputStream(), response::setContentLengthLong);
     }
 
     /**
-     * 上传OSS对象存储
+     * 上传 MultipartFile 到对象存储服务，并保存文件信息到数据库
      *
-     * @param file 文件
+     * @param file 要上传的 MultipartFile 对象
      * @param bo   业务对象
-     * @return
+     * @return 上传成功后的 SysOssVo 对象，包含文件信息
+     * @throws ServiceException 如果上传过程中发生异常，则抛出 ServiceException 异常
      */
     @Override
     public SysOssVo upload(MultipartFile file, SysOssBo bo) {
@@ -198,11 +216,11 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
     }
 
     /**
-     * 上传OSS对象存储
+     * 上传文件到对象存储服务，并保存文件信息到数据库
      *
-     * @param file 文件
+     * @param file 要上传的文件对象
      * @param bo   业务对象
-     * @return
+     * @return 上传成功后的 SysOssVo 对象，包含文件信息
      */
     @Override
     public SysOssVo upload(File file, SysOssBo bo) {
@@ -296,11 +314,11 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
         if (exists) {
             throw new ServiceException("加锁文件必须解锁后才能删除");
         }
-        List<SysOss> list = baseMapper.selectBatchIds(ids);
+        List<SysOss> list = baseMapper.selectByIds(ids);
         for (SysOss oss : list) {
             CacheUtils.evict(CacheNames.SYS_OSS, oss.getOssId());
         }
-        boolean b = removeBatchByIds(ids);
+        boolean b = removeByIds(ids);
         if (b) {
             removeRealOss(list);
         }
@@ -308,7 +326,7 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
     }
 
     /**
-     * 匹配Url
+     * 桶类型为 private 的URL 修改为临时URL时长为120s
      *
      * @param oss OSS对象
      * @return oss 匹配Url的OSS对象
@@ -318,7 +336,7 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
             OssClient storage = OssFactory.instance(oss.getService());
             // 仅修改桶类型为 private 的URL，临时URL时长为120s
             if (AccessPolicyType.PRIVATE == storage.getAccessPolicy()) {
-                oss.setUrl(storage.getPrivateUrl(oss.getFileName(), 120));
+                oss.setUrl(storage.getPrivateUrl(oss.getFileName(), Duration.ofSeconds(120)));
             }
         } catch (Exception e) {
             log.error("获取oss地址失败", e);

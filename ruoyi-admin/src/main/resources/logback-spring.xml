@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <property name="log.path" value="./logs"/>
     <property name="console.log.pattern"
-              value="%red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{36}%n) - %msg%n"/>
-    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
+              value="%cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %clr(${PID:- }){magenta} %green([%thread]) %clr(%-5level) %boldMagenta(%logger{39}%n) - %msg%n"/>
+    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${PID:- } [%thread] %-5level %logger{39} - %msg%n"/>
 
     <!--应用名称-->
     <springProperty scope="context" name="APP_NAME" source="spring.application.name"/>
+
     <!-- 控制台输出 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -14,16 +16,15 @@
             <charset>utf-8</charset>
         </encoder>
     </appender>
-    <!-- 控制台输出 -->
+
+    <!-- 控制台日志文件 -->
     <appender name="file_console" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.path}/${APP_NAME}-console.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 日志文件名格式 -->
             <fileNamePattern>${log.path}/${APP_NAME}-console.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!--日志分割-->
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>100MB</maxFileSize>
             <!-- 日志最大 7天 -->
             <maxHistory>7</maxHistory>
         </rollingPolicy>
@@ -41,13 +42,11 @@
     <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.path}/${APP_NAME}-info.log</file>
         <!-- 循环政策：基于时间创建日志文件 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 日志文件名格式 -->
             <fileNamePattern>${log.path}/${APP_NAME}-info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!--日志分割-->
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>100MB</maxFileSize>
             <!-- 日志最大的历史 30天 -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
@@ -67,13 +66,11 @@
     <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.path}/${APP_NAME}-error.log</file>
         <!-- 循环政策：基于时间创建日志文件 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 日志文件名格式 -->
             <fileNamePattern>${log.path}/${APP_NAME}-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!--日志分割-->
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>100MB</maxFileSize>
             <!-- 日志最大的历史 30天 -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>

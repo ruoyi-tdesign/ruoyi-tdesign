@@ -3,42 +3,7 @@
     <t-row :gutter="20">
       <!--部门数据-->
       <t-col :sm="2" :xs="12">
-        <div class="head-container">
-          <t-row style="width: 100%" :gutter="20">
-            <t-col :span="10">
-              <t-input v-model="deptName" placeholder="请输入部门名称" clearable style="margin-bottom: 20px">
-                <template #prefixIcon>
-                  <search-icon />
-                </template>
-              </t-input>
-            </t-col>
-            <t-col :span="2">
-              <t-button shape="square" variant="outline" @click="getDeptTree">
-                <template #icon><refresh-icon /></template>
-              </t-button>
-            </t-col>
-          </t-row>
-        </div>
-        <div class="head-container">
-          <t-loading :loading="loadingDept" size="small">
-            <t-tree
-              ref="deptTreeRef"
-              v-model:actived="deptActived"
-              v-model:expanded="expandedDept"
-              class="t-tree--block-node"
-              :data="deptOptions"
-              :keys="{ value: 'id', label: 'label', children: 'children' }"
-              :filter="filterNode"
-              activable
-              hover
-              line
-              check-strictly
-              allow-fold-node-on-filter
-              transition
-              @active="handleQuery"
-            />
-          </t-loading>
-        </div>
+        <dept-tree v-model="deptActived" @active="handleQuery" />
       </t-col>
       <!--用户数据-->
       <t-col :sm="10" :xs="12">
@@ -162,54 +127,29 @@
             <template #operation="{ row }">
               <t-space :size="8" break-line>
                 <t-tooltip content="详情" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:query']"
-                    theme="primary"
-                    hover="color"
-                    @click.stop="handleDetail(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:query']" @click.stop="handleDetail(row)">
                     <browse-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
                 <t-tooltip v-if="row.userId !== 1" content="修改" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:edit']"
-                    theme="primary"
-                    hover="color"
-                    @click.stop="handleUpdate(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:edit']" @click.stop="handleUpdate(row)">
                     <edit-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
                 <t-tooltip v-if="row.userId !== 1" content="删除" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:remove']"
-                    theme="danger"
-                    hover="color"
-                    @click.stop="handleDelete(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:remove']" theme="danger" @click.stop="handleDelete(row)">
                     <delete-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
                 <t-tooltip v-if="row.userId !== 1" content="重置密码" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:resetPwd']"
-                    theme="primary"
-                    hover="color"
-                    @click.stop="handleResetPwd(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:resetPwd']" @click.stop="handleResetPwd(row)">
                     <user-password-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
                 <t-tooltip v-if="row.userId !== 1" content="分配角色" placement="top">
-                  <t-link
-                    v-hasPermi="['system:user:edit']"
-                    theme="primary"
-                    hover="color"
-                    @click.stop="handleAuthRole(row)"
-                  >
+                  <my-link v-hasPermi="['system:user:edit']" @click.stop="handleAuthRole(row)">
                     <user-safety-icon />
-                  </t-link>
+                  </my-link>
                 </t-tooltip>
               </t-space>
             </template>
@@ -259,6 +199,7 @@
                     checkStrictly: true,
                   }"
                   placeholder="请选择归属部门"
+                  @change="handleDeptChange"
                 />
               </t-form-item>
             </t-col>
@@ -313,6 +254,7 @@
               <t-form-item label="岗位" name="postIds">
                 <t-select
                   v-model="form.postIds"
+                  :loading="loadingPost"
                   clearable
                   multiple
                   placeholder="请选择"
@@ -334,6 +276,7 @@
                   v-model="form.roleIds"
                   clearable
                   multiple
+                  filterable
                   placeholder="请选择"
                   :tag-props="{ theme: 'primary', variant: 'light' }"
                 >
@@ -400,7 +343,7 @@
     >
       <my-descriptions :loading="openViewLoading">
         <t-descriptions-item label="用户ID">{{ formView.userId }}</t-descriptions-item>
-        <t-descriptions-item label="部门">{{ formView.dept?.deptName }}</t-descriptions-item>
+        <t-descriptions-item label="部门">{{ formView.deptName }}</t-descriptions-item>
         <t-descriptions-item label="用户账号">{{ formView.userName }}</t-descriptions-item>
         <t-descriptions-item label="用户昵称">{{ formView.nickName }}</t-descriptions-item>
         <t-descriptions-item label="用户类型">{{ formView.userType }}</t-descriptions-item>
@@ -428,6 +371,7 @@
 defineOptions({
   name: 'User',
 });
+
 import { storeToRefs } from 'pinia';
 import {
   AddIcon,
@@ -450,7 +394,7 @@ import type {
   SubmitContext,
   SuccessContext,
   TableSort,
-  TreeNodeModel,
+  TreeSelectProps,
   UploadInstanceFunctions,
 } from 'tdesign-vue-next';
 import { computed, createVNode, getCurrentInstance, onMounted, reactive, ref } from 'vue';
@@ -460,6 +404,7 @@ import type { TreeModel } from '@/api/model/resultModel';
 import type { SysPostVo } from '@/api/system/model/postModel';
 import type { SysRoleVo } from '@/api/system/model/roleModel';
 import type { SysUserForm, SysUserQuery, SysUserVo } from '@/api/system/model/userModel';
+import { postOptionSelect } from '@/api/system/post';
 import {
   addUser,
   changeUserStatus,
@@ -486,7 +431,6 @@ const openView = ref(false);
 const openViewLoading = ref(false);
 const loading = ref(true);
 const dLoading = ref(false);
-const loadingDept = ref(false);
 const showSearch = ref(true);
 const columnControllerVisible = ref(false);
 const ids = ref([]);
@@ -495,15 +439,13 @@ const multiple = ref(true);
 const total = ref(0);
 const title = ref('');
 const dateRange = ref([]);
-const deptName = ref('');
-const deptOptions = ref<Array<TreeModel<number>>>([]);
 const deptFormOptions = ref<Array<TreeModel<number>>>([]);
-const expandedDept = ref<number[]>([]);
 const initPassword = ref(undefined);
 const postOptions = ref<SysPostVo[]>([]);
 const roleOptions = ref<SysRoleVo[]>([]);
 const deptActived = ref<number[]>([]);
 const sort = ref<TableSort>();
+const loadingPost = ref(false);
 const { token } = storeToRefs(useUserStore());
 /** 用户导入参数 */
 const upload = reactive({
@@ -546,6 +488,7 @@ const rules = ref<Record<string, Array<FormRule>>>({
   password: [
     { required: true, message: '用户密码不能为空' },
     { min: 5, max: 20, message: '用户密码长度必须介于 5 和 20 之间' },
+    { pattern: /^[^<>"'|\\]+$/, message: '不能包含非法字符：< > " \' \\ |', trigger: 'blur' },
   ],
   email: [{ email: true, message: '请输入正确的邮箱地址' }],
   phonenumber: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码' }],
@@ -582,34 +525,23 @@ const pagination = computed(() => {
   };
 });
 
-/** 通过条件过滤节点  */
-const filterNode = computed(() => {
-  const value = deptName.value;
-  return (node: TreeNodeModel) => {
-    if (!node.value || !value) return true;
-    return node.label.indexOf(value) >= 0;
-  };
-});
-/** 查询部门下拉树结构 */
-async function getDeptTree() {
-  loadingDept.value = true;
-  return deptTreeSelect()
-    .then((response) => {
-      deptOptions.value = response.data;
-    })
-    .finally(() => (loadingDept.value = false));
-}
 /** 查询部门下拉树结构 */
 async function getDeptFormTree() {
   return deptTreeSelect().then((response) => {
     deptFormOptions.value = response.data;
   });
 }
-function triggerExpandedDept() {
-  expandedDept.value = deptOptions.value
-    .flatMap((value) => value.children?.concat([value]) ?? [value])
-    .map((value) => value.id);
-}
+
+const handleDeptChange: TreeSelectProps['onChange'] = (value) => {
+  loadingPost.value = true;
+  form.value.postIds = [];
+  postOptionSelect(value as number)
+    .then((res) => {
+      postOptions.value = res.data;
+    })
+    .finally(() => (loadingPost.value = false));
+};
+
 /** 查询用户列表 */
 function getList() {
   loading.value = true;
@@ -843,8 +775,6 @@ const onSubmit = ({ validateResult, firstError }: SubmitContext) => {
 };
 
 onMounted(() => {
-  getDeptTree().then(() => triggerExpandedDept());
-  deptFormOptions.value = deptOptions.value;
   getList();
 });
 </script>

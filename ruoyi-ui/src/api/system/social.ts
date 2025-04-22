@@ -11,7 +11,7 @@ export function authBinding(source: string) {
 
 // 解绑账号
 export function authUnlock(socialId: number) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/auth/unlock/${socialId}`,
   });
 }

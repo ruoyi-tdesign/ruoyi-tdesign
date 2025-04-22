@@ -29,7 +29,7 @@ public interface ISysClientService extends IService<SysClient> {
     /**
      * 查询客户端信息基于客户端id
      */
-    SysClient queryByClientId(String clientId);
+    SysClientVo queryByClientId(String clientId);
 
     /**
      * 查询系统授权列表
@@ -66,7 +66,7 @@ public interface ISysClientService extends IService<SysClient> {
     /**
      * 修改状态
      */
-    int updateUserStatus(Long id, String status);
+    int updateClientStatus(String clientId, String status);
 
     /**
      * 校验并批量删除系统授权信息

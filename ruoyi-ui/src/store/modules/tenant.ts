@@ -13,7 +13,7 @@ export const useTenantStore = defineStore('tenant', () => {
 
   // 租户列表
   function initTenantList() {
-    getTenantList().then((res) => {
+    getTenantList(true).then((res) => {
       const vo = res.data;
       tenantEnabled.value = !!vo.tenantEnabled;
       if (tenantEnabled.value) {

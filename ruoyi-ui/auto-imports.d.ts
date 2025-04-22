@@ -6,6 +6,8 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
+  const MessagePlugin: typeof import('tdesign-vue-next')['MessagePlugin']
+  const TOTAL: typeof import('tdesign-vue-next')['OTAL']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']

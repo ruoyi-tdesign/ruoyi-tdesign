@@ -33,7 +33,10 @@ import type { $StringUtils.join($importApiModel, ", ") } from '@/api/${moduleNam
 import { request } from '@/utils/request';
 #if($isUseQueryMethod)
 
-// 查询${functionName}列表
+/**
+ * 查询${functionName}列表
+ * @param query 查询参数
+ */
 export function list${BusinessName}(query?: ${query}) {
   return request.get<$Result>({
     url: '/${moduleName}/${businessName}/list',
@@ -43,7 +46,10 @@ export function list${BusinessName}(query?: ${query}) {
 #end
 #if($isUseDetailMethod || $isUseEditMethod)
 
-// 查询${functionName}详细
+/**
+ * 查询${functionName}详细
+ * @param ${pkColumn.javaField} 主键
+ */
 export function get${BusinessName}(${pkColumn.javaField}: $idType) {
   return request.get<R<${vo}>>({
     url: `/${moduleName}/${businessName}/${${pkColumn.javaField}}`,
@@ -52,7 +58,10 @@ export function get${BusinessName}(${pkColumn.javaField}: $idType) {
 #end
 #if($isUseAddMethod)
 
-// 新增${functionName}
+/**
+ * 新增${functionName}
+ * @param data 表单数据
+ */
 export function add${BusinessName}(data: ${bo}) {
   return request.post<R<void>>({
     url: '/${moduleName}/${businessName}',
@@ -62,7 +71,10 @@ export function add${BusinessName}(data: ${bo}) {
 #end
 #if($isUseEditMethod)
 
-// 修改${functionName}
+/**
+ * 修改${functionName}
+ * @param data
+ */
 export function update${BusinessName}(data: ${bo}) {
   return request.put<R<void>>({
     url: '/${moduleName}/${businessName}',
@@ -72,7 +84,10 @@ export function update${BusinessName}(data: ${bo}) {
 #end
 #if($isUseRemoveMethod)
 
-// 删除${functionName}
+/**
+ * 删除${functionName}
+ * @param ${pkColumn.javaField}s 主键串
+ */
 export function del${BusinessName}(${pkColumn.javaField}s: $idType | Array<$idType>) {
   return request.delete<R<void>>({
     url: `/${moduleName}/${businessName}/${${pkColumn.javaField}s}`,

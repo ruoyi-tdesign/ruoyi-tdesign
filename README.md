@@ -1,12 +1,12 @@
 # 平台简介
 
 [![码云Gitee](https://gitee.com/yixiacoco/ruoyi-tdesign/badge/star.svg?theme=blue)](https://gitee.com/yixiacoco/ruoyi-tdesign)
-[![GitHub](https://img.shields.io/github/stars/yixiaco/ruoyi-tdesign.svg?style=social&label=Stars)](https://github.com/yixiaco/ruoyi-tdesign)
+[![GitHub](https://img.shields.io/github/stars/ruoyi-tdesign/ruoyi-tdesign.svg?style=social&label=Stars)](https://github.com/ruoyi-tdesign/ruoyi-tdesign)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitee.com/yixiacoco/ruoyi-tdesign/blob/master/LICENSE)
 [![使用IntelliJ IDEA开发维护](https://img.shields.io/badge/IntelliJ%20IDEA-提供支持-blue.svg)](https://www.jetbrains.com/?from=ruoyi-tdesign)
 <br>
-[![ruoyi-tdesign](https://img.shields.io/badge/ruoyi%20tdesign-1.3.1-success.svg)](https://gitee.com/yixiacoco/ruoyi-tdesign)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-blue.svg)]()
+[![ruoyi-tdesign](https://img.shields.io/badge/ruoyi%20tdesign-1.4.0-success.svg)](https://gitee.com/yixiacoco/ruoyi-tdesign)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4-blue.svg)]()
 [![JDK-17](https://img.shields.io/badge/JDK-17-green.svg)]()
 [![JDK-21](https://img.shields.io/badge/JDK-21-green.svg)]()
 
@@ -15,13 +15,13 @@
 > 项目代码、文档 均开源免费可商用 遵循开源协议在项目中保留开源协议文件即可<br>
 活到老写到老 为兴趣而开源 为学习而开源 为让大家真正可以学到技术而开源
 
-> 交流与讨论: [交流群](https://github.com/yixiaco/ruoyi-tdesign/wiki/%E4%BA%A4%E6%B5%81%E7%BE%A4)<br>
+> 交流与讨论: [交流群](https://github.com/ruoyi-tdesign/ruoyi-tdesign/wiki/%E4%BA%A4%E6%B5%81%E7%BE%A4)<br>
 > 系统演示(感谢 [疯狂的麦克粥](https://gitee.com/CrazyMikePorridge) 贡献的演示服务器): [传送门](https://ruoyi-tdesign.hexm.online)
 
 > 查看项目[更新日志](./CHANGELOG.md)
 
 ## 文档
-要查看项目文档，请访问[ruoyi-tdesign-doc](https://yixiaco.github.io/ruoyi-tdesign-doc/)
+要查看项目文档，请访问[ruoyi-tdesign-doc](https://ruoyi-tdesign.github.io/ruoyi-tdesign-doc/)
 
 ## 介绍
 | 功能介绍     | 使用技术                | 文档地址                                                                                            | 描述                                                                                                                                              |
@@ -41,14 +41,14 @@
 | 缓存注解     | Spring-Cache        | [Spring Cache文档](https://spring.io/guides/gs/caching/)                                          | 采用 Spring-Cache 注解 对其扩展了实现支持了更多功能<br/>例如 过期时间 最大空闲时间 组最大长度等 只需一个注解即可完成数据自动缓存                                                                    |
 | 数据库框架    | Mybatis-Plus        | [Mybatis-Plus文档](https://baomidou.com/guide/)                                                   | 采用 Mybatis-Plus 基于对象几乎不用写SQL全java操作 功能强大插件众多<br/>例如多租户插件 分页插件 乐观锁插件等等                                                                           |
 | 数据库框架    | p6spy               | [p6spy官网](https://p6spy.readthedocs.io/)                                                        | 采用 p6spy 可输出完整SQL与执行时间监控                                                                                                                        |
-| 多数据源框架   | dynamic-datasource  | [dynamic-ds文档](https://www.kancloud.cn/tracy5546/dynamic-datasource/content)                    | 采用 dynamic-datasource 支持世面大部分数据库<br/>通过yml配置即可动态管理异构不同种类的数据库 也可通过前端页面添加数据源<br/>支持spel表达式从请求头参数等条件切换数据源                                          |
+| 多数据源框架   | dynamic-datasource  | [dynamic-ds文档](https://www.kancloud.cn/tracy5546/dynamic-datasource/content)                    | 采用 dynamic-datasource 支持市面大部分数据库<br/>通过yml配置即可动态管理异构不同种类的数据库 也可通过前端页面添加数据源<br/>支持spel表达式从请求头参数等条件切换数据源                                          |
 | 序列化框架    | Jackson             | [Jackson官网](https://github.com/FasterXML/jackson)                                               | 统一使用 jackson 高效可靠                                                                                                                               |
 | 分布式队列    | Redisson            | [Redisson文档](https://github.com/redisson/redisson/wiki/%E7%9B%AE%E5%BD%95)                      | 普通队列、延迟队列、优先队列 等                                                                                                                                |
 | 分布式锁     | Lock4j              | [Lock4j官网](https://gitee.com/baomidou/lock4j)                                                   | 注解锁、工具锁 多种多样                                                                                                                                    |
 | 分布式幂等    | Redisson            | [Lock4j文档](https://gitee.com/baomidou/lock4j)                                                   | 拦截重复提交                                                                                                                                          |
 | 监控框架     | SpringBoot-Admin    | [GItHub](https://github.com/codecentric/spring-boot-admin)                                      | 采用 SpringBoot-Admin 基于SpringBoot官方 actuator 探针机制<br/>实时监控服务状态 框架还为其扩展了在线日志查看监控                                                                  |
 | 分布式链路追踪  | Apache SkyWalking   | [Apache SkyWalking文档](https://skywalking.apache.org/docs/)                                      | 链路追踪、网格分析、度量聚合、可视化                                                                                                                              |
-| 分布式任务调度  | PowerJob            | [PowerJob官网](http://www.powerjob.tech/)                                                         | 天生支持分布式 统一的管理中心                                                                                                                                 |
+| 分布式任务调度  | SnailJob            | [SnailJob官网](https://snailjob.opensnail.com/)                                                   | 天生支持分布式 统一的管理中心 支持多种数据库 支持分片重试DAG任务流等                                                                                                           |
 | 文件存储     | Minio               | [Minio文档](https://docs.min.io/)                                                                 | 采用 Minio 分布式文件存储 天生支持多机、多硬盘、多分片、多副本存储<br/>支持权限管理 安全可靠 文件可加密存储                                                                                   |
 | 云存储      | 七牛、阿里、腾讯            | [OSS使用文档](https://gitee.com/yixiacoco/ruoyi-tdesign/wikis/pages?sort_id=4359146&doc_id=1469725) | 采用 AWS S3 协议客户端 支持 七牛、阿里、腾讯 等一切支持S3协议的厂家                                                                                                        |
 | 短信       | 支持数十种短信厂家           | [短信使用文档](https://wind.kim/)                                                                     | 采用 sms4j 短信融合包 支持数十种短信厂家 只需在yml配置好厂家密钥即可使用 可多厂家共用                                                                                               |

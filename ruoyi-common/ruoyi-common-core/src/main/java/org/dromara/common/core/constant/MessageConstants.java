@@ -10,4 +10,7 @@ public interface MessageConstants {
 
     /** 登录验证码 */
     String LOGIN_CAPTCHA = "LOGIN_CAPTCHA";
+
+    /** 流程提醒 */
+    String WORK_FLOW = "WORK_FLOW";
 }

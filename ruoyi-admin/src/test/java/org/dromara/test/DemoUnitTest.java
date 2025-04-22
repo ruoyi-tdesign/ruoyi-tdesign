@@ -1,6 +1,6 @@
 package org.dromara.test;
 
-import org.dromara.common.core.config.RuoYiConfig;
+import org.dromara.common.web.config.properties.CaptchaProperties;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,19 +25,19 @@ import java.util.concurrent.TimeUnit;
 public class DemoUnitTest {
 
     @Autowired
-    private RuoYiConfig ruoYiConfig;
+    private CaptchaProperties captchaProperties;
 
     @DisplayName("测试 @SpringBootTest @Test @DisplayName 注解")
     @Test
     public void testTest() {
-        System.out.println(ruoYiConfig);
+        System.out.println(captchaProperties);
     }
 
     @Disabled
     @DisplayName("测试 @Disabled 注解")
     @Test
     public void testDisabled() {
-        System.out.println(ruoYiConfig);
+        System.out.println(captchaProperties);
     }
 
     @Timeout(value = 2L, unit = TimeUnit.SECONDS)
@@ -45,7 +45,7 @@ public class DemoUnitTest {
     @Test
     public void testTimeout() throws InterruptedException {
         Thread.sleep(3000);
-        System.out.println(ruoYiConfig);
+        System.out.println(captchaProperties);
     }
 
 

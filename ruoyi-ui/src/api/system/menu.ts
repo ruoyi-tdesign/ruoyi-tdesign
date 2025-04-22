@@ -46,7 +46,7 @@ export function tenantPackageMenuTreeSelect(packageId: number) {
 
 // 新增菜单
 export function addMenu(data: SysMenuForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/menu',
     data,
   });
@@ -54,7 +54,7 @@ export function addMenu(data: SysMenuForm) {
 
 // 修改菜单
 export function updateMenu(data: SysMenuForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/menu',
     data,
   });
@@ -62,7 +62,7 @@ export function updateMenu(data: SysMenuForm) {
 
 // 删除菜单
 export function delMenu(menuId: number) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/menu/${menuId}`,
   });
 }

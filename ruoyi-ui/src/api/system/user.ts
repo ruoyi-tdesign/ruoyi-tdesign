@@ -1,4 +1,5 @@
 import type { R, TableDataInfo, TreeModel } from '@/api/model/resultModel';
+import type { SysDeptQuery } from '@/api/system/model/deptModel';
 import type { SysUserForm, SysUserInfoVo, SysUserQuery, SysUserVo, UserAuthRole } from '@/api/system/model/userModel';
 import { request } from '@/utils/request';
 import { parseStrEmpty } from '@/utils/ruoyi';
@@ -20,7 +21,7 @@ export function getUser(userId?: number) {
 
 // 新增用户
 export function addUser(data: SysUserForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/user',
     data,
   });
@@ -28,7 +29,7 @@ export function addUser(data: SysUserForm) {
 
 // 修改用户
 export function updateUser(data: SysUserForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/user',
     data,
   });
@@ -36,7 +37,7 @@ export function updateUser(data: SysUserForm) {
 
 // 删除用户
 export function delUser(userId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/user/${userId}`,
     method: 'delete',
   });
@@ -48,13 +49,14 @@ export function resetUserPwd(userId: number, password: string) {
     userId,
     password,
   };
-  return request.put<R<void>>(
+  return request.put<R>(
     {
       url: '/system/user/resetPwd',
       data,
     },
     {
       withEncrypt: true,
+      repeatSubmit: false,
     },
   );
 }
@@ -65,7 +67,7 @@ export function changeUserStatus(userId: number, status: string) {
     userId,
     status,
   };
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/user/changeStatus',
     data,
   });
@@ -80,7 +82,7 @@ export function getAuthRole(userId: number | string) {
 
 // 保存授权角色
 export function updateAuthRole(data: { userId: number; roleIds: string }) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/user/authRole',
     params: data,
   });
@@ -97,9 +99,22 @@ export function listUserByDeptId(deptId: number) {
 }
 
 // 查询部门下拉树结构
-export function deptTreeSelect() {
+export function deptTreeSelect(params?: SysDeptQuery) {
   return request.get<R<Array<TreeModel<number>>>>({
     url: '/system/user/deptTree',
+    params,
     method: 'get',
+  });
+}
+
+/**
+ * 根据用户ID串批量获取用户基础信息
+ * @param userIds 用户ID串
+ * @param deptId 部门ID
+ */
+export function userOptionSelect(userIds: Array<number | string>, deptId?: number | string) {
+  return request.get<R<Array<SysUserVo>>>({
+    url: '/system/user/optionSelect',
+    params: { userIds, deptId },
   });
 }

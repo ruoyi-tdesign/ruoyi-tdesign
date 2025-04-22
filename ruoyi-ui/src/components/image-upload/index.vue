@@ -63,6 +63,7 @@
 </template>
 
 <script lang="ts" setup>
+import { compressAccurately } from 'image-conversion';
 import { storeToRefs } from 'pinia';
 import { CloudUploadIcon } from 'tdesign-icons-vue-next';
 import type { SuccessContext, UploadFile, UploadRemoveContext, UploadValidateType } from 'tdesign-vue-next';
@@ -72,6 +73,7 @@ import { delOss, listByIds, listByUrls } from '@/api/system/oss';
 import type { SelectFile } from '@/components/upload-select/index.vue';
 import type { MyOssProps } from '@/pages/system/ossCategory/components/myOss.vue';
 import { useUserStore } from '@/store';
+import { blobToFile } from '@/utils/file';
 import { getHttpFileName, getHttpFileSuffix } from '@/utils/ruoyi';
 
 export interface ImageUploadProps {
@@ -116,6 +118,10 @@ export interface ImageUploadProps {
   supportUrl?: boolean;
   // oss分类id
   ossCategoryId?: number;
+  // 是否支持压缩，默认否
+  compressSupport?: boolean;
+  // 压缩目标大小，单位KB。默认300KB以上文件才压缩，并压缩至300KB以内
+  compressTargetSize: number;
 }
 
 const props = withDefaults(defineProps<ImageUploadProps>(), {
@@ -129,6 +135,8 @@ const props = withDefaults(defineProps<ImageUploadProps>(), {
   allowUploadDuplicateFile: false,
   supportSelectFile: true,
   supportUrl: true,
+  compressSupport: false,
+  compressTargetSize: 300,
 });
 
 const queryParam = computed<MyOssProps['queryParam']>(() => {
@@ -283,7 +291,7 @@ function handleSelectSubmit(values: SelectFile[]) {
     const arr2: SelectFile[] = [];
     rowValues.forEach((value) => {
       const suffix = getHttpFileSuffix(value.name);
-      if (props.fileType.includes(suffix)) {
+      if (props.fileType.includes(suffix?.toLowerCase())) {
         arr1.push(value);
       } else {
         arr2.push(value);
@@ -330,7 +338,7 @@ function handleSelectSubmit(values: SelectFile[]) {
 }
 
 // 上传前loading加载
-function handleBeforeUpload(file: UploadFile) {
+async function handleBeforeUpload(file: UploadFile) {
   let isImg: boolean;
   if (props.fileType.length) {
     let fileExtension = '';
@@ -347,6 +355,16 @@ function handleBeforeUpload(file: UploadFile) {
   if (!isImg) {
     proxy.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}图片格式文件!`);
     return false;
+  }
+  if (file.name.includes(',')) {
+    proxy?.$modal.msgError('文件名不正确，不能包含英文逗号!');
+    return false;
+  }
+  // 压缩图片，开启压缩并且大于指定的压缩大小时才压缩
+  if (props.compressSupport && file.size / 1024 > props.compressTargetSize) {
+    const blob = await compressAccurately(file.raw, props.compressTargetSize);
+    file.raw = blobToFile(blob, file.name, file.type);
+    file.size = file.raw.size;
   }
   return true;
 }

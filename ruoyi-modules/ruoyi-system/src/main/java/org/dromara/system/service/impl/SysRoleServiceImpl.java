@@ -1,17 +1,20 @@
 package org.dromara.system.service.impl;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.NormalDisableEnum;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.service.RoleService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -33,6 +36,7 @@ import org.dromara.system.mapper.SysRoleMenuMapper;
 import org.dromara.system.mapper.SysUserRoleMapper;
 import org.dromara.system.service.ISysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +53,7 @@ import java.util.Set;
  * @author Lion Li
  */
 @Service
-public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements ISysRoleService {
+public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements ISysRoleService, RoleService {
 
     @Autowired
     private SysRoleMenuMapper roleMenuMapper;
@@ -59,8 +63,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     private SysRoleDeptMapper roleDeptMapper;
 
     @Override
-    public TableDataInfo<SysRoleVo> selectPageRoleList(SysRoleQuery role) {
-        return PageQuery.of(() -> baseMapper.queryList(role));
+    public TableDataInfo<SysRoleVo> selectPageRoleList(SysRoleQuery query) {
+        return PageQuery.of(query.getPageNum(), query.getPageSize()).execute(() -> baseMapper.queryList(query));
     }
 
     /**
@@ -82,14 +86,24 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     @Override
     public List<SysRoleVo> selectRolesByUserId(Long userId) {
-        List<SysRoleVo> userRoles = baseMapper.selectRolePermissionByUserId(userId);
+        return baseMapper.selectRolesByUserId(userId);
+    }
+
+    /**
+     * 根据用户ID查询角色列表(包含被授权状态)
+     *
+     * @param userId 用户ID
+     * @return 角色列表
+     */
+    @Override
+    public List<SysRoleVo> selectRolesAuthByUserId(Long userId) {
+        List<SysRoleVo> userRoles = baseMapper.selectRolesByUserId(userId);
         List<SysRoleVo> roles = selectRoleAll();
+        // 使用HashSet提高查找效率
+        Set<Long> userRoleIds = StreamUtils.toSet(userRoles, SysRoleVo::getRoleId);
         for (SysRoleVo role : roles) {
-            for (SysRoleVo userRole : userRoles) {
-                if (role.getRoleId().longValue() == userRole.getRoleId().longValue()) {
-                    role.setFlag(true);
-                    break;
-                }
+            if (userRoleIds.contains(role.getRoleId())) {
+                role.setFlag(true);
             }
         }
         return roles;
@@ -103,7 +117,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     @Override
     public Set<String> selectRolePermissionByUserId(Long userId) {
-        List<SysRoleVo> perms = baseMapper.selectRolePermissionByUserId(userId);
+        List<SysRoleVo> perms = baseMapper.selectRolesByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (SysRoleVo perm : perms) {
             if (ObjectUtil.isNotNull(perm)) {
@@ -131,7 +145,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     @Override
     public List<Long> selectRoleListByUserId(Long userId) {
-        return baseMapper.selectRoleListByUserId(userId);
+        List<SysRoleVo> list = baseMapper.selectRolesByUserId(userId);
+        return StreamUtils.toList(list, SysRoleVo::getRoleId);
     }
 
     /**
@@ -143,6 +158,20 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Override
     public SysRoleVo selectRoleById(Long roleId) {
         return baseMapper.selectRoleById(roleId);
+    }
+
+    /**
+     * 通过角色ID串查询角色
+     *
+     * @param roleIds 角色ID串
+     * @return 角色列表信息
+     */
+    @Override
+    public List<SysRoleVo> selectRoleByIds(List<Long> roleIds) {
+        SysRoleQuery query = new SysRoleQuery();
+        query.setStatus(NormalDisableEnum.NORMAL.getCode());
+        query.setRoleIds(roleIds);
+        return baseMapper.queryList(query);
     }
 
     /**
@@ -264,6 +293,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             throw new ServiceException("禁止修改管理员角色保留关键字");
         }
         SysRole role = MapstructUtils.convert(bo, SysRole.class);
+
+        if (NormalDisableEnum.DISABLE.getCode().equals(role.getStatus()) && this.countUserRoleByRoleId(role.getRoleId()) > 0) {
+            throw new ServiceException("角色已分配，不能禁用!");
+        }
         // 修改角色信息
         baseMapper.updateById(role);
         // 删除角色与菜单关联
@@ -295,6 +328,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      * @param bo 角色信息
      * @return 结果
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_ROLE_CUSTOM, key = "#bo.roleId")
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int authDataScope(SysRoleBo bo) {
@@ -355,6 +389,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      * @param roleId 角色ID
      * @return 结果
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_ROLE_CUSTOM, key = "#roleId")
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteRoleById(Long roleId) {
@@ -371,6 +406,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      * @param roleIds 需要删除的角色ID
      * @return 结果
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_ROLE_CUSTOM, allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteRoleByIds(Long[] roleIds) {
@@ -390,7 +426,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids));
         // 删除角色与部门关联
         roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().in(SysRoleDept::getRoleId, ids));
-        return baseMapper.deleteBatchIds(ids);
+        return baseMapper.deleteByIds(ids);
     }
 
     /**
@@ -405,7 +441,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             .eq(SysUserRole::getRoleId, userRole.getRoleId())
             .eq(SysUserRole::getUserId, userRole.getUserId()));
         if (rows > 0) {
-            cleanOnlineUserByRole(userRole.getRoleId());
+            cleanOnlineUser(List.of(userRole.getUserId()));
         }
         return rows;
     }
@@ -419,11 +455,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     @Override
     public int deleteAuthUsers(Long roleId, Long[] userIds) {
+        List<Long> ids = List.of(userIds);
         int rows = userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
             .eq(SysUserRole::getRoleId, roleId)
-            .in(SysUserRole::getUserId, Arrays.asList(userIds)));
+            .in(SysUserRole::getUserId, ids));
         if (rows > 0) {
-            cleanOnlineUserByRole(roleId);
+            cleanOnlineUser(ids);
         }
         return rows;
     }
@@ -439,7 +476,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     public int insertAuthUsers(Long roleId, Long[] userIds) {
         // 新增用户与角色管理
         int rows = 1;
-        List<SysUserRole> list = StreamUtils.toList(List.of(userIds), userId -> {
+        List<Long> ids = List.of(userIds);
+        List<SysUserRole> list = StreamUtils.toList(ids, userId -> {
             SysUserRole ur = new SysUserRole();
             ur.setUserId(userId);
             ur.setRoleId(roleId);
@@ -449,7 +487,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             rows = userRoleMapper.insertBatch(list) ? list.size() : 0;
         }
         if (rows > 0) {
-            cleanOnlineUserByRole(roleId);
+            cleanOnlineUser(ids);
         }
         return rows;
     }
@@ -478,6 +516,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                 return;
             }
             LoginUser loginUser = LoginHelper.getUser(token);
+            if (ObjectUtil.isNull(loginUser) || CollUtil.isEmpty(loginUser.getRoles())) {
+                return;
+            }
             if (loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(roleId))) {
                 try {
                     MultipleStpUtil.SYSTEM.logoutByTokenValue(token);
@@ -486,4 +527,31 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             }
         });
     }
+
+    @Override
+    public void cleanOnlineUser(List<Long> userIds) {
+        List<String> keys = StpUtil.searchTokenValue("", 0, -1, false);
+        if (CollUtil.isEmpty(keys)) {
+            return;
+        }
+        // 角色关联的在线用户量过大会导致redis阻塞卡顿 谨慎操作
+        keys.parallelStream().forEach(key -> {
+            String token = StringUtils.substringAfterLast(key, ":");
+            // 如果已经过期则跳过
+            if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
+                return;
+            }
+            LoginUser loginUser = LoginHelper.getUser(token);
+            if (ObjectUtil.isNull(loginUser)) {
+                return;
+            }
+            if (userIds.contains(loginUser.getUserId())) {
+                try {
+                    StpUtil.logoutByTokenValue(token);
+                } catch (NotLoginException ignored) {
+                }
+            }
+        });
+    }
+
 }

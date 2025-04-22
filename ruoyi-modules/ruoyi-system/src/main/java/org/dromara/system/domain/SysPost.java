@@ -28,6 +28,11 @@ public class SysPost extends TenantEntity {
     private Long postId;
 
     /**
+     * 部门id
+     */
+    private Long deptId;
+
+    /**
      * 岗位编码
      */
     private String postCode;
@@ -36,6 +41,11 @@ public class SysPost extends TenantEntity {
      * 岗位名称
      */
     private String postName;
+
+    /**
+     * 岗位类别编码
+     */
+    private String postCategory;
 
     /**
      * 岗位排序

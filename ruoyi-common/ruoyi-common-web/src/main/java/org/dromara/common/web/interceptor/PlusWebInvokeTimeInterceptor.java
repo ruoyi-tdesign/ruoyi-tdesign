@@ -2,13 +2,12 @@ package org.dromara.common.web.interceptor;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.map.MapUtil;
-import com.alibaba.ttl.TransmittableThreadLocal;
+import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.time.StopWatch;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.web.filter.RepeatedlyRequestWrapper;
 import org.springframework.http.MediaType;
@@ -20,7 +19,6 @@ import java.util.Map;
 
 /**
  * web的调用时间统计拦截器
- * dev环境有效
  *
  * @author Lion Li
  * @since 3.3.0
@@ -28,37 +26,34 @@ import java.util.Map;
 @Slf4j
 public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
 
-    private final String prodProfile = "prod";
-
-    private final TransmittableThreadLocal<StopWatch> invokeTimeTL = new TransmittableThreadLocal<>();
+    private final static ThreadLocal<StopWatch> KEY_CACHE = new ThreadLocal<>();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (!prodProfile.equals(SpringUtils.getActiveProfile())) {
-            String url = request.getMethod() + " " + request.getRequestURI();
+        String url = request.getMethod() + " " + request.getRequestURI();
 
-            // 打印请求参数
-            if (isJsonRequest(request)) {
-                String jsonParam = "";
-                if (request instanceof RepeatedlyRequestWrapper) {
-                    BufferedReader reader = request.getReader();
-                    jsonParam = IoUtil.read(reader);
-                }
-                log.debug("[PLUS]开始请求 => URL[{}],参数类型[json],参数:[{}]", url, jsonParam);
-            } else {
-                Map<String, String[]> parameterMap = request.getParameterMap();
-                if (MapUtil.isNotEmpty(parameterMap)) {
-                    String parameters = JsonUtils.toJsonString(parameterMap);
-                    log.debug("[PLUS]开始请求 => URL[{}],参数类型[param],参数:[{}]", url, parameters);
-                } else {
-                    log.debug("[PLUS]开始请求 => URL[{}],无参数", url);
-                }
+        // 打印请求参数
+        if (isJsonRequest(request)) {
+            String jsonParam = "";
+            if (request instanceof RepeatedlyRequestWrapper) {
+                BufferedReader reader = request.getReader();
+                jsonParam = IoUtil.read(reader);
             }
-
-            StopWatch stopWatch = new StopWatch();
-            invokeTimeTL.set(stopWatch);
-            stopWatch.start();
+            log.info("[PLUS]开始请求 => URL[{}],参数类型[json],参数:[{}]", url, jsonParam);
+        } else {
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            if (MapUtil.isNotEmpty(parameterMap)) {
+                String parameters = JsonUtils.toJsonString(parameterMap);
+                log.info("[PLUS]开始请求 => URL[{}],参数类型[param],参数:[{}]", url, parameters);
+            } else {
+                log.info("[PLUS]开始请求 => URL[{}],无参数", url);
+            }
         }
+
+        StopWatch stopWatch = new StopWatch();
+        KEY_CACHE.set(stopWatch);
+        stopWatch.start();
+
         return true;
     }
 
@@ -69,11 +64,11 @@ public class PlusWebInvokeTimeInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        if (!prodProfile.equals(SpringUtils.getActiveProfile())) {
-            StopWatch stopWatch = invokeTimeTL.get();
+        StopWatch stopWatch = KEY_CACHE.get();
+        if (ObjectUtil.isNotNull(stopWatch)) {
             stopWatch.stop();
-            log.debug("[PLUS]结束请求 => URL[{}],耗时:[{}]毫秒", request.getMethod() + " " + request.getRequestURI(), stopWatch.getTime());
-            invokeTimeTL.remove();
+            log.info("[PLUS]结束请求 => URL[{}],耗时:[{}]毫秒", request.getMethod() + " " + request.getRequestURI(), stopWatch.getDuration().toMillis());
+            KEY_CACHE.remove();
         }
     }
 

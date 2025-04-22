@@ -3,9 +3,10 @@
 
     <contextName>logback</contextName>
     <property name="log.path" value="./logs"/>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <property name="console.log.pattern"
-              value="%red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta(%logger{36}%n) - %msg%n"/>
-    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"/>
+              value="%cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %clr(${PID:- }){magenta} %green([%thread]) %clr(%-5level) %boldMagenta(%logger{39}%n) - %msg%n"/>
+    <property name="log.pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${PID:- } [%thread] %-5level %logger{39} - %msg%n"/>
 
     <!--应用名称-->
     <springProperty scope="context" name="APP_NAME" source="spring.application.name"/>
@@ -22,9 +23,7 @@
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!--日志分割-->
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>100MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxFileSize>100MB</maxFileSize>
             <!-- 日志最大的历史 30天 -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>

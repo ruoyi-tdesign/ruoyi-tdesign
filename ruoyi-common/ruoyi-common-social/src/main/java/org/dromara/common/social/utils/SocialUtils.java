@@ -11,6 +11,7 @@ import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.maxkey.AuthMaxKeyRequest;
+import org.dromara.common.social.topiam.AuthTopIamRequest;
 
 /**
  * 认证授权工具类
@@ -38,7 +39,8 @@ public class SocialUtils {
         AuthConfig.AuthConfigBuilder builder = AuthConfig.builder()
             .clientId(obj.getClientId())
             .clientSecret(obj.getClientSecret())
-            .redirectUri(obj.getRedirectUri());
+            .redirectUri(obj.getRedirectUri())
+            .scopes(obj.getScopes());
         return switch (source.toLowerCase()) {
             case "dingtalk" -> new AuthDingTalkRequest(builder.build(), STATE_CACHE);
             case "baidu" -> new AuthBaiduRequest(builder.build(), STATE_CACHE);
@@ -56,13 +58,14 @@ public class SocialUtils {
             case "linkedin" -> new AuthLinkedinRequest(builder.build(), STATE_CACHE);
             case "microsoft" -> new AuthMicrosoftRequest(builder.build(), STATE_CACHE);
             case "renren" -> new AuthRenrenRequest(builder.build(), STATE_CACHE);
-            case "stack_overflow" -> new AuthStackOverflowRequest(builder.stackOverflowKey("").build(), STATE_CACHE);
-            case "huawei" -> new AuthHuaweiRequest(builder.build(), STATE_CACHE);
-            case "wechat_enterprise" -> new AuthWeChatEnterpriseQrcodeRequest(builder.agentId("").build(), STATE_CACHE);
+            case "stack_overflow" -> new AuthStackOverflowRequest(builder.stackOverflowKey(obj.getStackOverflowKey()).build(), STATE_CACHE);
+            case "huawei" -> new AuthHuaweiV3Request(builder.build(), STATE_CACHE);
+            case "wechat_enterprise" -> new AuthWeChatEnterpriseQrcodeRequest(builder.agentId(obj.getAgentId()).build(), STATE_CACHE);
             case "gitlab" -> new AuthGitlabRequest(builder.build(), STATE_CACHE);
             case "wechat_mp" -> new AuthWeChatMpRequest(builder.build(), STATE_CACHE);
             case "aliyun" -> new AuthAliyunRequest(builder.build(), STATE_CACHE);
             case "maxkey" -> new AuthMaxKeyRequest(builder.build(), STATE_CACHE);
+            case "topiam" -> new AuthTopIamRequest(builder.build(), STATE_CACHE);
             default -> throw new AuthException("未获取到有效的Auth配置");
         };
     }

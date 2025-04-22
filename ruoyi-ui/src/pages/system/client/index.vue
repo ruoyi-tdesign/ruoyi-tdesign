@@ -106,21 +106,20 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link v-hasPermi="['system:client:query']" theme="primary" hover="color" @click.stop="handleDetail(row)">
-              <browse-icon />详情
-            </t-link>
-            <t-link v-hasPermi="['system:client:edit']" theme="primary" hover="color" @click.stop="handleUpdate(row)">
-              <edit-icon />修改
-            </t-link>
-            <t-link
+            <my-link v-hasPermi="['system:client:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:client:edit']" @click.stop="handleUpdate(row)">
+              <template #prefix-icon><edit-icon /></template>修改
+            </my-link>
+            <my-link
               v-if="row.clientId !== clientId"
               v-hasPermi="['system:client:remove']"
               theme="danger"
-              hover="color"
               @click.stop="handleDelete(row)"
             >
-              <delete-icon />删除
-            </t-link>
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>
@@ -179,9 +178,9 @@
           </t-form-item>
           <t-form-item v-if="form.clientId !== clientId" label="状态" name="status">
             <t-radio-group v-model="form.status">
-              <t-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">{{
-                dict.label
-              }}</t-radio>
+              <t-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">
+                {{ dict.label }}
+              </t-radio>
             </t-radio-group>
           </t-form-item>
         </t-form>
@@ -409,7 +408,7 @@ function handleUpdate(row?: SysClientVo) {
 /** 状态修改 */
 function handleStatusChange(row: SysClientVo) {
   handleChangeStatus(clientList.value, row, 'id', 'status', `${row.clientKey}客户端`, (obj) =>
-    changeStatus(obj.id, obj.status),
+    changeStatus(obj.clientId, obj.status),
   );
 }
 

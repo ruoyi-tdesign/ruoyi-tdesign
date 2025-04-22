@@ -13,10 +13,10 @@ import org.dromara.common.log.event.LogininforEvent;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysLogininfor;
 import org.dromara.system.domain.bo.SysLogininforBo;
 import org.dromara.system.domain.query.SysLogininforQuery;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysLogininforVo;
 import org.dromara.system.mapper.SysLogininforMapper;
 import org.dromara.system.service.ISysClientService;
@@ -65,7 +65,7 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
         String ip = logininforEvent.getIp();
         String clientId = logininforEvent.getClientId();
         // 客户端信息
-        SysClient client = null;
+        SysClientVo client = null;
         if (StringUtils.isNotBlank(clientId)) {
             client = clientService.queryByClientId(clientId);
         }
@@ -155,7 +155,7 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteLogininforByIds(Long[] infoIds) {
-        return baseMapper.deleteBatchIds(Arrays.asList(infoIds));
+        return baseMapper.deleteByIds(Arrays.asList(infoIds));
     }
 
     /**

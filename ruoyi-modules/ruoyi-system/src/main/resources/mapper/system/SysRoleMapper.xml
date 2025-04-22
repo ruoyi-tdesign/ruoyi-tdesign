@@ -35,9 +35,17 @@
             <if test="roleName != null and roleName != ''"> and r.role_name like concat(concat('%', #{roleName}), '%')</if>
             <if test="roleKey != null and roleKey != ''"> and r.role_key like concat(concat('%', #{roleKey}), '%')</if>
             <if test="status != null and status != ''"> and r.status = #{status}</if>
-            <if test="params.beginTime != null and params.endTime != null">and r.create_time between #{params.beginTime} and #{params.endTime}</if>
+            <if test="params.beginTime != null and params.endTime != null"> and r.create_time between #{params.beginTime} and #{params.endTime}</if>
+            <foreach collection="roleIds" item="item" open=" and r.role_id in (" close=")" separator="," nullable="true">
+                #{item}
+            </foreach>
         </where>
         order by r.role_sort, r.create_time desc
+    </select>
+
+    <select id="selectPageRoleList" resultMap="SysRoleResult">
+        <include refid="selectRoleVo"/>
+        ${ew.getCustomSqlSegment}
     </select>
 
     <select id="selectRolePermissionByUserId" parameterType="Long" resultMap="SysRoleResultVo">
@@ -45,23 +53,15 @@
         WHERE r.del_flag = '0' and sur.user_id = #{userId}
     </select>
 
-    <select id="selectRoleListByUserId" parameterType="Long" resultType="Long">
-        select r.role_id
-        from sys_role r
-                 left join sys_user_role sur on sur.role_id = r.role_id
-                 left join sys_user u on u.user_id = sur.user_id
-        where u.user_id = #{userId}
-    </select>
-
-    <select id="selectRolesByUserName" parameterType="String" resultMap="SysRoleResultVo">
+    <select id="selectRolesByUserId" parameterType="Long" resultMap="SysRoleResultVo">
         select r.role_id,
                r.role_name,
                r.role_key,
-               r.role_sort
+               r.role_sort,
+               r.data_scope,
+               r.status
         from sys_role r
-                 left join sys_user_role sur on sur.role_id = r.role_id
-                 left join sys_user u on u.user_id = sur.user_id
-        WHERE r.del_flag = '0' and u.user_name = #{userName}
+        WHERE r.del_flag = '0' and r.role_id in (select role_id from sys_user_role where user_id = #{userId})
     </select>
 
     <select id="selectRoleById" resultMap="SysRoleResultVo">

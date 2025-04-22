@@ -1,10 +1,11 @@
 package org.dromara.common.core.utils.spring;
 
 import cn.hutool.extra.spring.SpringUtil;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.boot.autoconfigure.thread.Threading;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -81,7 +82,7 @@ public final class SpringUtils extends SpringUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T getAopProxy(T invoker) {
-        return (T) AopContext.currentProxy();
+        return (T) getBean(invoker.getClass());
     }
 
 
@@ -90,6 +91,10 @@ public final class SpringUtils extends SpringUtil {
      */
     public static ApplicationContext context() {
         return getApplicationContext();
+    }
+
+    public static boolean isVirtual() {
+        return Threading.VIRTUAL.isActive(getBean(Environment.class));
     }
 
 }

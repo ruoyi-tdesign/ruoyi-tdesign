@@ -1,5 +1,7 @@
 import type { R, TableDataInfo } from '@/api/model/resultModel';
 import type {
+  MessageFieldConfig,
+  MessageTypeVo,
   SysMessageConfigForm,
   SysMessageConfigQuery,
   SysMessageConfigVo,
@@ -23,7 +25,7 @@ export function getMessageConfig(messageConfigId: number) {
 
 // 新增消息配置
 export function addMessageConfig(data: SysMessageConfigForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/messageConfig',
     data,
   });
@@ -31,7 +33,7 @@ export function addMessageConfig(data: SysMessageConfigForm) {
 
 // 修改消息配置
 export function updateMessageConfig(data: SysMessageConfigForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/messageConfig',
     data,
   });
@@ -39,14 +41,43 @@ export function updateMessageConfig(data: SysMessageConfigForm) {
 
 // 删除消息配置
 export function delMessageConfig(messageConfigIds: number | Array<number>) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/messageConfig/${messageConfigIds}`,
   });
 }
 
 // 刷新消息配置缓存
 export function refreshCache() {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: '/system/messageConfig/refreshCache',
+  });
+}
+
+/**
+ * 获取消息字段配置
+ */
+export function getMessageFieldConfigs() {
+  return request
+    .get<R<Record<string, MessageFieldConfig>>>({
+      url: '/system/messageConfig/getMessageFieldConfigs',
+    })
+    .then((res) => {
+      Object.entries(res.data).forEach(([, value]) => {
+        Object.entries(value.supplierConfig).forEach(([, v]) => {
+          v.rules?.forEach((rule) => {
+            rule.pattern = new RegExp(rule.pattern);
+          });
+        });
+      });
+      return res;
+    });
+}
+
+/**
+ * 获取消息字段配置
+ */
+export function getMessageSupplierType() {
+  return request.get<R<MessageTypeVo[]>>({
+    url: '/system/messageConfig/getSupplierType',
   });
 }

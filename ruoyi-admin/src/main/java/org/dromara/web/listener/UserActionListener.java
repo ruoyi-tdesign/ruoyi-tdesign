@@ -64,7 +64,6 @@ public class UserActionListener implements SaTokenListener {
             HttpServletRequest request = ServletUtils.getRequest();
             final UserAgent userAgent = UserAgentUtil.parse(request.getHeader(Header.USER_AGENT.getValue()));
             String ip = ServletUtils.getClientIP();
-            LoginUser user = LoginHelper.getUser();
             // 获取客户端操作系统
             String os = userAgent.getOs().getName();
             // 获取客户端浏览器
@@ -73,9 +72,9 @@ public class UserActionListener implements SaTokenListener {
 
             // 记录登录日志
             LogininforEvent logininforEvent = new LogininforEvent();
-            logininforEvent.setTenantId(user.getTenantId());
-            logininforEvent.setUserId(user.getUserId());
-            logininforEvent.setUsername(user.getUsername());
+            logininforEvent.setTenantId(baseUser.getTenantId());
+            logininforEvent.setUserId(baseUser.getUserId());
+            logininforEvent.setUsername(baseUser.getUsername());
             logininforEvent.setStatus(Constants.LOGIN_SUCCESS);
             logininforEvent.setMessage(MessageUtils.message("user.login.success"));
             logininforEvent.setIp(ip);
@@ -84,7 +83,7 @@ public class UserActionListener implements SaTokenListener {
             logininforEvent.setClientId(clientId);
             SpringUtils.context().publishEvent(logininforEvent);
             // 更新登录信息
-            loginService.recordLoginInfo(user.getUserId(), ip);
+            loginService.recordLoginInfo(baseUser.getUserId(), ip);
             log.info("user doLogin, userId:{}, token:{}", loginId, tokenValue);
         }
         // 用户登录处理逻辑

@@ -19,7 +19,7 @@ export function getTenantApp(appid: number) {
 
 // 新增租户应用管理
 export function addTenantApp(data: SysTenantAppForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/tenantApp',
     data,
   });
@@ -27,7 +27,7 @@ export function addTenantApp(data: SysTenantAppForm) {
 
 // 修改租户应用管理
 export function updateTenantApp(data: SysTenantAppForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/tenantApp',
     data,
   });
@@ -35,7 +35,7 @@ export function updateTenantApp(data: SysTenantAppForm) {
 
 // 删除租户应用管理
 export function delTenantApp(appids: number | Array<number>) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/tenantApp/${appids}`,
   });
 }

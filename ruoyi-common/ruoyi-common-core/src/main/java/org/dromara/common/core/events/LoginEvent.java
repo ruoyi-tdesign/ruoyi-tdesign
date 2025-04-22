@@ -13,5 +13,13 @@ import java.io.Serializable;
 @Data
 public class LoginEvent implements Serializable {
 
+    /**
+     * 登录类型
+     */
+    private String loginType;
+
+    /**
+     * 用户id
+     */
     private Long userId;
 }

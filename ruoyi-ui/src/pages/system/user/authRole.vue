@@ -1,6 +1,5 @@
 <template>
-  <t-card>
-    <h4 class="form-header h4">基本信息</h4>
+  <t-card title="基本信息" header-bordered>
     <t-form :data="form" label-width="calc(4em + 12px)">
       <t-row>
         <t-col :span="4" :offset="1">
@@ -15,8 +14,11 @@
         </t-col>
       </t-row>
     </t-form>
+  </t-card>
 
-    <h4 class="form-header h4">角色信息</h4>
+  <br />
+
+  <t-card title="角色信息" header-bordered>
     <t-table
       hover
       :loading="loading"
@@ -31,7 +33,7 @@
     </t-table>
 
     <t-form label-width="100px">
-      <div style="text-align: center; margin-left: -120px; margin-top: 30px">
+      <div style="text-align: center; margin-top: 30px">
         <t-button theme="primary" @click="submitForm()">提交</t-button>
         <t-button theme="default" variant="outline" @click="close()">返回</t-button>
       </div>
@@ -44,7 +46,7 @@ defineOptions({
 });
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, nextTick, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import type { SysRoleVo } from '@/api/system/model/roleModel';
 import type { SysUserVo } from '@/api/system/model/userModel';
@@ -59,9 +61,8 @@ const pageNum = ref(1);
 const pageSize = ref(10);
 const roleIds = ref([]);
 const roles = ref<SysRoleVo[]>([]);
-const tabsRouterStore = useTabsRouterStore();
+const removeCurrentTab = useTabsRouterStore().useRemoveCurrentTab();
 const route = useRoute();
-const router = useRouter();
 const form = ref<SysUserVo>({
   nickName: undefined,
   userName: undefined,
@@ -95,7 +96,7 @@ function handleSelectionChange(selection: Array<string | number>) {
 }
 /** 关闭按钮 */
 function close() {
-  tabsRouterStore.removeCurrentTab(route, '/system/user', router);
+  removeCurrentTab('/system/user');
 }
 /** 提交按钮 */
 function submitForm() {

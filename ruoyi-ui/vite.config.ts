@@ -3,6 +3,7 @@ import path from 'node:path';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import copy from 'rollup-plugin-copy';
+import UnoCSS from 'unocss/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 import { TDesignResolver } from 'unplugin-vue-components/resolvers';
 import Components from 'unplugin-vue-components/vite';
@@ -44,6 +45,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     },
 
     plugins: [
+      UnoCSS(),
       copy({
         targets: [
           {
@@ -96,16 +98,6 @@ export default ({ mode }: ConfigEnv): UserConfig => {
         theme: 'default', // 主题名称
         css: true,
       }),
-      {
-        name: 'singleHMR',
-        handleHotUpdate({ modules }) {
-          modules.forEach((m) => {
-            m.importedModules?.clear();
-            m.importers = new Set();
-          });
-          return modules;
-        },
-      },
       vue({
         script: {
           defineModel: true,
@@ -158,6 +150,10 @@ export default ({ mode }: ConfigEnv): UserConfig => {
         },
       },
       open: true,
+    },
+    // 预编译
+    optimizeDeps: {
+      include: ['vue', 'vue-router', 'pinia', 'axios', '@vueuse/core', 'vue-i18n', 'image-conversion'],
     },
   };
 };

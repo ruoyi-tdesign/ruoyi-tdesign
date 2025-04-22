@@ -32,21 +32,21 @@ export function getCacheValue(cacheName: string, cacheKey: string) {
 
 // 清理指定名称缓存
 export function clearCacheName(cacheName: string) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/monitor/cache/clearCacheName/${cacheName}`,
   });
 }
 
 // 清理指定键名缓存
 export function clearCacheKey(cacheName: string, cacheKey: string) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/monitor/cache/clearCacheKey/${cacheName}/${cacheKey}`,
   });
 }
 
 // 清理全部缓存
 export function clearCacheAll() {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: '/monitor/cache/clearCacheAll',
   });
 }

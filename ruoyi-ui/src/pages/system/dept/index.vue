@@ -1,7 +1,14 @@
 <template>
   <t-card>
     <t-space direction="vertical" style="width: 100%">
-      <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline" label-width="calc(4em + 12px)">
+      <t-form
+        v-show="showSearch"
+        ref="queryRef"
+        :data="queryParams"
+        layout="inline"
+        reset-type="initial"
+        label-width="calc(4em + 12px)"
+      >
         <t-form-item label="部门名称" name="deptName">
           <t-input
             v-model="queryParams.deptName"
@@ -10,6 +17,9 @@
             style="width: 200px"
             @enter="handleQuery"
           />
+        </t-form-item>
+        <t-form-item label="部门类别编码" name="deptCategory">
+          <t-input v-model="queryParams.deptCategory" placeholder="请输入部门类别编码" clearable @enter="handleQuery" />
         </t-form-item>
         <t-form-item label="状态" name="status">
           <t-select v-model="queryParams.status" placeholder="部门状态" clearable style="width: 200px">
@@ -77,24 +87,18 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link v-hasPermi="['system:dept:query']" theme="primary" hover="color" @click.stop="handleDetail(row)">
-              <browse-icon />详情
-            </t-link>
-            <t-link v-hasPermi="['system:dept:edit']" theme="primary" hover="color" @click.stop="handleUpdate(row)">
-              <edit-icon />修改
-            </t-link>
-            <t-link v-hasPermi="['system:dept:add']" theme="primary" hover="color" @click.stop="handleAdd(row)">
-              <add-icon />新增
-            </t-link>
-            <t-link
-              v-if="row.parentId !== 0"
-              v-hasPermi="['system:dept:remove']"
-              theme="danger"
-              hover="color"
-              @click.stop="handleDelete(row)"
-            >
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['system:dept:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:dept:edit']" @click.stop="handleUpdate(row)">
+              <template #prefix-icon><edit-icon /></template>修改
+            </my-link>
+            <my-link v-hasPermi="['system:dept:add']" @click.stop="handleAdd(row)">
+              <template #prefix-icon><add-icon /></template>新增
+            </my-link>
+            <my-link v-hasPermi="['system:dept:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-enhanced-table>
@@ -106,7 +110,7 @@
       :header="title"
       destroy-on-close
       :close-on-overlay-click="false"
-      width="600px"
+      width="min(700px, 100%)"
       attach="body"
       :confirm-btn="{
         loading: eLoading,
@@ -119,7 +123,7 @@
           :data="form"
           :rules="rules"
           label-align="right"
-          label-width="calc(4em + 41px)"
+          label-width="calc(6em + 41px)"
           scroll-to-first-error="smooth"
           @submit="submitForm"
         >
@@ -140,6 +144,11 @@
             <t-col :span="6">
               <t-form-item label="部门名称" name="deptName">
                 <t-input v-model="form.deptName" placeholder="请输入部门名称" />
+              </t-form-item>
+            </t-col>
+            <t-col :span="6">
+              <t-form-item label="部门类别编码" name="deptCategory">
+                <t-input v-model="form.deptCategory" placeholder="请输入部门类别编码" clearable />
               </t-form-item>
             </t-col>
             <t-col :span="6">
@@ -172,9 +181,9 @@
             <t-col :span="6">
               <t-form-item label="部门状态">
                 <t-radio-group v-model="form.status">
-                  <t-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">{{
-                    dict.label
-                  }}</t-radio>
+                  <t-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">
+                    {{ dict.label }}
+                  </t-radio>
                 </t-radio-group>
               </t-form-item>
             </t-col>
@@ -188,7 +197,7 @@
       v-model:visible="openView"
       header="部门详情"
       placement="center"
-      width="700px"
+      width="min(700px, 100%)"
       attach="body"
       :footer="false"
     >
@@ -197,6 +206,7 @@
         <t-descriptions-item label="父部门id">{{ form.parentId }}</t-descriptions-item>
         <t-descriptions-item label="祖级列表" :span="2">{{ form.ancestors }}</t-descriptions-item>
         <t-descriptions-item label="部门名称">{{ form.deptName }}</t-descriptions-item>
+        <t-descriptions-item label="部门类别编码">{{ form.deptCategory }}</t-descriptions-item>
         <t-descriptions-item label="显示顺序">{{ form.orderNum }}</t-descriptions-item>
         <t-descriptions-item label="负责人">{{ form.leader }}</t-descriptions-item>
         <t-descriptions-item label="联系电话">{{ form.phone }}</t-descriptions-item>
@@ -214,7 +224,6 @@
 defineOptions({
   name: 'Dept',
 });
-
 import {
   AddIcon,
   BrowseIcon,
@@ -261,6 +270,16 @@ const columnControllerVisible = ref(false);
 const deptUserList = ref<SysUserVo[]>([]);
 const expandedTreeNodes = ref([]);
 
+// 校验规则
+const rules = ref<Record<string, Array<FormRule>>>({
+  parentId: [{ required: true, message: '上级部门不能为空' }],
+  deptName: [{ required: true, message: '部门名称不能为空' }],
+  deptCategory: [{ max: 100, message: '部门类别编码不能超过100个字符' }],
+  orderNum: [{ required: true, message: '显示排序不能为空' }],
+  email: [{ email: true, message: '请输入正确的邮箱地址' }],
+  phone: [{ pattern: /^1[3456789][0-9]\d{8}$/, message: '请输入正确的手机号码' }],
+});
+
 // 列显隐信息
 const columns = ref<Array<PrimaryTableCol>>([
   { title: `部门名称`, colKey: 'deptName', align: 'left', width: '30%', ellipsis: true },
@@ -269,14 +288,6 @@ const columns = ref<Array<PrimaryTableCol>>([
   { title: `创建时间`, colKey: 'createTime', align: 'center', width: '20%', minWidth: 112, sorter: true },
   { title: `操作`, colKey: 'operation', align: 'center', width: '25%', minWidth: 180 },
 ]);
-
-const rules = ref<Record<string, Array<FormRule>>>({
-  parentId: [{ required: true, message: '上级部门不能为空' }],
-  deptName: [{ required: true, message: '部门名称不能为空' }],
-  orderNum: [{ required: true, message: '显示排序不能为空' }],
-  email: [{ email: true, message: '请输入正确的邮箱地址' }],
-  phone: [{ pattern: /^1[3456789][0-9]\d{8}$/, message: '请输入正确的手机号码' }],
-});
 // 提交表单对象
 const form = ref<SysDeptForm & SysDeptVo>({
   orderNum: 0,
@@ -285,6 +296,7 @@ const form = ref<SysDeptForm & SysDeptVo>({
 // 查询对象
 const queryParams = ref<SysDeptQuery>({
   deptName: undefined,
+  deptCategory: undefined,
   status: undefined,
 });
 const isExpand = computed(() => {

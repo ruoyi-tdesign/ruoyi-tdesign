@@ -11,6 +11,7 @@ import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.enums.NormalDisableEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -122,7 +123,7 @@ public class SysOssConfigServiceImpl extends ServiceImpl<SysOssConfigMapper, Sys
             SysOssConfig config = baseMapper.selectById(configId);
             list.add(config);
         }
-        boolean flag = baseMapper.deleteBatchIds(ids) > 0;
+        boolean flag = baseMapper.deleteByIds(ids) > 0;
         if (flag) {
             list.forEach(sysOssConfig ->
                 CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, sysOssConfig.getConfigKey()));
@@ -134,7 +135,7 @@ public class SysOssConfigServiceImpl extends ServiceImpl<SysOssConfigMapper, Sys
      * 判断configKey是否唯一
      */
     private boolean checkConfigKeyUnique(SysOssConfig sysOssConfig) {
-        long ossConfigId = ObjectUtil.isNull(sysOssConfig.getOssConfigId()) ? -1L : sysOssConfig.getOssConfigId();
+        long ossConfigId = ObjectUtils.notNull(sysOssConfig.getOssConfigId(), -1L);
         SysOssConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysOssConfig>()
             .select(SysOssConfig::getOssConfigId, SysOssConfig::getConfigKey)
             .eq(SysOssConfig::getConfigKey, sysOssConfig.getConfigKey()));

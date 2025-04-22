@@ -25,7 +25,7 @@ public interface CacheConstants {
     /**
      * 敏感词管理 cache key
      */
-    String SYS_SENSITIVE_WORD = GlobalConstants.GLOBAL_REDIS_KEY + "sys_sensitive_word:";
+    String SYS_SENSITIVE_WORD = GlobalConstants.GLOBAL_REDIS_KEY + "sys_sensitive_word";
 
     /**
      * 字典类型管理 cache key

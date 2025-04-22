@@ -3,13 +3,14 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.dromara.common.core.constant.HttpStatus;
-import org.dromara.common.core.constant.UserConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.enums.MenuTypeEnum;
 import org.dromara.common.core.enums.ShowHiddenEnum;
 import org.dromara.common.core.enums.YesNoEnum;
@@ -204,11 +205,12 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 continue;
             }
             RouterVo router = new RouterVo();
-            router.setName(menu.getRouteName());
+//            router.setName(menu.getRouteName());
             router.setPath(menu.getRouterPath());
             router.setComponent(menu.getComponentInfo());
             router.setQuery(getQueryParam(menu.getQueryParam()));
             MetaVo meta = new MetaVo();
+            meta.setMenuId(menu.getMenuId());
             meta.setTitle(menu.getMenuName());
             meta.setIcon(menu.getIcon());
             meta.setNoCache(Objects.equals(YesNoEnum.NO.getCodeNum(), menu.getIsCache()));
@@ -219,7 +221,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 meta.setHidden(ShowHiddenEnum.HIDDEN.getCode().equals(menu.getVisible()));
             }
             if (MenuTypeEnum.MENU.getType().equals(menu.getMenuType())) {
-                meta.setComponentName(StringUtils.blankToDefault(menu.getComponentName(), router.getName()));
+                meta.setComponentName(StringUtils.blankToDefault(menu.getComponentName(), menu.getRouteName()));
             }
 
             router.setMeta(meta);
@@ -238,7 +240,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 RouterVo children = new RouterVo();
                 children.setPath("index");
                 children.setComponent(menu.getComponent());
-                children.setName(StringUtils.capitalize(menu.getPath()));
+//                children.setName(StringUtils.capitalize(menu.getPath()));
                 children.setQuery(getQueryParam(menu.getQueryParam()));
                 children.setMeta(new MetaVo().setActiveMenu(router.getPath()));
                 childrenList.add(children);
@@ -251,8 +253,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 RouterVo children = new RouterVo();
                 String routerPath = SysMenuVo.innerLinkReplaceEach(menu.getPath());
                 children.setPath(routerPath);
-                children.setComponent(UserConstants.INNER_LINK);
-                children.setName(StringUtils.capitalize(routerPath));
+                children.setComponent(SystemConstants.INNER_LINK);
+//                children.setName(StringUtils.capitalize(routerPath));
                 children.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon(), menu.getPath()));
                 childrenList.add(children);
                 router.setChildren(childrenList);
@@ -283,11 +285,14 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         if (CollUtil.isEmpty(menus)) {
             return CollUtil.newArrayList();
         }
-        return TreeBuildUtils.build(menus, (menu, tree) ->
-            tree.setId(menu.getMenuId())
+        return TreeBuildUtils.build(menus, (menu, tree) -> {
+            Tree<Long> menuTree = tree.setId(menu.getMenuId())
                 .setParentId(menu.getParentId())
                 .setName(menu.getMenuName())
-                .setWeight(menu.getOrderNum()));
+                .setWeight(menu.getOrderNum());
+            menuTree.put("menuType", menu.getMenuType());
+            menuTree.put("icon", menu.getIcon());
+        });
     }
 
     /**

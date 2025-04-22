@@ -25,9 +25,9 @@ import org.dromara.system.domain.SysOssConfig;
 public class SysOssConfigBo extends BaseEntity {
 
     /**
-     * 主建
+     * 主键
      */
-    @NotNull(message = "主建不能为空", groups = {EditGroup.class})
+    @NotNull(message = "主键不能为空", groups = {EditGroup.class})
     private Long ossConfigId;
 
     /**
@@ -97,11 +97,6 @@ public class SysOssConfigBo extends BaseEntity {
      */
     @NotBlank(message = "是否默认不能为空", groups = {AddGroup.class, EditGroup.class})
     private String status;
-
-    /**
-     * 创建桶（1=是,0=否）
-     */
-    private Integer createBucket;
 
     /**
      * 扩展字段

@@ -30,7 +30,7 @@ public class CompatibleTenantLineInnerInterceptor extends TenantLineInnerInterce
     }
 
     @Override
-    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
         String effectiveMsId = ms.getId();
         if (ms.getId().endsWith(SUFFIX)) {
             effectiveMsId = ms.getId().substring(0, ms.getId().length() - SUFFIX.length());

@@ -4,7 +4,7 @@ package org.dromara.web.service;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.spring.SpringUtils;
-import org.dromara.system.domain.SysClient;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.web.domain.vo.LoginVo;
 
 /**
@@ -18,8 +18,12 @@ public interface IAuthStrategy<L extends LoginBody> {
 
     /**
      * 登录
+     *
+     * @param client    授权管理视图对象
+     * @param loginBody 登录对象
+     * @return 登录验证信息
      */
-    static <L extends LoginBody> LoginVo login(SysClient client, L loginBody) {
+    static <L extends LoginBody> LoginVo login(SysClientVo client, L loginBody) {
         // 授权类型和客户端id
         String grantType = loginBody.getGrantType();
         String beanName = grantType + BASE_NAME;
@@ -32,7 +36,11 @@ public interface IAuthStrategy<L extends LoginBody> {
 
     /**
      * 登录
+     *
+     * @param loginBody 登录对象
+     * @param client    授权管理视图对象
+     * @return 登录验证信息
      */
-    LoginVo login(L loginBody, SysClient client);
+    LoginVo login(L loginBody, SysClientVo client);
 
 }

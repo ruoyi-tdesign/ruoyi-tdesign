@@ -12,14 +12,14 @@ export function list(query?: SysOperLogQuery) {
 
 // 删除操作日志
 export function delOperlog(operId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/monitor/operlog/${operId}`,
   });
 }
 
 // 清空操作日志
 export function cleanOperlog() {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: '/monitor/operlog/clean',
   });
 }

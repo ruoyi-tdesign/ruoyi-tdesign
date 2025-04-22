@@ -19,7 +19,7 @@ export function getType(dictId: number) {
 
 // 新增字典类型
 export function addType(data: SysDictTypeForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/dict/type',
     data,
   });
@@ -27,7 +27,7 @@ export function addType(data: SysDictTypeForm) {
 
 // 修改字典类型
 export function updateType(data: SysDictTypeForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/dict/type',
     data,
   });
@@ -35,14 +35,14 @@ export function updateType(data: SysDictTypeForm) {
 
 // 删除字典类型
 export function delType(dictId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/dict/type/${dictId}`,
   });
 }
 
 // 刷新字典缓存
 export function refreshCache() {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: '/system/dict/type/refreshCache',
   });
 }

@@ -72,10 +72,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
             .select(SysConfig::getConfigId, SysConfig::getConfigValue)
             .eq(SysConfig::getIsGlobal, YesNoEnum.NO.getCodeNum())
             .oneOpt();
-        if (oneOpt.isPresent()) {
-            return oneOpt.get().getConfigValue();
-        }
-        return StringUtils.EMPTY;
+        return oneOpt.map(SysConfig::getConfigValue).orElse(StringUtils.EMPTY);
     }
 
     /**
@@ -161,7 +158,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
             boolean isGlobal = YesNoEnum.YES.getCodeNum().equals(config.getIsGlobal());
             CacheUtils.evict(GlobalConstants.getGlobalKey(isGlobal, CacheNames.SYS_CONFIG), config.getConfigKey());
         }
-        baseMapper.deleteBatchIds(Arrays.asList(configIds));
+        baseMapper.deleteByIds(Arrays.asList(configIds));
     }
 
     /**

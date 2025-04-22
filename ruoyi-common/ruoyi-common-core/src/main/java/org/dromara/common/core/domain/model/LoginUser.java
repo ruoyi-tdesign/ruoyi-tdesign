@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.domain.dto.RoleDTO;
+import org.dromara.common.core.domain.dto.PostDTO;
 
 import java.util.List;
 
@@ -12,7 +13,6 @@ import java.util.List;
  *
  * @author Lion Li
  */
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
@@ -34,6 +34,11 @@ public class LoginUser extends BaseUser {
     private Long deptId;
 
     /**
+     * 部门类别编码
+     */
+    private String deptCategory;
+
+    /**
      * 部门名
      */
     private String deptName;
@@ -42,6 +47,11 @@ public class LoginUser extends BaseUser {
      * 角色对象
      */
     private List<RoleDTO> roles;
+
+    /**
+     * 岗位对象
+     */
+    private List<PostDTO> posts;
 
     /**
      * 数据权限 当前角色ID

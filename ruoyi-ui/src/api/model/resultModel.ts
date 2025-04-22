@@ -14,7 +14,7 @@ export interface TableDataInfo<T> {
 /**
  * 返回结果
  */
-export interface R<T> {
+export interface R<T = void> {
   // 消息码
   code: number;
   // 消息
@@ -52,4 +52,10 @@ export interface TreeModel<ID> {
   label: string;
   weight?: any;
   children?: Array<TreeModel<ID>>;
+}
+export interface BasePageQuery extends BaseEntity {
+  /** 页码 */
+  pageNum: number;
+  /** 每页大小 */
+  pageSize: number;
 }

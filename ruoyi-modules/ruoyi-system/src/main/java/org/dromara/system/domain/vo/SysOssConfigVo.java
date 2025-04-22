@@ -27,7 +27,7 @@ public class SysOssConfigVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 主建
+     * 主键
      */
     @ExcelProperty(value = "主建")
     private Long ossConfigId;
@@ -97,12 +97,6 @@ public class SysOssConfigVo implements Serializable {
      */
     @ExcelProperty(value = "是否默认")
     private String status;
-
-    /**
-     * 创建桶（1=是,0=否）
-     */
-    @ExcelProperty(value = "创建桶")
-    private Integer createBucket;
 
     /**
      * 扩展字段

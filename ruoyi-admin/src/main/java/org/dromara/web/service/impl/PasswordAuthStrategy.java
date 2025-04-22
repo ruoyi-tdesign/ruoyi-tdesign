@@ -9,11 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.constant.GrantTypeConstants;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.domain.model.PasswordLoginBody;
 import org.dromara.common.core.enums.LoginType;
-import org.dromara.common.core.enums.UserStatus;
 import org.dromara.common.core.exception.user.CaptchaException;
 import org.dromara.common.core.exception.user.CaptchaExpireException;
 import org.dromara.common.core.exception.user.UserException;
@@ -24,8 +24,8 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.satoken.utils.MultipleStpUtil;
 import org.dromara.common.tenant.annotation.IgnoreTenant;
 import org.dromara.common.web.config.properties.CaptchaProperties;
-import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.SysUser;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.web.domain.vo.LoginVo;
@@ -49,7 +49,7 @@ public class PasswordAuthStrategy implements IAuthStrategy<PasswordLoginBody> {
 
     @Override
     @IgnoreTenant
-    public LoginVo login(PasswordLoginBody loginBody, SysClient client) {
+    public LoginVo login(PasswordLoginBody loginBody, SysClientVo client) {
         String username = loginBody.getUsername();
         String password = loginBody.getPassword();
         String code = loginBody.getCode();
@@ -98,7 +98,7 @@ public class PasswordAuthStrategy implements IAuthStrategy<PasswordLoginBody> {
      * @param uuid     唯一标识
      */
     private void validateCaptcha(String tenantId, Long userId, String username, String code, String uuid) {
-        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
+        String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.blankToDefault(uuid, "");
         String captcha = RedisUtils.getObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
@@ -112,18 +112,15 @@ public class PasswordAuthStrategy implements IAuthStrategy<PasswordLoginBody> {
     }
 
     private SysUserVo loadUserByUsername(String username) {
-        SysUser user = userMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-            .select(SysUser::getUserName, SysUser::getStatus)
-//            .eq(TenantHelper.isEnable(), SysUser::getTenantId, tenantId)
-            .eq(SysUser::getUserName, username));
+        SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, username));
         if (ObjectUtil.isNull(user)) {
             log.info("登录用户：{} 不存在.", username);
             throw new UserException("user.not.exists", username);
-        } else if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+        } else if (SystemConstants.DISABLE.equals(user.getStatus())) {
             log.info("登录用户：{} 已被停用.", username);
             throw new UserException("user.blocked", username);
         }
-        return userMapper.selectUserByUserName(username);
+        return user;
     }
 
 }

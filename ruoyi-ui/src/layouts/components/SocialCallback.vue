@@ -3,7 +3,7 @@
     <result v-if="hasError" title="授权失败" type="401" :tip="errorMessage || '未知原因'">
       <t-button @click="() => $router.push('/login')">返回登录</t-button>
     </result>
-    <t-loading :loading="loading" :text="lodingText" :fullscreen="true"> </t-loading>
+    <t-loading :loading="loading" :text="loadingText" :fullscreen="true"> </t-loading>
   </div>
 </template>
 
@@ -23,7 +23,7 @@ const loading = ref(true);
 const { token, tenantId } = storeToRefs(useUserStore());
 const hasError = ref(false);
 const errorMessage = ref<string>();
-const lodingText = ref('');
+const loadingText = ref('');
 
 /**
  * 接收Route传递的参数
@@ -32,6 +32,11 @@ const lodingText = ref('');
 const code = route.query.code as string;
 const state = route.query.state as string;
 const source = route.query.source as string;
+const stateJson = JSON.parse(atob(state));
+
+const effectTenantId = computed(() =>
+  (stateJson.tenantId as string) ? (stateJson.tenantId as string) : tenantId.value,
+);
 
 const processResponse = async (res: any) => {
   if (res.code !== 200) {
@@ -78,17 +83,17 @@ const init = async () => {
   const data: LoginData = {
     socialCode: code,
     socialState: state,
-    tenantId: tenantId.value,
+    tenantId: effectTenantId.value,
     source,
     clientId: import.meta.env.VITE_CLIENT_ID,
     grantType: 'social',
   };
 
   if (!token.value) {
-    lodingText.value = '登录中...';
+    loadingText.value = '登录中...';
     await loginByCode(data);
   } else {
-    lodingText.value = '正在授权中...';
+    loadingText.value = '正在授权中...';
     await callbackByCode(data);
   }
 };

@@ -10,6 +10,7 @@ export * from './modules/notice';
 export * from './modules/notification';
 export * from './modules/permission';
 export * from './modules/setting';
+export * from './modules/sse';
 export * from './modules/tabs-router';
 export * from './modules/user';
 

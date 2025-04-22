@@ -125,4 +125,10 @@ public class SysMessageTemplateVo implements Serializable {
     @ExcelProperty(value = "创建时间")
     private Date createTime;
 
+    /**
+     * 支持平台标识
+     */
+    @ExcelProperty(value = "支持平台标识")
+    private String supplierType;
+
 }

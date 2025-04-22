@@ -7,17 +7,17 @@
         </t-form-item>
         <t-form-item label="消息类型" name="messageType">
           <t-select v-model="queryParams.messageType" placeholder="请选择消息类型" clearable>
-            <t-option v-for="dict in sys_message_type" :key="dict.value" :label="dict.label" :value="dict.value" />
+            <t-option
+              v-for="item in supplierTypeList"
+              :key="item.messageType"
+              :label="item.description"
+              :value="item.messageType"
+            />
           </t-select>
         </t-form-item>
-        <t-form-item label="支持平台" name="supplierType">
+        <t-form-item v-if="queryParams.messageType" label="支持平台" name="supplierType">
           <t-select v-model="queryParams.supplierType" placeholder="请选择支持平台" clearable>
-            <t-option
-              v-for="dict in sys_message_supplier_type"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            />
+            <t-option v-for="item in supplierTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
           </t-select>
         </t-form-item>
         <t-form-item label="状态" name="status">
@@ -114,40 +114,25 @@
           </t-row>
         </template>
         <template #messageType="{ row }">
-          <dict-tag :options="sys_message_type" :value="row.messageType" />
+          <dict-tag :options="messageTypeOptions" :value="row.messageType" />
         </template>
         <template #supplierType="{ row }">
-          <dict-tag :options="sys_message_supplier_type" :value="row.supplierType" />
+          <dict-tag :options="supplierTypeOptions" :value="row.supplierType" />
         </template>
         <template #status="{ row }">
           <dict-tag :options="sys_normal_disable" :value="row.status" />
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['system:messageConfig:query']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDetail(row)"
-            >
-              <browse-icon />详情
-            </t-link>
-            <t-link
-              v-hasPermi="['system:messageConfig:edit']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleUpdate(row)"
-            >
-              <edit-icon />修改
-            </t-link>
-            <t-link
-              v-hasPermi="['system:messageConfig:remove']"
-              theme="danger"
-              hover="color"
-              @click.stop="handleDelete(row)"
-            >
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['system:messageConfig:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:messageConfig:edit']" @click.stop="handleUpdate(row)">
+              <template #prefix-icon><edit-icon /></template>修改
+            </my-link>
+            <my-link v-hasPermi="['system:messageConfig:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>
@@ -185,7 +170,20 @@
             </t-col>
             <t-col :span="6">
               <t-form-item label="消息类型" name="messageType">
-                <dict-tag :options="sys_message_type" :value="form.messageType" />
+                <t-select
+                  v-model="form.messageType"
+                  placeholder="请选择消息类型"
+                  clearable
+                  filterable
+                  @change="handleMessageTypeChange"
+                >
+                  <t-option
+                    v-for="dict in messageTypeOptions"
+                    :key="dict.value"
+                    :label="dict.label"
+                    :value="dict.value"
+                  />
+                </t-select>
               </t-form-item>
             </t-col>
             <t-col :span="6">
@@ -198,7 +196,7 @@
                   @change="handleSupplierTypeChange"
                 >
                   <t-option
-                    v-for="dict in sys_message_supplier_type"
+                    v-for="dict in getSupplierTypeMap(form.messageType)"
                     :key="dict.value"
                     :label="dict.label"
                     :value="dict.value"
@@ -218,7 +216,7 @@
                 </t-select>
               </t-form-item>
             </t-col>
-            <template v-for="(value, key) in messageConfig.supplierConfig" :key="key">
+            <template v-for="(value, key) in messageConfig.supplierConfig" :key="form.supplierType + key">
               <t-col
                 v-if="!value.visible || (form.configJson as Record<string, any>)[value.visible]"
                 :span="value.span ?? 12"
@@ -273,10 +271,10 @@
         <t-descriptions-item label="消息设置id">{{ form.messageConfigId }}</t-descriptions-item>
         <t-descriptions-item label="标题">{{ form.title }}</t-descriptions-item>
         <t-descriptions-item label="消息类型">
-          <dict-tag :options="sys_message_type" :value="form.messageType" />
+          <dict-tag :options="messageTypeOptions" :value="form.messageType" />
         </t-descriptions-item>
         <t-descriptions-item label="支持平台标识">
-          <dict-tag :options="sys_message_supplier_type" :value="form.supplierType" />
+          <dict-tag :options="supplierTypeOptions" :value="form.supplierType" />
         </t-descriptions-item>
         <t-descriptions-item label="配置json" :span="2">
           <div style="max-height: 300px; width: 100%" class="content-scrollbar">
@@ -328,27 +326,25 @@ import {
   addMessageConfig,
   delMessageConfig,
   getMessageConfig,
+  getMessageFieldConfigs,
+  getMessageSupplierType,
   listMessageConfig,
   refreshCache,
   updateMessageConfig,
 } from '@/api/system/messageConfig';
 import type {
+  MessageFieldConfig,
+  MessageTypeVo,
   SysMessageConfigForm,
   SysMessageConfigQuery,
   SysMessageConfigVo,
 } from '@/api/system/model/messageConfigModel';
 import { ArrayOps } from '@/utils/array';
+import type { DictModel } from '@/utils/dict';
 import { isJson } from '@/utils/ruoyi';
 
-import { SUPPLIER_TYPE_MAP } from './data/index';
-import type { MessageConfig } from './model';
-
 const { proxy } = getCurrentInstance();
-const { sys_message_type, sys_normal_disable, sys_message_supplier_type } = proxy.useDict(
-  'sys_message_type',
-  'sys_normal_disable',
-  'sys_message_supplier_type',
-);
+const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
 const messageConfigList = ref<SysMessageConfigVo[]>([]);
 const messageConfigRef = ref<FormInstanceFunctions>();
@@ -365,12 +361,14 @@ const multiple = ref(true);
 const total = ref(0);
 const title = ref('');
 const sort = ref<TableSort>();
+const messageFieldConfigs = ref<Record<string, MessageFieldConfig>>({});
+const supplierTypeList = ref<MessageTypeVo[]>([]);
 
-const messageConfig = computed<MessageConfig>(() => {
+const messageConfig = computed<MessageFieldConfig>(() => {
   if (!form.value.supplierType) {
-    return {} as MessageConfig;
+    return {} as MessageFieldConfig;
   }
-  return SUPPLIER_TYPE_MAP.get(form.value.supplierType);
+  return messageFieldConfigs.value[form.value.supplierType];
 });
 
 // 校验规则
@@ -421,6 +419,46 @@ const pagination = computed(() => {
   };
 });
 
+const messageTypeOptions = computed(() => {
+  return (
+    supplierTypeList.value?.map<DictModel>((item) => ({
+      label: item.description,
+      value: item.messageType,
+      tagType: 'primary',
+    })) ?? []
+  );
+});
+
+const supplierTypeOptions = computed(() => {
+  return supplierTypeList.value.flatMap((item) => {
+    return Object.entries(item.supplierTypeMap).map<DictModel>(([key, value]) => ({
+      label: value,
+      value: key,
+      tagType: 'primary',
+    }));
+  });
+});
+
+const getSupplierTypeMap = (messageType: string): DictModel[] => {
+  const supplierTypeMap = supplierTypeList.value.find((item) => item.messageType === messageType)?.supplierTypeMap;
+  if (!supplierTypeMap) {
+    return [];
+  }
+  return Object.entries(supplierTypeMap).map((value) => {
+    return {
+      value: value[0],
+      label: value[1],
+      tagType: 'primary',
+    };
+  });
+};
+
+/** 处理消息类型变更 */
+function handleMessageTypeChange() {
+  form.value.supplierType = undefined;
+  form.value.configJson = {};
+}
+
 /** 处理支持平台变更事件 */
 function handleSupplierTypeChange() {
   // 默认值赋值
@@ -431,7 +469,6 @@ function handleSupplierTypeChange() {
       configValue[value[0]] = value[1].value;
     });
     form.value.configJson = configValue;
-    form.value.messageType = messageConfig.value.messageType;
   } else {
     form.value.configJson = {};
   }
@@ -598,5 +635,18 @@ function handleExport() {
   );
 }
 
-getList();
+/** 初始化消息配置 */
+function initMessageFieldConfigs() {
+  getMessageFieldConfigs().then((res) => {
+    messageFieldConfigs.value = res.data;
+  });
+  getMessageSupplierType().then((res) => {
+    supplierTypeList.value = res.data;
+  });
+}
+
+onMounted(() => {
+  initMessageFieldConfigs();
+  getList();
+});
 </script>

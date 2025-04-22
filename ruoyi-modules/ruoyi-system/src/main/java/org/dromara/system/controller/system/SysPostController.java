@@ -1,6 +1,7 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -115,12 +117,23 @@ public class SysPostController extends BaseController {
 
     /**
      * 获取岗位选择框列表
+     *
+     * @param postIds 岗位ID串
+     * @param deptId  部门id
      */
-    @GetMapping("/optionselect")
-    public R<List<SysPostVo>> optionselect() {
-        SysPostQuery query = new SysPostQuery();
-        query.setStatus(NormalDisableEnum.NORMAL.getCode());
-        List<SysPostVo> posts = postService.selectPostList(query);
-        return R.ok(posts);
+    @SaCheckPermission("system:post:query")
+    @GetMapping("/optionSelect")
+    public R<List<SysPostVo>> optionSelect(@RequestParam(name = "postIds[]", required = false) Long[] postIds,
+                                           @RequestParam(required = false) Long deptId) {
+        List<SysPostVo> list = new ArrayList<>();
+        if (ObjectUtil.isNotNull(deptId)) {
+            SysPostQuery query = new SysPostQuery();
+            query.setDeptId(deptId);
+            list = postService.selectPostList(query);
+        } else if (postIds != null) {
+            list = postService.selectPostByIds(List.of(postIds));
+        }
+        return R.ok(list);
     }
+
 }

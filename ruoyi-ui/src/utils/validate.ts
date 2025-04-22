@@ -1,6 +1,16 @@
 /**
+ * 路径匹配器
+ * @param pattern
+ * @param path
+ */
+export function isPathMatch(pattern: string, path: string) {
+  const regexPattern = pattern.replace(/\//g, '\\/').replace(/\*\*/g, '.*').replace(/\*/g, '[^\\/]*');
+  const regex = new RegExp(`^${regexPattern}$`);
+  return regex.test(path);
+}
+
+/**
  * 判断url是否是http或https
- * @returns {Boolean}
  * @param url
  */
 export function isHttp(url: string) {
@@ -9,16 +19,14 @@ export function isHttp(url: string) {
 
 /**
  * 判断path是否为外链
- * @param {string} path
- * @returns {Boolean}
+ * @param path
  */
 export function isExternal(path: string) {
   return /^(https?:|mailto:|tel:)/.test(path);
 }
 
 /**
- * @param {string} str
- * @returns {Boolean}
+ * @param str
  */
 export function validUsername(str: string) {
   const validMap = ['admin', 'editor'];
@@ -26,8 +34,7 @@ export function validUsername(str: string) {
 }
 
 /**
- * @param {string} url
- * @returns {Boolean}
+ * @param url
  */
 export function validURL(url: string) {
   const reg =
@@ -36,8 +43,7 @@ export function validURL(url: string) {
 }
 
 /**
- * @param {string} str
- * @returns {Boolean}
+ * @param str
  */
 export function validLowerCase(str: string) {
   const reg = /^[a-z]+$/;
@@ -45,8 +51,7 @@ export function validLowerCase(str: string) {
 }
 
 /**
- * @param {string} str
- * @returns {Boolean}
+ * @param str
  */
 export function validUpperCase(str: string) {
   const reg = /^[A-Z]+$/;
@@ -54,8 +59,7 @@ export function validUpperCase(str: string) {
 }
 
 /**
- * @param {string} str
- * @returns {Boolean}
+ * @param str
  */
 export function validAlphabets(str: string) {
   const reg = /^[A-Za-z]+$/;
@@ -63,8 +67,7 @@ export function validAlphabets(str: string) {
 }
 
 /**
- * @param {string} email
- * @returns {Boolean}
+ * @param email
  */
 export function validEmail(email: string) {
   const reg =
@@ -73,8 +76,7 @@ export function validEmail(email: string) {
 }
 
 /**
- * @param {string} str
- * @returns {Boolean}
+ * @param str
  */
 export function isString(str: any) {
   return typeof str === 'string' || str instanceof String;
@@ -82,7 +84,6 @@ export function isString(str: any) {
 
 /**
  * @param {Array} arg
- * @returns {Boolean}
  */
 export function isArray(arg: any) {
   if (typeof Array.isArray === 'undefined') {

@@ -11,7 +11,7 @@ export function listData(query: SysDictDataQuery) {
 }
 
 // 查询字典数据详细
-export function getData(dictCode: string) {
+export function getData(dictCode: string | number) {
   return request.get<R<SysDictDataVo>>({
     url: `/system/dict/data/${dictCode}`,
   });
@@ -26,7 +26,7 @@ export function getDicts(dictType: string) {
 
 // 新增字典数据
 export function addData(data: SysDictDataForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/dict/data',
     data,
   });
@@ -34,7 +34,7 @@ export function addData(data: SysDictDataForm) {
 
 // 修改字典数据
 export function updateData(data: SysDictDataForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/dict/data',
     data,
   });
@@ -42,7 +42,7 @@ export function updateData(data: SysDictDataForm) {
 
 // 删除字典数据
 export function delData(dictCode: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/dict/data/${dictCode}`,
   });
 }

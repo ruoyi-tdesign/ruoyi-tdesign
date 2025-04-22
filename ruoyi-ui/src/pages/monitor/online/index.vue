@@ -51,15 +51,12 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link theme="primary" hover="color" @click.stop="handleDetail(row)"> <browse-icon />详情 </t-link>
-            <t-link
-              v-hasPermi="['monitor:online:forceLogout']"
-              theme="danger"
-              hover="color"
-              @click.stop="handleForceLogout(row)"
-            >
-              <delete-icon />强退
-            </t-link>
+            <my-link @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['monitor:online:forceLogout']" theme="danger" @click.stop="handleForceLogout(row)">
+              <template #prefix-icon><delete-icon /></template>强退
+            </my-link>
           </t-space>
         </template>
       </t-table>

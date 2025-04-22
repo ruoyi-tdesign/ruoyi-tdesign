@@ -16,8 +16,15 @@ import org.springframework.core.Ordered;
 @Slf4j
 public class WebSocketTopicListener implements ApplicationRunner, Ordered {
 
+    /**
+     * 在Spring Boot应用程序启动时初始化WebSocket主题订阅监听器
+     *
+     * @param args 应用程序参数
+     * @throws Exception 初始化过程中可能抛出的异常
+     */
     @Override
-    public void run(ApplicationArguments args) {
+    public void run(ApplicationArguments args) throws Exception {
+        // 订阅WebSocket消息
         WebSocketUtils.subscribeMessage((message) -> {
             String loginType = message.getLoginType();
             log.info("WebSocket主题订阅收到消息session loginType={} keys={} message={}", loginType, message.getSessionKeys(), message.getMessage());

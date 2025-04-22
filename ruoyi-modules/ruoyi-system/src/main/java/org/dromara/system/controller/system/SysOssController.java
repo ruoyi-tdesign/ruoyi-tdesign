@@ -85,7 +85,7 @@ public class SysOssController extends BaseController {
      *
      * @param ossIds OSS对象ID串
      */
-    @SaCheckPermission("system:oss:list")
+    @SaCheckPermission("system:oss:query")
     @GetMapping("/listByIds/{ossIds}")
     public R<List<SysOssVo>> listByIds(@NotEmpty(message = "主键不能为空") @PathVariable Long[] ossIds) {
         List<SysOssVo> list = ossService.listVoByIds(List.of(ossIds));

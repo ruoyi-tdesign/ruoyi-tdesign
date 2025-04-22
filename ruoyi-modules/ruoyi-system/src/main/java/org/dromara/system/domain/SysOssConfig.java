@@ -21,7 +21,7 @@ import java.util.Date;
 public class SysOssConfig extends BaseEntity {
 
     /**
-     * 主建
+     * 主键
      */
     @TableId(value = "oss_config_id")
     private Long ossConfigId;
@@ -80,11 +80,6 @@ public class SysOssConfig extends BaseEntity {
      * 是否默认（1=是,0=否）
      */
     private String status;
-
-    /**
-     * 创建桶（1=是,0=否）
-     */
-    private Integer createBucket;
 
     /**
      * 扩展字段

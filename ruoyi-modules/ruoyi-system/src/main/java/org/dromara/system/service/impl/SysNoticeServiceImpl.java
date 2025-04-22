@@ -113,6 +113,6 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteNoticeByIds(Long[] noticeIds) {
-        return baseMapper.deleteBatchIds(Arrays.asList(noticeIds));
+        return baseMapper.deleteByIds(Arrays.asList(noticeIds));
     }
 }

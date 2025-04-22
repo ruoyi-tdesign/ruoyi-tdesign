@@ -1,5 +1,6 @@
 package org.dromara.common.websocket.handler;
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.BaseUser;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
@@ -12,6 +13,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.dromara.common.websocket.constant.WebSocketConstants.LOGIN_USER_KEY;
@@ -38,30 +40,35 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
      * 连接成功后
      */
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
+    public void afterConnectionEstablished(WebSocketSession session) throws IOException {
         BaseUser user = (BaseUser) session.getAttributes().get(LOGIN_USER_KEY);
-        if (user != null) {
-            WebSocketSessionHolder.addSession(user.getLoginType(), user.getUserId(), session);
-            log.info("[connect] sessionId: {},userId:{},loginType:{},deviceType:{}", session.getId(), user.getUserId(), user.getLoginType(), user.getDeviceType());
-            if (customWebSocketHandler != null) {
-                customWebSocketHandler.afterConnectionEstablished(session, user);
-            }
+        if (ObjectUtil.isNull(user)) {
+            session.close(CloseStatus.BAD_DATA);
+            log.info("[connect] invalid token received. sessionId: {}", session.getId());
+            return;
+        }
+        WebSocketSessionHolder.addSession(user.getLoginType(), user.getUserId(), session);
+        log.info("[connect] sessionId: {},userId:{},loginType:{},deviceType:{}", session.getId(), user.getUserId(), user.getLoginType(), user.getDeviceType());
+        if (customWebSocketHandler != null) {
+            customWebSocketHandler.afterConnectionEstablished(session, user);
         }
     }
 
     /**
-     * 处理发送来的文本消息
+     * 处理接收到的文本消息
      *
-     * @param session
-     * @param message
+     * @param session WebSocket会话
+     * @param message 接收到的文本消息
+     * @throws Exception 处理消息过程中可能抛出的异常
      */
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        // 从WebSocket会话中获取登录用户信息
         BaseUser user = (BaseUser) session.getAttributes().get(LOGIN_USER_KEY);
-        List<Long> userIds = List.of(user.getUserId());
+        // 创建WebSocket消息DTO对象
         WebSocketMessageDto webSocketMessageDto = new WebSocketMessageDto();
         webSocketMessageDto.setLoginType(user.getLoginType());
-        webSocketMessageDto.setSessionKeys(userIds);
+        webSocketMessageDto.setSessionKeys(List.of(user.getUserId()));
         webSocketMessageDto.setMessage(message.getPayload());
         WebSocketUtils.publishMessage(webSocketMessageDto);
 
@@ -70,6 +77,13 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
         }
     }
 
+    /**
+     * 处理接收到的二进制消息
+     *
+     * @param session WebSocket会话
+     * @param message 接收到的二进制消息
+     * @throws Exception 处理消息过程中可能抛出的异常
+     */
     @Override
     protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
         super.handleBinaryMessage(session, message);
@@ -81,10 +95,11 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     /**
-     * 心跳监测的回复
+     * 处理接收到的Pong消息（心跳监测）
      *
-     * @param session
-     * @param message
+     * @param session WebSocket会话
+     * @param message 接收到的Pong消息
+     * @throws Exception 处理消息过程中可能抛出的异常
      */
     @Override
     protected void handlePongMessage(WebSocketSession session, PongMessage message) {
@@ -92,13 +107,14 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     /**
-     * 连接出错时
+     * 处理WebSocket传输错误
      *
-     * @param session
-     * @param exception
+     * @param session   WebSocket会话
+     * @param exception 发生的异常
+     * @throws Exception 处理过程中可能抛出的异常
      */
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) {
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         log.error("[transport error] sessionId: {} , exception:{}", session.getId(), exception.getMessage());
 
         if (customWebSocketHandler != null) {
@@ -107,15 +123,18 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     /**
-     * 连接关闭后
+     * 在WebSocket连接关闭后执行清理操作
      *
-     * @param session
-     * @param status
+     * @param session WebSocket会话
+     * @param status  关闭状态信息
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         BaseUser user = (BaseUser) session.getAttributes().get(LOGIN_USER_KEY);
-        if (user != null) {
+        if (ObjectUtil.isNull(user)) {
+            log.info("[disconnect] invalid token received. sessionId: {}", session.getId());
+            return;
+        } else {
             WebSocketSessionHolder.removeSession(user.getLoginType(), user.getUserId(), session);
             log.info("[disconnect] sessionId: {},userId:{},loginType:{},deviceType:{}",
                 session.getId(), user.getUserId(), user.getLoginType(), user.getDeviceType());
@@ -127,9 +146,9 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     }
 
     /**
-     * 是否支持分片消息
+     * 指示处理程序是否支持接收部分消息
      *
-     * @return
+     * @return 如果支持接收部分消息，则返回true；否则返回false
      */
     @Override
     public boolean supportsPartialMessages() {

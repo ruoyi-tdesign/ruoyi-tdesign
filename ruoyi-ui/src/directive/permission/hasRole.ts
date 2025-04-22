@@ -8,14 +8,13 @@ import { useUserStore } from '@/store/modules/user';
 export default {
   mounted(el: any, binding: any) {
     const { value } = binding;
-    const superAdmin = 'admin';
     const { roles } = useUserStore();
 
     if (value && value instanceof Array && value.length > 0) {
       const roleFlag = value;
 
       const hasRole = roles.some((role) => {
-        return superAdmin === role || roleFlag.includes(role);
+        return role === 'superadmin' || role === 'admin' || roleFlag.includes(role);
       });
 
       if (!hasRole) {

@@ -71,4 +71,13 @@ public interface ISysDictDataService extends IService<SysDictData> {
      * @return 结果
      */
     List<SysDictDataVo> updateDictData(SysDictDataBo bo);
+
+    /**
+     * 校验字典键值是否唯一
+     *
+     * @param dict 字典数据
+     * @return 结果
+     */
+    boolean checkDictDataUnique(SysDictDataBo dict);
+
 }

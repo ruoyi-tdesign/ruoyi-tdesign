@@ -5,9 +5,11 @@ import cn.hutool.core.util.StrUtil;
 import org.dromara.common.core.constant.CacheConstants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.dto.UserOnlineDTO;
+import org.dromara.common.core.domain.model.BaseUser;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
 import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.common.satoken.context.SaSecurityContext;
 import org.dromara.common.satoken.online.OnlineUserCacheManager;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.satoken.utils.OnlineUserUtil;
@@ -48,10 +50,10 @@ public class TenantOnlineUserCacheManager implements OnlineUserCacheManager {
      */
     @Override
     public void setCache(UserType userType, String tokenValue, SaLoginModel loginModel, Long timeout) {
-        LoginUser user = LoginHelper.getUser();
+        BaseUser baseUser = SaSecurityContext.getContext();
         UserOnlineDTO dto = OnlineUserUtil.getOnlineDTO(tokenValue);
         RedisUtils.setObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue, dto, Duration.ofSeconds(timeout));
-        RedisUtils.setObject(GlobalConstants.ONLINE_TOKEN_TENANT_ID_KEY + tokenValue, user.getTenantId(), Duration.ofSeconds(timeout));
+        RedisUtils.setObject(GlobalConstants.ONLINE_TOKEN_TENANT_ID_KEY + tokenValue, baseUser.getTenantId(), Duration.ofSeconds(timeout));
     }
 
     /**

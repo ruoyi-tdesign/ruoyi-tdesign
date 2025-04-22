@@ -53,10 +53,10 @@ public interface I${ClassName}Service extends IService<${ClassName}> {
 #if($isUseQueryMethod && $table.isCrud())
 
     /**
-     * 查询${functionName}列表
+     * 分页查询${functionName}列表
      *
      * @param query 查询对象
-     * @return ${vo}
+     * @return ${functionName}分页列表
      */
     TableDataInfo<${vo}> queryPageList(${query} query);
 #end
@@ -66,7 +66,7 @@ public interface I${ClassName}Service extends IService<${ClassName}> {
      * 查询${functionName}列表
      *
      * @param query 查询对象
-     * @return ${vo}
+     * @return ${functionName}列表
      */
     List<${vo}> queryList(${query} query);
 #end
@@ -76,7 +76,7 @@ public interface I${ClassName}Service extends IService<${ClassName}> {
      * 新增${functionName}
      *
      * @param $boObjName ${functionName}新增业务对象
-     * @return Boolean
+     * @return 是否新增成功
      */
     Boolean insertByBo(${bo} $boObjName);
 #end
@@ -86,17 +86,17 @@ public interface I${ClassName}Service extends IService<${ClassName}> {
      * 修改${functionName}
      *
      * @param $boObjName ${functionName}编辑业务对象
-     * @return Boolean
+     * @return 是否修改成功
      */
     Boolean updateByBo(${bo} $boObjName);
 #end
 #if($isUseRemoveMethod)
 
     /**
-     * 校验并批量删除${functionName}信息
+     * 批量删除${functionName}信息
      *
-     * @param ids 主键集合
-     * @return Boolean
+     * @param ids 待删除的主键集合
+     * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<${pkColumn.javaType}> ids);
 #end

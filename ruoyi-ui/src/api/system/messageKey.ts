@@ -19,7 +19,7 @@ export function getMessageKey(messageKeyId: number) {
 
 // 新增消息常量
 export function addMessageKey(data: SysMessageKeyForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/messageKey',
     data,
   });
@@ -27,7 +27,7 @@ export function addMessageKey(data: SysMessageKeyForm) {
 
 // 修改消息常量
 export function updateMessageKey(data: SysMessageKeyForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/messageKey',
     data,
   });
@@ -35,7 +35,7 @@ export function updateMessageKey(data: SysMessageKeyForm) {
 
 // 删除消息常量
 export function delMessageKey(messageKeyIds: number | Array<number>) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/messageKey/${messageKeyIds}`,
   });
 }

@@ -12,7 +12,7 @@ export function getUserProfile() {
 
 // 修改用户个人信息
 export function updateUserProfile(data: SysUserProfileBo) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/user/profile/basic',
     data,
   });
@@ -20,7 +20,7 @@ export function updateUserProfile(data: SysUserProfileBo) {
 
 // 修改用户手机号
 export function updateUserPhonenumber(phonenumber: string) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/user/profile/updatePhonenumber',
     params: { phonenumber },
   });
@@ -28,7 +28,7 @@ export function updateUserPhonenumber(phonenumber: string) {
 
 // 修改用户邮箱
 export function updateUserEmail(email: string) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/user/profile/updateEmail',
     params: { email },
   });
@@ -40,13 +40,14 @@ export function updateUserPwd(oldPassword: string, newPassword: string) {
     oldPassword,
     newPassword,
   };
-  return request.put<R<void>>(
+  return request.put<R>(
     {
       url: '/system/user/profile/updatePwd',
       data,
     },
     {
       withEncrypt: true,
+      repeatSubmit: false,
     },
   );
 }

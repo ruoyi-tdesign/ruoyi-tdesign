@@ -17,9 +17,20 @@ export function getPost(postId: number) {
   });
 }
 
+// 获取岗位选择框列表
+export function postOptionSelect(deptId?: number | string, postIds?: (number | string)[]) {
+  return request.get<R<SysPostVo[]>>({
+    url: '/system/post/optionSelect',
+    params: {
+      postIds,
+      deptId,
+    },
+  });
+}
+
 // 新增岗位
 export function addPost(data: SysPostForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/post',
     data,
   });
@@ -27,7 +38,7 @@ export function addPost(data: SysPostForm) {
 
 // 修改岗位
 export function updatePost(data: SysPostForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/post',
     data,
   });
@@ -35,7 +46,7 @@ export function updatePost(data: SysPostForm) {
 
 // 删除岗位
 export function delPost(postId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/post/${postId}`,
   });
 }

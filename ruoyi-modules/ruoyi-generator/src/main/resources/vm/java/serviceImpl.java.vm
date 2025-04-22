@@ -74,10 +74,10 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #if($isUseQueryMethod && $table.isCrud())
 
     /**
-     * 查询${functionName}列表
+     * 分页查询${functionName}列表
      *
      * @param query 查询对象
-     * @return ${vo}
+     * @return ${functionName}分页列表
      */
     @Override
     public TableDataInfo<${vo}> queryPageList(${query} query) {
@@ -90,7 +90,7 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
      * 查询${functionName}列表
      *
      * @param query 查询对象
-     * @return ${vo}
+     * @return ${functionName}列表
      */
     @Override
     public List<${vo}> queryList(${query} query) {
@@ -104,10 +104,10 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #if($isUseAddMethod)
 
     /**
-     * 根据新增业务对象插入${functionName}
+     * 新增${functionName}
      *
      * @param ${boObjName} ${functionName}新增业务对象
-     * @return Boolean
+     * @return 是否新增成功
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -123,10 +123,10 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #if($isUseEditMethod)
 
     /**
-     * 根据编辑业务对象修改${functionName}
+     * 修改${functionName}
      *
      * @param ${boObjName} ${functionName}编辑业务对象
-     * @return Boolean
+     * @return 是否修改成功
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -142,10 +142,10 @@ public class ${ClassName}ServiceImpl extends ServiceImpl<${ClassName}Mapper, ${C
 #if($isUseRemoveMethod)
 
     /**
-     * 校验并批量删除${functionName}信息
+     * 批量删除${functionName}信息
      *
-     * @param ids 主键集合
-     * @return Boolean
+     * @param ids 待删除的主键集合
+     * @return 是否删除成功
      */
     @Override
     @Transactional(rollbackFor = Exception.class)

@@ -117,26 +117,15 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['system:oss:download']"
-              v-copyText="row.url"
-              v-copyText:callback="copyTextSuccess"
-              theme="primary"
-              hover="color"
-            >
-              <relativity-icon />复制
-            </t-link>
-            <t-link
-              v-hasPermi="['system:oss:download']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDownload(row)"
-            >
-              <download-icon />下载
-            </t-link>
-            <t-link v-hasPermi="['system:oss:remove']" theme="danger" hover="color" @click.stop="handleDelete(row)">
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['system:oss:download']" v-copyText="row.url" v-copyText:callback="copyTextSuccess">
+              <template #prefix-icon><relativity-icon /></template>复制
+            </my-link>
+            <my-link v-hasPermi="['system:oss:download']" @click.stop="handleDownload(row)">
+              <template #prefix-icon><download-icon /></template>下载
+            </my-link>
+            <my-link v-hasPermi="['system:oss:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>

@@ -18,7 +18,7 @@ export function listTable(query: GenTableQuery) {
 
 // 查询db数据库列表
 export function listDbTable(query: GenTableQuery) {
-  return request.get<TableDataInfo<GenTableVo>>({
+  return request.get<R<GenTableVo[]>>({
     url: '/tool/gen/db/list',
     params: query,
   });
@@ -33,7 +33,7 @@ export function getGenTable(tableId: number | string) {
 
 // 修改代码生成信息
 export function updateGenTable(data: GenTableForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/tool/gen',
     data,
   });
@@ -41,7 +41,7 @@ export function updateGenTable(data: GenTableForm) {
 
 // 修改代码生成信息
 export function updateGenTableName(data: GenUpdateTableNameForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/tool/gen/updateTableName',
     data,
   });
@@ -49,7 +49,7 @@ export function updateGenTableName(data: GenUpdateTableNameForm) {
 
 // 导入表
 export function importTable(tables: string, dataName: string) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/tool/gen/importTable',
     params: { tables, dataName },
   });
@@ -72,7 +72,7 @@ export function tempPreviewTable(data: GenTableForm) {
 
 // 删除表数据
 export function delTable(tableId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/tool/gen/${tableId}`,
   });
 }
@@ -86,7 +86,7 @@ export function genCode(tableId: string | number) {
 
 // 同步数据库
 export function synchDb(tableId: string | number) {
-  return request.get<R<void>>({
+  return request.get<R>({
     url: `/tool/gen/synchDb/${tableId}`,
   });
 }

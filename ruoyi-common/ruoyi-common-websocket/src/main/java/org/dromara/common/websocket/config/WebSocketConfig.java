@@ -61,6 +61,7 @@ public class WebSocketConfig {
             })
             .<WebSocketConfigurer>map(entry -> {
                 WebSocketProperties properties = entry.getValue();
+                // 如果允许跨域访问的地址为空，则设置为 "*"，表示允许所有来源的跨域请求
                 if (StrUtil.isBlank(properties.getAllowedOrigins())) {
                     properties.setAllowedOrigins("*");
                 }
@@ -78,8 +79,10 @@ public class WebSocketConfig {
                         throw new RuntimeException(e);
                     }
                 }
+                // 返回一个WebSocketConfigurer对象，用于配置WebSocket
                 WebSocketHandler finalHandler = handler;
                 return registry -> registry
+                    // 添加WebSocket处理程序和拦截器到指定路径，设置允许的跨域来源
                     .addHandler(finalHandler, properties.getPaths().toArray(String[]::new))
                     .addInterceptors(handshakeInterceptor)
                     .setAllowedOrigins(properties.getAllowedOrigins());

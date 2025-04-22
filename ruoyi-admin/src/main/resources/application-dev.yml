@@ -1,28 +1,34 @@
 --- # 监控中心配置
 spring.boot.admin.client:
   # 增加客户端开关
-  enabled: true
+  enabled: false
   url: http://localhost:9090/admin
   instance:
     service-host-type: IP
-  username: ruoyi
-  password: 123456
+    metadata:
+      username: ${spring.boot.admin.client.username}
+      userpassword: ${spring.boot.admin.client.password}
+  username: @monitor.username@
+  password: @monitor.password@
 
---- # powerjob 配置
-powerjob:
-  worker:
-    # 如何开启调度中心请查看文档教程
-    enabled: false
-    # 需要先在 powerjob 登录页执行应用注册后才能使用
-    app-name: ruoyi-worker
-    allow-lazy-connect-server: false
-    max-appended-wf-context-length: 4096
-    max-result-length: 4096
-    # 28080 端口 随着主应用端口飘逸 避免集群冲突
-    port: 2${server.port}
-    protocol: http
-    server-address: 127.0.0.1:7700
-    store-strategy: disk
+--- # snail-job 配置
+snail-job:
+  enabled: false
+  # 需要在 SnailJob 后台组管理创建对应名称的组,然后创建任务的时候选择对应的组,才能正确分派任务
+  group: "ruoyi_group"
+  # SnailJob 接入验证令牌 详见 script/sql/ry_job.sql `sj_group_config` 表
+  token: "SJ_cKqBTPzCsWA3VyuCfFoccmuIEGXjr5KT"
+  server:
+    host: 127.0.0.1
+    port: 17888
+  # 命名空间UUID 详见 script/sql/ry_job.sql `sj_namespace`表`unique_id`字段
+  namespace: ${spring.profiles.active}
+  # 随主应用端口漂移
+  port: 2${server.port}
+  # 客户端ip指定
+  host:
+  # RPC类型: netty, grpc
+  rpc-type: grpc
 
 --- # 数据源配置
 spring:
@@ -43,17 +49,17 @@ spring:
           driverClassName: com.mysql.cj.jdbc.Driver
           # jdbc 所有参数配置参考 https://lionli.blog.csdn.net/article/details/122018562
           # rewriteBatchedStatements=true 批处理优化 大幅提升批量插入更新删除性能(对数据库有性能损耗 使用批量操作应考虑性能问题)
-          url: jdbc:mysql://localhost:3306/ruoyi-tdesign?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
-          username: root
-          password: root
-        # 从库数据源
-        slave:
-          lazy: true
-          type: ${spring.datasource.type}
-          driverClassName: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/ruoyi-tdesign?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+          url: jdbc:mysql://localhost:3306/ruoyi-tdesign?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
           username:
           password:
+        # 从库数据源
+#        slave:
+#          lazy: true
+#          type: ${spring.datasource.type}
+#          driverClassName: com.mysql.cj.jdbc.Driver
+#          url: jdbc:mysql://localhost:3306/ruoyi-tdesign?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+#          username:
+#          password:
 #        oracle:
 #          type: ${spring.datasource.type}
 #          driverClassName: oracle.jdbc.OracleDriver
@@ -108,9 +114,10 @@ spring:
       ssl:
         enabled: false
 
+# redisson 配置
 redisson:
   # redis key前缀
-  keyPrefix: ${ruoyi.name}
+  keyPrefix: ${spring.application.name}
   # 线程池数量
   threads: 4
   # Netty线程池数量
@@ -118,7 +125,7 @@ redisson:
   # 单节点配置
   singleServerConfig:
     # 客户端名称
-    clientName: ${ruoyi.name}
+    clientName: ${spring.application.name}
     # 最小空闲连接数
     connectionMinimumIdleSize: 8
     # 连接池大小
@@ -132,7 +139,6 @@ redisson:
 
 --- # 三方授权
 justauth:
-  enabled: true
   # 前端外网访问地址
   address: http://localhost:3002
   type:
@@ -143,6 +149,13 @@ justauth:
       client-id: 876892492581044224
       client-secret: x1Y5MTMwNzIwMjMxNTM4NDc3Mzche8
       redirect-uri: ${justauth.address}/social-callback?source=maxkey
+    topiam:
+      # topiam 服务器地址
+      server-url: http://127.0.0.1:1898/api/v1/authorize/y0q************spq***********8ol
+      client-id: 449c4*********937************759
+      client-secret: ac7***********1e0************28d
+      redirect-uri: ${justauth.address}/social-callback?source=topiam
+      scopes: [openid, email, phone, profile]
     qq:
       client-id: 10**********6
       client-secret: 1f7d08**********5b7**********29e

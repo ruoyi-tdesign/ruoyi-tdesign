@@ -67,13 +67,13 @@ public class SysUserVo implements Serializable {
     /**
      * 用户邮箱
      */
-    @Sensitive(strategy = SensitiveStrategy.EMAIL)
+    @Sensitive(strategy = SensitiveStrategy.EMAIL, perms = "system:user:edit")
     private String email;
 
     /**
      * 手机号码
      */
-    @Sensitive(strategy = SensitiveStrategy.PHONE)
+    @Sensitive(strategy = SensitiveStrategy.PHONE, perms = "system:user:edit")
     private String phonenumber;
 
     /**
@@ -125,9 +125,10 @@ public class SysUserVo implements Serializable {
     private Date createTime;
 
     /**
-     * 部门对象
+     * 部门名
      */
-    private SysDeptVo dept;
+    @Translation(type = TransConstant.DEPT_ID_TO_NAME, mapper = "deptId")
+    private String deptName;
 
     /**
      * 角色对象

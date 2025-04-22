@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
@@ -16,6 +17,8 @@ import org.dromara.system.domain.query.SysClientQuery;
 import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.mapper.SysClientMapper;
 import org.dromara.system.service.ISysClientService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,9 +50,10 @@ public class SysClientServiceImpl extends ServiceImpl<SysClientMapper, SysClient
     /**
      * 查询客户端管理
      */
+    @Cacheable(cacheNames = CacheNames.SYS_CLIENT, key = "#clientId")
     @Override
-    public SysClient queryByClientId(String clientId) {
-        return baseMapper.selectOne(new LambdaQueryWrapper<SysClient>().eq(SysClient::getClientId, clientId));
+    public SysClientVo queryByClientId(String clientId) {
+        return baseMapper.selectVoOne(new LambdaQueryWrapper<SysClient>().eq(SysClient::getClientId, clientId));
     }
 
     /**
@@ -102,6 +106,7 @@ public class SysClientServiceImpl extends ServiceImpl<SysClientMapper, SysClient
      * @param bo 系统授权编辑业务对象
      * @return Boolean
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, key = "#bo.clientId")
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(SysClientBo bo) {
@@ -114,12 +119,13 @@ public class SysClientServiceImpl extends ServiceImpl<SysClientMapper, SysClient
     /**
      * 修改状态
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, key = "#clientId")
     @Override
-    public int updateUserStatus(Long id, String status) {
+    public int updateClientStatus(String clientId, String status) {
         return baseMapper.update(null,
             new LambdaUpdateWrapper<SysClient>()
                 .set(SysClient::getStatus, status)
-                .eq(SysClient::getId, id));
+                .eq(SysClient::getClientId, clientId));
     }
 
     /**
@@ -128,6 +134,7 @@ public class SysClientServiceImpl extends ServiceImpl<SysClientMapper, SysClient
      * @param ids 主键集合
      * @return Boolean
      */
+    @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {

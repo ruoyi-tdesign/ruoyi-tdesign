@@ -41,7 +41,7 @@ public interface IGenTableService extends IService<GenTable> {
      * @param query 查询对象
      * @return 数据库表集合
      */
-    TableDataInfo<GenTableVo> selectPageDbTableList(GenTableQuery query);
+    List<GenTableVo> selectPageDbTableList(GenTableQuery query);
 
     /**
      * 查询据库列表
@@ -93,6 +93,15 @@ public interface IGenTableService extends IService<GenTable> {
      * @param dataName  数据源名称
      */
     void importGenTable(List<GenTableVo> tableList, String dataName);
+
+    /**
+     * 根据表名称查询列信息
+     *
+     * @param tableName 表名称
+     * @param dataName  数据源名称
+     * @return 列信息
+     */
+    List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName);
 
     /**
      * 预览代码

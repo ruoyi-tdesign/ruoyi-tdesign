@@ -1,14 +1,15 @@
 package org.dromara.system.mapper;
 
-import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.query.SysUserQuery;
+import org.dromara.system.domain.vo.SysUserExportVo;
 import org.dromara.system.domain.vo.SysUserVo;
 
 import java.util.List;
@@ -27,10 +28,47 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
      * @return {@link SysUser}
      */
     @DataPermission({
-        @DataColumn(key = "deptName", value = "sd.dept_id"),
+        @DataColumn(key = "deptName", value = "su.dept_id"),
         @DataColumn(key = "userName", value = "su.user_id")
     })
     List<SysUserVo> queryList(SysUserQuery query);
+
+    /**
+     * 分页查询用户列表，并进行数据权限控制
+     *
+     * @param page         分页参数
+     * @param queryWrapper 查询条件
+     * @return 分页的用户信息
+     */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "u.dept_id"),
+        @DataColumn(key = "userName", value = "u.user_id")
+    })
+    Page<SysUserVo> selectPageUserList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+
+    /**
+     * 查询用户列表，并进行数据权限控制
+     *
+     * @param queryWrapper 查询条件
+     * @return 用户信息集合
+     */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "user_id")
+    })
+    List<SysUserVo> selectUserList(@Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+
+    /**
+     * 查询用户信息列表
+     *
+     * @param query 查询对象
+     * @return {@link SysUser}
+     */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "su.dept_id"),
+        @DataColumn(key = "userName", value = "su.user_id")
+    })
+    List<SysUserExportVo> selectUserExportList(SysUserQuery query);
 
     /**
      * 根据条件分页查询已配用户角色列表
@@ -56,32 +94,6 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     })
     List<SysUserVo> selectUnallocatedList(SysUserQuery query);
 
-    /**
-     * 通过用户名查询用户
-     *
-     * @param userName 用户名
-     * @return 用户对象信息
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    SysUserVo selectUserByUserName(@Param("userName") String userName);
-
-    /**
-     * 通过手机号查询用户
-     *
-     * @param phonenumber 手机号
-     * @return 用户对象信息
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    SysUserVo selectUserByPhonenumber(@Param("phonenumber") String phonenumber);
-
-    /**
-     * 通过邮箱查询用户
-     *
-     * @param email 邮箱
-     * @return 用户对象信息
-     */
-    @InterceptorIgnore(tenantLine = "true")
-    SysUserVo selectUserByEmail(@Param("email") String email);
 
     /**
      * 通过权限查询用户
@@ -90,19 +102,30 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
      * @return 用户对象信息
      */
     @DataPermission({
-        @DataColumn(key = "deptName", value = "d.dept_id"),
-        @DataColumn(key = "userName", value = "u.user_id")
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "user_id")
     })
     SysUserVo selectSafeUserById(@Param("userId") Long userId);
 
     /**
-     * 通过用户ID查询用户
+     * 根据用户ID统计用户数量
      *
      * @param userId 用户ID
-     * @return 用户对象信息
+     * @return 用户数量
      */
-    SysUserVo selectUserById(@Param("userId") Long userId);
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "user_id")
+    })
+    long countUserById(@Param("userId") Long userId);
 
+    /**
+     * 根据条件更新用户数据
+     *
+     * @param user          要更新的用户实体
+     * @param updateWrapper 更新条件封装器
+     * @return 更新操作影响的行数
+     */
     @Override
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),
@@ -110,6 +133,12 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
     })
     int update(@Param(Constants.ENTITY) SysUser user, @Param(Constants.WRAPPER) Wrapper<SysUser> updateWrapper);
 
+    /**
+     * 根据用户ID更新用户数据
+     *
+     * @param user 要更新的用户实体
+     * @return 更新操作影响的行数
+     */
     @Override
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),

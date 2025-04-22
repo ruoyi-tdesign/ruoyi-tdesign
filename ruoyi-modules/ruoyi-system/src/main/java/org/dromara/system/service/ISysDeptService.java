@@ -2,6 +2,7 @@ package org.dromara.system.service;
 
 import cn.hutool.core.lang.tree.Tree;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.system.domain.SysDept;
 import org.dromara.system.domain.bo.SysDeptBo;
 import org.dromara.system.domain.query.SysDeptQuery;
@@ -15,6 +16,15 @@ import java.util.List;
  * @author Lion Li
  */
 public interface ISysDeptService extends IService<SysDept> {
+
+    /**
+     * 分页查询部门管理数据
+     *
+     * @param query 部门查询对象
+     * @return 部门信息集合
+     */
+    TableDataInfo<SysDeptVo> selectPageDeptList(SysDeptQuery query);
+
     /**
      * 查询部门管理数据
      *
@@ -40,15 +50,6 @@ public interface ISysDeptService extends IService<SysDept> {
     List<Tree<Long>> buildDeptTreeSelect(List<SysDeptVo> depts);
 
     /**
-     * 查询部门名称
-     *
-     * @param deptIds   多个部门id
-     * @param separator 分隔符
-     * @return
-     */
-    String selectDeptNameByDeptIds(List<Long> deptIds, CharSequence separator);
-
-    /**
      * 根据角色ID查询部门树信息
      *
      * @param roleId 角色ID
@@ -63,6 +64,14 @@ public interface ISysDeptService extends IService<SysDept> {
      * @return 部门信息
      */
     SysDeptVo selectDeptById(Long deptId);
+
+    /**
+     * 通过部门ID串查询部门
+     *
+     * @param deptIds 部门id串
+     * @return 部门列表信息
+     */
+    List<SysDeptVo> selectDeptByIds(List<Long> deptIds);
 
     /**
      * 根据ID查询所有子部门数（正常状态）

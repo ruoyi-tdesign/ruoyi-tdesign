@@ -19,7 +19,7 @@ export function getClient(id: number) {
 
 // 新增系统授权
 export function addClient(data: SysClientForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/client',
     data,
   });
@@ -27,7 +27,7 @@ export function addClient(data: SysClientForm) {
 
 // 修改系统授权
 export function updateClient(data: SysClientForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/client',
     data,
   });
@@ -35,19 +35,19 @@ export function updateClient(data: SysClientForm) {
 
 // 删除系统授权
 export function delClient(ids: number | Array<number>) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/client/${ids}`,
   });
 }
 
 /**
  * 状态修改
- * @param id ID
+ * @param clientId 客户端id
  * @param status 状态
  */
-export function changeStatus(id: number, status: string) {
+export function changeStatus(clientId: string, status: string) {
   const data = {
-    id,
+    clientId,
     status,
   };
   return request.put({

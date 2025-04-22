@@ -19,7 +19,7 @@ export function getNotice(noticeId: number) {
 
 // 新增公告
 export function addNotice(data: SysNoticeForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/notice',
     data,
   });
@@ -27,7 +27,7 @@ export function addNotice(data: SysNoticeForm) {
 
 // 修改公告
 export function updateNotice(data: SysNoticeForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/notice',
     data,
   });
@@ -35,7 +35,7 @@ export function updateNotice(data: SysNoticeForm) {
 
 // 删除公告
 export function delNotice(noticeId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/notice/${noticeId}`,
   });
 }

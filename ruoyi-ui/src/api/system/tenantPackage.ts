@@ -30,7 +30,7 @@ export function getTenantPackage(packageId: number) {
 
 // 新增租户套餐
 export function addTenantPackage(data: SysTenantPackageForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/tenant/package',
     data,
   });
@@ -38,7 +38,7 @@ export function addTenantPackage(data: SysTenantPackageForm) {
 
 // 修改租户套餐
 export function updateTenantPackage(data: SysTenantPackageForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/tenant/package',
     data,
   });
@@ -50,7 +50,7 @@ export function changePackageStatus(packageId: number, status: string) {
     packageId,
     status,
   };
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/tenant/package/changeStatus',
     data,
   });
@@ -58,7 +58,7 @@ export function changePackageStatus(packageId: number, status: string) {
 
 // 删除租户套餐
 export function delTenantPackage(packageId: string | number | string[] | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/tenant/package/${packageId}`,
   });
 }

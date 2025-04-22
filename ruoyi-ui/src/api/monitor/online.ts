@@ -12,7 +12,21 @@ export function list(query: SysUserOnlineQuery) {
 
 // 强退用户
 export function forceLogout(tokenId: string) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/monitor/online/${tokenId}`,
+  });
+}
+
+// 获取当前用户登录在线设备
+export function getOnline() {
+  return request.get<TableDataInfo<SysUserOnline>>({
+    url: '/monitor/online',
+  });
+}
+
+// 删除当前在线设备
+export function delOnline(tokenId: string) {
+  return request.delete<R>({
+    url: `/monitor/online/myself/${tokenId}`,
   });
 }

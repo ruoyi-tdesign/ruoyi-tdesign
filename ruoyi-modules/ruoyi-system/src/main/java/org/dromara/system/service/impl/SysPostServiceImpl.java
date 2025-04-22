@@ -1,19 +1,25 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.dromara.common.core.enums.NormalDisableEnum;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.service.PostService;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.SortQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.system.domain.SysDept;
 import org.dromara.system.domain.SysPost;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.bo.SysPostBo;
 import org.dromara.system.domain.query.SysPostQuery;
 import org.dromara.system.domain.vo.SysPostVo;
+import org.dromara.system.mapper.SysDeptMapper;
 import org.dromara.system.mapper.SysPostMapper;
 import org.dromara.system.mapper.SysUserPostMapper;
 import org.dromara.system.service.ISysPostService;
@@ -29,14 +35,17 @@ import java.util.List;
  * @author Lion Li
  */
 @Service
-public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> implements ISysPostService {
+public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> implements ISysPostService, PostService {
 
+    @Autowired
+    private SysDeptMapper deptMapper;
     @Autowired
     private SysUserPostMapper userPostMapper;
 
     @Override
-    public TableDataInfo<SysPostVo> selectPagePostList(SysPostQuery post) {
-        return PageQuery.of(() -> baseMapper.queryList(post));
+    public TableDataInfo<SysPostVo> selectPagePostList(SysPostQuery query) {
+        buildQuery(query);
+        return PageQuery.of(query.getPageNum(), query.getPageSize()).execute(() -> baseMapper.queryList(query));
     }
 
     /**
@@ -47,7 +56,29 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
      */
     @Override
     public List<SysPostVo> selectPostList(SysPostQuery query) {
+        buildQuery(query);
         return SortQuery.of(() -> baseMapper.queryList(query));
+    }
+
+    private void buildQuery(SysPostQuery query) {
+        if (ObjectUtil.isNull(query.getDeptId()) && ObjectUtil.isNotNull(query.getBelongDeptId())) {
+            //部门树搜索
+            List<SysDept> deptList = deptMapper.selectListByParentId(query.getBelongDeptId());
+            List<Long> deptIds = StreamUtils.toList(deptList, SysDept::getDeptId);
+            deptIds.add(query.getBelongDeptId());
+            query.setDeptIds(deptIds);
+        }
+    }
+
+    /**
+     * 查询用户所属岗位组
+     *
+     * @param userId 用户ID
+     * @return 岗位ID
+     */
+    @Override
+    public List<SysPostVo> selectPostsByUserId(Long userId) {
+        return baseMapper.selectPostsByUserId(userId);
     }
 
     /**
@@ -79,7 +110,22 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
      */
     @Override
     public List<Long> selectPostListByUserId(Long userId) {
-        return baseMapper.selectPostListByUserId(userId);
+        List<SysPostVo> list = baseMapper.selectPostsByUserId(userId);
+        return StreamUtils.toList(list, SysPostVo::getPostId);
+    }
+
+    /**
+     * 通过岗位ID串查询岗位
+     *
+     * @param postIds 岗位id串
+     * @return 岗位列表信息
+     */
+    @Override
+    public List<SysPostVo> selectPostByIds(List<Long> postIds) {
+        return baseMapper.selectVoList(new LambdaQueryWrapper<SysPost>()
+            .select(SysPost::getPostId, SysPost::getPostName, SysPost::getPostCode)
+            .eq(SysPost::getStatus, NormalDisableEnum.NORMAL.getCode())
+            .in(CollUtil.isNotEmpty(postIds), SysPost::getPostId, postIds));
     }
 
     /**
@@ -92,6 +138,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     public boolean checkPostNameUnique(SysPostBo post) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysPost>()
             .eq(SysPost::getPostName, post.getPostName())
+            .eq(SysPost::getDeptId, post.getDeptId())
             .ne(ObjectUtil.isNotNull(post.getPostId()), SysPost::getPostId, post.getPostId()));
         return !exist;
     }
@@ -122,6 +169,17 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     }
 
     /**
+     * 通过部门ID查询岗位使用数量
+     *
+     * @param deptId 部门id
+     * @return 结果
+     */
+    @Override
+    public long countPostByDeptId(Long deptId) {
+        return baseMapper.selectCount(new LambdaQueryWrapper<SysPost>().eq(SysPost::getDeptId, deptId));
+    }
+
+    /**
      * 删除岗位信息
      *
      * @param postId 岗位ID
@@ -146,7 +204,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
                 throw new ServiceException(String.format("%1$s已分配，不能删除!", post.getPostName()));
             }
         }
-        return baseMapper.deleteBatchIds(Arrays.asList(postIds));
+        return baseMapper.deleteByIds(Arrays.asList(postIds));
     }
 
     /**
@@ -172,4 +230,5 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
         SysPost post = MapstructUtils.convert(bo, SysPost.class);
         return baseMapper.updateById(post);
     }
+
 }

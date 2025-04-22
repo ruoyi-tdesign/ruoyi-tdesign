@@ -19,7 +19,7 @@ export function getMessageLog(messageLogId: number) {
 
 // 新增消息发送记录
 export function addMessageLog(data: SysMessageLog) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/messageLog',
     data,
   });
@@ -27,7 +27,7 @@ export function addMessageLog(data: SysMessageLog) {
 
 // 修改消息发送记录
 export function updateMessageLog(data: SysMessageLog) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/messageLog',
     data,
   });
@@ -35,14 +35,14 @@ export function updateMessageLog(data: SysMessageLog) {
 
 // 删除消息发送记录
 export function delMessageLog(messageLogIds: number | Array<number>) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/messageLog/${messageLogIds}`,
   });
 }
 
 // 清空消息发送记录
 export function clearMessageLog() {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/messageLog/clear`,
   });
 }

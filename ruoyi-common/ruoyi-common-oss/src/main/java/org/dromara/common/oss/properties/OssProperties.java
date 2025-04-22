@@ -60,9 +60,4 @@ public class OssProperties {
      */
     private String accessPolicy;
 
-    /**
-     * 创建桶
-     */
-    private Boolean createBucket;
-
 }

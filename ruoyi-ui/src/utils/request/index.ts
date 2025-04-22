@@ -232,15 +232,17 @@ const transform: AxiosTransform = {
         cache.session.setJSON('sessionObj', requestObj);
       }
     }
-    // 当开启参数加密
-    if (withEncrypt && (config.method === 'post' || config.method === 'put')) {
-      // 生成一个 AES 密钥
-      const aesKey = generateAesKey();
-      config.headers[encryptHeader] = encrypt(encryptBase64(aesKey));
-      config.data =
-        typeof config.data === 'object'
-          ? encryptWithAes(JSON.stringify(config.data), aesKey)
-          : encryptWithAes(config.data, aesKey);
+    if (import.meta.env.VITE_APP_ENCRYPT === 'true') {
+      // 当开启参数加密
+      if (withEncrypt && (config.method === 'post' || config.method === 'put')) {
+        // 生成一个 AES 密钥
+        const aesKey = generateAesKey();
+        config.headers[encryptHeader] = encrypt(encryptBase64(aesKey));
+        config.data =
+          typeof config.data === 'object'
+            ? encryptWithAes(JSON.stringify(config.data), aesKey)
+            : encryptWithAes(config.data, aesKey);
+      }
     }
     config.headers[contentLanguage] = i18n?.global?.locale?.value || config.headers[contentLanguage];
     return config;

@@ -1,6 +1,7 @@
 package org.dromara.web.controller;
 
 import cn.dev33.satoken.annotation.SaIgnore;
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,8 +29,8 @@ import org.dromara.common.social.config.properties.SocialLoginConfigProperties;
 import org.dromara.common.social.config.properties.SocialProperties;
 import org.dromara.common.social.utils.SocialUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
-import org.dromara.system.domain.SysClient;
 import org.dromara.system.domain.query.SysTenantQuery;
+import org.dromara.system.domain.vo.SysClientVo;
 import org.dromara.system.domain.vo.SysTenantVo;
 import org.dromara.system.service.ISysClientService;
 import org.dromara.system.service.ISysSocialService;
@@ -100,7 +101,7 @@ public class AuthController {
         // 授权类型和客户端id
         String clientId = loginBody.getClientId();
         String grantType = loginBody.getGrantType();
-        SysClient client = clientService.queryByClientId(clientId);
+        SysClientVo client = clientService.queryByClientId(clientId);
         // 查询不到 client 或 client 内不包含 grantType
         if (ObjectUtil.isNull(client) || !StringUtils.contains(client.getGrantType(), grantType)) {
             log.info("客户端id: {} 认证类型：{} 异常!.", clientId, grantType);
@@ -112,12 +113,13 @@ public class AuthController {
         LoginVo login = IAuthStrategy.login(client, loginBody);
         LoginEvent event = new LoginEvent();
         event.setUserId(LoginHelper.getUserId());
+        event.setLoginType(LoginHelper.getLoginType());
         SpringUtils.getApplicationContext().publishEvent(event);
         return R.ok(login);
     }
 
     /**
-     * 第三方登录请求
+     * 第三方登录请求获取跳转URL
      *
      * @param source 登录来源
      * @return 结果
@@ -135,7 +137,7 @@ public class AuthController {
     }
 
     /**
-     * 第三方登录回调业务处理 绑定授权
+     * 前端回调绑定授权(需要token)
      *
      * @param loginBody 请求体
      * @return 结果
@@ -155,7 +157,7 @@ public class AuthController {
 
 
     /**
-     * 取消授权
+     * 取消授权(需要token)
      *
      * @param socialId socialId
      */
@@ -197,8 +199,26 @@ public class AuthController {
     @SaIgnore
     @GetMapping("/tenant/list")
     public R<LoginTenantVo> tenantList(HttpServletRequest request) throws Exception {
+        // 返回对象
+        LoginTenantVo result = new LoginTenantVo();
+        boolean enable = TenantHelper.isEnable();
+        result.setTenantEnabled(enable);
+        // 如果未开启租户这直接返回
+        if (!enable) {
+            return R.ok(result);
+        }
+
         List<SysTenantVo> tenantList = tenantService.queryList(new SysTenantQuery());
         List<TenantListVo> voList = MapstructUtils.convert(tenantList, TenantListVo.class);
+        try {
+            // 如果只超管返回所有租户
+            if (LoginHelper.isSuperAdmin()) {
+                result.setVoList(voList);
+                return R.ok(result);
+            }
+        } catch (NotLoginException ignored) {
+        }
+
         // 获取域名
         String host;
         String referer = request.getHeader("referer");
@@ -210,12 +230,9 @@ public class AuthController {
         }
         // 根据域名进行筛选
         List<TenantListVo> list = StreamUtils.filter(voList, vo ->
-            StringUtils.equals(vo.getDomain(), host));
-        // 返回对象
-        LoginTenantVo vo = new LoginTenantVo();
-        vo.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
-        vo.setTenantEnabled(TenantHelper.isEnable());
-        return R.ok(vo);
+            StringUtils.equalsIgnoreCase(vo.getDomain(), host));
+        result.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
+        return R.ok(result);
     }
 
 }

@@ -9,7 +9,7 @@
   >
     <template v-if="type === 'password'">
       <t-form-item name="account">
-        <t-input v-model="formData.account" size="large" :placeholder="$t('pages.login.input.account')">
+        <t-input v-model="formData.account" size="large" :placeholder="t('pages.login.input.account')">
           <template #prefix-icon>
             <user-icon />
           </template>
@@ -22,7 +22,7 @@
           size="large"
           :type="showPsw ? 'text' : 'password'"
           clearable
-          :placeholder="$t('pages.login.input.password')"
+          :placeholder="t('pages.login.input.password')"
         >
           <template #prefix-icon>
             <lock-on-icon />
@@ -35,7 +35,7 @@
       </t-form-item>
 
       <t-form-item v-if="captchaEnabled" class="verification-code" name="code">
-        <t-input v-model="formData.code" size="large" :placeholder="$t('pages.login.input.verification')">
+        <t-input v-model="formData.code" size="large" :placeholder="t('pages.login.input.verification')">
           <template #label>
             <secured-icon />
           </template>
@@ -44,21 +44,21 @@
           <img :src="codeUrl" class="login-code-img" @click="getCode" />
         </div>
         <!--        <t-button variant="outline" :disabled="countDown > 0" @click="sendCode">-->
-        <!--          {{ countDown === 0 ? $t('pages.login.sendVerification') : `${countDown}秒后可重发` }}-->
+        <!--          {{ countDown === 0 ? t('pages.login.sendVerification') : `${countDown}秒后可重发` }}-->
         <!--        </t-button>-->
       </t-form-item>
 
       <div class="check-container remember-pwd">
-        <t-checkbox v-model="formData.rememberMe">{{ $t('pages.login.remember') }}</t-checkbox>
-        <span class="tip">{{ $t('pages.login.forget') }}</span>
+        <t-checkbox v-model="formData.rememberMe">{{ t('pages.login.remember') }}</t-checkbox>
+        <span class="tip">{{ t('pages.login.forget') }}</span>
       </div>
     </template>
 
     <!-- 扫码登录 -->
     <template v-else-if="type === 'qrcode'">
       <div class="tip-container">
-        <span class="tip">{{ $t('pages.login.wechatLogin') }}</span>
-        <span class="refresh">{{ $t('pages.login.refresh') }} <refresh-icon /> </span>
+        <span class="tip">{{ t('pages.login.wechatLogin') }}</span>
+        <span class="refresh">{{ t('pages.login.refresh') }} <refresh-icon /> </span>
       </div>
       <qrcode-vue value="" :size="160" level="H" />
     </template>
@@ -66,7 +66,7 @@
     <!-- 手机号登录 -->
     <template v-else>
       <t-form-item name="phone">
-        <t-input v-model="formData.phone" size="large" :placeholder="$t('pages.login.input.phone')">
+        <t-input v-model="formData.phone" size="large" :placeholder="t('pages.login.input.phone')">
           <template #prefix-icon>
             <mobile-icon />
           </template>
@@ -74,44 +74,47 @@
       </t-form-item>
 
       <t-form-item class="verification-code" name="code">
-        <t-input v-model="formData.code" size="large" :placeholder="$t('pages.login.input.verification')" />
+        <t-input v-model="formData.code" size="large" :placeholder="t('pages.login.input.verification')" />
         <t-button size="large" variant="outline" :disabled="countDown > 0" @click="sendCode">
-          {{ countDown === 0 ? $t('pages.login.sendVerification') : `${countDown}秒后可重发` }}
+          {{ countDown === 0 ? t('pages.login.sendVerification') : `${countDown}秒后可重发` }}
         </t-button>
       </t-form-item>
     </template>
 
     <t-form-item v-if="type !== 'qrcode'" class="btn-container">
       <t-button block size="large" type="submit" :loading="loading">
-        {{ loading ? $t('pages.login.loading') : $t('pages.login.signIn') }}
+        {{ loading ? t('pages.login.loading') : t('pages.login.signIn') }}
       </t-button>
     </t-form-item>
 
     <div class="switch-container">
       <span v-if="type !== 'password'" class="tip" @click="switchType('password')">
-        {{ $t('pages.login.accountLogin') }}
+        {{ t('pages.login.accountLogin') }}
       </span>
       <span v-show="false" v-if="type !== 'qrcode'" class="tip" @click="switchType('qrcode')">
-        {{ $t('pages.login.wechatLogin') }}
+        {{ t('pages.login.wechatLogin') }}
       </span>
       <span v-show="false" v-if="type !== 'phone'" class="tip" @click="switchType('phone')">
-        {{ $t('pages.login.phoneLogin') }}
+        {{ t('pages.login.phoneLogin') }}
       </span>
     </div>
     <div style="display: flex; justify-content: flex-end; flex-direction: row">
-      <t-button shape="circle" variant="outline" @click="doSocialLogin('wechat_open')">
-        <logo-wechat-icon />
+      <t-button shape="circle" variant="outline" title="微信登录" @click="doSocialLogin('wechat_open')">
+        <logo-wechat-stroke-filled-icon style="color: #1aad19" />
       </t-button>
-      <t-button shape="circle" variant="outline" @click="doSocialLogin('qq')">
+      <t-button shape="circle" variant="outline" title="QQ登录" @click="doSocialLogin('qq')">
         <logo-qq-icon />
       </t-button>
-      <t-button shape="circle" variant="outline" @click="doSocialLogin('maxkey')">
+      <t-button shape="circle" variant="outline" title="MaxKey登录" @click="doSocialLogin('maxkey')">
         <max-key class="t-icon" />
       </t-button>
-      <t-button shape="circle" variant="outline" @click="doSocialLogin('gitee')">
+      <t-button shape="circle" variant="outline" title="TopIam登录" @click="doSocialLogin('topiam')">
+        <img :src="TopIam" class="t-icon" alt="使用 TopIam 账号授权登录" />
+      </t-button>
+      <t-button shape="circle" variant="outline" title="Gitee登录" @click="doSocialLogin('gitee')">
         <gitee-svg class="t-icon" />
       </t-button>
-      <t-button shape="circle" variant="outline" @click="doSocialLogin('github')">
+      <t-button shape="circle" variant="outline" title="Github登录" @click="doSocialLogin('github')">
         <logo-github-filled-icon />
       </t-button>
     </div>
@@ -126,7 +129,7 @@ import {
   LockOnIcon,
   LogoGithubFilledIcon,
   LogoQqIcon,
-  LogoWechatIcon,
+  LogoWechatStrokeFilledIcon,
   MobileIcon,
   RefreshIcon,
   SecuredIcon,
@@ -142,6 +145,7 @@ import type { LoginParam } from '@/api/model/loginModel';
 import { authBinding } from '@/api/system/social';
 import GiteeSvg from '@/assets/icons/svg/gitee.svg?component';
 import MaxKey from '@/assets/icons/svg/maxkey.svg?component';
+import TopIam from '@/assets/icons/svg/topiam.svg?url';
 import { useCounter } from '@/hooks';
 import { t } from '@/locales';
 import { useTabsRouterStore, useUserStore } from '@/store';

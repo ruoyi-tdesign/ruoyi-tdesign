@@ -15,7 +15,7 @@
         </t-form-item>
         <t-form-item label="消息类型" name="messageType">
           <t-select v-model="queryParams.messageType" placeholder="请选择消息类型" clearable>
-            <t-option v-for="dict in sys_message_type" :key="dict.value" :label="dict.label" :value="dict.value" />
+            <t-option v-for="dict in messageTypeOptions" :key="dict.value" :label="dict.label" :value="dict.value" />
           </t-select>
         </t-form-item>
         <t-form-item label="模板类型" name="templateMode">
@@ -36,12 +36,7 @@
         </t-form-item>
         <t-form-item label="平台标识" name="supplierType">
           <t-select v-model="queryParams.supplierType" placeholder="请选择平台标识" clearable>
-            <t-option
-              v-for="dict in sys_message_supplier_type"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            />
+            <t-option v-for="dict in supplierTypeOptions" :key="dict.value" :label="dict.label" :value="dict.value" />
           </t-select>
         </t-form-item>
         <t-form-item label="是否成功" name="isSuccess">
@@ -129,13 +124,13 @@
           </t-row>
         </template>
         <template #messageType="{ row }">
-          <dict-tag :options="sys_message_type" :value="row.messageType" />
+          <dict-tag :options="messageTypeOptions" :value="row.messageType" />
         </template>
         <template #templateMode="{ row }">
           <dict-tag :options="sys_message_template_mode" :value="row.templateMode" />
         </template>
         <template #supplierType="{ row }">
-          <dict-tag :options="sys_message_supplier_type" :value="row.supplierType" />
+          <dict-tag :options="supplierTypeOptions" :value="row.supplierType" />
         </template>
         <template #isSuccess="{ row }">
           <dict-tag :options="sys_common_status" :value="row.isSuccess" />
@@ -143,22 +138,12 @@
         <template #costTime="{ row }"> {{ row.costTime }}毫秒 </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link
-              v-hasPermi="['system:messageLog:query']"
-              theme="primary"
-              hover="color"
-              @click.stop="handleDetail(row)"
-            >
-              <browse-icon />详情
-            </t-link>
-            <t-link
-              v-hasPermi="['system:messageLog:remove']"
-              theme="danger"
-              hover="color"
-              @click.stop="handleDelete(row)"
-            >
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['system:messageLog:query']" theme="primary" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:messageLog:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>
@@ -179,7 +164,7 @@
         <t-descriptions-item label="消息key">{{ form.messageKey }}</t-descriptions-item>
         <t-descriptions-item label="模板名称">{{ form.messageTemplateName }}</t-descriptions-item>
         <t-descriptions-item label="消息类型">
-          <dict-tag :options="sys_message_type" :value="form.messageType" />
+          <dict-tag :options="messageTypeOptions" :value="form.messageType" />
         </t-descriptions-item>
         <t-descriptions-item label="模板类型">
           <dict-tag :options="sys_message_template_mode" :value="form.templateMode" />
@@ -192,7 +177,7 @@
         </t-descriptions-item>
         <t-descriptions-item label="消息配置标题">{{ form.messageConfigTitle }}</t-descriptions-item>
         <t-descriptions-item label="平台标识">
-          <dict-tag :options="sys_message_supplier_type" :value="form.supplierType" />
+          <dict-tag :options="supplierTypeOptions" :value="form.supplierType" />
         </t-descriptions-item>
         <t-descriptions-item label="是否成功">
           <dict-tag :options="sys_common_status" :value="form.isSuccess" />
@@ -208,20 +193,22 @@
 defineOptions({
   name: 'MessageLog',
 });
+
 import { BrowseIcon, DeleteIcon, DownloadIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
 import type { PageInfo, PrimaryTableCol, TableSort } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
+import { getMessageSupplierType } from '@/api/system/messageConfig';
 import { clearMessageLog, delMessageLog, getMessageLog, listMessageLog } from '@/api/system/messageLog';
+import type { MessageTypeVo } from '@/api/system/model/messageConfigModel';
 import type { SysMessageLogQuery, SysMessageLogVo } from '@/api/system/model/messageLogModel';
 import { ArrayOps } from '@/utils/array';
+import type { DictModel } from '@/utils/dict';
 
 const { proxy } = getCurrentInstance();
-const { sys_message_template_mode, sys_common_status, sys_message_type, sys_message_supplier_type } = proxy.useDict(
+const { sys_message_template_mode, sys_common_status } = proxy.useDict(
   'sys_message_template_mode',
   'sys_common_status',
-  'sys_message_type',
-  'sys_message_supplier_type',
 );
 
 const openView = ref(false);
@@ -236,6 +223,7 @@ const single = ref(true);
 const multiple = ref(true);
 const sort = ref<TableSort>();
 const dateRangeLogTime = ref([]);
+const supplierTypeList = ref<MessageTypeVo[]>([]);
 
 // 列显隐信息
 const columns = ref<Array<PrimaryTableCol>>([
@@ -281,6 +269,26 @@ const pagination = computed(() => {
       getList();
     },
   };
+});
+
+const messageTypeOptions = computed(() => {
+  return (
+    supplierTypeList.value?.map<DictModel>((item) => ({
+      label: item.description,
+      value: item.messageType,
+      tagType: 'primary',
+    })) ?? []
+  );
+});
+
+const supplierTypeOptions = computed(() => {
+  return supplierTypeList.value.flatMap((item) => {
+    return Object.entries(item.supplierTypeMap).map<DictModel>(([key, value]) => ({
+      label: value,
+      value: key,
+      tagType: 'primary',
+    }));
+  });
 });
 
 /** 查询消息发送记录列表 */
@@ -391,5 +399,15 @@ function handleExport() {
   );
 }
 
-getList();
+/** 初始化消息配置 */
+function initMessageFieldConfigs() {
+  getMessageSupplierType().then((res) => {
+    supplierTypeList.value = res.data;
+  });
+}
+
+onMounted(() => {
+  getList();
+  initMessageFieldConfigs();
+});
 </script>

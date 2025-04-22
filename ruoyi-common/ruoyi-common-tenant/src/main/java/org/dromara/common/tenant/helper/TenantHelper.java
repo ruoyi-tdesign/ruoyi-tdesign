@@ -2,9 +2,6 @@ package org.dromara.common.tenant.helper;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.hutool.core.convert.Convert;
-import com.alibaba.ttl.TransmittableThreadLocal;
-import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
-import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +12,7 @@ import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.funtion.Apply;
 import org.dromara.common.core.utils.spring.SpringUtils;
+import org.dromara.common.mybatis.helper.MyInterceptorIgnoreHelper;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.context.SaSecurityContext;
 
@@ -38,13 +36,13 @@ public class TenantHelper {
     // 动态租户的缓存key
     private static final String DYNAMIC_TENANT_KEY = GlobalConstants.GLOBAL_REDIS_KEY + "dynamicTenant";
     // 临时动态租户，可重入可动态切换
-    private static final ThreadLocal<Deque<String>> TEMP_DYNAMIC_TENANT = TransmittableThreadLocal.withInitial(ArrayDeque::new);
+    private static final ThreadLocal<Deque<String>> TEMP_DYNAMIC_TENANT = InheritableThreadLocal.withInitial(ArrayDeque::new);
     // 忽略缓存
-    private static final ThreadLocal<Boolean> IGNORE_CACHE_TENANT = new TransmittableThreadLocal<>();
+    private static final ThreadLocal<Boolean> IGNORE_CACHE_TENANT = new InheritableThreadLocal<>();
     // 忽略租户db重入计数,防止重入调用提前关闭租户
-    private static final ThreadLocal<AtomicInteger> HEAVY_ENTRY_IGNORE_DB_TENANT = TransmittableThreadLocal.withInitial(() -> new AtomicInteger(0));
+    private static final ThreadLocal<AtomicInteger> HEAVY_ENTRY_IGNORE_DB_TENANT = InheritableThreadLocal.withInitial(() -> new AtomicInteger(0));
     // 忽略租户缓存重入计数,防止重入调用提前关闭租户
-    private static final ThreadLocal<AtomicInteger> HEAVY_ENTRY_IGNORE_CACHE_TENANT = TransmittableThreadLocal.withInitial(() -> new AtomicInteger(0));
+    private static final ThreadLocal<AtomicInteger> HEAVY_ENTRY_IGNORE_CACHE_TENANT = InheritableThreadLocal.withInitial(() -> new AtomicInteger(0));
 
     /**
      * 是否启用了缓存忽略租户
@@ -66,7 +64,7 @@ public class TenantHelper {
      * 开启忽略租户(开启后需手动调用 {@link #disableIgnore()} 关闭)
      */
     public static void enableIgnore() {
-        InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
+        MyInterceptorIgnoreHelper.setIgnoreTenantLine();
         HEAVY_ENTRY_IGNORE_DB_TENANT.get().incrementAndGet();
     }
 
@@ -86,7 +84,7 @@ public class TenantHelper {
      */
     public static void disableIgnore(boolean force) {
         if (force || HEAVY_ENTRY_IGNORE_DB_TENANT.get().decrementAndGet() <= 0) {
-            InterceptorIgnoreHelper.clearIgnoreStrategy();
+            MyInterceptorIgnoreHelper.removeIgnoreTenantLine();
             HEAVY_ENTRY_IGNORE_DB_TENANT.remove();
         }
     }
@@ -272,7 +270,7 @@ public class TenantHelper {
     }
 
     /**
-     * 设置动态租户(一直有效 需要手动清理)
+     * 设置当前用户的动态租户(一直有效 需要手动清理)
      */
     public static void setUserDynamicTenant(String tenantId) {
         BaseUser user = SaSecurityContext.getContext();
@@ -282,7 +280,7 @@ public class TenantHelper {
     }
 
     /**
-     * 获取动态租户(一直有效 需要手动清理)
+     * 获取当前用户的动态租户(一直有效 需要手动清理)
      */
     public static String getUserDynamicTenant() {
         BaseUser user = SaSecurityContext.getContext();
@@ -303,7 +301,7 @@ public class TenantHelper {
     }
 
     /**
-     * 清除动态租户
+     * 清除当前用户的动态租户
      */
     public static void clearUserDynamicTenant() {
         BaseUser user = SaSecurityContext.getContext();

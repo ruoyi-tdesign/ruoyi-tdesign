@@ -3,7 +3,7 @@
     <template #content>
       <div class="header-msg">
         <div class="header-msg-top">
-          <p>{{ $t('layout.notice.title') }}</p>
+          <p>{{ t('layout.notice.title') }}</p>
           <t-button
             v-if="unreadMsg.length > 0"
             class="clear-btn"
@@ -11,10 +11,10 @@
             theme="primary"
             @click="setRead('all')"
           >
-            {{ $t('layout.notice.clear') }}
+            {{ t('layout.notice.clear') }}
           </t-button>
         </div>
-        <t-list v-if="unreadMsg.length > 0" class="narrow-scrollbar" style="max-height: 366px"  :split="false">
+        <t-list v-if="unreadMsg.length > 0" class="narrow-scrollbar" style="max-height: 366px" :split="false">
           <t-list-item v-for="(item, index) in unreadMsg" :key="index">
             <div>
               <p class="msg-content">{{ item.message }}</p>
@@ -23,7 +23,7 @@
             <p class="msg-time">{{ item.time }}</p>
             <template #action>
               <t-button size="small" variant="outline" @click="setRead('radio', item)">
-                {{ $t('layout.notice.setRead') }}
+                {{ t('layout.notice.setRead') }}
               </t-button>
             </template>
           </t-list-item>
@@ -31,11 +31,11 @@
 
         <div v-else class="empty-list">
           <img :src="Nothing" alt="空" />
-          <p>{{ $t('layout.notice.empty') }}</p>
+          <p>{{ t('layout.notice.empty') }}</p>
         </div>
         <div v-if="unreadMsg.length > 0" class="header-msg-bottom">
           <t-button class="header-msg-bottom-link" variant="text" theme="default" block @click="goDetail">
-            {{ $t('layout.notice.viewAll') }}
+            {{ t('layout.notice.viewAll') }}
           </t-button>
         </div>
       </div>
@@ -51,13 +51,14 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { MailIcon } from 'tdesign-icons-vue-next';
-import { onMounted, onUnmounted } from 'vue';
+import { onBeforeUnmount, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 import Nothing from '@/assets/images/nothing.png';
-import { useNoticeStore } from '@/store';
+import { t } from '@/locales';
+import { useNoticeStore, useSSE } from '@/store';
 import type { NoticeItem } from '@/types/interface';
-import { closeWebsocket, initWebSocket } from '@/utils/websocket';
+import { initWebSocket } from '@/utils/websocket';
 
 onMounted(() => {
   const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
@@ -69,8 +70,12 @@ onMounted(() => {
   initWebSocket(`${address}/resource/websocket`);
 });
 
-onUnmounted(() => {
-  closeWebsocket();
+onMounted(() => {
+  useSSE().execute(`${import.meta.env.VITE_APP_BASE_API}/resource/sse/connect/login`);
+});
+
+onBeforeUnmount(() => {
+  useSSE().close();
 });
 
 const router = useRouter();

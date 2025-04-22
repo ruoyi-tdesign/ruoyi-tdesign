@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.Data;
@@ -170,6 +171,9 @@ public class PageQuery implements Serializable {
             .setSortQuery(sortQuery);
     }
 
+    /**
+     * 构建分页对象
+     */
     public <T> Page<T> build() {
         Integer pageNum = ObjectUtil.defaultIfNull(getPageNum(), DEFAULT_PAGE_NUM);
         Integer pageSize = ObjectUtil.defaultIfNull(getPageSize(), DEFAULT_PAGE_SIZE);
@@ -265,6 +269,11 @@ public class PageQuery implements Serializable {
      */
     public static <T> TableDataInfo<T> of(Supplier<List<T>> supplier) {
         return of().execute(supplier);
+    }
+
+    @JsonIgnore
+    public Integer getFirstNum() {
+        return (pageNum - 1) * pageSize;
     }
 
 }

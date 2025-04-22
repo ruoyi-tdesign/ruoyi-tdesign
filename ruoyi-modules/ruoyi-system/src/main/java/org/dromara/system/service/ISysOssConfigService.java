@@ -33,12 +33,11 @@ public interface ISysOssConfigService extends IService<SysOssConfig> {
      */
     TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigQuery query);
 
-
     /**
      * 根据新增业务对象插入对象存储配置
      *
      * @param bo 对象存储配置新增业务对象
-     * @return
+     * @return 结果
      */
     Boolean insertByBo(SysOssConfigBo bo);
 
@@ -46,7 +45,7 @@ public interface ISysOssConfigService extends IService<SysOssConfig> {
      * 根据编辑业务对象修改对象存储配置
      *
      * @param bo 对象存储配置编辑业务对象
-     * @return
+     * @return 结果
      */
     Boolean updateByBo(SysOssConfigBo bo);
 
@@ -55,7 +54,7 @@ public interface ISysOssConfigService extends IService<SysOssConfig> {
      *
      * @param ids     主键集合
      * @param isValid 是否校验,true-删除前校验,false-不校验
-     * @return
+     * @return 结果
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
 

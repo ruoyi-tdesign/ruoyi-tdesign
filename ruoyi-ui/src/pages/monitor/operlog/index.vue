@@ -116,9 +116,9 @@
         <template #costTime="{ row }"> {{ row.costTime }}毫秒 </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link v-hasPermi="['monitor:operlog:query']" theme="primary" hover="color" @click.stop="handleView(row)">
-              <browse-icon />详细
-            </t-link>
+            <my-link v-hasPermi="['monitor:operlog:query']" @click.stop="handleView(row)">
+              <template #prefix-icon><browse-icon /></template>详细
+            </my-link>
           </t-space>
         </template>
       </t-table>

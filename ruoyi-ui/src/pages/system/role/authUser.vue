@@ -85,10 +85,10 @@
           <dict-tag :options="sys_normal_disable" :value="row.status" />
         </template>
         <template #operation="{ row }">
-          <t-link v-hasPermi="['system:role:remove']" theme="primary" hover="color" @click="cancelAuthUser(row)">
-            <close-circle-icon />
+          <my-link v-hasPermi="['system:role:remove']" theme="danger" @click="cancelAuthUser(row)">
+            <template #prefix-icon><close-circle-icon /></template>
             取消授权
-          </t-link>
+          </my-link>
         </template>
       </t-table>
     </t-space>
@@ -102,7 +102,7 @@ defineOptions({
 import { AddIcon, CloseCircleIcon, CloseIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
 import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, reactive, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import type { SysUserQuery, SysUserVo } from '@/api/system/model/userModel';
 import { allocatedUserList, authUserCancel, authUserCancelAll } from '@/api/system/role';
@@ -110,9 +110,8 @@ import SelectUser, { type SelectUserInstance } from '@/pages/system/role/selectU
 import { useTabsRouterStore } from '@/store';
 import { ArrayOps } from '@/utils/array';
 
-const tabsRouterStore = useTabsRouterStore();
+const removeCurrentTab = useTabsRouterStore().useRemoveCurrentTab();
 const route = useRoute();
-const router = useRouter();
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
@@ -169,7 +168,7 @@ function getList() {
 }
 // 返回按钮
 function handleClose() {
-  tabsRouterStore.removeCurrentTab(route, '/system/role', router);
+  removeCurrentTab('/system/role');
 }
 /** 搜索按钮操作 */
 function handleQuery() {

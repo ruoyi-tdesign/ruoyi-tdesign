@@ -8,6 +8,7 @@ import org.dromara.common.core.constant.GlobalConstants;
  * @author zendwang
  */
 public interface WebSocketConstants {
+
     /**
      * websocketSession中的参数的key
      */

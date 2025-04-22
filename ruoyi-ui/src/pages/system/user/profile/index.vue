@@ -63,7 +63,7 @@
             {{ userInfo.roleGroup }}
           </t-descriptions-item>
           <t-descriptions-item label="部门">
-            {{ userInfo.deptGroup }}
+            {{ userInfo.user?.deptName }}
           </t-descriptions-item>
         </t-descriptions>
       </t-card>
@@ -83,9 +83,14 @@
         @submit="(email) => (userInfo.user.email = email)"
       />
 
-      <!--   内容tabs   -->
+      <!--   第三方应用   -->
       <t-card class="content-container" title="第三方应用" :bordered="false">
         <third-party />
+      </t-card>
+
+      <!--   在线设备   -->
+      <t-card title="在线设备" :bordered="false">
+        <online-device />
       </t-card>
     </t-col>
 
@@ -94,7 +99,7 @@
       <t-card class="user-intro" :bordered="false">
         <user-avatar />
         <div class="name">{{ userInfo.user?.userName }}</div>
-        <div class="position">{{ userInfo.deptGroup }}员工</div>
+        <div class="position">{{ userInfo.user?.deptName }}员工</div>
       </t-card>
 
       <!--   登录日志   -->
@@ -126,6 +131,7 @@ import { dateDiffAbs, dateFormat } from '@/utils/date';
 import BindingEmail from './BindingEmail.vue';
 import BindingPhone from './BindingPhone.vue';
 import ModifyUserBasicInfo from './ModifyUserBasicInfo.vue';
+import OnlineDevice from './OnlineDevice.vue';
 import ThirdParty from './ThirdParty.vue';
 import UserAvatar from './UserAvatar.vue';
 import UserLoginLog from './UserLoginLog.vue';

@@ -40,7 +40,7 @@ export function register(data: RegisterBody) {
     clientId,
     grantType: 'password',
   };
-  return request.post<R<void>>(
+  return request.post<R>(
     {
       url: '/auth/register',
       data: params,
@@ -61,7 +61,7 @@ export function callback(data: LoginData) {
     clientId,
     grantType: 'social',
   };
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/auth/social/callback',
     data: LoginData,
   });
@@ -76,7 +76,7 @@ export function getInfo() {
 
 // 退出方法
 export function logout() {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/auth/logout',
   });
 }
@@ -96,7 +96,7 @@ export function getCodeImg() {
 
 // 短信验证码
 export function getCodeSms() {
-  return request.get<R<void>>(
+  return request.get<R>(
     {
       url: '/resource/sms/code',
       timeout: 20000,
@@ -108,13 +108,13 @@ export function getCodeSms() {
 }
 
 // 获取租户列表
-export function getTenantList() {
+export function getTenantList(withToken: boolean) {
   return request.get<R<LoginTenantVo>>(
     {
       url: '/auth/tenant/list',
     },
     {
-      withToken: false,
+      withToken,
     },
   );
 }

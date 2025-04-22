@@ -20,7 +20,7 @@ export function getRole(roleId: number) {
 
 // 新增角色
 export function addRole(data: SysRoleForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/role',
     data,
   });
@@ -28,7 +28,7 @@ export function addRole(data: SysRoleForm) {
 
 // 修改角色
 export function updateRole(data: SysRoleForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/role',
     data,
   });
@@ -36,7 +36,7 @@ export function updateRole(data: SysRoleForm) {
 
 // 角色数据权限
 export function dataScope(data: SysRoleForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/role/dataScope',
     data,
   });
@@ -48,7 +48,7 @@ export function changeRoleStatus(roleId: number, status: string) {
     roleId,
     status,
   };
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/role/changeStatus',
     data,
   });
@@ -56,7 +56,7 @@ export function changeRoleStatus(roleId: number, status: string) {
 
 // 删除角色
 export function delRole(roleId: number | number[]) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/role/${roleId}`,
   });
 }
@@ -79,7 +79,7 @@ export function unallocatedUserList(query: SysUserQuery) {
 
 // 取消用户授权角色
 export function authUserCancel(data: SysUserRole) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/role/authUser/cancel',
     data,
   });
@@ -87,7 +87,7 @@ export function authUserCancel(data: SysUserRole) {
 
 // 批量取消用户授权角色
 export function authUserCancelAll(data: { roleId: number | string; userIds: string }) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/role/authUser/cancelAll',
     params: data,
   });
@@ -95,7 +95,7 @@ export function authUserCancelAll(data: { roleId: number | string; userIds: stri
 
 // 授权用户选择
 export function authUserSelectAll(data: { roleId: number; userIds: string }) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/role/authUser/selectAll',
     params: data,
   });
@@ -105,5 +105,16 @@ export function authUserSelectAll(data: { roleId: number; userIds: string }) {
 export function deptTreeSelect(roleId: number) {
   return request.get<R<DeptTreeSelect>>({
     url: `/system/role/deptTree/${roleId}`,
+  });
+}
+
+/**
+ * 获取角色选择框列表
+ * @param roleIds 角色ID串
+ */
+export function roleOptionSelect(roleIds: Array<number | string>) {
+  return request.get<R<Array<SysRoleVo>>>({
+    url: '/system/role/optionSelect',
+    params: { roleIds },
   });
 }

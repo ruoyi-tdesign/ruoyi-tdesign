@@ -99,15 +99,15 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
-            <t-link v-hasPermi="['system:dict:query']" theme="primary" hover="color" @click.stop="handleDetail(row)">
-              <browse-icon />详情
-            </t-link>
-            <t-link v-hasPermi="['system:dict:edit']" theme="primary" hover="color" @click.stop="handleUpdate(row)">
-              <edit-icon />修改
-            </t-link>
-            <t-link v-hasPermi="['system:dict:remove']" theme="danger" hover="color" @click.stop="handleDelete(row)">
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['system:dict:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:dict:edit']" @click.stop="handleUpdate(row)">
+              <template #prefix-icon><edit-icon /></template>修改
+            </my-link>
+            <my-link v-hasPermi="['system:dict:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-table>
@@ -224,7 +224,7 @@ import type {
   TableSort,
 } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import { addData, delData, getData, listData, updateData } from '@/api/system/dict/data';
 import { getType, optionselect as getDictOptionselect } from '@/api/system/dict/type';
@@ -254,9 +254,8 @@ const defaultDictType = ref('');
 const typeOptions = ref<SysDictTypeVo[]>([]);
 const columnControllerVisible = ref(false);
 const dataRef = ref<FormInstanceFunctions>();
-const tabsRouterStore = useTabsRouterStore();
+const removeCurrentTab = useTabsRouterStore().useRemoveCurrentTab();
 const route = useRoute();
-const router = useRouter();
 const sort = ref<TableSort>();
 const dictOptions = computed(() => {
   return dictConvert(dataList.value);
@@ -368,7 +367,7 @@ function handleQuery() {
 }
 /** 返回按钮操作 */
 function handleClose() {
-  tabsRouterStore.removeCurrentTab(route, '/system/dict', router);
+  removeCurrentTab('/system/dict');
 }
 /** 重置按钮操作 */
 function resetQuery() {

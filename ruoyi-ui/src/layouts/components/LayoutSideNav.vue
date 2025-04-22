@@ -23,7 +23,7 @@ import LSideNav from './SideNav.vue';
 const route = useRoute();
 const permissionStore = usePermissionStore();
 const settingStore = useSettingStore();
-const { sidebarRouters: menuRouters } = storeToRefs(permissionStore);
+const { menus: menuRouters } = storeToRefs(permissionStore);
 
 const sideMenu = computed(() => {
   const { layout, splitMenu } = settingStore;

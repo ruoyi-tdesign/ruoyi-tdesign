@@ -7,7 +7,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ApprovalRecord: typeof import('./src/components/Process/approvalRecord.vue')['default']
     Color: typeof import('./src/components/color/index.vue')['default']
+    DeptTree: typeof import('./src/components/dept-tree/index.vue')['default']
     DictTag: typeof import('./src/components/dict-tag/index.vue')['default']
     Editor: typeof import('./src/components/editor/index.vue')['default']
     EditorPreview: typeof import('./src/components/editor-preview/index.vue')['default']
@@ -18,15 +20,19 @@ declare module 'vue' {
     ImagePreview: typeof import('./src/components/image-preview/index.vue')['default']
     ImageUpload: typeof import('./src/components/image-upload/index.vue')['default']
     MyDescriptions: typeof import('./src/components/my-descriptions/index.vue')['default']
+    MyLink: typeof import('./src/components/my-link/index.vue')['default']
     MyScrollbar: typeof import('./src/components/my-scrollbar/index.vue')['default']
     ParentView: typeof import('./src/components/ParentView/index.vue')['default']
     PreviewCode: typeof import('./src/components/preview-code/index.vue')['default']
+    ProcessMeddle: typeof import('./src/components/Process/processMeddle.vue')['default']
     ProductCard: typeof import('./src/components/product-card/index.vue')['default']
     RectSelect: typeof import('./src/components/rect-select/index.vue')['default']
     Result: typeof import('./src/components/result/index.vue')['default']
     RIcon: typeof import('./src/components/r-icon/index.vue')['default']
+    RoleSelect: typeof import('./src/components/role-select/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SubmitVerify: typeof import('./src/components/Process/submitVerify.vue')['default']
     TAside: typeof import('tdesign-vue-next')['Aside']
     TAutoComplete: typeof import('tdesign-vue-next')['AutoComplete']
     TAvatar: typeof import('tdesign-vue-next')['Avatar']
@@ -37,6 +43,7 @@ declare module 'vue' {
     TButton: typeof import('tdesign-vue-next')['Button']
     TCard: typeof import('tdesign-vue-next')['Card']
     TCheckbox: typeof import('tdesign-vue-next')['Checkbox']
+    TCheckboxGroup: typeof import('tdesign-vue-next')['CheckboxGroup']
     TCol: typeof import('tdesign-vue-next')['Col']
     TColorPickerPanel: typeof import('tdesign-vue-next')['ColorPickerPanel']
     TConfigProvider: typeof import('tdesign-vue-next')['ConfigProvider']
@@ -78,6 +85,7 @@ declare module 'vue' {
     TRadio: typeof import('tdesign-vue-next')['Radio']
     TRadioButton: typeof import('tdesign-vue-next')['RadioButton']
     TRadioGroup: typeof import('tdesign-vue-next')['RadioGroup']
+    TRangeInput: typeof import('tdesign-vue-next')['RangeInput']
     TranslateSelect: typeof import('./src/components/translate-select/index.vue')['default']
     Trend: typeof import('./src/components/trend/index.vue')['default']
     TRow: typeof import('tdesign-vue-next')['Row']
@@ -100,5 +108,6 @@ declare module 'vue' {
     TWatermark: typeof import('tdesign-vue-next')['Watermark']
     UploadExcel: typeof import('./src/components/upload-excel/index.vue')['default']
     UploadSelect: typeof import('./src/components/upload-select/index.vue')['default']
+    UserSelect: typeof import('./src/components/user-select/index.vue')['default']
   }
 }

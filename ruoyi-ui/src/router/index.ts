@@ -176,6 +176,46 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: '/workflow/leaveEdit',
+    component: Layout,
+    meta: {
+      hidden: true,
+      permissions: ['workflow:leave:edit'],
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/pages/workflow/leave/leaveEdit.vue'),
+        name: 'LeaveEdit',
+        meta: {
+          title: '请假申请',
+          activeMenu: '/leave',
+          key: (route) => route.name as string,
+        },
+      },
+    ],
+  },
+  {
+    path: '/workflow/design',
+    component: Layout,
+    meta: {
+      hidden: true,
+      permissions: ['workflow:leave:edit'],
+    },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/pages/workflow/processDefinition/design.vue'),
+        name: 'design',
+        meta: {
+          title: '流程设计',
+          activeMenu: '/workflow/processDefinition',
+          key: (route) => (route.name as string) + (route.params.definitionId ?? ''),
+        },
+      },
+    ],
+  },
 ];
 
 export const allRoutes = [...defaultRouterList, ...asyncRouterList];

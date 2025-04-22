@@ -42,6 +42,12 @@ public class SysDeptBo extends BaseEntity {
     private Long parentId;
 
     /**
+     * 部门类别编码
+     */
+    @Size(min = 0, max = 100, message = "部门类别编码长度不能超过{max}个字符")
+    private String deptCategory;
+
+    /**
      * 显示顺序
      */
     @NotNull(message = "显示顺序不能为空", groups = {AddGroup.class, EditGroup.class})

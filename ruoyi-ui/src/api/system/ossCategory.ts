@@ -20,7 +20,7 @@ export function getOssCategory(query: SysOssCategoryQuery & { ossCategoryId: num
 
 // 新增OSS分类
 export function addOssCategory(data: SysOssCategoryForm) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/system/ossCategory',
     data,
   });
@@ -28,7 +28,7 @@ export function addOssCategory(data: SysOssCategoryForm) {
 
 // 修改OSS分类
 export function updateOssCategory(data: SysOssCategoryForm) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/system/ossCategory',
     data,
   });
@@ -36,7 +36,7 @@ export function updateOssCategory(data: SysOssCategoryForm) {
 
 // 删除OSS分类
 export function delOssCategory(ossCategoryIds: number | Array<number>) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/system/ossCategory/${ossCategoryIds}`,
   });
 }

@@ -148,6 +148,9 @@
             <t-radio-button v-if="imageUpload" :value="1">上传图片</t-radio-button>
           </t-radio-group>
         </t-form-item>
+        <t-form-item v-if="rowType === 1" label="压缩图片">
+          <t-switch v-model="isCompress" />
+        </t-form-item>
         <t-form-item :label="rowType === 0 ? '选择文件' : '选择图片'">
           <file-upload
             v-if="rowType === 0 && fileUpload"
@@ -172,6 +175,7 @@
             :file-type="imageUploadProps?.fileType"
             :accept="imageUploadProps?.accept"
             :oss-category-id="categoryId"
+            :compress-support="isCompress"
           />
         </t-form-item>
       </t-form>
@@ -234,8 +238,8 @@
                 {{ form.url }}
               </div>
               <t-space>
-                <t-link theme="primary" @click="handleDownload(form.ossId)">下载</t-link>
-                <t-link theme="primary" @click="copyText(form.url)">复制链接URL</t-link>
+                <my-link @click="handleDownload(form.ossId)">下载</my-link>
+                <my-link @click="copyText(form.url)">复制链接URL</my-link>
               </t-space>
             </t-space>
           </t-form-item>
@@ -416,6 +420,7 @@ const fileType = {
   video: 'avi,mp4,m4v,mkv,webm,flv,mov,wmv,3gp,3g2,mpg,vob,ogg,swf,dxr,fla,rm,mpe,mpeg,ts'.split(','),
   word: ['doc', 'docx', 'wps', 'rtf', 'odt'],
 };
+const isCompress = ref(false);
 const rowType = computed({
   get() {
     if (props.imageUpload === false) {

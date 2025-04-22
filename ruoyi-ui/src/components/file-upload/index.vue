@@ -271,7 +271,7 @@ function handleSelectSubmit(values: SelectFile[]) {
     const arr2: SelectFile[] = [];
     rowValues.forEach((value) => {
       const suffix = getHttpFileSuffix(value.name);
-      if (props.fileType.includes(suffix)) {
+      if (props.fileType.includes(suffix?.toLowerCase())) {
         arr1.push(value);
       } else {
         arr2.push(value);
@@ -327,6 +327,11 @@ function handleBeforeUpload(file: UploadFile) {
       proxy.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}格式文件!`);
       return false;
     }
+  }
+  // 校检文件名是否包含特殊字符
+  if (file.name.includes(',')) {
+    proxy?.$modal.msgError('文件名不正确，不能包含英文逗号!');
+    return false;
   }
   return true;
 }

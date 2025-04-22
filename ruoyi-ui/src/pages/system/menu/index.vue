@@ -83,21 +83,21 @@
         </template>
         <template #operation="{ row }">
           <t-space :size="4" break-line>
-            <t-link v-hasPermi="['system:menu:query']" theme="primary" hover="color" @click.stop="handleDetail(row)">
-              <browse-icon />详情
-            </t-link>
-            <t-link v-hasPermi="['system:menu:edit']" theme="primary" hover="color" @click.stop="handleUpdate(row)">
-              <edit-icon />修改
-            </t-link>
-            <t-link v-hasPermi="['system:menu:edit']" theme="primary" hover="color" @click.stop="handleCopyAdd(row)">
-              <copy-icon />复制
-            </t-link>
-            <t-link v-hasPermi="['system:menu:add']" theme="primary" hover="color" @click.stop="handleAdd(row)">
-              <add-icon />新增
-            </t-link>
-            <t-link v-hasPermi="['system:menu:remove']" theme="danger" hover="color" @click.stop="handleDelete(row)">
-              <delete-icon />删除
-            </t-link>
+            <my-link v-hasPermi="['system:menu:query']" @click.stop="handleDetail(row)">
+              <template #prefix-icon><browse-icon /></template>详情
+            </my-link>
+            <my-link v-hasPermi="['system:menu:edit']" @click.stop="handleUpdate(row)">
+              <template #prefix-icon><edit-icon /></template>修改
+            </my-link>
+            <my-link v-hasPermi="['system:menu:edit']" @click.stop="handleCopyAdd(row)">
+              <template #prefix-icon><copy-icon /></template>复制
+            </my-link>
+            <my-link v-hasPermi="['system:menu:add']" @click.stop="handleAdd(row)">
+              <template #prefix-icon><add-icon /></template>新增
+            </my-link>
+            <my-link v-hasPermi="['system:menu:remove']" theme="danger" @click.stop="handleDelete(row)">
+              <template #prefix-icon><delete-icon /></template>删除
+            </my-link>
           </t-space>
         </template>
       </t-enhanced-table>
@@ -110,7 +110,7 @@
       destroy-on-close
       :close-on-overlay-click="false"
       placement="center"
-      width="680px"
+      width="min(780px, 100%)"
       attach="body"
       :confirm-btn="{
         loading: eLoading,
