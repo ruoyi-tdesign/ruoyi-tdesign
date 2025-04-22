@@ -38,3 +38,6 @@ ALTER TABLE sys_oper_log
 ALTER COLUMN oper_param TYPE VARCHAR(4000),
 ALTER COLUMN json_result TYPE VARCHAR(4000),
 ALTER COLUMN error_msg TYPE VARCHAR(4000);
+
+ALTER TABLE sys_oss ADD COLUMN ext1 varchar(500));
+COMMENT ON COLUMN sys_oss.ext1 IS '扩展属性';

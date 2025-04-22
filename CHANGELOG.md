@@ -1,3 +1,85 @@
+## 🌈 1.4.0 `2025-4-23`
+> 本次更新需要执行`update_1.3.1-1.4.0.sql`脚本<br>
+> 本次更新改动较大，请谨慎升级。<br>
+> 本次更新需清除redis缓存。<br>
+
+### 🚀 New Features
+- 新增warmflow工作流
+- 使用SnailJob替代PowerJob
+- 图片上传组件增加压缩功能支持，可自行开关
+- 使用SSE替代websocket，更轻量更稳定的推送
+- 支持虚拟线程
+- 岗位新增岗位类别编码、部门id字段，作为部门下的岗位
+- 部门新增部门类别编码
+- 消息配置从前端移除，使用后端配置
+- 权限标识符支持通配符 '*'
+- 适配 TOPIAM 2.0 单点登录
+- 增加默认数据权限 "部门及以下或本人数据权限" 选项
+- 个人中心强退设备接口路径
+- 支持脱敏传多角色多权限标识
+- 基于Redisson的发号器工具
+- 多账户类型体系下，支持同一个接口多个账户类型体系同时匹配。SaSecurityContext现在持有多个登录对象
+- 限流注解增加固定清理时间
+### 🔥 Performance
+- 去除OSS桶检测 桶不存在自然会报错无需额外检测。删除桶自动创建代码逻辑(云厂商限制不允许操作桶)
+- 移除 alibaba ttl 与线程池搭配有问题(可传递但无法清除与更新)
+- 优化了数据库字段加解密的缓存机制.在自动配置类启动时,就把有加密注解的类进行缓存,以提高速度.
+- 添加启动耗时
+- 租户套餐重名校验
+- 兼容部分用户不想给用户分配角色与部门的场景
+- 字典缓存使用Map代替Array，更高效
+- 将crt客户端替换为Netty客户端 节约17M打包大小
+### 🐞 Bug Fixes
+- 修复 关闭租户功能 三方登录报错问题
+- oss 下载使用临时文件避免线程冲突
+- 修复菜单使用顶部导航布局时，太多菜单挤占问题
+- 三方账号可以绑定多平台账号问题
+- 预览开关未清理缓存导致延迟生效问题
+- spring重大bug 导致 actuator 泄漏问题
+- 修复菜单名称重复导致的路由404问题
+
+### 🔨 Dependency Upgrades
+#### 🔨 java pom
+- Upgrade to spring-boot-3.4.4
+- Upgrade to mybatis-3.5.16
+- Upgrade to easyexcel-4.0.3
+- Upgrade to satoken-1.40.0
+- Upgrade to mybatis-plus-3.5.11
+- Upgrade to hutool-5.8.35
+- Upgrade to spring-boot-admin-3.4.5
+- Upgrade to redisson-3.45.1
+- Upgrade to dynamic-datasource-4.3.1
+- Upgrade to mapstruct-plus-1.4.6
+- Upgrade to lombok-1.18.36
+- Upgrade to bouncycastle-1.78
+- Upgrade to justauth-1.16.7
+- Upgrade to aws.sdk-2.28.22
+- Add to anyline-8.7.2-20250101
+- Add to warm-flow-1.6.8
+#### 🔨 node package
+- Upgrade to @vueuse/core@^11.0.3
+- Upgrade to @vueuse/core@^13.0.0
+- Upgrade to axios@^1.8.4
+- Upgrade to fuse.js@^7.1.0
+- Add to image-conversion@^2.1.1
+- Upgrade to pinia@~3.0.1
+- Upgrade to pinia-plugin-persistedstate@~4.2.0
+- Upgrade to prismjs@^1.30.0
+- Upgrade to qrcode.vue@^3.6.0
+- Upgrade to qs@^6.14.0
+- Upgrade to tdesign-icons-vue-next@0.3.5
+- Upgrade to tdesign-vue-next@1.11.5
+- Upgrade to tinymce@^7.3.0
+- Upgrade to tvision-color@^1.6.0
+- Upgrade to vue@~3.5.13
+- Upgrade to vue-cropper@^1.1.4
+- Upgrade to vue-i18n@^9.14.0
+- Add to vue-json-pretty@^2.4.0
+- Upgrade to vue-router@~4.5.0
+- Add to unocss@^0.62.3
+- Upgrade to vite@6.2.4
+- Upgrade to vue-tsc@2.2.8
+
 ## 🌈 1.3.1 `2024-8-30`
 > 本次更新需要执行`update_1.3.0-1.3.1.sql`脚本<br>
 
