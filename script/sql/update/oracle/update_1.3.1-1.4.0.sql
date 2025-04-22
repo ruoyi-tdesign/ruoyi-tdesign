@@ -38,3 +38,6 @@ ALTER TABLE sys_social MODIFY (tenant_id DEFAULT '000000');
 ALTER TABLE sys_oper_log MODIFY oper_param VARCHAR2(4000);
 ALTER TABLE sys_oper_log MODIFY json_result VARCHAR2(4000);
 ALTER TABLE sys_oper_log MODIFY error_msg VARCHAR2(4000);
+
+ALTER TABLE sys_oss ADD (ext1 VARCHAR2(500));
+COMMENT ON COLUMN sys_oss.ext1 IS '扩展属性';

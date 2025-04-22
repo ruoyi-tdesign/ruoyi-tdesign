@@ -18,3 +18,6 @@ ALTER TABLE sys_oper_log
 MODIFY COLUMN oper_param varchar(4000) NULL DEFAULT '' COMMENT '请求参数' AFTER oper_location,
 MODIFY COLUMN json_result varchar(4000) NULL DEFAULT '' COMMENT '返回参数' AFTER oper_param,
 MODIFY COLUMN error_msg varchar(4000) NULL DEFAULT '' COMMENT '错误消息' AFTER status;
+
+ALTER TABLE sys_oss
+ADD COLUMN ext1 text NULL COMMENT '扩展属性' AFTER url;
