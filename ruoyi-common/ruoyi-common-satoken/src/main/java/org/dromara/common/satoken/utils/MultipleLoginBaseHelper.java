@@ -104,11 +104,15 @@ public class MultipleLoginBaseHelper {
      */
     @SuppressWarnings("unchecked")
     public static <T extends BaseUser> T getUser(StpLogic logic) {
-        SaSession session = logic.getTokenSession();
-        if (ObjectUtil.isNull(session)) {
+        try {
+            SaSession session = logic.getTokenSession();
+            if (ObjectUtil.isNull(session)) {
+                return null;
+            }
+            return (T) session.get(LOGIN_USER_KEY);
+        } catch (Exception e) {
             return null;
         }
-        return (T) session.get(LOGIN_USER_KEY);
     }
 
     /**

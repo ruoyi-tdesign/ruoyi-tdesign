@@ -59,6 +59,7 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
             // 插入时，如果对象值不为空，则使用对象值，否则使用填充值
             fillStrategy(true, metaObject, tableInfo, fieldFills);
         } catch (Exception e) {
+            log.error("自动注入异常 => {}", e.getMessage(), e);
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
         }
     }
@@ -80,6 +81,7 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
             // 更新时，不管值是否为空，都覆盖
             fillStrategy(false, metaObject, tableInfo, fieldFills);
         } catch (Exception e) {
+            log.error("自动注入异常 => {}", e.getMessage(), e);
             throw new ServiceException("自动注入异常 => " + e.getMessage(), HttpStatus.HTTP_UNAUTHORIZED);
         }
     }
