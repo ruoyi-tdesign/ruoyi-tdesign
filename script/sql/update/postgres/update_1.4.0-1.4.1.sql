@@ -1,0 +1,11 @@
+UPDATE sys_menu SET path = 'workflow', icon = 'tree-round-dot-vertical' WHERE menu_id = 11616;
+UPDATE sys_menu SET path = 'task', icon = 'task' WHERE menu_id = 11618;
+UPDATE sys_menu SET path = 'taskWaiting', icon = 'task-visible' WHERE menu_id = 11619;
+UPDATE sys_menu SET path = 'processDefinition', icon = 'system-components' WHERE menu_id = 11620;
+UPDATE sys_menu SET path = 'processInstance', icon = 'tree-round-dot' WHERE menu_id = 11621;
+UPDATE sys_menu SET path = 'category', icon = 'app' WHERE menu_id = 11622;
+UPDATE sys_menu SET path = 'myDocument', icon = 'send' WHERE menu_id = 11629;
+UPDATE sys_menu SET path = 'monitor', icon = 'chart-analytics' WHERE menu_id = 11630;
+UPDATE sys_menu SET path = 'allTaskWaiting', icon = 'task-visible' WHERE menu_id = 11631;
+UPDATE sys_menu SET path = 'taskFinish', icon = 'task-checked' WHERE menu_id = 11632;
+UPDATE sys_menu SET path = 'taskCopyList', icon = 'user-arrow-left' WHERE menu_id = 11633;
