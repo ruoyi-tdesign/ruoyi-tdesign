@@ -387,3 +387,28 @@ export function getHttpFileName(http: string) {
   }
   return http.substring(http.lastIndexOf('/') + 1);
 }
+
+/**
+ * 首字母大小
+ * @param str
+ */
+export function titleCase(str: string) {
+  return str.replace(/( |^)[a-z]/g, (L) => L.toUpperCase());
+}
+
+/**
+ * 下划转驼峰
+ * @param str
+ */
+export function camelCase(str: string) {
+  return str.replace(/_[a-z]/g, (str1) => str1.slice(-1).toUpperCase());
+}
+
+export function makeMap(str: string, expectsLowerCase?: boolean) {
+  const map = Object.create(null);
+  const list = str.split(',');
+  for (let i = 0; i < list.length; i++) {
+    map[list[i]] = true;
+  }
+  return expectsLowerCase ? (val: string) => map[val.toLowerCase()] : (val: string) => map[val];
+}
