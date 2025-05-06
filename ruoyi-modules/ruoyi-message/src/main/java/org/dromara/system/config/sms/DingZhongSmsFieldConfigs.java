@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.system.config.FieldConfig;
+import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.system.config.SmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 

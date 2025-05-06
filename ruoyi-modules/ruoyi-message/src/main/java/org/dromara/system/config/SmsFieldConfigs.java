@@ -3,6 +3,7 @@ package org.dromara.system.config;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.core.enums.MessageTypeEnum;
+import org.dromara.common.core.ui.FieldConfig;
 
 /**
  * 短信配置

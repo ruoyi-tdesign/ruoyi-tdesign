@@ -1,4 +1,4 @@
-package org.dromara.system.config;
+package org.dromara.common.core.ui;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Builder;
@@ -37,6 +37,6 @@ public class FormRule {
     /** 'error' | 'warning' */
     private String type;
     private Boolean url;
-    //    validator?:CustomValidator;
+    private String validator;
     private Boolean whitespace;
 }

@@ -1,4 +1,4 @@
-package org.dromara.system.config;
+package org.dromara.common.core.ui;
 
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +18,7 @@ public class FieldConfig<T> {
     private T value;
     /** 字段名称 */
     private String name;
-    /** 组件 */
+    /** 组件, 目前支持: input、input-number、switch、select */
     private String component;
     /** 帮助信息 */
     private String help;
@@ -36,4 +36,10 @@ public class FieldConfig<T> {
     private List<FormRule> rules;
     /** 组件类型 'number' | 'submit' | 'url' | 'text' | 'search' | 'password' | 'hidden' | 'tel' */
     private String type;
+    /** 占位符 */
+    private String placeholder;
+    /** 是否多选 */
+    private boolean multiple;
+    /** 选项 */
+    private List<FieldOption<Object>> options;
 }

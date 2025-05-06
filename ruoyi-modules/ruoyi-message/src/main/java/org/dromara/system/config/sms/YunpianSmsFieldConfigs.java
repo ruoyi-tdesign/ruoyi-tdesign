@@ -3,7 +3,7 @@ package org.dromara.system.config.sms;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.core.enums.MessageTypeEnum;
-import org.dromara.system.config.FieldConfig;
+import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.system.config.SupplierFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 

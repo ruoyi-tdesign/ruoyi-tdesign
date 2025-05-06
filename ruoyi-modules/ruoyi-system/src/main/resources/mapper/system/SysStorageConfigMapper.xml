@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.system.mapper.SysStorageConfigMapper">
+
+    <resultMap id="SysStorageConfigResult" autoMapping="true" type="org.dromara.system.domain.SysStorageConfig">
+        <id property="storageConfigId" column="storage_config_id"/>
+    </resultMap>
+    <resultMap id="SysStorageConfigResultVo" autoMapping="true" type="org.dromara.system.domain.vo.SysStorageConfigVo">
+        <id property="storageConfigId" column="storage_config_id"/>
+    </resultMap>
+
+    <sql id="selectSysStorageConfigVo">
+        select ssc.storage_config_id, ssc.tenant_id, ssc.platform, ssc.weight, ssc.status, ssc.config_json, ssc.del_flag, ssc.create_dept, ssc.create_by, ssc.create_time, ssc.update_by, ssc.update_time, ssc.remark from sys_storage_config ssc
+    </sql>
+    <select id="queryList" parameterType="org.dromara.system.domain.query.SysStorageConfigQuery" resultMap="SysStorageConfigResultVo">
+        <include refid="selectSysStorageConfigVo"/>
+        <where>
+            <if test="platform != null and platform != ''"> and ssc.platform = #{platform}</if>
+            <if test="status != null"> and ssc.status = #{status}</if>
+            and ssc.del_flag = '0'
+        </where>
+        order by ssc.create_time desc
+    </select>
+
+</mapper>

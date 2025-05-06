@@ -53,6 +53,7 @@
         <anyline.version>8.7.2-20250101</anyline.version>
         <!--工作流配置-->
         <warm-flow.version>1.6.8</warm-flow.version>
+        <x-file-storage.version>2.2.1</x-file-storage.version>
 
         <!-- 插件版本 -->
         <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
@@ -353,6 +354,12 @@
                 <groupId>org.anyline</groupId>
                 <artifactId>anyline-data-jdbc-mysql</artifactId>
                 <version>${anyline.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.dromara.x-file-storage</groupId>
+                <artifactId>x-file-storage-core</artifactId>
+                <version>${x-file-storage.version}</version>
             </dependency>
 
             <dependency>

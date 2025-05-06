@@ -1,0 +1,83 @@
+package org.dromara.common.storage.config;
+
+import lombok.Data;
+import org.dromara.common.core.ui.FieldConfig;
+
+/**
+ * MinIO字段配置
+ *
+ * @author hexm
+ * @date 2025/5/3
+ */
+@Data
+public class MinioStorageFieldConfig implements StorageFieldConfig {
+    /** Access Key */
+    private FieldConfig<String> accessKey;
+    /** Access Key Secret */
+    private FieldConfig<String> secretKey;
+    /** 访问站点 */
+    private FieldConfig<String> endPoint;
+    /** 存储空间名 */
+    private FieldConfig<String> bucketName;
+    /** 访问域名 */
+    private FieldConfig<String> domain;
+    /** 基础路径 */
+    private FieldConfig<String> basePath;
+    /**
+     * 自动分片上传阈值，达到此大小则使用分片上传，默认 128MB。
+     * 在获取不到文件大小或达到这个阈值的情况下，会使用这里提供的分片大小，否则 MinIO 会自动分片大小
+     */
+    private FieldConfig<Integer> multipartThreshold;
+    /** 自动分片上传时每个分片大小，默认 32MB */
+    private FieldConfig<Integer> multipartPartSize;
+
+    public MinioStorageFieldConfig() {
+        this.accessKey = FieldConfig.<String>builder()
+            .component("input")
+            .name("accessKey")
+            .required(true)
+            .build();
+        this.secretKey = FieldConfig.<String>builder()
+            .component("input")
+            .name("secretKey")
+            .required(true)
+            .type("password")
+            .build();
+        this.endPoint = FieldConfig.<String>builder()
+            .component("input")
+            .name("访问站点")
+            .required(true)
+            .build();
+        this.bucketName = FieldConfig.<String>builder()
+            .component("input")
+            .name("存储空间名")
+            .required(true)
+            .build();
+        this.domain = FieldConfig.<String>builder()
+            .component("input")
+            .value("")
+            .name("访问域名")
+            .required(false)
+            .build();
+        this.basePath = FieldConfig.<String>builder()
+            .component("input")
+            .name("基础路径")
+            .required(false)
+            .build();
+        this.multipartThreshold = FieldConfig.<Integer>builder()
+            .component("input-number")
+            .value(128 * 1024 * 1024)
+            .name("分片阈值")
+            .help("自动分片上传阈值，达到此大小则使用分片上传，默认 128MB。<br/>" +
+                "在获取不到文件大小或达到这个阈值的情况下，会使用这里提供的分片大小，否则 MinIO 会自动分片大小")
+            .required(true)
+            .build();
+        this.multipartPartSize = FieldConfig.<Integer>builder()
+            .component("input-number")
+            .value(32 * 1024 * 1024)
+            .name("分片大小")
+            .help("自动分片上传时每个分片大小，默认 32MB")
+            .required(true)
+            .build();
+    }
+}

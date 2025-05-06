@@ -206,7 +206,7 @@
             </my-link>
 #end
 #if($isUseRemoveMethod)
-            <my-link v-hasPermi="['${moduleName}:${businessName}:remove']" size="small" @click.stop="handleDelete(row)">
+            <my-link v-hasPermi="['${moduleName}:${businessName}:remove']" theme="danger" @click.stop="handleDelete(row)">
               <template #prefix-icon><delete-icon /></template>删除
             </my-link>
 #end

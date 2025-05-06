@@ -217,36 +217,12 @@
               </t-form-item>
             </t-col>
             <template v-for="(value, key) in messageConfig.supplierConfig" :key="form.supplierType + key">
-              <t-col
-                v-if="!value.visible || (form.configJson as Record<string, any>)[value.visible]"
-                :span="value.span ?? 12"
-              >
-                <t-form-item
-                  :label="value.name"
-                  :name="`configJson[${key}]`"
-                  :rules="[{ required: value.required, message: `${value.name}不能为空` }, ...(value.rules ?? [])]"
-                >
-                  <template #help><span v-html="value.help"></span></template>
-                  <t-input
-                    v-if="value.component === 'input'"
-                    v-model.trim="(form.configJson as Record<string, any>)[key]"
-                    :placeholder="`请输入${value.name}`"
-                    :type="value.type"
-                  />
-                  <t-input-number
-                    v-else-if="value.component === 'input-number'"
-                    v-model="(form.configJson as Record<string, any>)[key]"
-                    :allow-input-over-limit="false"
-                    :min="value.min"
-                    :max="value.max"
-                    :decimal-places="0"
-                  />
-                  <t-switch
-                    v-else-if="value.component === 'switch'"
-                    v-model="(form.configJson as Record<string, any>)[key]"
-                  />
-                </t-form-item>
-              </t-col>
+              <form-field-render
+                v-model="(form.configJson as Record<string, any>)[key]"
+                :config-value="form.configJson as Record<string, any>"
+                :name="`configJson[${key}]`"
+                :field-config="value"
+              />
             </template>
             <t-col :span="12">
               <t-form-item label="备注" name="remark">
