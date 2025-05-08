@@ -22,26 +22,26 @@ public class CloopenSmsFieldConfigs extends SmsFieldConfigs {
 
     public CloopenSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("accessKeyId")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("accessKeySecret")
             .help("访问键秘钥")
             .required(true)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.sdkAppId = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("应用 ID")
             .required(true)
             .build();
         this.baseUrl = FieldConfig.<String>builder()
             .value("https://app.cloopen.com:8883/2013-12-26")
-            .component("input")
+            .useInput()
             .name("BaseURL")
             .required(true)
             .build();

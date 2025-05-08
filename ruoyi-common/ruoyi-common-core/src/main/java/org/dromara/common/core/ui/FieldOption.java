@@ -1,7 +1,10 @@
 package org.dromara.common.core.ui;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * 字段选项
@@ -9,8 +12,11 @@ import lombok.Data;
  * @author hexm
  * @date 2025/5/3
  */
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FieldOption<T> {
     /** 标签 */
     private String label;

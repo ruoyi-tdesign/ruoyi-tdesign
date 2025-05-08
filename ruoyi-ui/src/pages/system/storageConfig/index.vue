@@ -259,6 +259,7 @@ import {
   listStorageConfig,
   updateStorageConfig,
 } from '@/api/system/storageConfig';
+import FormFieldRender from '@/components/field-config/FormFieldRender';
 import { ArrayOps } from '@/utils/array';
 
 const { proxy } = getCurrentInstance();
@@ -311,7 +312,9 @@ const columns = ref<Array<PrimaryTableCol>>([
   { title: `操作`, colKey: 'operation', align: 'center', width: 180 },
 ]);
 // 提交表单对象
-const form = ref<SysStorageConfigVo & SysStorageConfigForm>({});
+const form = ref<SysStorageConfigVo & SysStorageConfigForm>({
+  configObject: {},
+});
 // 查询对象
 const queryParams = ref<SysStorageConfigQuery>({
   pageNum: 1,

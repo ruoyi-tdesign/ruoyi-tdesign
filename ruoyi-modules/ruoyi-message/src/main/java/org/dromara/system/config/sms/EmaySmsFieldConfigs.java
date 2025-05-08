@@ -20,20 +20,20 @@ public class EmaySmsFieldConfigs extends SmsFieldConfigs {
 
     public EmaySmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("appId")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("secretKey")
             .help("访问键秘钥")
             .required(true)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.requestUrl = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("请求地址")
             .help("短信发送请求地址")
             .required(true)

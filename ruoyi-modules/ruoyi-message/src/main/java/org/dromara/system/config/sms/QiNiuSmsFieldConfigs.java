@@ -28,44 +28,44 @@ public class QiNiuSmsFieldConfigs extends SmsFieldConfigs {
 
     public QiNiuSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("AccessKey")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("SecretKey")
             .required(true)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.baseUrl = FieldConfig.<String>builder()
             .value("https://sms.qiniuapi.com")
-            .component("input")
+            .useInput()
             .name("请求地址")
             .help("默认请求地址为 https://sms.qiniuapi.com")
             .required(true)
             .build();
         this.templateName = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("模板变量名称")
             .required(false)
             .build();
         this.singleMsgUrl = FieldConfig.<String>builder()
             .value("/v1/message/single")
-            .component("input")
+            .useInput()
             .name("单发链接")
             .help("默认单发链接为 /v1/message/single")
             .required(true)
             .build();
         this.massMsgUrl = FieldConfig.<String>builder()
             .value("/v1/message")
-            .component("input")
+            .useInput()
             .name("群发链接")
             .help("默认群发链接为 /v1/message")
             .required(true)
             .build();
         this.signatureId = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("签名ID")
             .required(false)
             .build();

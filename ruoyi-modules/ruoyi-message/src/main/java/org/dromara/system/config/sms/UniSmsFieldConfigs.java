@@ -20,20 +20,20 @@ public class UniSmsFieldConfigs extends SignatureSmsFieldConfigs {
 
     public UniSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("accessKeyId")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("accessKeySecret")
             .help("访问键秘钥 简易模式不需要配置")
             .required(false)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("默认短信签名")
             .required(true)
             .build();

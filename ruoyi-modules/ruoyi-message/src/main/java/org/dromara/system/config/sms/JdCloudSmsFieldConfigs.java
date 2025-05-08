@@ -20,26 +20,26 @@ public class JdCloudSmsFieldConfigs extends SignatureSmsFieldConfigs {
 
     public JdCloudSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("accessKeyId")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("accessKeySecret")
             .help("访问键秘钥")
             .required(false)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("默认短信签名")
             .required(true)
             .build();
         this.region = FieldConfig.<String>builder()
             .value("cn-north-1")
-            .component("input")
+            .useInput()
             .name("地域信息")
             .required(true)
             .build();

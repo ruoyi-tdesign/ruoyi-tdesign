@@ -315,6 +315,7 @@ import type {
   SysMessageConfigQuery,
   SysMessageConfigVo,
 } from '@/api/system/model/messageConfigModel';
+import FormFieldRender from '@/components/field-config/FormFieldRender';
 import { ArrayOps } from '@/utils/array';
 import type { DictModel } from '@/utils/dict';
 import { isJson } from '@/utils/ruoyi';

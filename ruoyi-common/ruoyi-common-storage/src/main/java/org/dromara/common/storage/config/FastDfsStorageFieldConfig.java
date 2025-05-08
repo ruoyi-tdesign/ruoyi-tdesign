@@ -64,64 +64,64 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
 
     public FastDfsStorageFieldConfig() {
         this.runMod = FieldConfig.<String>builder()
-            .component("select")
             .name("运行模式")
             .help("运行模式，由于 FastDFS 比较特殊，不支持自定义文件名及路径，所以使用运行模式来解决这个问题。<br/>" +
                 "详情请查看：https://x-file-storage.xuyanwu.cn/2.2.0/#/%E5%AD%98%E5%82%A8%E5%B9%B3%E5%8F%B0?id=OCI_FastDFS")
             .required(true)
-            .options(List.of(
+            .selectComponent().options(List.of(
                 new FieldOption<>("覆盖模式", "COVER"),
                 new FieldOption<>("URL模式", "URL")
             ))
+            .end()
             .build();
         this.trackerServerAddr = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("Tracker Server 地址")
             .help("Tracker Server 地址（IP:PORT），多个用英文逗号隔开")
             .required(false)
             .build();
         this.trackerHttpPort = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(80)
             .name("Tracker HTTP端口")
             .help("Tracker HTTP端口，默认：80")
             .required(false)
             .build();
         this.storageServerAddr = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("Storage Server 地址")
             .help("Storage Server 地址:IP:PORT（当不使用 Tracker Server 时使用）")
             .required(false)
             .build();
         this.storageStorePath = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(0)
             .name("Store path")
             .help("Store path，默认 0（当不使用 Tracker Server 时使用）")
             .required(false)
             .build();
         this.groupName = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("组名")
             .help("扩展信息，组名，可以为空")
             .required(false)
             .build();
         this.connectTimeoutInSeconds = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(5)
             .name("连接超时")
             .help("扩展信息，连接超时，单位：秒，默认：5s")
             .required(false)
             .build();
         this.networkTimeoutInSeconds = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(30)
             .name("套接字超时")
             .help("扩展信息，套接字超时，单位：秒，默认：30s")
             .required(false)
             .build();
         this.charset = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .value("UTF-8")
             .name("字符编码")
             .help("扩展信息，字符编码，默认：UTF-8")
@@ -135,7 +135,7 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
             .required(false)
             .build();
         this.httpSecretKey = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .value("FastDFS1234567890")
             .name("安全密钥")
             .help("扩展信息，安全密钥，默认：FastDFS1234567890")
@@ -149,34 +149,34 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
             .required(false)
             .build();
         this.connectionPoolMaxCountPerEntry = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(100)
             .name("最大连接数")
             .help("扩展信息，#每一个IP:Port的最大连接数，0为没有限制，默认：100")
             .required(false)
             .build();
         this.connectionPoolMaxIdleTime = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(3600)
             .name("最大空闲时间")
             .help("扩展信息，连接池最大空闲时间。单位：秒，默认：3600")
             .required(false)
             .build();
         this.connectionPoolMaxWaitTimeInMs = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(1000)
             .name("最大等待时间")
             .help("扩展信息，连接池最大等待时间。单位：毫秒，默认：1000")
             .required(false)
             .build();
         this.domain = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .value("")
             .name("访问域名")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("基础路径")
             .help("基础路径，强烈建议留空<br/>" +
                 "仅在上传成功时和获取文件时原样传到 FileInfo 及 RemoteFileInfo 中，可以用来保存到数据库中使用，<br/>" +
@@ -186,14 +186,14 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
             .required(false)
             .build();
         this.multipartThreshold = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(128 * 1024 * 1024)
             .name("分片阈值")
             .help("自动分片上传阈值，达到此大小则使用分片上传，默认 128MB")
             .required(true)
             .build();
         this.multipartPartSize = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(32 * 1024 * 1024)
             .name("分片大小")
             .help("自动分片上传时每个分片大小，默认 32MB")

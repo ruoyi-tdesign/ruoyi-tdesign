@@ -1,4 +1,4 @@
-import type { FormRule } from 'tdesign-vue-next';
+import type { FormRule, InputNumberProps, InputProps, SelectProps, SwitchProps, TextareaProps } from 'tdesign-vue-next';
 
 export interface FieldOption {
   label: string;
@@ -16,24 +16,24 @@ export interface FieldConfig<T extends string | number | boolean | Array<string 
   help?: string;
   /** 是否必填 */
   required: boolean;
-  /** 是否多选 */
-  multiple: boolean;
   /** 占位符 */
   placeholder?: string;
-  /** 选项 */
-  options?: FieldOption[];
   /** 占用栅格数 */
   span?: number;
-  /** 最小值 */
-  min?: number;
-  /** 最大值 */
-  max?: number;
   /** 可见性依赖字段。例如a=true，则b设置visible为a */
   visible?: string;
   /** 其他校验规则 */
   rules?: FormRule[];
-  /** 组件类型 */
-  type?: 'number' | 'submit' | 'url' | 'text' | 'search' | 'password' | 'hidden' | 'tel';
+  /** 输入框组件属性 */
+  inputProps: InputProps;
+  /** 数字输入框组件属性 */
+  inputNumberProps: InputNumberProps;
+  /** 开关组件属性 */
+  switchProps: SwitchProps;
+  /** 文本域组件属性 */
+  textareaProps: TextareaProps;
+  /** 选择器组件属性 */
+  selectProps: SelectProps;
 }
 
 /**

@@ -4,9 +4,12 @@
     <slot name="prefix" />
     <template v-for="(fieldConfig, key) in fieldConfigs" :key="fieldConfig + key">
       <t-descriptions-item v-if="!fieldConfig.visible || configValue[fieldConfig.visible]" :label="fieldConfig.name">
-        <template v-if="['select', 'radio', 'checkbox', 'tree-select'].includes(fieldConfig.component)">
-          <dict-tag :options="fieldConfig.options" :value="configValue[key]" />
+        <template v-if="fieldConfig.component === 'select'">
+          <dict-tag :options="fieldConfig.selectProps.options as FieldOption[]" :value="configValue[key]" />
         </template>
+        <!--        <template v-if="['select', 'radio', 'checkbox', 'tree-select'].includes(fieldConfig.component)">
+          <dict-tag :options="fieldConfig.options" :value="configValue[key]" />
+        </template>-->
         <template v-else-if="['image-upload'].includes(fieldConfig.component)">
           <image-preview :src="configValue[key]" width="60px" height="60px" />
         </template>
@@ -20,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FieldConfig } from '@/api/model/fieldConfigModel';
+import type { FieldConfig, FieldOption } from '@/api/model/fieldConfigModel';
 
 defineProps({
   // 配置值对象

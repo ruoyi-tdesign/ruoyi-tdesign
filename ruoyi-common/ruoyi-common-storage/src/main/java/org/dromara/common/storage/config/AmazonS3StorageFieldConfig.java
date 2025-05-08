@@ -38,47 +38,45 @@ public class AmazonS3StorageFieldConfig implements StorageFieldConfig {
 
     public AmazonS3StorageFieldConfig() {
         this.accessKey = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("accessKey")
             .required(true)
             .build();
         this.secretKey = FieldConfig.<String>builder()
-            .component("input")
             .name("secretKey")
             .required(true)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.region = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("存储区域(region)")
             .required(true)
             .build();
         this.endPoint = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("访问站点(endPoint)")
             .required(true)
             .build();
         this.bucketName = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("存储空间名")
             .required(true)
             .build();
         this.domain = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .value("")
             .name("访问域名")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("基础路径")
             .required(false)
             .build();
         this.defaultAcl = FieldConfig.<String>builder()
-            .component("select")
             .name("默认的 ACL")
             .help("文件的访问控制列表，一般情况下只有对象存储支持该功能")
-            .options(List.of(
+            .selectComponent().options(List.of(
                 new FieldOption<>("私有", "private"),
                 new FieldOption<>("公共读", "public-read"),
                 new FieldOption<>("公共读写", "public-read-write"),
@@ -87,17 +85,17 @@ public class AmazonS3StorageFieldConfig implements StorageFieldConfig {
                 new FieldOption<>("bucket-owner-read", "bucket-owner-read"),
                 new FieldOption<>("bucket-owner-full-control", "bucket-owner-full-control"),
                 new FieldOption<>("aws-exec-read", "aws-exec-read")
-            ))
+            )).end()
             .build();
         this.multipartThreshold = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(128 * 1024 * 1024)
             .name("分片阈值")
             .help("自动分片上传阈值，达到此大小则使用分片上传，默认 128MB")
             .required(true)
             .build();
         this.multipartPartSize = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(32 * 1024 * 1024)
             .name("分片大小")
             .help("自动分片上传时每个分片大小，默认 32MB")

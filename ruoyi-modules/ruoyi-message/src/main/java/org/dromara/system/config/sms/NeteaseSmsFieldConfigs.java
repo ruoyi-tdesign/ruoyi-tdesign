@@ -26,38 +26,38 @@ public class NeteaseSmsFieldConfigs extends SignatureSmsFieldConfigs {
 
     public NeteaseSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("accessKey")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("accessKeySecret")
             .help("访问键秘钥")
             .required(true)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("默认短信签名")
             .required(true)
             .build();
         this.templateUrl = FieldConfig.<String>builder()
             .value("https://api.netease.im/sms/sendtemplate.action")
-            .component("input")
+            .useInput()
             .name("模板短信请求地址")
             .required(true)
             .build();
         this.codeUrl = FieldConfig.<String>builder()
             .value("https://api.netease.im/sms/sendcode.action")
-            .component("input")
+            .useInput()
             .name("验证码短信请求地址")
             .required(true)
             .build();
         this.verifyUrl = FieldConfig.<String>builder()
             .value("https://api.netease.im/sms/verifycode.action")
-            .component("input")
+            .useInput()
             .name("验证码验证请求地址")
             .required(true)
             .build();

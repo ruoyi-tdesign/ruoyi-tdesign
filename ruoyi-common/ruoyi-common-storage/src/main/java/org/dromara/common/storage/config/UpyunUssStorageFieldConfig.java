@@ -30,34 +30,34 @@ public class UpyunUssStorageFieldConfig implements StorageFieldConfig {
 
     public UpyunUssStorageFieldConfig() {
         this.username = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("账号")
             .required(true)
             .build();
         this.password = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("密码")
             .required(true)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.bucketName = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("存储空间名")
             .required(true)
             .build();
         this.domain = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .value("")
             .name("访问域名")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("基础路径")
             .required(false)
             .build();
         this.multipartUploadPartSize = FieldConfig.<Integer>builder()
-            .component("input-number")
+            .useInputNumber()
             .value(1024 * 1024)
             .name("分片大小")
             .help("手动分片上传时，每个分片大小，单位字节，最小 1MB，最大 50MB，必须是 1MB 的整数倍，默认 1MB。")

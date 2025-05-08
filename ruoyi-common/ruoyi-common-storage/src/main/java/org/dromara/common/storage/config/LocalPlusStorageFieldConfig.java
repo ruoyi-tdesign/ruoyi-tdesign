@@ -20,20 +20,20 @@ public class LocalPlusStorageFieldConfig implements StorageFieldConfig {
 
     public LocalPlusStorageFieldConfig() {
         this.basePath = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .value("test")
             .name("基础路径")
             .required(false)
             .build();
         this.storagePath = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .value("/")
             .name("存储路径")
             .help("存储路径，上传的文件都会存储在这个路径下面，默认“/”，注意“/”结尾")
             .required(true)
             .build();
         this.domain = FieldConfig.<String>builder()
-            .component("input")
+            .useInput()
             .name("访问域名")
             .required(false)
             .build();
