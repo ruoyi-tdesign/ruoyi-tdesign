@@ -21,26 +21,26 @@ public class UniSmsFieldConfigs extends SignatureSmsFieldConfigs {
     public UniSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
             .useInput()
-            .name("accessKeyId")
+            .label("accessKeyId")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
             .useInput()
-            .name("accessKeySecret")
+            .label("accessKeySecret")
             .help("访问键秘钥 简易模式不需要配置")
             .required(false)
             .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
             .useInput()
-            .name("默认短信签名")
+            .label("默认短信签名")
             .required(true)
             .build();
         this.isSimple = FieldConfig.<Boolean>builder()
             .value(true)
-            .component("switch")
-            .name("简易模式")
+            .useSwitch()
+            .label("简易模式")
             .help("是否为简易模式 默认为true")
             .required(true)
             .build();

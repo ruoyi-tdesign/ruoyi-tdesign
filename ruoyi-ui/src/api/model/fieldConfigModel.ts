@@ -1,14 +1,34 @@
 import type { FormRule, InputNumberProps, InputProps, SelectProps, SwitchProps, TextareaProps } from 'tdesign-vue-next';
 
 export interface FieldOption {
+  /** 当前选项是否为全选，全选可以在顶部，也可以在底部。点击当前选项会选中禁用态除外的全部选项，即使是分组选择器也会选中全部选项 */
+  checkAll?: boolean;
+  /** 是否禁用该选项 */
+  disabled?: boolean;
+  /** 选项标题，在选项过长时hover选项展示 */
+  title?: string;
+  /** 标签 */
   label: string;
+  /** 值 */
   value: string | number;
 }
+export type FieldOptionGroup = {
+  /** 是否显示分隔线，默认为true */
+  divider?: boolean;
+  /** 分组别名 */
+  label?: string;
+  /** 分组名称 */
+  group: string;
+  /** 子选项 */
+  children?: FieldOption[];
+};
 /** 字段基本配置对象 */
 export interface FieldConfig<T extends string | number | boolean | Array<string | number> = string> {
   /** 字段默认值 */
   value?: T;
-  /** 字段名称 */
+  /** 标签名称 */
+  label: string;
+  /** 自定义字段名称，默认为对象的属性名称。可以使用.作为嵌套对象的属性，例如：items.item */
   name: string;
   /** 组件 */
   component: string;

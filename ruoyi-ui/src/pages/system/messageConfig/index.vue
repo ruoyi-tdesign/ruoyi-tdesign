@@ -188,13 +188,7 @@
             </t-col>
             <t-col :span="6">
               <t-form-item label="支持平台" name="supplierType">
-                <t-select
-                  v-model="form.supplierType"
-                  placeholder="请选择支持平台"
-                  clearable
-                  filterable
-                  @change="handleSupplierTypeChange"
-                >
+                <t-select v-model="form.supplierType" placeholder="请选择支持平台" clearable filterable>
                   <t-option
                     v-for="dict in getSupplierTypeMap(form.messageType)"
                     :key="dict.value"
@@ -216,14 +210,13 @@
                 </t-select>
               </t-form-item>
             </t-col>
-            <template v-for="(value, key) in messageConfig.supplierConfig" :key="form.supplierType + key">
-              <form-field-render
-                v-model="(form.configJson as Record<string, any>)[key]"
-                :config-value="form.configJson as Record<string, any>"
-                :name="`configJson[${key}]`"
-                :field-config="value"
-              />
-            </template>
+            <form-field-renders
+              :key="form.messageConfigId"
+              v-model="form.configObject"
+              :configs="messageConfig.supplierConfig"
+              name="configObject"
+              :form="form"
+            />
             <t-col :span="12">
               <t-form-item label="备注" name="remark">
                 <t-textarea v-model="form.remark" placeholder="请输入备注" />
@@ -239,37 +232,34 @@
       v-model:visible="openView"
       header="消息配置详情"
       placement="center"
-      width="700px"
+      width="min(850px, 100%)"
       attach="body"
       :footer="false"
     >
-      <my-descriptions :loading="openViewLoading">
-        <t-descriptions-item label="消息设置id">{{ form.messageConfigId }}</t-descriptions-item>
-        <t-descriptions-item label="标题">{{ form.title }}</t-descriptions-item>
-        <t-descriptions-item label="消息类型">
-          <dict-tag :options="messageTypeOptions" :value="form.messageType" />
-        </t-descriptions-item>
-        <t-descriptions-item label="支持平台标识">
-          <dict-tag :options="supplierTypeOptions" :value="form.supplierType" />
-        </t-descriptions-item>
-        <t-descriptions-item label="配置json" :span="2">
-          <div style="max-height: 300px; width: 100%" class="content-scrollbar">
-            <template v-if="!isJson(form.configJson as string)">{{ form.configJson }}...</template>
-            <preview-code
-              v-else
-              :code="JSON.stringify(JSON.parse(form.configJson as string), null, 2)"
-              language="json"
-              style="width: 100%"
-            />
-          </div>
-        </t-descriptions-item>
-        <t-descriptions-item label="状态">
-          <dict-tag :options="sys_normal_disable" :value="form.status" />
-        </t-descriptions-item>
-        <t-descriptions-item label="备注" :span="2">{{ form.remark }}</t-descriptions-item>
-        <t-descriptions-item label="更新时间">{{ parseTime(form.updateTime) }}</t-descriptions-item>
-        <t-descriptions-item label="创建时间">{{ parseTime(form.createTime) }}</t-descriptions-item>
-      </my-descriptions>
+      <field-descriptions
+        :loading="openViewLoading"
+        :config-value="form.configJson"
+        :field-configs="messageConfig.supplierConfig"
+      >
+        <template #prefix>
+          <t-descriptions-item label="消息设置id">{{ form.messageConfigId }}</t-descriptions-item>
+          <t-descriptions-item label="标题">{{ form.title }}</t-descriptions-item>
+          <t-descriptions-item label="消息类型">
+            <dict-tag :options="messageTypeOptions" :value="form.messageType" />
+          </t-descriptions-item>
+          <t-descriptions-item label="支持平台标识">
+            <dict-tag :options="supplierTypeOptions" :value="form.supplierType" />
+          </t-descriptions-item>
+        </template>
+        <template #suffix>
+          <t-descriptions-item label="状态">
+            <dict-tag :options="sys_normal_disable" :value="form.status" />
+          </t-descriptions-item>
+          <t-descriptions-item label="备注" :span="2">{{ form.remark }}</t-descriptions-item>
+          <t-descriptions-item label="更新时间">{{ parseTime(form.updateTime) }}</t-descriptions-item>
+          <t-descriptions-item label="创建时间">{{ parseTime(form.createTime) }}</t-descriptions-item>
+        </template>
+      </field-descriptions>
     </t-dialog>
   </t-card>
 </template>
@@ -315,7 +305,7 @@ import type {
   SysMessageConfigQuery,
   SysMessageConfigVo,
 } from '@/api/system/model/messageConfigModel';
-import FormFieldRender from '@/components/field-config/FormFieldRender';
+import FormFieldRenders from '@/components/field-config/FormFieldRenders';
 import { ArrayOps } from '@/utils/array';
 import type { DictModel } from '@/utils/dict';
 import { isJson } from '@/utils/ruoyi';
@@ -369,7 +359,7 @@ const columns = ref<Array<PrimaryTableCol>>([
 ]);
 // 提交表单对象
 const form = ref<SysMessageConfigVo & SysMessageConfigForm>({
-  configJson: {},
+  configObject: {},
 });
 // 查询对象
 const queryParams = ref<SysMessageConfigQuery>({
@@ -433,22 +423,6 @@ const getSupplierTypeMap = (messageType: string): DictModel[] => {
 /** 处理消息类型变更 */
 function handleMessageTypeChange() {
   form.value.supplierType = undefined;
-  form.value.configJson = {};
-}
-
-/** 处理支持平台变更事件 */
-function handleSupplierTypeChange() {
-  // 默认值赋值
-  if (messageConfig.value?.supplierConfig) {
-    const configValue = {};
-    Object.entries(messageConfig.value.supplierConfig).forEach((value) => {
-      // @ts-ignore
-      configValue[value[0]] = value[1].value;
-    });
-    form.value.configJson = configValue;
-  } else {
-    form.value.configJson = {};
-  }
 }
 
 /** 查询消息配置列表 */
@@ -466,7 +440,7 @@ function getList() {
 function reset() {
   form.value = {
     status: 1,
-    configJson: {},
+    configObject: {},
   };
   proxy.resetForm('messageConfigRef');
 }
@@ -532,7 +506,8 @@ function handleUpdate(row?: SysMessageConfigVo) {
   const messageConfigId = row?.messageConfigId || ids.value.at(0);
   getMessageConfig(messageConfigId).then((response) => {
     buttonLoading.value = false;
-    form.value = { ...response.data, configJson: JSON.parse(response.data.configJson as string) };
+    form.value = response.data;
+    form.value.configObject = JSON.parse(form.value.configJson);
   });
 }
 
@@ -546,9 +521,9 @@ function submitForm({ validateResult, firstError }: SubmitContext) {
   if (validateResult === true) {
     buttonLoading.value = true;
     const msgLoading = proxy.$modal.msgLoading('提交中...');
-    const data = { ...form.value, configJson: JSON.stringify(form.value.configJson) };
+    form.value.configJson = JSON.stringify(form.value.configObject);
     if (form.value.messageConfigId) {
-      updateMessageConfig(data)
+      updateMessageConfig(form.value)
         .then(() => {
           proxy.$modal.msgSuccess('修改成功');
           open.value = false;
@@ -559,7 +534,7 @@ function submitForm({ validateResult, firstError }: SubmitContext) {
           proxy.$modal.msgClose(msgLoading);
         });
     } else {
-      addMessageConfig(data)
+      addMessageConfig(form.value)
         .then(() => {
           proxy.$modal.msgSuccess('新增成功');
           open.value = false;

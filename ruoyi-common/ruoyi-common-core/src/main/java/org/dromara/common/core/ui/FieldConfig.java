@@ -22,7 +22,9 @@ import java.util.List;
 public class FieldConfig<T> {
     /** 字段默认值 */
     private T value;
-    /** 字段名称 */
+    /** 标签 */
+    private String label;
+    /** 自定义字段名称，默认为对象的属性名称。可以使用.作为嵌套对象的属性，例如：items.item */
     private String name;
     /** 组件, 设置inputComponent、inputNumberComponent...等组件属性时，自动设置该值 */
     private String component;

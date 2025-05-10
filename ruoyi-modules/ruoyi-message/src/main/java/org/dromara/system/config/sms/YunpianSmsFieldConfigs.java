@@ -26,19 +26,19 @@ public class YunpianSmsFieldConfigs extends SupplierFieldConfigs {
     public YunpianSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
             .useInput()
-            .name("apikey")
+            .label("apikey")
             .help("账号唯一标识")
             .required(true)
             .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
             .useInput()
-            .name("默认短信签名")
+            .label("默认短信签名")
             .required(false)
             .build();
         this.callbackUrl = FieldConfig.<String>builder()
             .useInput()
-            .name("回调地址")
+            .label("回调地址")
             .help("云片官方回调地址，无需求可以不设置")
             .required(false)
             .build();

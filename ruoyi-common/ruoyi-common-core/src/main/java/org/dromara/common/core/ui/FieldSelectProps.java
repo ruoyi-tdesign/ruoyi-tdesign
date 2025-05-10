@@ -56,7 +56,7 @@ public class FieldSelectProps {
     /** 是否允许多选 */
     private Boolean multiple;
     /** 数据化配置选项内容。 */
-    private List<FieldOption<Object>> options;
+    private List<FieldOptionProps<Object>> options;
     /** 面板内的底部内容 */
     private String panelBottomContent;
     /** 面板内的顶部内容 */

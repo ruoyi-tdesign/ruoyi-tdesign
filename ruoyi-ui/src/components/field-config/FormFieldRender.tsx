@@ -33,12 +33,6 @@ export default defineComponent({
   props: FormFieldRenderProps,
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    onMounted(() => {
-      if (props.initValue && modelValue.value === undefined) {
-        modelValue.value = props.fieldConfig.value;
-      }
-    });
-
     const modelValue = computed({
       get() {
         if (props.fieldConfig.component === 'input') {
@@ -49,6 +43,12 @@ export default defineComponent({
       set(value) {
         emit('update:modelValue', value);
       },
+    });
+
+    onMounted(() => {
+      if (props.initValue) {
+        modelValue.value = props.fieldConfig.value;
+      }
     });
 
     return () => {
@@ -68,12 +68,11 @@ export default defineComponent({
        * 渲染组件
        */
       const renderComponent = () => {
-        console.log('渲染FormFieldRender组件');
         if (fieldConfig.component === 'input') {
           return (
             <Input
               v-model={modelValue.value}
-              placeholder={fieldConfig.placeholder ?? `请输入${fieldConfig.name}`}
+              placeholder={fieldConfig.placeholder ?? `请输入${fieldConfig.label}`}
               {...fieldConfig.inputProps}
             ></Input>
           );
@@ -94,10 +93,10 @@ export default defineComponent({
         return (
           <Col span={fieldConfig.span ?? 12}>
             <FormItem
-              label={fieldConfig.name}
+              label={fieldConfig.label}
               name={props.name}
               rules={[
-                { required: fieldConfig.required, message: `${fieldConfig.name}不能为空` },
+                { required: fieldConfig.required, message: `${fieldConfig.label}不能为空` },
                 ...(fieldConfig.rules ?? []),
               ]}
               help={() => renderHelp()}

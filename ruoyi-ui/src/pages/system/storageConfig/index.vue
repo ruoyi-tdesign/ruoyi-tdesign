@@ -163,25 +163,16 @@
             </t-col>
             <t-col :span="12">
               <t-form-item label="启用状态" name="status">
-                <t-select v-model="form.status" placeholder="请选择启用状态" clearable>
-                  <t-option
-                    v-for="dict in sys_normal_disable"
-                    :key="dict.value"
-                    :label="dict.label"
-                    :value="parseInt(dict.value)"
-                  />
-                </t-select>
+                <t-switch v-model="form.status" :custom-value="[1, 0]" />
               </t-form-item>
             </t-col>
-            <template v-for="(value, key) in currentStoragePlatformConfigs" :key="form.platform + key">
-              <form-field-render
-                v-model="form.configObject[key]"
-                :config-value="form.configObject"
-                :name="`configObject[${key}]`"
-                :field-config="value"
-                :init-value="!form.storageConfigId"
-              />
-            </template>
+            <form-field-renders
+              :key="form.storageConfigId"
+              v-model="form.configObject"
+              :configs="currentStoragePlatformConfigs"
+              name="configObject"
+              :form="form"
+            />
             <t-col :span="12">
               <t-form-item label="备注" name="remark">
                 <t-textarea v-model="form.remark" placeholder="请输入备注" />
@@ -197,13 +188,13 @@
       v-model:visible="openView"
       header="存储配置详情"
       placement="center"
-      width="min(700px, 100%)"
+      width="min(800px, 100%)"
       attach="body"
       :footer="false"
     >
       <field-descriptions
         :loading="openViewLoading"
-        :config-value="form.configObject"
+        :config-value="form.configJson"
         :field-configs="currentStoragePlatformConfigs"
       >
         <template #prefix>
@@ -259,7 +250,7 @@ import {
   listStorageConfig,
   updateStorageConfig,
 } from '@/api/system/storageConfig';
-import FormFieldRender from '@/components/field-config/FormFieldRender';
+import FormFieldRenders from '@/components/field-config/FormFieldRenders';
 import { ArrayOps } from '@/utils/array';
 
 const { proxy } = getCurrentInstance();
@@ -421,6 +412,7 @@ function handleUpdate(row?: SysStorageConfigVo) {
   getStorageConfig(storageConfigId).then((response) => {
     buttonLoading.value = false;
     form.value = response.data;
+    form.value.configObject = JSON.parse(form.value.configJson);
   });
 }
 

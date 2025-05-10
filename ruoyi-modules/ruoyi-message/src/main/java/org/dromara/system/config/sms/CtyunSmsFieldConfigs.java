@@ -23,33 +23,33 @@ public class CtyunSmsFieldConfigs extends SignatureSmsFieldConfigs {
     public CtyunSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
             .useInput()
-            .name("accessKey")
+            .label("accessKey")
             .help("天翼云的accessKey")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
             .useInput()
-            .name("accessKeySecret")
+            .label("accessKeySecret")
             .help("天翼云的accessKeySecret")
             .required(true)
             .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
             .useInput()
-            .name("默认短信签名")
+            .label("默认短信签名")
             .required(true)
             .build();
         this.requestUrl = FieldConfig.<String>builder()
             .value("https://sms-global.ctapi.ctyun.cn/sms/api/v1")
             .useInput()
-            .name("请求地址")
+            .label("请求地址")
             .help("请求地址默认为 https://sms-global.ctapi.ctyun.cn/sms/api/v1 如无特殊改变可以不用设置")
             .required(true)
             .build();
         this.action = FieldConfig.<String>builder()
             .value("SendSms")
             .useInput()
-            .name("接口方法")
+            .label("接口方法")
             .help("接口方法默认为 SendSms 如无特殊改变可以不用设置")
             .required(true)
             .build();

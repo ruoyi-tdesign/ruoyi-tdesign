@@ -1,9 +1,12 @@
 package org.dromara.system.service.impl;
 
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.storage.config.StorageConfigData;
+import org.dromara.common.storage.config.StorageFieldConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.dromara.system.domain.SysStorageConfig;
@@ -67,6 +70,7 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean insertByBo(SysStorageConfigBo bo) {
+        validateConfig(bo);
         SysStorageConfig add = MapstructUtils.convert(bo, SysStorageConfig.class);
         return save(add);
     }
@@ -80,8 +84,16 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(SysStorageConfigBo bo) {
+        validateConfig(bo);
         SysStorageConfig update = MapstructUtils.convert(bo, SysStorageConfig.class);
         return updateById(update);
+    }
+
+    private static void validateConfig(SysStorageConfigBo bo) {
+        StorageFieldConfig storageConfig = StorageConfigData.getStorageConfig(bo.getPlatform());
+        if (storageConfig == null) {
+            throw new ServiceException("平台配置不存在！");
+        }
     }
 
     /**

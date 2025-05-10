@@ -25,37 +25,37 @@ public class HuaweiSmsFieldConfigs extends SignatureSmsFieldConfigs {
     public HuaweiSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
             .useInput()
-            .name("appkey")
+            .label("appkey")
             .help("华为短信应用appkey")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
             .useInput()
-            .name("appSecret")
+            .label("appSecret")
             .help("华为云的appSecret")
             .required(true)
             .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
             .useInput()
-            .name("默认短信签名")
+            .label("默认短信签名")
             .required(true)
             .build();
         this.sender = FieldConfig.<String>builder()
             .useInput()
-            .name("短信签名通道号")
+            .label("短信签名通道号")
             .required(true)
             .build();
         this.statusCallBack = FieldConfig.<String>builder()
             .useInput()
-            .name("短信状态回调")
+            .label("短信状态回调")
             .help("华为云国内短信状态报告接收地址")
             .required(false)
             .build();
         this.url = FieldConfig.<String>builder()
             .value("https://smsapi.cn-xxxxx-4.myhuaweicloud.com:443")
             .useInput()
-            .name("APP接入地址")
+            .label("APP接入地址")
             .help("APP接入地址 建立短信应用后获取到的地址")
             .required(true)
             .build();

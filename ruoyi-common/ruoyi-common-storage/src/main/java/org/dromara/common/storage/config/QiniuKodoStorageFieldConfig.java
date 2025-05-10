@@ -25,29 +25,29 @@ public class QiniuKodoStorageFieldConfig implements StorageFieldConfig {
     public QiniuKodoStorageFieldConfig() {
         this.accessKey = FieldConfig.<String>builder()
             .useInput()
-            .name("accessKey")
+            .label("accessKey")
             .required(true)
             .build();
         this.secretKey = FieldConfig.<String>builder()
             .useInput()
-            .name("secretKey")
+            .label("secretKey")
             .required(true)
             .inputComponent().type("password").end()
             .build();
         this.bucketName = FieldConfig.<String>builder()
             .useInput()
-            .name("存储空间名")
+            .label("存储空间名")
             .required(true)
             .build();
         this.domain = FieldConfig.<String>builder()
             .useInput()
             .value("")
-            .name("访问域名")
+            .label("访问域名")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()
             .useInput()
-            .name("基础路径")
+            .label("基础路径")
             .required(false)
             .build();
     }

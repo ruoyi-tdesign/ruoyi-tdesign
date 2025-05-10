@@ -45,8 +45,10 @@ export interface SysMessageConfigVo {
   messageType?: string;
   /** 支持平台标识 */
   supplierType?: string;
+  /** 配置object */
+  configObject?: Record<string, any>;
   /** 配置json */
-  configJson?: string | object;
+  configJson?: string;
   /** 状态（1正常 0停用） */
   status?: number;
   /** 备注 */

@@ -21,13 +21,13 @@ public class DingZhongSmsFieldConfigs extends SmsFieldConfigs {
     public DingZhongSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
             .useInput()
-            .name("cdkey")
+            .label("cdkey")
             .help("短信帐号")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
             .useInput()
-            .name("password")
+            .label("password")
             .help("密码")
             .required(true)
             .inputComponent().type("password").end()
@@ -35,7 +35,7 @@ public class DingZhongSmsFieldConfigs extends SmsFieldConfigs {
         this.requestUrl = FieldConfig.<String>builder()
             .value("http://demoapi.321sms.com:8201")
             .useInput()
-            .name("请求地址")
+            .label("请求地址")
             .help("短信发送请求地址： （演示及测试域名：http://demoapi.321sms.com:8201；正式域名：http://api.321sms.com）")
             .required(true)
             .build();

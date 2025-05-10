@@ -34,4 +34,13 @@ public class StorageConfigData {
         STORAGE_CONFIG_MAP.put(StorageEnum.AZURE_BLOB_STORAGE.getCode(), new AzureBlobStorageFieldConfig());
     }
 
+    /**
+     * 获取存储配置
+     *
+     * @param platform 平台
+     */
+    public static StorageFieldConfig getStorageConfig(String platform) {
+        return STORAGE_CONFIG_MAP.get(platform);
+    }
+
 }
