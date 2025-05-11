@@ -2,6 +2,10 @@ package org.dromara.common.storage.config;
 
 import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
+
+import java.util.Collections;
 
 /**
  * WebDav字段配置
@@ -59,5 +63,14 @@ public class WebDavStorageFieldConfig implements StorageFieldConfig {
             .label("访问域名")
             .required(false)
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        FileStorageProperties.WebDavConfig webDavConfig = JsonUtils.parseObject(json, FileStorageProperties.WebDavConfig.class);
+        webDavConfig.setPlatform(properties.getDefaultPlatform());
+        properties.setWebdav(Collections.singletonList(webDavConfig));
+        return properties;
     }
 }

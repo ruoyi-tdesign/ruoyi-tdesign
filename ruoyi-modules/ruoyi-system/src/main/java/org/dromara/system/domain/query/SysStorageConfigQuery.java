@@ -18,6 +18,11 @@ import org.dromara.common.mybatis.core.domain.BasePageQuery;
 public class SysStorageConfigQuery extends BasePageQuery {
 
     /**
+     * 配置名称
+     */
+    private String name;
+
+    /**
      * 平台
      */
     private String platform;

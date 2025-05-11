@@ -1,20 +1,20 @@
 package org.dromara.system.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.core.page.PageQuery;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.storage.config.StorageConfigData;
 import org.dromara.common.storage.config.StorageFieldConfig;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.dromara.system.domain.SysStorageConfig;
 import org.dromara.system.domain.bo.SysStorageConfigBo;
 import org.dromara.system.domain.query.SysStorageConfigQuery;
 import org.dromara.system.domain.vo.SysStorageConfigVo;
 import org.dromara.system.mapper.SysStorageConfigMapper;
 import org.dromara.system.service.ISysStorageConfigService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -106,5 +106,19 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
         return removeByIds(ids);
+    }
+
+    /**
+     * 修改状态
+     *
+     * @param storageConfigId 主键
+     * @param status          状态
+     */
+    @Override
+    public boolean updateConfigStatus(Long storageConfigId, Integer status) {
+        return lambdaUpdate()
+            .set(SysStorageConfig::getStatus, status)
+            .eq(SysStorageConfig::getStorageConfigId, storageConfigId)
+            .update();
     }
 }

@@ -1,16 +1,15 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.system.domain.SysStorageConfig;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import io.github.linpeilie.annotations.AutoMapper;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
+import org.dromara.common.core.validate.StatusGroup;
+import org.dromara.system.domain.SysStorageConfig;
 import org.hibernate.validator.constraints.Length;
-import io.github.linpeilie.annotations.AutoMapper;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
 
-import java.util.Date;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -30,8 +29,14 @@ public class SysStorageConfigBo implements Serializable {
     /**
      * 主建
      */
-    @NotNull(message = "主建不能为空", groups = {EditGroup.class})
+    @NotNull(message = "主建不能为空", groups = {EditGroup.class, StatusGroup.class})
     private Long storageConfigId;
+    /**
+     * 配置名称
+     */
+    @NotBlank(message = "配置名称不能为空", groups = {AddGroup.class, EditGroup.class})
+    @Length(max = 255, message = "配置名称不能大于{max}个字符", groups = {AddGroup.class, EditGroup.class})
+    private String name;
     /**
      * 平台
      */
@@ -46,7 +51,7 @@ public class SysStorageConfigBo implements Serializable {
     /**
      * 启用状态
      */
-    @NotNull(message = "启用状态不能为空", groups = {AddGroup.class, EditGroup.class})
+    @NotNull(message = "启用状态不能为空", groups = {AddGroup.class, EditGroup.class, StatusGroup.class})
     private Integer status;
     /**
      * 配置json

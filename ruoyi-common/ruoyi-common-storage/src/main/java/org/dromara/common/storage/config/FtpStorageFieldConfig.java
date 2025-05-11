@@ -2,8 +2,11 @@ package org.dromara.common.storage.config;
 
 import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 /**
  * Ftp字段配置
@@ -132,5 +135,14 @@ public class FtpStorageFieldConfig implements StorageFieldConfig {
             .label("访问域名")
             .required(false)
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        FileStorageProperties.FtpConfig ftpConfig = JsonUtils.parseObject(json, FileStorageProperties.FtpConfig.class);
+        ftpConfig.setPlatform(properties.getDefaultPlatform());
+        properties.setFtp(Collections.singletonList(ftpConfig));
+        return properties;
     }
 }

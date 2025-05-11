@@ -1,11 +1,19 @@
 package org.dromara.common.storage.config;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Dict;
 import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.core.ui.FieldOption;
+import org.dromara.common.core.utils.StreamUtils;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * AzureBlob字段配置
@@ -111,12 +119,31 @@ public class AzureBlobStorageFieldConfig implements StorageFieldConfig {
             .label("权限映射表")
             .help("预签名 URL 时，传入的 HTTP method 与 Azure Blob Storage 中的 SAS 权限映射表<br/>目前默认支持 GET （获取），PUT（上传），DELETE（删除）")
             .selectComponent().options(List.of(
-                new FieldOption<>("GET", "GET"),
-                new FieldOption<>("PUT", "PUT"),
-                new FieldOption<>("DELETE", "DELETE"),
-                new FieldOption<>("ALL", "ALL")
+                new FieldOption<>("GET", "GET,r"),
+                new FieldOption<>("PUT", "PUT,w"),
+                new FieldOption<>("DELETE", "DELETE,d"),
+                new FieldOption<>("ALL", "ALL,racwdxytlmei")
             ))
+            .multiple(true)
             .end()
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        Dict dict = JsonUtils.parseMap(json);
+        FileStorageProperties.AzureBlobStorageConfig azureBlobStorageConfig =
+            BeanUtil.copyProperties(dict, FileStorageProperties.AzureBlobStorageConfig.class, "methodToPermissionMap");
+
+        // 处理methodToPermissionMap字段转换
+        ArrayList<String> methodToPermissionList = dict.get("methodToPermissionMap", new ArrayList<>());
+        Map<String, String> map = StreamUtils.toMap(methodToPermissionList,
+            s -> s.split(",")[0], s -> s.split(",")[1]);
+        azureBlobStorageConfig.setMethodToPermissionMap(map);
+
+        azureBlobStorageConfig.setPlatform(properties.getDefaultPlatform());
+        properties.setAzureBlob(Collections.singletonList(azureBlobStorageConfig));
+        return properties;
     }
 }

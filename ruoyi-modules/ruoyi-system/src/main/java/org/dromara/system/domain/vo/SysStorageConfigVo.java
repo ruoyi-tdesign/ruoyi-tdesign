@@ -32,6 +32,12 @@ public class SysStorageConfigVo implements Serializable {
     private Long storageConfigId;
 
     /**
+     * 配置名称
+     */
+    @ExcelProperty(value = "配置名称")
+    private String name;
+
+    /**
      * 平台
      */
     @ExcelProperty(value = "平台")

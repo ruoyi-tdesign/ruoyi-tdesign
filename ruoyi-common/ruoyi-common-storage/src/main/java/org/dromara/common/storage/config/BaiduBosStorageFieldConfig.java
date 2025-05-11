@@ -3,8 +3,11 @@ package org.dromara.common.storage.config;
 import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.core.ui.FieldOption;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -90,5 +93,14 @@ public class BaiduBosStorageFieldConfig implements StorageFieldConfig {
             .help("自动分片上传时每个分片大小，默认 32MB")
             .required(true)
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        FileStorageProperties.BaiduBosConfig baiduBosConfig = JsonUtils.parseObject(json, FileStorageProperties.BaiduBosConfig.class);
+        baiduBosConfig.setPlatform(properties.getDefaultPlatform());
+        properties.setBaiduBos(Collections.singletonList(baiduBosConfig));
+        return properties;
     }
 }

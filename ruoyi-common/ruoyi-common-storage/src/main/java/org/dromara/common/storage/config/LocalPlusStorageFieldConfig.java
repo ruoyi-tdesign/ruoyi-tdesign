@@ -2,6 +2,10 @@ package org.dromara.common.storage.config;
 
 import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
+
+import java.util.Collections;
 
 /**
  * 本地存储升级版字段配置
@@ -36,5 +40,15 @@ public class LocalPlusStorageFieldConfig implements StorageFieldConfig {
             .label("访问域名")
             .required(false)
             .build();
+    }
+
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        FileStorageProperties.LocalPlusConfig localPlusConfig = JsonUtils.parseObject(json, FileStorageProperties.LocalPlusConfig.class);
+        localPlusConfig.setPlatform(properties.getDefaultPlatform());
+        properties.setLocalPlus(Collections.singletonList(localPlusConfig));
+        return properties;
     }
 }

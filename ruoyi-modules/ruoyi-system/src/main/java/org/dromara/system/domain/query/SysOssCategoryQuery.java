@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.core.validate.QueryOneGroup;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.common.mybatis.core.domain.BasePageQuery;
 
 /**
  * OSS分类查询对象 sys_oss_category
@@ -14,7 +14,7 @@ import org.dromara.common.mybatis.core.domain.BaseEntity;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SysOssCategoryQuery extends BaseEntity {
+public class SysOssCategoryQuery extends BasePageQuery {
 
     /**
      * 分类名称

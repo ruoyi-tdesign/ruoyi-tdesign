@@ -33,6 +33,11 @@ public class SysStorageConfig implements Serializable {
     private String tenantId;
 
     /**
+     * 配置名称
+     */
+    private String name;
+
+    /**
      * 平台
      */
     private String platform;

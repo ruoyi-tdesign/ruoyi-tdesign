@@ -2,6 +2,10 @@ package org.dromara.common.storage.config;
 
 import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
+
+import java.util.Collections;
 
 /**
  * 又拍云 USS 字段配置
@@ -63,5 +67,14 @@ public class UpyunUssStorageFieldConfig implements StorageFieldConfig {
             .help("手动分片上传时，每个分片大小，单位字节，最小 1MB，最大 50MB，必须是 1MB 的整数倍，默认 1MB。")
             .required(true)
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        FileStorageProperties.UpyunUssConfig upyunUssConfig = JsonUtils.parseObject(json, FileStorageProperties.UpyunUssConfig.class);
+        upyunUssConfig.setPlatform(properties.getDefaultPlatform());
+        properties.setUpyunUss(Collections.singletonList(upyunUssConfig));
+        return properties;
     }
 }

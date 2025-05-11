@@ -1,11 +1,11 @@
 package org.dromara.system.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.system.domain.SysStorageConfig;
 import org.dromara.system.domain.bo.SysStorageConfigBo;
 import org.dromara.system.domain.query.SysStorageConfigQuery;
 import org.dromara.system.domain.vo.SysStorageConfigVo;
-import com.baomidou.mybatisplus.extension.service.IService;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -65,4 +65,12 @@ public interface ISysStorageConfigService extends IService<SysStorageConfig> {
      * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<Long> ids);
+
+    /**
+     * 修改状态
+     *
+     * @param storageConfigId 主键
+     * @param status          状态
+     */
+    boolean updateConfigStatus(Long storageConfigId, Integer status);
 }

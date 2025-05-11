@@ -4,8 +4,11 @@ import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.core.ui.FieldOption;
 import org.dromara.common.core.ui.FieldOptionGroup;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -97,5 +100,14 @@ public class TencentCosStorageFieldConfig implements StorageFieldConfig {
             .help("自动分片上传时每个分片大小，默认 32MB")
             .required(true)
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        FileStorageProperties.TencentCosConfig tencentCosConfig = JsonUtils.parseObject(json, FileStorageProperties.TencentCosConfig.class);
+        tencentCosConfig.setPlatform(properties.getDefaultPlatform());
+        properties.setTencentCos(Collections.singletonList(tencentCosConfig));
+        return properties;
     }
 }

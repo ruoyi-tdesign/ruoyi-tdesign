@@ -4,6 +4,8 @@ import type { BaseEntity } from '@/api/model/resultModel';
  * 存储配置查询对象
  */
 export interface SysStorageConfigQuery extends BaseEntity {
+  /** 配置名称 */
+  name?: string;
   /** 平台 */
   platform?: string;
   /** 启用状态 */
@@ -15,6 +17,8 @@ export interface SysStorageConfigQuery extends BaseEntity {
 export interface SysStorageConfigForm {
   /** 主建 */
   storageConfigId?: number;
+  /** 配置名称 */
+  name?: string;
   /** 平台 */
   platform?: string;
   /** 负载均衡权重 */
@@ -34,6 +38,8 @@ export interface SysStorageConfigForm {
 export interface SysStorageConfigVo {
   /** 主建 */
   storageConfigId?: number;
+  /** 配置名称 */
+  name?: string;
   /** 平台 */
   platform?: string;
   /** 负载均衡权重 */

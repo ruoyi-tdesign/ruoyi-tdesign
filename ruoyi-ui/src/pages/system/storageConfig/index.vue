@@ -9,10 +9,11 @@
         reset-type="initial"
         label-width="calc(4em + 12px)"
       >
+        <t-form-item label="配置名称" name="name">
+          <t-input v-model="queryParams.name" placeholder="请输入配置名称" clearable @enter="handleQuery" />
+        </t-form-item>
         <t-form-item label="平台" name="platform">
-          <t-select v-model="queryParams.platform" placeholder="请选择平台" clearable>
-            <t-option label="请选择字典生成" value="" />
-          </t-select>
+          <t-select v-model="queryParams.platform" :options="allStoragePlatform" placeholder="请选择平台" clearable />
         </t-form-item>
         <t-form-item label="启用状态" name="status">
           <t-select v-model="queryParams.status" placeholder="请选择启用状态" clearable>
@@ -99,7 +100,13 @@
           <dict-tag :options="allStoragePlatform" :value="row.platform" />
         </template>
         <template #status="{ row }">
-          <dict-tag :options="sys_normal_disable" :value="row.status" />
+          <t-switch
+            v-model="row.status"
+            :custom-value="[1, 0]"
+            :disabled="!proxy.$auth.hasPermi('system:storageConfig:edit')"
+            @change="handleStatusChange(row)"
+            @click.stop
+          ></t-switch>
         </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
@@ -147,12 +154,17 @@
           @submit="submitForm"
         >
           <t-row :gutter="[0, 20]">
-            <t-col :span="12">
+            <t-col :span="6">
+              <t-form-item label="配置名称" name="name">
+                <t-input v-model="form.name" placeholder="请输入配置名称" clearable />
+              </t-form-item>
+            </t-col>
+            <t-col :span="6">
               <t-form-item label="平台" name="platform">
                 <t-select v-model="form.platform" :options="supportPlatform" placeholder="请选择平台" clearable />
               </t-form-item>
             </t-col>
-            <t-col :span="12">
+            <t-col :span="6">
               <t-form-item
                 label="负载均衡权重"
                 name="weight"
@@ -161,7 +173,7 @@
                 <t-input-number v-model="form.weight" placeholder="请输入" />
               </t-form-item>
             </t-col>
-            <t-col :span="12">
+            <t-col :span="6">
               <t-form-item label="启用状态" name="status">
                 <t-switch v-model="form.status" :custom-value="[1, 0]" />
               </t-form-item>
@@ -199,6 +211,7 @@
       >
         <template #prefix>
           <t-descriptions-item label="主建">{{ form.storageConfigId }}</t-descriptions-item>
+          <t-descriptions-item label="配置名称">{{ form.name }}</t-descriptions-item>
           <t-descriptions-item label="平台">
             <dict-tag :options="allStoragePlatform" :value="form.platform" />
           </t-descriptions-item>
@@ -249,9 +262,11 @@ import {
   getSupportPlatform,
   listStorageConfig,
   updateStorageConfig,
+  updateStorageStatus,
 } from '@/api/system/storageConfig';
 import FormFieldRenders from '@/components/field-config/FormFieldRenders';
 import { ArrayOps } from '@/utils/array';
+import { handleChangeStatus } from '@/utils/ruoyi';
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
@@ -282,6 +297,10 @@ const currentStoragePlatformConfigs = computed(() => {
 });
 // 校验规则
 const rules = ref<Record<string, Array<FormRule>>>({
+  name: [
+    { required: true, message: '配置名称不能为空' },
+    { max: 255, message: '配置名称不能超过255个字符' },
+  ],
   platform: [
     { required: true, message: '平台不能为空' },
     { max: 50, message: '平台不能超过50个字符' },
@@ -294,6 +313,7 @@ const rules = ref<Record<string, Array<FormRule>>>({
 // 列显隐信息
 const columns = ref<Array<PrimaryTableCol>>([
   { title: `选择列`, colKey: 'row-select', type: 'multiple', width: 50, align: 'center' },
+  { title: `配置名称`, colKey: 'name', align: 'center' },
   { title: `平台`, colKey: 'platform', align: 'center' },
   { title: `负载均衡权重`, colKey: 'weight', align: 'center' },
   { title: `启用状态`, colKey: 'status', align: 'center' },
@@ -310,6 +330,7 @@ const form = ref<SysStorageConfigVo & SysStorageConfigForm>({
 const queryParams = ref<SysStorageConfigQuery>({
   pageNum: 1,
   pageSize: 10,
+  name: undefined,
   platform: undefined,
   status: undefined,
 });
@@ -465,6 +486,13 @@ function handleDelete(row?: SysStorageConfigVo) {
         proxy.$modal.msgClose(msgLoading);
       });
   });
+}
+
+/** 状态修改  */
+function handleStatusChange(row: SysStorageConfigVo) {
+  handleChangeStatus(storageConfigList.value, row, 'storageConfigId', 'status', `${row.name}配置`, (config) =>
+    updateStorageStatus(config.storageConfigId, config.status).then(() => getList()),
+  );
 }
 
 /** 导出按钮操作 */

@@ -4,8 +4,11 @@ import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.core.ui.FieldOption;
 import org.dromara.common.core.ui.FieldOptionGroup;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -82,7 +85,7 @@ public class AmazonS3StorageFieldConfig implements StorageFieldConfig {
                     new FieldOption<>("私有", "private"),
                     new FieldOption<>("公共读", "public-read"),
                     new FieldOption<>("公共读写", "public-read-write")
-                    )),
+                )),
                 new FieldOptionGroup<>("AwsS3 ACL", List.of(
                     new FieldOption<>("authenticated-read", "authenticated-read"),
                     new FieldOption<>("log-delivery-write", "log-delivery-write"),
@@ -106,5 +109,14 @@ public class AmazonS3StorageFieldConfig implements StorageFieldConfig {
             .help("自动分片上传时每个分片大小，默认 32MB")
             .required(true)
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        FileStorageProperties.AmazonS3Config amazonS3Config = JsonUtils.parseObject(json, FileStorageProperties.AmazonS3Config.class);
+        amazonS3Config.setPlatform(properties.getDefaultPlatform());
+        properties.setAmazonS3(Collections.singletonList(amazonS3Config));
+        return properties;
     }
 }

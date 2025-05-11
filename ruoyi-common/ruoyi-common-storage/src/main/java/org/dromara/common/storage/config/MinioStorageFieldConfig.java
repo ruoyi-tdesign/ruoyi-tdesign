@@ -2,6 +2,10 @@ package org.dromara.common.storage.config;
 
 import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
+
+import java.util.Collections;
 
 /**
  * MinIO字段配置
@@ -79,5 +83,14 @@ public class MinioStorageFieldConfig implements StorageFieldConfig {
             .help("自动分片上传时每个分片大小，默认 32MB")
             .required(true)
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        FileStorageProperties.MinioConfig minioConfig = JsonUtils.parseObject(json, FileStorageProperties.MinioConfig.class);
+        minioConfig.setPlatform(properties.getDefaultPlatform());
+        properties.setMinio(Collections.singletonList(minioConfig));
+        return properties;
     }
 }

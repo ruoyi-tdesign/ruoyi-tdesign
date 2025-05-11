@@ -67,6 +67,21 @@ export function delStorageConfig(storageConfigIds: number | Array<number>) {
 }
 
 /**
+ * 修改存储配置状态值
+ * @param storageConfigId
+ * @param status
+ */
+export function updateStorageStatus(storageConfigId: number, status: number) {
+  return request.put<R>({
+    url: '/system/storageConfig/changeStatus',
+    data: {
+      storageConfigId,
+      status,
+    },
+  });
+}
+
+/**
  * 获取所有存储平台
  */
 export function getAllStoragePlatform() {

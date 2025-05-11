@@ -9,6 +9,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.ui.FieldOption;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
+import org.dromara.common.core.validate.StatusGroup;
 import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
@@ -107,6 +108,16 @@ public class SysStorageConfigController extends BaseController {
     @DeleteMapping("/{storageConfigIds}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空") @PathVariable Long[] storageConfigIds) {
         return toAjax(sysStorageConfigService.deleteWithValidByIds(List.of(storageConfigIds)));
+    }
+
+    /**
+     * 状态修改
+     */
+    @SaCheckPermission("system:storageConfig:edit")
+    @Log(title = "状态修改", businessType = BusinessType.UPDATE)
+    @PutMapping("/changeStatus")
+    public R<Void> changeStatus(@Validated(StatusGroup.class) @RequestBody SysStorageConfigBo bo) {
+        return toAjax(sysStorageConfigService.updateConfigStatus(bo.getStorageConfigId(), bo.getStatus()));
     }
 
     /**

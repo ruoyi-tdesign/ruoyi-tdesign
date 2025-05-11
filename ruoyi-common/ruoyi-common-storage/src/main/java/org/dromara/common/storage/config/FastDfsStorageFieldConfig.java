@@ -3,7 +3,10 @@ package org.dromara.common.storage.config;
 import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.core.ui.FieldOption;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -76,14 +79,14 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
             .build();
         this.trackerServerAddr = FieldConfig.<String>builder()
             .useInput()
-            .name("trackerServer.trackerServerAddr")
+            .name("trackerServer.serverAddr")
             .label("Tracker Server 地址")
             .help("Tracker Server 地址（IP:PORT），多个用英文逗号隔开")
             .required(false)
             .build();
         this.trackerHttpPort = FieldConfig.<Integer>builder()
             .useInputNumber()
-            .name("trackerServer.trackerHttpPort")
+            .name("trackerServer.httpPort")
             .value(80)
             .label("Tracker HTTP端口")
             .help("Tracker HTTP端口，默认：80")
@@ -91,14 +94,14 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
             .build();
         this.storageServerAddr = FieldConfig.<String>builder()
             .useInput()
-            .name("storageServer.storageServerAddr")
+            .name("storageServer.serverAddr")
             .label("Storage Server 地址")
             .help("Storage Server 地址:IP:PORT（当不使用 Tracker Server 时使用）")
             .required(false)
             .build();
         this.storageStorePath = FieldConfig.<Integer>builder()
             .useInputNumber()
-            .name("storageServer.storageStorePath")
+            .name("storageServer.storePath")
             .value(0)
             .label("Store path")
             .help("Store path，默认 0（当不使用 Tracker Server 时使用）")
@@ -213,5 +216,14 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
             .help("自动分片上传时每个分片大小，默认 32MB")
             .required(true)
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        FileStorageProperties properties = new FileStorageProperties();
+        FileStorageProperties.FastDfsConfig fastDfsConfig = JsonUtils.parseObject(json, FileStorageProperties.FastDfsConfig.class);
+        fastDfsConfig.setPlatform(properties.getDefaultPlatform());
+        properties.setFastdfs(Collections.singletonList(fastDfsConfig));
+        return properties;
     }
 }

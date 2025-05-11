@@ -2,6 +2,7 @@ package org.dromara.common.storage.config;
 
 import lombok.Data;
 import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.x.file.storage.core.FileStorageProperties;
 
 /**
  * 七牛云 Kodo 字段配置
@@ -50,5 +51,10 @@ public class QiniuKodoStorageFieldConfig implements StorageFieldConfig {
             .label("基础路径")
             .required(false)
             .build();
+    }
+
+    @Override
+    public FileStorageProperties buildStorageProperties(String json) {
+        return null;
     }
 }
