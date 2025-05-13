@@ -96,10 +96,9 @@ public class BaiduBosStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.BaiduBosConfig baiduBosConfig = JsonUtils.parseObject(json, FileStorageProperties.BaiduBosConfig.class);
-        baiduBosConfig.setPlatform(properties.getDefaultPlatform());
+        baiduBosConfig.setPlatform(platform);
         properties.setBaiduBos(Collections.singletonList(baiduBosConfig));
         return properties;
     }

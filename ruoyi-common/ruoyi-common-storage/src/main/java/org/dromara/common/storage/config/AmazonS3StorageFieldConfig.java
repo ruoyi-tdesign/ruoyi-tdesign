@@ -112,10 +112,9 @@ public class AmazonS3StorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.AmazonS3Config amazonS3Config = JsonUtils.parseObject(json, FileStorageProperties.AmazonS3Config.class);
-        amazonS3Config.setPlatform(properties.getDefaultPlatform());
+        amazonS3Config.setPlatform(platform);
         properties.setAmazonS3(Collections.singletonList(amazonS3Config));
         return properties;
     }

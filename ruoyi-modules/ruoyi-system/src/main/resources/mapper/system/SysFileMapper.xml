@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.system.mapper.SysFileMapper">
+
+    <resultMap id="SysFileResult" autoMapping="true" type="org.dromara.system.domain.SysFile">
+        <id property="fileId" column="file_id"/>
+    </resultMap>
+    <resultMap id="SysFileResultVo" autoMapping="true" type="org.dromara.system.domain.vo.SysFileVo">
+        <id property="fileId" column="file_id"/>
+    </resultMap>
+
+    <sql id="selectSysFileVo">
+        select sf.file_id, sf.url, sf.size, sf.filename, sf.original_filename, sf.base_path, sf.path, sf.ext, sf.content_type, sf.storage_config_id, sf.th_url, sf.th_filename, sf.th_size, sf.th_content_type, sf.object_id, sf.object_type, sf.metadata, sf.user_metadata, sf.th_metadata, sf.th_user_metadata, sf.attr, sf.file_acl, sf.th_file_acl, sf.hash_info, sf.upload_id, sf.upload_status, sf.file_category_id, sf.user_type, sf.is_lock, sf.create_dept, sf.update_by, sf.create_by, sf.update_time, sf.create_time from sys_file sf
+    </sql>
+    <select id="queryList" parameterType="org.dromara.system.domain.query.SysFileQuery" resultMap="SysFileResultVo">
+        <include refid="selectSysFileVo"/>
+        <where>
+            <if test="filename != null and filename != ''"> and sf.filename like concat(concat('%', #{filename}), '%')</if>
+            <if test="originalFilename != null and originalFilename != ''"> and sf.original_filename like concat(concat('%', #{originalFilename}), '%')</if>
+            <if test="basePath != null and basePath != ''"> and sf.base_path = #{basePath}</if>
+            <if test="path != null and path != ''"> and sf.path = #{path}</if>
+            <if test="ext != null and ext != ''"> and sf.ext = #{ext}</if>
+            <if test="contentType != null and contentType != ''"> and sf.content_type = #{contentType}</if>
+            <if test="fileAcl != null and fileAcl != ''"> and sf.file_acl = #{fileAcl}</if>
+            <if test="fileCategoryId != null"> and sf.file_category_id = #{fileCategoryId}</if>
+            <if test="userType != null and userType != ''"> and sf.user_type = #{userType}</if>
+            <if test="isLock != null"> and sf.is_lock = #{isLock}</if>
+        </where>
+    </select>
+
+</mapper>

@@ -130,8 +130,7 @@ public class AzureBlobStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         Dict dict = JsonUtils.parseMap(json);
         FileStorageProperties.AzureBlobStorageConfig azureBlobStorageConfig =
             BeanUtil.copyProperties(dict, FileStorageProperties.AzureBlobStorageConfig.class, "methodToPermissionMap");
@@ -142,7 +141,7 @@ public class AzureBlobStorageFieldConfig implements StorageFieldConfig {
             s -> s.split(",")[0], s -> s.split(",")[1]);
         azureBlobStorageConfig.setMethodToPermissionMap(map);
 
-        azureBlobStorageConfig.setPlatform(properties.getDefaultPlatform());
+        azureBlobStorageConfig.setPlatform(platform);
         properties.setAzureBlob(Collections.singletonList(azureBlobStorageConfig));
         return properties;
     }

@@ -70,10 +70,9 @@ public class UpyunUssStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.UpyunUssConfig upyunUssConfig = JsonUtils.parseObject(json, FileStorageProperties.UpyunUssConfig.class);
-        upyunUssConfig.setPlatform(properties.getDefaultPlatform());
+        upyunUssConfig.setPlatform(platform);
         properties.setUpyunUss(Collections.singletonList(upyunUssConfig));
         return properties;
     }

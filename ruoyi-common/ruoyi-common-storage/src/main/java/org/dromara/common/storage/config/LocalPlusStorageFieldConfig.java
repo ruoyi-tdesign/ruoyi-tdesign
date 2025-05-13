@@ -44,10 +44,9 @@ public class LocalPlusStorageFieldConfig implements StorageFieldConfig {
 
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.LocalPlusConfig localPlusConfig = JsonUtils.parseObject(json, FileStorageProperties.LocalPlusConfig.class);
-        localPlusConfig.setPlatform(properties.getDefaultPlatform());
+        localPlusConfig.setPlatform(platform);
         properties.setLocalPlus(Collections.singletonList(localPlusConfig));
         return properties;
     }

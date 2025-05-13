@@ -82,10 +82,9 @@ public class GoogleCloudStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.GoogleCloudStorageConfig googleCloudStorageConfig = JsonUtils.parseObject(json, FileStorageProperties.GoogleCloudStorageConfig.class);
-        googleCloudStorageConfig.setPlatform(properties.getDefaultPlatform());
+        googleCloudStorageConfig.setPlatform(platform);
         properties.setGoogleCloudStorage(Collections.singletonList(googleCloudStorageConfig));
         return properties;
     }

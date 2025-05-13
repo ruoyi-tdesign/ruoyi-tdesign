@@ -86,10 +86,9 @@ public class MinioStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.MinioConfig minioConfig = JsonUtils.parseObject(json, FileStorageProperties.MinioConfig.class);
-        minioConfig.setPlatform(properties.getDefaultPlatform());
+        minioConfig.setPlatform(platform);
         properties.setMinio(Collections.singletonList(minioConfig));
         return properties;
     }

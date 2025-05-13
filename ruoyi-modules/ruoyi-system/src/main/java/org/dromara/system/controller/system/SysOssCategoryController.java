@@ -52,7 +52,7 @@ public class SysOssCategoryController extends BaseController {
     /**
      * 获取OSS分类详细信息
      *
-     * @param query 主键
+     * @param query 查询对象
      */
     @SaCheckPermission(value = {"system:ossCategory:query", "system:ossCategory:edit"}, mode = SaMode.OR)
     @GetMapping("/query")

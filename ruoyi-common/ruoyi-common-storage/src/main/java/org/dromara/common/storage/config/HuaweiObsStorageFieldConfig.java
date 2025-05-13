@@ -109,10 +109,9 @@ public class HuaweiObsStorageFieldConfig implements StorageFieldConfig {
 
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.HuaweiObsConfig huaweiObsConfig = JsonUtils.parseObject(json, FileStorageProperties.HuaweiObsConfig.class);
-        huaweiObsConfig.setPlatform(properties.getDefaultPlatform());
+        huaweiObsConfig.setPlatform(platform);
         properties.setHuaweiObs(Collections.singletonList(huaweiObsConfig));
         return properties;
     }

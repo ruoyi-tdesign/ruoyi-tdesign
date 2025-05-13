@@ -103,10 +103,9 @@ public class TencentCosStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.TencentCosConfig tencentCosConfig = JsonUtils.parseObject(json, FileStorageProperties.TencentCosConfig.class);
-        tencentCosConfig.setPlatform(properties.getDefaultPlatform());
+        tencentCosConfig.setPlatform(platform);
         properties.setTencentCos(Collections.singletonList(tencentCosConfig));
         return properties;
     }

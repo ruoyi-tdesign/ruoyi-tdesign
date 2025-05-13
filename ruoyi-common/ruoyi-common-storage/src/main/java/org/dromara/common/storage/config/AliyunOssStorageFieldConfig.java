@@ -103,10 +103,9 @@ public class AliyunOssStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.AliyunOssConfig aliyunOssConfig = JsonUtils.parseObject(json, FileStorageProperties.AliyunOssConfig.class);
-        aliyunOssConfig.setPlatform(properties.getDefaultPlatform());
+        aliyunOssConfig.setPlatform(platform);
         properties.setAliyunOss(Collections.singletonList(aliyunOssConfig));
         return properties;
     }

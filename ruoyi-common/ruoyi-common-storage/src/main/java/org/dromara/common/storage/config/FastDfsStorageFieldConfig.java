@@ -219,10 +219,9 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.FastDfsConfig fastDfsConfig = JsonUtils.parseObject(json, FileStorageProperties.FastDfsConfig.class);
-        fastDfsConfig.setPlatform(properties.getDefaultPlatform());
+        fastDfsConfig.setPlatform(platform);
         properties.setFastdfs(Collections.singletonList(fastDfsConfig));
         return properties;
     }

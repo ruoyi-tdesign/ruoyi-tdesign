@@ -66,10 +66,9 @@ public class WebDavStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.WebDavConfig webDavConfig = JsonUtils.parseObject(json, FileStorageProperties.WebDavConfig.class);
-        webDavConfig.setPlatform(properties.getDefaultPlatform());
+        webDavConfig.setPlatform(platform);
         properties.setWebdav(Collections.singletonList(webDavConfig));
         return properties;
     }

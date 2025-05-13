@@ -138,10 +138,9 @@ public class FtpStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.FtpConfig ftpConfig = JsonUtils.parseObject(json, FileStorageProperties.FtpConfig.class);
-        ftpConfig.setPlatform(properties.getDefaultPlatform());
+        ftpConfig.setPlatform(platform);
         properties.setFtp(Collections.singletonList(ftpConfig));
         return properties;
     }

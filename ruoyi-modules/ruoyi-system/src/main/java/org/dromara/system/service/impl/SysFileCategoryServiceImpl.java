@@ -6,14 +6,14 @@ import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.system.domain.SysOss;
-import org.dromara.system.domain.SysOssCategory;
-import org.dromara.system.domain.bo.SysOssCategoryBo;
-import org.dromara.system.domain.query.SysOssCategoryQuery;
-import org.dromara.system.domain.vo.SysOssCategoryVo;
-import org.dromara.system.mapper.SysOssCategoryMapper;
-import org.dromara.system.service.ISysOssCategoryService;
-import org.dromara.system.service.ISysOssService;
+import org.dromara.system.domain.SysFile;
+import org.dromara.system.domain.SysFileCategory;
+import org.dromara.system.domain.bo.SysFileCategoryBo;
+import org.dromara.system.domain.query.SysFileCategoryQuery;
+import org.dromara.system.domain.vo.SysFileCategoryVo;
+import org.dromara.system.mapper.SysFileCategoryMapper;
+import org.dromara.system.service.ISysFileCategoryService;
+import org.dromara.system.service.ISysFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,56 +22,56 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * OSS分类Service业务层处理
+ * 文件分类Service业务层处理
  *
- * @author hexm
- * @date 2023-08-14
+ * @author yixiacoco
+ * @date 2025-05-13
  */
 @Service
-public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper, SysOssCategory> implements ISysOssCategoryService {
+public class SysFileCategoryServiceImpl extends ServiceImpl<SysFileCategoryMapper, SysFileCategory> implements ISysFileCategoryService {
 
     @Autowired
-    private ISysOssService ossService;
+    private ISysFileService fileService;
 
     /**
-     * 查询OSS分类
+     * 查询文件分类
      *
-     * @param query 查询对象
-     * @return SysOssCategoryVo
+     * @param query
+     * @return
      */
     @Override
-    public SysOssCategoryVo query(SysOssCategoryQuery query) {
+    public SysFileCategoryVo query(SysFileCategoryQuery query) {
         return baseMapper.queryVoById(query);
     }
 
     /**
-     * 查询OSS分类列表
+     * 查询文件分类列表
      *
      * @param query 查询对象
-     * @return SysOssCategoryVo
+     * @return 文件分类列表
      */
     @Override
-    public List<SysOssCategoryVo> queryList(SysOssCategoryQuery query) {
+    public List<SysFileCategoryVo> queryList(SysFileCategoryQuery query) {
         return baseMapper.queryList(query);
     }
 
     /**
-     * 根据新增业务对象插入OSS分类
+     * 新增文件分类
      *
-     * @param bo OSS分类新增业务对象
-     * @return Boolean
+     * @param bo 文件分类新增业务对象
+     * @return 是否新增成功
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean insertByBo(SysOssCategoryBo bo) {
-        SysOssCategory category = MapstructUtils.convert(bo, SysOssCategory.class);
+    public Boolean insertByBo(SysFileCategoryBo bo) {
+        SysFileCategory category = MapstructUtils.convert(bo, SysFileCategory.class);
         // 设置路径、层级
         if (bo.getParentId().equals(0L)) {
             category.setCategoryPath(Constants.ROOT_PATH + category.getCategoryName());
             category.setLevel(0);
             category.setParentId(0L);
         } else {
-            SysOssCategory parent = getById(bo.getParentId());
+            SysFileCategory parent = getById(bo.getParentId());
             if (parent == null) {
                 throw new ServiceException("父分类不存在！");
             }
@@ -79,7 +79,7 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
             if ((parent.getCategoryPath() + Constants.ROOT_PATH).startsWith(category.getCategoryPath() + Constants.ROOT_PATH)) {
                 throw new ServiceException("父分类不能为当前分类或子分类下");
             }
-            category.setParentId(parent.getOssCategoryId());
+            category.setParentId(parent.getFileCategoryId());
             category.setCategoryPath(parent.getCategoryPath() + Constants.ROOT_PATH + category.getCategoryName());
             category.setLevel(parent.getLevel() + 1);
         }
@@ -88,15 +88,15 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
     }
 
     /**
-     * 根据编辑业务对象修改OSS分类
+     * 修改文件分类
      *
-     * @param bo OSS分类编辑业务对象
-     * @return Boolean
+     * @param bo 文件分类编辑业务对象
+     * @return 是否修改成功
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean updateByBo(SysOssCategoryBo bo) {
-        SysOssCategory category = getById(bo.getOssCategoryId());
+    public Boolean updateByBo(SysFileCategoryBo bo) {
+        SysFileCategory category = getById(bo.getFileCategoryId());
         if (!category.getParentId().equals(bo.getParentId()) || !category.getCategoryName().equals(bo.getCategoryName())) {
             int level = category.getLevel();
             String path = category.getCategoryPath();
@@ -108,7 +108,7 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
                 category.setLevel(0);
                 category.setParentId(0L);
             } else {
-                SysOssCategory parent = getById(bo.getParentId());
+                SysFileCategory parent = getById(bo.getParentId());
                 if (parent == null) {
                     throw new ServiceException("父分类不存在！");
                 }
@@ -117,18 +117,18 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
                     throw new ServiceException("父分类不能为当前分类或子分类下");
                 }
                 levelDiff = level - (parent.getLevel() + 1);
-                category.setParentId(parent.getOssCategoryId());
+                category.setParentId(parent.getFileCategoryId());
                 category.setCategoryPath(parent.getCategoryPath() + Constants.ROOT_PATH + category.getCategoryName());
                 category.setLevel(parent.getLevel() + 1);
             }
             // 检查分类名称是否重复
             checkRepeat(category);
             // 获取子分类，更新子分类的路径
-            List<SysOssCategory> children = lambdaQuery()
-                .likeRight(SysOssCategory::getCategoryPath, path + Constants.ROOT_PATH)
-                .select(SysOssCategory::getOssCategoryId, SysOssCategory::getCategoryPath, SysOssCategory::getLevel)
+            List<SysFileCategory> children = lambdaQuery()
+                .likeRight(SysFileCategory::getCategoryPath, path + Constants.ROOT_PATH)
+                .select(SysFileCategory::getFileCategoryId, SysFileCategory::getCategoryPath, SysFileCategory::getLevel)
                 .list();
-            for (SysOssCategory child : children) {
+            for (SysFileCategory child : children) {
                 child.setLevel(child.getLevel() - levelDiff);
                 child.setCategoryPath(child.getCategoryPath().replaceFirst(path, category.getCategoryPath()));
             }
@@ -137,35 +137,35 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
             }
         }
         return update(category, lambdaQuery()
-            .eq(SysOssCategory::getOssCategoryId, category.getOssCategoryId())
-            .eq(SysOssCategory::getUserType, bo.getUserType())
-            .eq(SysOssCategory::getCreateBy, bo.getCreateBy())
+            .eq(SysFileCategory::getFileCategoryId, category.getFileCategoryId())
+            .eq(SysFileCategory::getUserType, bo.getUserType())
+            .eq(SysFileCategory::getCreateBy, bo.getCreateBy())
             .getWrapper());
     }
 
     /**
-     * 校验并批量删除OSS分类信息
+     * 批量删除文件分类信息
      *
-     * @param ids      主键集合
-     * @param userType 用户类型
-     * @param userId   用户id
-     * @return Boolean
+     * @param ids       待删除的主键集合
+     * @param loginType
+     * @param userId
+     * @return 是否删除成功
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Boolean deleteWithValidByIds(Collection<Long> ids, UserType userType, Long userId) {
-        boolean exists = ossService.lambdaQuery().in(SysOss::getOssCategoryId, ids).exists();
+    public Boolean deleteWithValidByIds(Collection<Long> ids, String loginType, Long userId) {
+        boolean exists = fileService.lambdaQuery().in(SysFile::getFileCategoryId, ids).exists();
         if (exists) {
             throw new ServiceException("无法删除非空分类");
         }
-        exists = lambdaQuery().in(SysOssCategory::getParentId, ids).exists();
+        exists = lambdaQuery().in(SysFileCategory::getParentId, ids).exists();
         if (exists) {
             throw new ServiceException("请先删除子分类");
         }
         return lambdaUpdate()
-            .in(SysOssCategory::getOssCategoryId, ids)
-            .eq(SysOssCategory::getUserType, userType.getUserType())
-            .eq(SysOssCategory::getCreateBy, userId)
+            .in(SysFileCategory::getFileCategoryId, ids)
+            .eq(SysFileCategory::getUserType, loginType)
+            .eq(SysFileCategory::getCreateBy, userId)
             .remove();
     }
 
@@ -174,12 +174,12 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
      *
      * @param category 分类对象
      */
-    private void checkRepeat(SysOssCategory category) {
+    private void checkRepeat(SysFileCategory category) {
         boolean exists = lambdaQuery()
-            .ne(category.getOssCategoryId() != null, SysOssCategory::getOssCategoryId, category.getOssCategoryId())
-            .eq(SysOssCategory::getCategoryPath, category.getCategoryPath())
-            .eq(SysOssCategory::getUserType, category.getUserType())
-            .eq(SysOssCategory::getCreateBy, category.getCreateBy())
+            .ne(category.getFileCategoryId() != null, SysFileCategory::getFileCategoryId, category.getFileCategoryId())
+            .eq(SysFileCategory::getCategoryPath, category.getCategoryPath())
+            .eq(SysFileCategory::getUserType, category.getUserType())
+            .eq(SysFileCategory::getCreateBy, category.getCreateBy())
             .exists();
         if (exists) {
             throw new ServiceException("此位置已包含同名分类");
@@ -200,10 +200,10 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
             return false;
         }
         return lambdaQuery()
-            .eq(SysOssCategory::getOssCategoryId, ossCategoryId)
-            .eq(SysOssCategory::getUserType, userType.getUserType())
-            .eq(SysOssCategory::getCreateBy, userId)
-            .select(SysOssCategory::getOssCategoryId)
+            .eq(SysFileCategory::getFileCategoryId, ossCategoryId)
+            .eq(SysFileCategory::getUserType, userType.getUserType())
+            .eq(SysFileCategory::getCreateBy, userId)
+            .select(SysFileCategory::getFileCategoryId)
             .exists();
     }
 }

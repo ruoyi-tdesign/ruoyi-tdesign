@@ -13,8 +13,10 @@ public interface StorageFieldConfig {
     /**
      * 构建存储属性
      *
-     * @param json 配置json
+     * @param properties 属性
+     * @param platform   平台
+     * @param json       配置json
      * @return 存储属性
      */
-    FileStorageProperties buildStorageProperties(String json);
+    FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json);
 }

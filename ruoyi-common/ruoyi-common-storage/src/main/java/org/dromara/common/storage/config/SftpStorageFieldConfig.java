@@ -102,10 +102,9 @@ public class SftpStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(String json) {
-        FileStorageProperties properties = new FileStorageProperties();
+    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.SftpConfig sftpConfig = JsonUtils.parseObject(json, FileStorageProperties.SftpConfig.class);
-        sftpConfig.setPlatform(properties.getDefaultPlatform());
+        sftpConfig.setPlatform(platform);
         properties.setSftp(Collections.singletonList(sftpConfig));
         return properties;
     }
