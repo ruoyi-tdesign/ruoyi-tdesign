@@ -6,7 +6,7 @@ import org.dromara.common.core.ui.FieldOption;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -219,10 +219,14 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.FastDfsConfig fastDfsConfig = JsonUtils.parseObject(json, FileStorageProperties.FastDfsConfig.class);
         fastDfsConfig.setPlatform(platform);
-        properties.setFastdfs(Collections.singletonList(fastDfsConfig));
+        if (properties.getFastdfs() == null) {
+            properties.setFastdfs(new ArrayList<>());
+        }
+        List<FileStorageProperties.FastDfsConfig> list = (List<FileStorageProperties.FastDfsConfig>) properties.getFastdfs();
+        list.add(fastDfsConfig);
         return properties;
     }
 }

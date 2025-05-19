@@ -11,7 +11,6 @@ import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -130,7 +129,7 @@ public class AzureBlobStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         Dict dict = JsonUtils.parseMap(json);
         FileStorageProperties.AzureBlobStorageConfig azureBlobStorageConfig =
             BeanUtil.copyProperties(dict, FileStorageProperties.AzureBlobStorageConfig.class, "methodToPermissionMap");
@@ -142,7 +141,11 @@ public class AzureBlobStorageFieldConfig implements StorageFieldConfig {
         azureBlobStorageConfig.setMethodToPermissionMap(map);
 
         azureBlobStorageConfig.setPlatform(platform);
-        properties.setAzureBlob(Collections.singletonList(azureBlobStorageConfig));
+        if (properties.getAzureBlob() == null) {
+            properties.setAzureBlob(new ArrayList<>());
+        }
+        List<FileStorageProperties.AzureBlobStorageConfig> list = (List<FileStorageProperties.AzureBlobStorageConfig>) properties.getAzureBlob();
+        list.add(azureBlobStorageConfig);
         return properties;
     }
 }

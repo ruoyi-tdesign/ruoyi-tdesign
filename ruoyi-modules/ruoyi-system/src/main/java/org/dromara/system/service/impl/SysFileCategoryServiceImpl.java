@@ -3,7 +3,6 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.dromara.common.core.constant.Constants;
-import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.system.domain.SysFile;
@@ -138,7 +137,7 @@ public class SysFileCategoryServiceImpl extends ServiceImpl<SysFileCategoryMappe
         }
         return update(category, lambdaQuery()
             .eq(SysFileCategory::getFileCategoryId, category.getFileCategoryId())
-            .eq(SysFileCategory::getUserType, bo.getUserType())
+            .eq(SysFileCategory::getLoginType, bo.getUserType())
             .eq(SysFileCategory::getCreateBy, bo.getCreateBy())
             .getWrapper());
     }
@@ -164,7 +163,7 @@ public class SysFileCategoryServiceImpl extends ServiceImpl<SysFileCategoryMappe
         }
         return lambdaUpdate()
             .in(SysFileCategory::getFileCategoryId, ids)
-            .eq(SysFileCategory::getUserType, loginType)
+            .eq(SysFileCategory::getLoginType, loginType)
             .eq(SysFileCategory::getCreateBy, userId)
             .remove();
     }
@@ -178,7 +177,7 @@ public class SysFileCategoryServiceImpl extends ServiceImpl<SysFileCategoryMappe
         boolean exists = lambdaQuery()
             .ne(category.getFileCategoryId() != null, SysFileCategory::getFileCategoryId, category.getFileCategoryId())
             .eq(SysFileCategory::getCategoryPath, category.getCategoryPath())
-            .eq(SysFileCategory::getUserType, category.getUserType())
+            .eq(SysFileCategory::getLoginType, category.getLoginType())
             .eq(SysFileCategory::getCreateBy, category.getCreateBy())
             .exists();
         if (exists) {
@@ -190,18 +189,18 @@ public class SysFileCategoryServiceImpl extends ServiceImpl<SysFileCategoryMappe
      * 是否存在分类id
      *
      * @param ossCategoryId 分类id
-     * @param userType      用户类型
+     * @param loginType     用户类型
      * @param userId        用户id
      * @return
      */
     @Override
-    public boolean hasId(Long ossCategoryId, UserType userType, Long userId) {
+    public boolean hasId(Long ossCategoryId, String loginType, Long userId) {
         if (ossCategoryId == null) {
             return false;
         }
         return lambdaQuery()
             .eq(SysFileCategory::getFileCategoryId, ossCategoryId)
-            .eq(SysFileCategory::getUserType, userType.getUserType())
+            .eq(SysFileCategory::getLoginType, loginType)
             .eq(SysFileCategory::getCreateBy, userId)
             .select(SysFileCategory::getFileCategoryId)
             .exists();

@@ -106,7 +106,7 @@
       </t-col>
       <!-- 文件数据 -->
       <t-col :sm="10" :xs="12">
-        <my-oss
+        <file-list
           :category-id="categoryActived[0]"
           :query-param="queryParam"
           :multiple="multiple"
@@ -213,10 +213,10 @@ import type {
 } from '@/api/system/model/fileCategoryModel';
 import type { SysFileVo } from '@/api/system/model/fileModel';
 
-import type { MyOssProps } from './components/myOss.vue';
-import MyOss from './components/myOss.vue';
+import type { FileListProps } from './FileList.vue';
+import FileList from './components/FileList.vue';
 
-export interface FileCategoryProps extends Omit<MyOssProps, 'categoryId'> {}
+export interface FileCategoryProps extends Omit<FileListProps, 'categoryId'> {}
 const props = withDefaults(defineProps<FileCategoryProps>(), {
   imageUpload: true,
   fileUpload: true,

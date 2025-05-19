@@ -11,12 +11,12 @@ import org.dromara.x.file.storage.core.FileStorageProperties;
 public interface StorageFieldConfig {
 
     /**
-     * 构建存储属性
+     * 增加存储属性
      *
      * @param properties 属性
      * @param platform   平台
      * @param json       配置json
      * @return 存储属性
      */
-    FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json);
+    FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json);
 }

@@ -6,7 +6,6 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
-import java.math.BigDecimal;
 
 /**
  * 文件分类对象 sys_file_category
@@ -55,7 +54,7 @@ public class SysFileCategory implements Serializable {
     /**
      * 用户类型
      */
-    private String userType;
+    private String loginType;
 
     /**
      * 上传人

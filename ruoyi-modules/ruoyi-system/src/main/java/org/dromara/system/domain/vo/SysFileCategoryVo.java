@@ -65,7 +65,7 @@ public class SysFileCategoryVo implements Serializable {
      * 用户类型
      */
     @ExcelProperty(value = "用户类型")
-    private String userType;
+    private String loginType;
 
     /**
      * 上传人

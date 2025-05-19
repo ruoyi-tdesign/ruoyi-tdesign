@@ -2,9 +2,6 @@ package org.dromara.system.domain.query;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.util.Date;
-
 import org.dromara.common.mybatis.core.domain.BasePageQuery;
 
 /**
@@ -67,4 +64,24 @@ public class SysFileQuery extends BasePageQuery {
      */
     private Integer isLock;
 
+    /**
+     * 上传人
+     */
+    private Long createBy;
+
+    /**
+     * 多个文件后缀
+     */
+    private String[] suffixes;
+
+
+    /**
+     * 文件最大字节长度
+     */
+    private Long maxSize;
+
+    /**
+     * 内容类型
+     */
+    private String[] contentTypes;
 }

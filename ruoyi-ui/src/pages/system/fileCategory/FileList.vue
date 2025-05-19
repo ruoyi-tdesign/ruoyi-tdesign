@@ -4,40 +4,40 @@
       <t-space>
         <t-button
           v-if="imageUpload || fileUpload"
-          v-hasPermi="['system:oss:upload']"
+          v-hasPermi="['system:file:upload']"
           theme="primary"
           @click="handleUpload"
         >
           <template #icon> <cloud-upload-icon /></template>
           上传
         </t-button>
-        <t-button v-hasPermi="['system:oss:remove']" theme="danger" :disabled="!ids.length" @click="handleDelete()">
+        <t-button v-hasPermi="['system:file:remove']" theme="danger" :disabled="!ids.length" @click="handleDelete()">
           <template #icon> <delete-icon /> </template>
           删除
         </t-button>
-        <t-button v-hasPermi="['system:oss:download']" :disabled="ids.length !== 1" @click="handleDownload()">
+        <t-button v-hasPermi="['system:file:download']" :disabled="ids.length !== 1" @click="handleDownload()">
           <template #icon> <download-icon /> </template>
           下载
         </t-button>
         <t-image-viewer v-model:index="imagePreviewIndex" :images="previewList" :z-index="5000">
           <template #trigger="{ open }">
-            <t-button v-hasPermi="['system:oss:query']" :disabled="previewList.length === 0" @click="open">
+            <t-button v-hasPermi="['system:file:query']" :disabled="previewList.length === 0" @click="open">
               <template #icon> <browse-icon /> </template>
               预览
             </t-button>
           </template>
         </t-image-viewer>
-        <t-button v-hasPermi="['system:oss:edit']" :disabled="ids.length !== 1" @click="handleUpdate()">
+        <t-button v-hasPermi="['system:file:edit']" :disabled="ids.length !== 1" @click="handleUpdate()">
           <template #icon> <info-circle-icon /> </template>
           属性
         </t-button>
-        <t-button v-hasPermi="['system:oss:edit']" :disabled="ids.length === 0" @click="handleMove()">
+        <t-button v-hasPermi="['system:file:edit']" :disabled="ids.length === 0" @click="handleMove()">
           <template #icon> <swap-icon /> </template>
           移动到
         </t-button>
         <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline">
-          <t-form-item label-width="0px" name="originalName">
-            <t-input v-model="queryParams.originalName" placeholder="搜索文件名" @enter="handleQuery">
+          <t-form-item label-width="0px" name="originalFilename">
+            <t-input v-model="queryParams.originalFilename" placeholder="搜索文件名" @enter="handleQuery">
               <template #suffix-icon>
                 <search-icon :style="{ cursor: 'pointer' }" size="var(--td-comp-size-xxxs)" @click="handleQuery" />
               </template>
@@ -46,7 +46,7 @@
         </t-form>
       </t-space>
       <t-loading :loading="loading">
-        <div v-if="ossList.length === 0" class="t-table__empty">暂无数据</div>
+        <div v-if="fileList.length === 0" class="t-table__empty">暂无数据</div>
         <rect-select
           v-else
           class="list-card-gallery"
@@ -56,52 +56,55 @@
           @keydown.ctrl.a.stop.prevent="handleCheckedAll"
         >
           <div
-            v-for="(oss, index) in effectiveOssList"
-            :key="oss.ossId"
-            :aria-checked="oss.active ? 'true' : 'false'"
+            v-for="(file, index) in effectiveFileList"
+            :key="file.fileId"
+            :aria-checked="file.active ? 'true' : 'false'"
             class="list-card-gallery-item"
             role="checkbox"
             :tabindex="index"
-            :title="oss.originalName"
+            :title="file.originalName"
             @mousedown.stop
-            @dblclick.stop="handleUpdate(oss)"
-            @click.exact.stop="handleClick(oss)"
-            @click.ctrl.exact.stop="handleCtrlClick(oss)"
-            @click.shift.exact.stop="handleShiftClick(oss)"
-            @click.ctrl.shift.stop="handleShiftClick(oss, true)"
+            @dblclick.stop="handleUpdate(file)"
+            @click.exact.stop="handleClick(file)"
+            @click.ctrl.exact.stop="handleCtrlClick(file)"
+            @click.shift.exact.stop="handleShiftClick(file)"
+            @click.ctrl.shift.stop="handleShiftClick(file, true)"
           >
-            <div class="list-card-gallery-item__label" :class="{ 'list-card-gallery-item__label--active': oss.active }">
+            <div
+              class="list-card-gallery-item__label"
+              :class="{ 'list-card-gallery-item__label--active': file.active }"
+            >
               <figure class="list-card-gallery-figure" data-visible="true">
                 <figcaption class="list-card-gallery-figure__caption">
-                  {{ oss.fileSuffix?.substring(1) }}
-                  <template v-if="thumbnailSize >= 100"> ({{ bytesToSize(oss.size).replace(' ', '') }}) </template>
+                  {{ file.fileSuffix?.substring(1) }}
+                  <template v-if="thumbnailSize >= 100"> ({{ bytesToSize(file.size).replace(' ', '') }}) </template>
                 </figcaption>
                 <div class="list-card-gallery-figure__content">
                   <div
-                    v-if="getMediaType(oss) !== 'image'"
-                    :class="`gallery-doc-icon gallery-doc-icon--${getMediaType(oss)}`"
+                    v-if="getMediaType(file) !== 'image'"
+                    :class="`gallery-doc-icon gallery-doc-icon--${getMediaType(file)}`"
                   >
-                    <component :is="getMediaType(oss) + '-svg'" class="gallery-doc-icon__icon" />
+                    <component :is="getMediaType(file) + '-svg'" class="gallery-doc-icon__icon" />
                   </div>
                   <picture v-else class="list-card-gallery-responsive-image list-card-gallery-responsive-image--fit">
                     <img
                       draggable="false"
                       class="list-card-gallery-responsive-image__img--fit list-card-gallery-responsive-image__img--cover"
-                      :src="oss.url"
-                      :alt="oss.originalName"
+                      :src="file.url"
+                      :alt="file.originalName"
                     />
                   </picture>
                 </div>
               </figure>
               <div class="list-card-gallery-item__details">
                 <span class="list-card-gallery-item__name">
-                  <lock-on-icon v-if="oss.isLock === 1" /><span>{{ oss.originalName }}</span>
+                  <lock-on-icon v-if="file.isLock === 1" /><span>{{ file.originalName }}</span>
                 </span>
                 <button
                   class="gallery-btn gallery-btn--neutral gallery-btn--plain gallery-btn--small gallery-btn--icon-only-small list-card-gallery-item__checkmark"
-                  :class="{ 'list-card-gallery-item__checkmark--active': oss.active }"
+                  :class="{ 'list-card-gallery-item__checkmark--active': file.active }"
                   type="button"
-                  @click.stop="buttonChecked(oss)"
+                  @click.stop="buttonChecked(file)"
                 >
                   <span>
                     <check-icon class="gallery-icon gallery-icon--base gallery-btn__icon" />
@@ -131,7 +134,7 @@
       </div>
     </t-space>
 
-    <!-- 上传OSS对象存储对话框 -->
+    <!-- 上传文件存储对话框 -->
     <t-dialog
       v-model:visible="openUpload"
       :header="uploadTitle"
@@ -180,7 +183,7 @@
         </t-form-item>
       </t-form>
     </t-dialog>
-    <!-- 添加或修改OSS对象存储对话框 -->
+    <!-- 添加或修改文件存储对话框 -->
     <t-dialog
       v-model:visible="openView"
       :header="title"
@@ -195,7 +198,7 @@
     >
       <t-loading :loading="buttonLoading" size="small">
         <t-form
-          ref="ossRef"
+          ref="fileRef"
           label-align="right"
           :data="form"
           :rules="rules"
@@ -203,18 +206,18 @@
           scroll-to-first-error="smooth"
           @submit="submitForm"
         >
-          <t-form-item label="ossId" name="ossId">
-            {{ form.ossId }}
+          <t-form-item label="fileId" name="fileId">
+            {{ form.fileId }}
           </t-form-item>
           <t-form-item label="原名" name="originalName">
             <t-input v-model="form.originalName" placeholder="请输入原名" clearable />
           </t-form-item>
-          <t-form-item label="分类" name="ossCategoryId">
+          <t-form-item label="分类" name="fileCategoryId">
             <t-tree-select
-              v-model="form.ossCategoryId"
-              :data="ossCategoryOptions"
+              v-model="form.fileCategoryId"
+              :data="fileCategoryOptions"
               :tree-props="{
-                keys: { value: 'ossCategoryId', label: 'categoryName', children: 'children' },
+                keys: { value: 'fileCategoryId', label: 'categoryName', children: 'children' },
                 checkStrictly: true,
               }"
               placeholder="请选择分类"
@@ -238,7 +241,7 @@
                 {{ form.url }}
               </div>
               <t-space>
-                <my-link @click="handleDownload(form.ossId)">下载</my-link>
+                <my-link @click="handleDownload(form.fileId)">下载</my-link>
                 <my-link @click="copyText(form.url)">复制链接URL</my-link>
               </t-space>
             </t-space>
@@ -261,7 +264,7 @@
         </t-form>
       </t-loading>
     </t-dialog>
-    <!-- 移动OSS对象存储对话框 -->
+    <!-- 移动文件存储对话框 -->
     <t-dialog
       v-model:visible="openMove"
       :close-on-overlay-click="false"
@@ -274,7 +277,7 @@
     >
       <t-loading :loading="buttonLoading" size="small">
         <t-form
-          ref="ossMoveRef"
+          ref="fileMoveRef"
           label-align="right"
           :data="form"
           :rules="rules"
@@ -282,12 +285,12 @@
           scroll-to-first-error="smooth"
           @submit="submitMoveForm"
         >
-          <t-form-item label="分类" name="ossCategoryId">
+          <t-form-item label="分类" name="fileCategoryId">
             <t-tree-select
-              v-model="form.ossCategoryId"
-              :data="ossCategoryOptions"
+              v-model="form.fileCategoryId"
+              :data="fileCategoryOptions"
               :tree-props="{
-                keys: { value: 'ossCategoryId', label: 'categoryName', children: 'children' },
+                keys: { value: 'fileCategoryId', label: 'categoryName', children: 'children' },
                 checkStrictly: true,
               }"
               placeholder="请选择分类"
@@ -316,10 +319,8 @@ import type { FormInstanceFunctions, FormRule, PageInfo, SubmitContext } from 't
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import type { SysOssCategoryVo } from '@/api/system/model/ossCategoryModel';
-import type { SysOssActiveVo, SysOssForm, SysOssQuery, SysOssVo } from '@/api/system/model/ossModel';
-import { delMyOss, getOss, listMyOss, moveOss, updateOss } from '@/api/system/oss';
-import { listOssCategory } from '@/api/system/ossCategory';
+import type { SysFileCategoryVo } from '@/api/system/model/fileCategoryModel';
+import type { SysFileActiveVo, SysFileForm, SysFileQuery, SysFileVo } from '@/api/system/model/fileModel';
 import ArchiveSvg from '@/assets/file-type/archive.svg?component';
 import AudioSvg from '@/assets/file-type/audio.svg?component';
 import ExcelSvg from '@/assets/file-type/excel.svg?component';
@@ -336,11 +337,11 @@ import ImageUpload from '@/components/image-upload/index.vue';
 import RectSelect from '@/components/rect-select/index.vue';
 
 defineOptions({
-  name: 'MyOss',
+  name: 'FileList',
   components: { ArchiveSvg, ExcelSvg, PdfSvg, PptSvg, AudioSvg, TextSvg, UnknownSvg, VideoSvg, WordSvg },
 });
 
-export interface MyOssProps {
+export interface FileListProps {
   /** 分类id */
   categoryId?: number;
   /** 启用多选 */
@@ -352,7 +353,7 @@ export interface MyOssProps {
   /** 开启文件上传 */
   fileUpload?: boolean;
   /** 查询参数 */
-  queryParam?: Pick<SysOssQuery, 'maxSize' | 'contentTypes' | 'suffixes'>;
+  queryParam?: Pick<SysFileQuery, 'maxSize' | 'contentTypes' | 'suffixes'>;
   /** 图片上传组件参数 */
   imageUploadProps?: Pick<ImageUploadProps, 'fileType' | 'fileSize' | 'accept'>;
   /** 文件上传组件参数 */
@@ -361,7 +362,7 @@ export interface MyOssProps {
   rectMaxHeight?: string;
 }
 
-const props = withDefaults(defineProps<MyOssProps>(), {
+const props = withDefaults(defineProps<FileListProps>(), {
   imageUpload: true,
   fileUpload: true,
   multiple: true,
@@ -383,16 +384,16 @@ watch(
   },
 );
 const emit = defineEmits<{
-  (e: 'change', selectValues: SysOssVo[]): void;
+  (e: 'change', selectValues: SysFileVo[]): void;
   (e: 'update'): void;
 }>();
 
 const { proxy } = getCurrentInstance();
 
-const ossRef = ref<FormInstanceFunctions>();
-const ossMoveRef = ref<FormInstanceFunctions>();
-const ossList = ref<SysOssVo[]>([]);
-const ossCategoryOptions = ref<SysOssCategoryVo[]>([]);
+const fileRef = ref<FormInstanceFunctions>();
+const fileMoveRef = ref<FormInstanceFunctions>();
+const fileList = ref<SysFileVo[]>([]);
+const fileCategoryOptions = ref<SysFileCategoryVo[]>([]);
 const openUpload = ref(false);
 const openMove = ref(false);
 const openView = ref(false);
@@ -439,19 +440,19 @@ const rules = ref<Record<string, Array<FormRule>>>({
     { required: true, message: '原名不能为空' },
     { pattern: /^[^.][^\\/<>:?"|*]*$/, message: '文件名不能包含下列任何字符：\\/<>:?"|*' },
   ],
-  ossCategoryId: [{ required: true, message: '分类不能为空' }],
+  fileCategoryId: [{ required: true, message: '分类不能为空' }],
   isLock: [{ required: true, message: '是否锁定状态不能为空' }],
 });
 
 const uploadForm = ref<{ file?: any }>({});
 // 提交表单对象
-const form = ref<SysOssVo & SysOssForm>({
+const form = ref<SysFileVo & SysFileForm>({
   isLock: 0,
 });
-const queryParams = ref<SysOssQuery>({
+const queryParams = ref<SysFileQuery>({
   pageNum: 1,
   pageSize: 20,
-  originalName: undefined,
+  originalFilename: undefined,
 });
 
 const uploadTitle = computed(() => {
@@ -460,22 +461,22 @@ const uploadTitle = computed(() => {
   }
   return '上传图片';
 });
-// 保存了选中状态的oss列表
-const effectiveOssList = computed(() => {
-  const ossCollection: SysOssActiveVo[] = [];
-  ossList.value.forEach((oss) => {
-    ossCollection.push({
-      ...oss,
-      active: ids.value.includes(oss.ossId),
+// 保存了选中状态的文件列表
+const effectiveFileList = computed(() => {
+  const fileCollection: SysFileActiveVo[] = [];
+  fileList.value.forEach((file) => {
+    fileCollection.push({
+      ...file,
+      active: ids.value.includes(file.fileId),
     });
   });
-  return ossCollection;
+  return fileCollection;
 });
 // 图片预览列表
 const previewList = computed(() => {
-  return effectiveOssList.value
-    .filter((oss) => {
-      return oss.active && getMediaType(oss) === 'image';
+  return effectiveFileList.value
+    .filter((file) => {
+      return file.active && getMediaType(file) === 'image';
     })
     .map((value) => value.url);
 });
@@ -496,8 +497,8 @@ const pagination = computed(() => {
 });
 
 /** 获取媒体类型 */
-function getMediaType(oss: SysOssVo) {
-  const suffix = oss.fileSuffix?.substring(1)?.toLowerCase();
+function getMediaType(file: SysFileVo) {
+  const suffix = file.ext?.substring(1)?.toLowerCase();
   if (suffix) {
     const entries = Object.entries(fileType);
     const type = entries.find((value) => {
@@ -507,7 +508,7 @@ function getMediaType(oss: SysOssVo) {
       return type[0];
     }
   }
-  const contentType = oss.contentType?.toLowerCase();
+  const contentType = file.contentType?.toLowerCase();
   if (contentType) {
     if (contentType.startsWith('image/')) {
       return 'image';
@@ -522,18 +523,18 @@ function getMediaType(oss: SysOssVo) {
   return 'unknown';
 }
 
-/** 查询OSS对象存储列表 */
+/** 查询文件对象存储列表 */
 function getList() {
   loading.value = true;
-  queryParams.value.ossCategoryId = props.categoryId;
+  queryParams.value.fileCategoryId = props.categoryId;
   queryParams.value.suffixes = props.queryParam?.suffixes?.map((value) => `.${value}`);
   queryParams.value.maxSize = props.queryParam?.maxSize;
   queryParams.value.contentTypes = props.queryParam?.contentTypes;
-  listMyOss(queryParams.value)
+  listMyFile(queryParams.value)
     .then((response) => {
       ids.value = [];
       shiftId.value = null;
-      ossList.value = response.rows;
+      fileList.value = response.rows;
       total.value = response.total;
       loading.value = false;
     })
@@ -546,23 +547,23 @@ function reset() {
   };
   form.value = {
     isLock: 0,
-    ossCategoryId: 0,
+    fileCategoryId: 0,
   };
-  proxy.resetForm('ossRef');
+  proxy.resetForm('fileRef');
 }
 /** 搜索按钮操作 */
 function handleQuery() {
   queryParams.value.pageNum = 1;
   getList();
 }
-/** 查询OSS分类下拉树选项结构 */
+/** 查询文件分类下拉树选项结构 */
 async function getCategoryOptions() {
-  const response = await listOssCategory();
-  ossCategoryOptions.value = [
+  const response = await listFileCategory();
+  fileCategoryOptions.value = [
     {
-      ossCategoryId: 0,
+      fileCategoryId: 0,
       categoryName: '根分类',
-      children: proxy.handleTree(response.data, 'ossCategoryId', 'parentId'),
+      children: proxy.handleTree(response.data, 'fileCategoryId', 'parentId'),
     },
   ];
 }
@@ -572,14 +573,14 @@ function handleUpload() {
   openUpload.value = true;
 }
 /** 修改按钮操作 */
-async function handleUpdate(row?: SysOssVo) {
+async function handleUpdate(row?: SysFileVo) {
   buttonLoading.value = true;
   reset();
   openView.value = true;
-  title.value = '修改OSS对象存储';
+  title.value = '修改文件存储';
   await getCategoryOptions();
-  const ossId = row?.ossId || ids.value.at(0);
-  getOss(ossId).then((response) => {
+  const fileId = row?.fileId || ids.value.at(0);
+  getFile(fileId).then((response) => {
     buttonLoading.value = false;
     form.value = response.data;
   });
@@ -589,7 +590,7 @@ async function handleMove() {
   buttonLoading.value = true;
   reset();
   openMove.value = true;
-  title.value = '移动OSS对象存储';
+  title.value = '移动文件存储';
   await getCategoryOptions();
   buttonLoading.value = false;
 }
@@ -601,14 +602,14 @@ function submitUploadForm() {
 }
 /** 编辑移动分类表单提交按钮 */
 function onConfirmMove() {
-  ossMoveRef.value.submit();
+  fileMoveRef.value.submit();
 }
 /** 提交移动分类表单 */
 function submitMoveForm({ validateResult, firstError }: SubmitContext) {
   if (validateResult === true) {
     buttonLoading.value = true;
     const msgLoading = proxy.$modal.msgLoading('移动提交中...');
-    moveOss(form.value.ossCategoryId, ids.value)
+    moveFile(form.value.fileCategoryId, ids.value)
       .then(() => {
         proxy.$modal.msgSuccess('移动成功');
         openMove.value = false;
@@ -625,15 +626,15 @@ function submitMoveForm({ validateResult, firstError }: SubmitContext) {
 }
 /** 编辑表单提交按钮 */
 function onConfirm() {
-  ossRef.value.submit();
+  fileRef.value.submit();
 }
 /** 提交修改文件表单 */
 function submitForm({ validateResult, firstError }: SubmitContext) {
   if (validateResult === true) {
     buttonLoading.value = true;
     const msgLoading = proxy.$modal.msgLoading('提交中...');
-    if (form.value.ossId) {
-      updateOss(form.value)
+    if (form.value.fileId) {
+      updateFile(form.value)
         .then(() => {
           proxy.$modal.msgSuccess('修改成功');
           openView.value = false;
@@ -645,7 +646,7 @@ function submitForm({ validateResult, firstError }: SubmitContext) {
           proxy.$modal.msgClose(msgLoading);
         });
     } else {
-      proxy.$modal.msgError('不支持新增OSS对象存储');
+      proxy.$modal.msgError('不支持新增文件存储');
     }
   } else {
     proxy.$modal.msgError(firstError);
@@ -665,22 +666,22 @@ function copyText(text: string) {
     });
 }
 /** 下载按钮操作 */
-function handleDownload(ossId?: number) {
-  proxy.$download.oss(ossId ?? ids.value.at(0));
+function handleDownload(fileId?: number) {
+  proxy.$download.file(fileId ?? ids.value.at(0));
 }
 /** 删除按钮操作 */
 function handleDelete() {
-  const ossIds = ids.value;
-  const files = ossList.value.filter((value) => ids.value.includes(value.ossId));
+  const fileIds = ids.value;
+  const files = fileList.value.filter((value) => ids.value.includes(value.fileId));
   let content;
   if (files.length === 1) {
-    content = `是否确认删除文件【"${files.at(0).originalName}"】?`;
+    content = `是否确认删除文件【"${files.at(0).originalFilename}"】?`;
   } else {
-    content = `是否确认删除选中的${ossIds.length}项文件?`;
+    content = `是否确认删除选中的${fileIds.length}项文件?`;
   }
   proxy.$modal.confirm(content, () => {
     const msgLoading = proxy.$modal.msgLoading('正在删除中...');
-    return delMyOss(ossIds)
+    return delMyFile(fileIds)
       .then(() => {
         ids.value = [];
         getList();
@@ -694,49 +695,49 @@ function handleDelete() {
 /** 处理鼠标区域选择 */
 function handleRectChange(checkedIndexes: number[]) {
   imagePreviewIndex.value = 0;
-  ids.value = ossList.value.filter((value, index) => checkedIndexes.includes(index)).map((value) => value.ossId);
+  ids.value = fileList.value.filter((value, index) => checkedIndexes.includes(index)).map((value) => value.fileId);
   handleChangeEmit();
 }
 
 /** 处理单击事件 */
-function handleClick(oss: SysOssVo) {
+function handleClick(file: SysFileVo) {
   imagePreviewIndex.value = 0;
-  shiftId.value = oss.ossId;
-  ids.value = [oss.ossId];
+  shiftId.value = file.fileId;
+  ids.value = [file.fileId];
   handleChangeEmit();
 }
 
 /** 处理ctrl + 单击事件 */
-function handleCtrlClick(oss: SysOssVo) {
-  shiftId.value = oss.ossId;
+function handleCtrlClick(file: SysFileVo) {
+  shiftId.value = file.fileId;
   imagePreviewIndex.value = 0;
   if (props.multiple) {
-    const index = ids.value.indexOf(oss.ossId);
+    const index = ids.value.indexOf(file.fileId);
     if (index !== -1) {
       ids.value.splice(index, 1);
     } else {
-      ids.value.push(oss.ossId);
+      ids.value.push(file.fileId);
     }
     handleChangeEmit();
   } else {
-    handleClick(oss);
+    handleClick(file);
   }
 }
 
 /** 处理shift + 单击 和 ctrl + shift + 单击事件 */
-function handleShiftClick(oss: SysOssVo, append = false) {
+function handleShiftClick(file: SysFileVo, append = false) {
   imagePreviewIndex.value = 0;
   if (props.multiple) {
     const arr = [];
-    const ossId = shiftId.value ?? ossList.value.at(0).ossId;
-    const startIndex = ossList.value.findIndex((value) => value.ossId === ossId) ?? 0;
-    const endIndex = ossList.value.findIndex((value) => value.ossId === oss.ossId);
+    const fileId = shiftId.value ?? fileList.value.at(0).fileId;
+    const startIndex = fileList.value.findIndex((value) => value.fileId === fileId) ?? 0;
+    const endIndex = fileList.value.findIndex((value) => value.fileId === file.fileId);
     let i = Math.min(startIndex, endIndex);
     const max = Math.max(startIndex, endIndex);
     for (; i <= max; i++) {
-      const value = ossList.value[i];
-      if (!append || (append && !ids.value.includes(value.ossId))) {
-        arr.push(value.ossId);
+      const value = fileList.value[i];
+      if (!append || (append && !ids.value.includes(value.fileId))) {
+        arr.push(value.fileId);
       }
     }
     if (append) {
@@ -746,33 +747,33 @@ function handleShiftClick(oss: SysOssVo, append = false) {
     }
     handleChangeEmit();
   } else {
-    handleClick(oss);
+    handleClick(file);
   }
 }
 
 /** 按钮选中 */
-function buttonChecked(oss: SysOssVo) {
+function buttonChecked(file: SysFileVo) {
   imagePreviewIndex.value = 0;
-  const index = ids.value.indexOf(oss.ossId);
+  const index = ids.value.indexOf(file.fileId);
   if (index !== -1) {
     ids.value.splice(index, 1);
   } else if (props.multiple) {
-    ids.value.push(oss.ossId);
+    ids.value.push(file.fileId);
   } else {
-    ids.value = [oss.ossId];
+    ids.value = [file.fileId];
   }
   handleChangeEmit();
 }
 
 /** 选择全部 */
 function handleCheckedAll() {
-  ids.value = ossList.value.map((value) => value.ossId);
+  ids.value = fileList.value.map((value) => value.fileId);
   handleChangeEmit();
 }
 
 /** 触发变更提交 */
 function handleChangeEmit() {
-  const values = ossList.value.filter((value) => ids.value.includes(value.ossId));
+  const values = fileList.value.filter((value) => ids.value.includes(value.fileId));
   emit('change', values);
 }
 

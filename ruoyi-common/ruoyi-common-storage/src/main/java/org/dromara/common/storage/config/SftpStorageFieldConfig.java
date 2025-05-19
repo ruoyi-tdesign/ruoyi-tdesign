@@ -6,7 +6,8 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Sftp字段配置
@@ -102,10 +103,14 @@ public class SftpStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.SftpConfig sftpConfig = JsonUtils.parseObject(json, FileStorageProperties.SftpConfig.class);
         sftpConfig.setPlatform(platform);
-        properties.setSftp(Collections.singletonList(sftpConfig));
+        if (properties.getSftp() == null) {
+            properties.setSftp(new ArrayList<>());
+        }
+        List<FileStorageProperties.SftpConfig> list = (List<FileStorageProperties.SftpConfig>) properties.getSftp();
+        list.add(sftpConfig);
         return properties;
     }
 }

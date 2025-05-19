@@ -658,7 +658,51 @@ public class RedisUtils {
      * @param key   Redis键
      * @param value 值
      */
-    public static void setAtomicValue(String key, long value) {
+    public static void setAtomicDouble(String key, double value) {
+        RAtomicDouble atomic = CLIENT.getAtomicDouble(key);
+        atomic.set(value);
+    }
+
+    /**
+     * 获取原子值
+     *
+     * @param key Redis键
+     * @return 当前值
+     */
+    public static double getAtomicDouble(String key) {
+        RAtomicDouble atomic = CLIENT.getAtomicDouble(key);
+        return atomic.get();
+    }
+
+    /**
+     * 递增原子值
+     *
+     * @param key Redis键
+     * @return 当前值
+     */
+    public static double incrAtomicDouble(String key) {
+        RAtomicDouble atomic = CLIENT.getAtomicDouble(key);
+        return atomic.incrementAndGet();
+    }
+
+    /**
+     * 递减原子值
+     *
+     * @param key Redis键
+     * @return 当前值
+     */
+    public static double decrAtomicDouble(String key) {
+        RAtomicDouble atomic = CLIENT.getAtomicDouble(key);
+        return atomic.decrementAndGet();
+    }
+
+    /**
+     * 设置原子值
+     *
+     * @param key   Redis键
+     * @param value 值
+     */
+    public static void setAtomicLong(String key, long value) {
         RAtomicLong atomic = CLIENT.getAtomicLong(key);
         atomic.set(value);
     }
@@ -669,7 +713,7 @@ public class RedisUtils {
      * @param key Redis键
      * @return 当前值
      */
-    public static long getAtomicValue(String key) {
+    public static long getAtomicLong(String key) {
         RAtomicLong atomic = CLIENT.getAtomicLong(key);
         return atomic.get();
     }
@@ -680,7 +724,7 @@ public class RedisUtils {
      * @param key Redis键
      * @return 当前值
      */
-    public static long incrAtomicValue(String key) {
+    public static long incrAtomicLong(String key) {
         RAtomicLong atomic = CLIENT.getAtomicLong(key);
         return atomic.incrementAndGet();
     }
@@ -691,7 +735,7 @@ public class RedisUtils {
      * @param key Redis键
      * @return 当前值
      */
-    public static long decrAtomicValue(String key) {
+    public static long decrAtomicLong(String key) {
         RAtomicLong atomic = CLIENT.getAtomicLong(key);
         return atomic.decrementAndGet();
     }

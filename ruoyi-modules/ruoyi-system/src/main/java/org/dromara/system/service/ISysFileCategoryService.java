@@ -1,7 +1,6 @@
 package org.dromara.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.dromara.common.core.enums.UserType;
 import org.dromara.system.domain.SysFileCategory;
 import org.dromara.system.domain.bo.SysFileCategoryBo;
 import org.dromara.system.domain.query.SysFileCategoryQuery;
@@ -64,9 +63,9 @@ public interface ISysFileCategoryService extends IService<SysFileCategory> {
      * 是否存在分类id
      *
      * @param ossCategoryId 分类id
-     * @param userType      用户类型
+     * @param loginType     用户类型
      * @param userId        用户id
      * @return
      */
-    boolean hasId(Long ossCategoryId, UserType userType, Long userId);
+    boolean hasId(Long ossCategoryId, String loginType, Long userId);
 }

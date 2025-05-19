@@ -39,11 +39,6 @@ public class StorageSupport {
             .toList();
     }
 
-    public static void main(String[] args) {
-        System.out.println(getSupportPlatform());
-        System.out.println(getNotSupportPlatform());
-    }
-
     /**
      * 判断是否存在Class
      *

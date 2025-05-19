@@ -8,7 +8,7 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -103,10 +103,14 @@ public class TencentCosStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.TencentCosConfig tencentCosConfig = JsonUtils.parseObject(json, FileStorageProperties.TencentCosConfig.class);
         tencentCosConfig.setPlatform(platform);
-        properties.setTencentCos(Collections.singletonList(tencentCosConfig));
+        if (properties.getTencentCos() == null) {
+            properties.setTencentCos(new ArrayList<>());
+        }
+        List<FileStorageProperties.TencentCosConfig> list = (List<FileStorageProperties.TencentCosConfig>) properties.getTencentCos();
+        list.add(tencentCosConfig);
         return properties;
     }
 }

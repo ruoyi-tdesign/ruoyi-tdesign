@@ -5,7 +5,8 @@ import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * WebDav字段配置
@@ -66,10 +67,14 @@ public class WebDavStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.WebDavConfig webDavConfig = JsonUtils.parseObject(json, FileStorageProperties.WebDavConfig.class);
         webDavConfig.setPlatform(platform);
-        properties.setWebdav(Collections.singletonList(webDavConfig));
+        if (properties.getWebdav() == null) {
+            properties.setWebdav(new ArrayList<>());
+        }
+        List<FileStorageProperties.WebDavConfig> list = (List<FileStorageProperties.WebDavConfig>) properties.getWebdav();
+        list.add(webDavConfig);
         return properties;
     }
 }

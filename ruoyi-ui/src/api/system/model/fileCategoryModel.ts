@@ -9,7 +9,7 @@ export interface SysFileCategoryQuery extends BaseEntity {
   /** 父级分类id */
   parentId?: number;
   /** 用户类型 */
-  userType?: string;
+  loginType?: string;
   /** 上传人 */
   createBy?: number;
   /** 文件最大字节长度 */
@@ -34,7 +34,7 @@ export interface SysFileCategoryForm {
   /** 显示顺序 */
   orderNum?: number;
   /** 用户类型 */
-  userType?: string;
+  loginType?: string;
   /** 上传人 */
   createBy?: number;
 }
@@ -57,7 +57,7 @@ export interface SysFileCategoryVo {
   /** 显示顺序 */
   orderNum?: number;
   /** 用户类型 */
-  userType?: string;
+  loginType?: string;
   /** 上传人 */
   createBy?: number;
   /** 更新时间 */

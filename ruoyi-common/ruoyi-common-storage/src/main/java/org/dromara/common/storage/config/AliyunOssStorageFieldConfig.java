@@ -8,7 +8,7 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -103,10 +103,14 @@ public class AliyunOssStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.AliyunOssConfig aliyunOssConfig = JsonUtils.parseObject(json, FileStorageProperties.AliyunOssConfig.class);
         aliyunOssConfig.setPlatform(platform);
-        properties.setAliyunOss(Collections.singletonList(aliyunOssConfig));
+        if (properties.getAliyunOss() == null) {
+            properties.setAliyunOss(new ArrayList<>());
+        }
+        List<FileStorageProperties.AliyunOssConfig> list = (List<FileStorageProperties.AliyunOssConfig>) properties.getAliyunOss();
+        list.add(aliyunOssConfig);
         return properties;
     }
 }

@@ -23,9 +23,14 @@ public class SysFileCategoryQuery extends BasePageQuery {
     private String categoryName;
 
     /**
+     * 父级分类id
+     */
+    private String parentId;
+
+    /**
      * 用户类型
      */
-    private String userType;
+    private String loginType;
 
     /**
      * 上传人

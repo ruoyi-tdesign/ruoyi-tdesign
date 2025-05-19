@@ -18,9 +18,11 @@ import org.dromara.system.service.ISysFileService;
 import org.dromara.x.file.storage.core.FileInfo;
 import org.dromara.x.file.storage.core.hash.HashInfo;
 import org.dromara.x.file.storage.core.upload.FilePartInfo;
+import org.dromara.x.file.storage.core.upload.UploadPretreatment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.List;
@@ -94,6 +96,17 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
         return removeByIds(ids);
+    }
+
+    /**
+     * 上传文件
+     *
+     * @param file 文件
+     * @return 文件上传预处理器
+     */
+    @Override
+    public UploadPretreatment getUploader(MultipartFile file) {
+        return null;
     }
 
     /**

@@ -8,7 +8,7 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -109,10 +109,14 @@ public class HuaweiObsStorageFieldConfig implements StorageFieldConfig {
 
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.HuaweiObsConfig huaweiObsConfig = JsonUtils.parseObject(json, FileStorageProperties.HuaweiObsConfig.class);
         huaweiObsConfig.setPlatform(platform);
-        properties.setHuaweiObs(Collections.singletonList(huaweiObsConfig));
+        if (properties.getHuaweiObs() == null) {
+            properties.setHuaweiObs(new ArrayList<>());
+        }
+        List<FileStorageProperties.HuaweiObsConfig> list = (List<FileStorageProperties.HuaweiObsConfig>) properties.getHuaweiObs();
+        list.add(huaweiObsConfig);
         return properties;
     }
 }

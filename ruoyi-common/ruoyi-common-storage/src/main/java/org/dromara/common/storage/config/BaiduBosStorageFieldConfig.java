@@ -7,7 +7,7 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -96,10 +96,14 @@ public class BaiduBosStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.BaiduBosConfig baiduBosConfig = JsonUtils.parseObject(json, FileStorageProperties.BaiduBosConfig.class);
         baiduBosConfig.setPlatform(platform);
-        properties.setBaiduBos(Collections.singletonList(baiduBosConfig));
+        if (properties.getBaiduBos() == null) {
+            properties.setBaiduBos(new ArrayList<>());
+        }
+        List<FileStorageProperties.BaiduBosConfig> list = (List<FileStorageProperties.BaiduBosConfig>) properties.getBaiduBos();
+        list.add(baiduBosConfig);
         return properties;
     }
 }

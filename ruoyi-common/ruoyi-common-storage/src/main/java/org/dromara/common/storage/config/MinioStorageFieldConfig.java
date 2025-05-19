@@ -5,7 +5,8 @@ import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * MinIO字段配置
@@ -86,10 +87,14 @@ public class MinioStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.MinioConfig minioConfig = JsonUtils.parseObject(json, FileStorageProperties.MinioConfig.class);
         minioConfig.setPlatform(platform);
-        properties.setMinio(Collections.singletonList(minioConfig));
+        if (properties.getMinio() == null) {
+            properties.setMinio(new ArrayList<>());
+        }
+        List<FileStorageProperties.MinioConfig> list = (List<FileStorageProperties.MinioConfig>) properties.getMinio();
+        list.add(minioConfig);
         return properties;
     }
 }

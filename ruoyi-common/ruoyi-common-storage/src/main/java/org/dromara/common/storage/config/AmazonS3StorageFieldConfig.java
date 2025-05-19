@@ -8,7 +8,7 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -112,10 +112,14 @@ public class AmazonS3StorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.AmazonS3Config amazonS3Config = JsonUtils.parseObject(json, FileStorageProperties.AmazonS3Config.class);
         amazonS3Config.setPlatform(platform);
-        properties.setAmazonS3(Collections.singletonList(amazonS3Config));
+        if (properties.getAmazonS3() == null) {
+            properties.setAmazonS3(new ArrayList<>());
+        }
+        List<FileStorageProperties.AmazonS3Config> list = (List<FileStorageProperties.AmazonS3Config>) properties.getAmazonS3();
+        list.add(amazonS3Config);
         return properties;
     }
 }

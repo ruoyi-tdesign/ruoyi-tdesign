@@ -5,7 +5,8 @@ import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 本地存储升级版字段配置
@@ -44,10 +45,14 @@ public class LocalPlusStorageFieldConfig implements StorageFieldConfig {
 
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.LocalPlusConfig localPlusConfig = JsonUtils.parseObject(json, FileStorageProperties.LocalPlusConfig.class);
         localPlusConfig.setPlatform(platform);
-        properties.setLocalPlus(Collections.singletonList(localPlusConfig));
+        if (properties.getLocalPlus() == null) {
+            properties.setLocalPlus(new ArrayList<>());
+        }
+        List<FileStorageProperties.LocalPlusConfig> list = (List<FileStorageProperties.LocalPlusConfig>) properties.getLocalPlus();
+        list.add(localPlusConfig);
         return properties;
     }
 }

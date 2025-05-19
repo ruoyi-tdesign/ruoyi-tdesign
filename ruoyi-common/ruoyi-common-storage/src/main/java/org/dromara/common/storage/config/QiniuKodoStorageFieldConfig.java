@@ -5,7 +5,8 @@ import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 七牛云 Kodo 字段配置
@@ -57,10 +58,14 @@ public class QiniuKodoStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.QiniuKodoConfig qiniuKodoConfig = JsonUtils.parseObject(json, FileStorageProperties.QiniuKodoConfig.class);
         qiniuKodoConfig.setPlatform(platform);
-        properties.setQiniuKodo(Collections.singletonList(qiniuKodoConfig));
+        if (properties.getQiniuKodo() == null) {
+            properties.setQiniuKodo(new ArrayList<>());
+        }
+        List<FileStorageProperties.QiniuKodoConfig> list = (List<FileStorageProperties.QiniuKodoConfig>) properties.getQiniuKodo();
+        list.add(qiniuKodoConfig);
         return properties;
     }
 }

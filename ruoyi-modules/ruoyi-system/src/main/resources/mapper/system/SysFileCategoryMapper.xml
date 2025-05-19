@@ -12,7 +12,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectSysFileCategoryVo">
-        select sfc.file_category_id, sfc.category_name, sfc.parent_id, sfc.category_path, sfc.level, sfc.order_num, sfc.user_type, sfc.create_by, sfc.update_time, sfc.create_time from sys_file_category sfc
+        select sfc.file_category_id, sfc.category_name, sfc.parent_id, sfc.category_path, sfc.level, sfc.order_num, sfc.login_type, sfc.create_by, sfc.update_time, sfc.create_time from sys_file_category sfc
     </sql>
     <select id="queryList" parameterType="org.dromara.system.domain.query.SysFileCategoryQuery" resultMap="SysFileCategoryResultVo">
         select sfc.file_category_id,
@@ -21,7 +21,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                sfc.category_path,
                sfc.level,
                sfc.order_num,
-               sfc.user_type,
+               sfc.login_type,
                sfc.create_by,
                sfc.update_time,
                sfc.create_time,
@@ -39,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             <if test="categoryName != null and categoryName != ''"> and sfc.category_name like concat(concat('%', #{categoryName}), '%')</if>
             <if test="parentId != null"> and sfc.parent_id = #{parentId}</if>
-            <if test="userType != null and userType != ''"> and sfc.user_type = #{userType}</if>
+            <if test="loginType != null and loginType != ''"> and sfc.login_type = #{loginType}</if>
             <if test="createBy != null"> and sfc.create_by = #{createBy}</if>
         </where>
         order by sfc.order_num
@@ -51,7 +51,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                sfc.category_path,
                sfc.level,
                sfc.order_num,
-               sfc.user_type,
+               sfc.login_type,
                sfc.create_by,
                sfc.update_time,
                sfc.create_time,
@@ -69,7 +69,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from sys_file_category sfc
         <where>
             sfc.file_category_id = #{ossCategoryId}
-            <if test="userType != null and userType != ''"> and sfc.user_type = #{userType}</if>
+            <if test="loginType != null and loginType != ''"> and sfc.login_type = #{loginType}</if>
             <if test="createBy != null"> and sfc.create_by = #{createBy}</if>
         </where>
     </select>

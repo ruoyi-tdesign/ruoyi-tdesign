@@ -64,7 +64,7 @@ public class SysFileCategoryBo implements Serializable {
      */
     @NotBlank(message = "用户类型不能为空", groups = {AddGroup.class, EditGroup.class})
     @Length(max = 20, message = "用户类型不能大于{max}个字符", groups = {AddGroup.class, EditGroup.class})
-    private String userType;
+    private String loginType;
     /**
      * 上传人
      */

@@ -8,7 +8,7 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.constant.Constant;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -82,10 +82,14 @@ public class GoogleCloudStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.GoogleCloudStorageConfig googleCloudStorageConfig = JsonUtils.parseObject(json, FileStorageProperties.GoogleCloudStorageConfig.class);
         googleCloudStorageConfig.setPlatform(platform);
-        properties.setGoogleCloudStorage(Collections.singletonList(googleCloudStorageConfig));
+        if (properties.getGoogleCloudStorage() == null) {
+            properties.setGoogleCloudStorage(new ArrayList<>());
+        }
+        List<FileStorageProperties.GoogleCloudStorageConfig> list = (List<FileStorageProperties.GoogleCloudStorageConfig>) properties.getGoogleCloudStorage();
+        list.add(googleCloudStorageConfig);
         return properties;
     }
 }

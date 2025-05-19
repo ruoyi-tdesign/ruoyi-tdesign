@@ -42,7 +42,7 @@ public class SysFileCategoryController extends BaseController {
     @SaCheckPermission("system:fileCategory:list")
     @GetMapping("/list")
     public R<List<SysFileCategoryVo>> list(SysFileCategoryQuery query) {
-        query.setUserType(SaSecurityContext.getContext().getLoginType());
+        query.setLoginType(SaSecurityContext.getContext().getLoginType());
         query.setCreateBy(SaSecurityContext.getContext().getUserId());
         List<SysFileCategoryVo> list = sysFileCategoryService.queryList(query);
         return R.ok(list);
@@ -56,7 +56,7 @@ public class SysFileCategoryController extends BaseController {
     @SaCheckPermission(value = {"system:fileCategory:query", "system:fileCategory:edit"}, mode = SaMode.OR)
     @GetMapping("/query")
     public R<SysFileCategoryVo> getInfo(@Validated(QueryOneGroup.class) SysFileCategoryQuery query) {
-        query.setUserType(SaSecurityContext.getContext().getLoginType());
+        query.setLoginType(SaSecurityContext.getContext().getLoginType());
         query.setCreateBy(SaSecurityContext.getContext().getUserId());
         return R.ok(sysFileCategoryService.query(query));
     }
@@ -69,7 +69,7 @@ public class SysFileCategoryController extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysFileCategoryBo bo) {
-        bo.setUserType(SaSecurityContext.getContext().getLoginType());
+        bo.setLoginType(SaSecurityContext.getContext().getLoginType());
         bo.setCreateBy(SaSecurityContext.getContext().getUserId());
         return toAjax(sysFileCategoryService.insertByBo(bo));
     }
@@ -82,7 +82,7 @@ public class SysFileCategoryController extends BaseController {
     @RepeatSubmit()
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysFileCategoryBo bo) {
-        bo.setUserType(SaSecurityContext.getContext().getLoginType());
+        bo.setLoginType(SaSecurityContext.getContext().getLoginType());
         bo.setCreateBy(SaSecurityContext.getContext().getUserId());
         return toAjax(sysFileCategoryService.updateByBo(bo));
     }

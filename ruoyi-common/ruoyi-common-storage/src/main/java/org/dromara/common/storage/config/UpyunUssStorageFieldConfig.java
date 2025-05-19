@@ -5,7 +5,8 @@ import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 又拍云 USS 字段配置
@@ -70,10 +71,14 @@ public class UpyunUssStorageFieldConfig implements StorageFieldConfig {
     }
 
     @Override
-    public FileStorageProperties buildStorageProperties(FileStorageProperties properties, String platform, String json) {
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
         FileStorageProperties.UpyunUssConfig upyunUssConfig = JsonUtils.parseObject(json, FileStorageProperties.UpyunUssConfig.class);
         upyunUssConfig.setPlatform(platform);
-        properties.setUpyunUss(Collections.singletonList(upyunUssConfig));
+        if (properties.getUpyunUss() == null) {
+            properties.setUpyunUss(new ArrayList<>());
+        }
+        List<FileStorageProperties.UpyunUssConfig> list = (List<FileStorageProperties.UpyunUssConfig>) properties.getUpyunUss();
+        list.add(upyunUssConfig);
         return properties;
     }
 }

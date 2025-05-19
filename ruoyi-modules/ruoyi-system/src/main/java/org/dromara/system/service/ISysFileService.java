@@ -1,12 +1,14 @@
 package org.dromara.system.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.system.domain.SysFile;
 import org.dromara.system.domain.bo.SysFileBo;
 import org.dromara.system.domain.query.SysFileQuery;
 import org.dromara.system.domain.vo.SysFileVo;
-import com.baomidou.mybatisplus.extension.service.IService;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.x.file.storage.core.recorder.FileRecorder;
+import org.dromara.x.file.storage.core.upload.UploadPretreatment;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.List;
@@ -58,4 +60,12 @@ public interface ISysFileService extends IService<SysFile>, FileRecorder {
      * @return 是否删除成功
      */
     Boolean deleteWithValidByIds(Collection<Long> ids);
+
+    /**
+     * 上传文件
+     *
+     * @param file 文件
+     * @return 文件上传预处理器
+     */
+    UploadPretreatment getUploader(MultipartFile file);
 }
