@@ -1,12 +1,9 @@
 package org.dromara.common.storage.balancer;
 
 import lombok.Setter;
-import org.dromara.common.storage.config.StorageConfigData;
-import org.dromara.common.storage.config.StorageFieldConfig;
-import org.dromara.common.storage.expcetion.StorageServiceException;
-import org.dromara.x.file.storage.core.FileStorageProperties;
+import org.dromara.common.storage.utils.FileStorageUtil;
 import org.dromara.x.file.storage.core.FileStorageService;
-import org.dromara.x.file.storage.core.FileStorageServiceBuilder;
+import org.dromara.x.file.storage.core.recorder.FileRecorder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +16,31 @@ import java.util.List;
  */
 public class FileStorageLoadBalancer {
 
+    /**
+     * 负载均衡算法
+     */
     @Setter
     private LoadBalancingAlgorithm algorithm;
 
+    /**
+     * 配置列表
+     */
     private final List<FileServer> servers;
+
+    /**
+     * 持久化记录器
+     */
+    @Setter
+    private FileRecorder fileRecorder;
 
     public FileStorageLoadBalancer(LoadBalancingAlgorithm algorithm) {
         this.algorithm = algorithm;
         servers = new ArrayList<>();
+    }
+
+    public FileStorageLoadBalancer(LoadBalancingAlgorithm algorithm, List<FileServer> servers) {
+        this.servers = servers;
+        this.algorithm = algorithm;
     }
 
     public void addServer(FileServer server) {
@@ -40,14 +54,11 @@ public class FileStorageLoadBalancer {
 
     public FileStorageService getService() {
         FileServer server = algorithm.selectServer(servers);
-        StorageFieldConfig config = StorageConfigData.getStorageConfig(server.getPlatform());
-        if (config == null) {
-            throw new StorageServiceException("平台配置不存在！");
+        FileStorageService service = FileStorageUtil.getFileStorageService(server);
+        if (fileRecorder != null) {
+            service.setFileRecorder(fileRecorder);
         }
-        FileStorageProperties properties = new FileStorageProperties();
-        properties.setDefaultPlatform(server.getId());
-        config.addStorageProperties(properties, server.getId(), server.getProperties());
-        return FileStorageServiceBuilder.create(properties).useDefault().build();
+        return service;
     }
 
 }

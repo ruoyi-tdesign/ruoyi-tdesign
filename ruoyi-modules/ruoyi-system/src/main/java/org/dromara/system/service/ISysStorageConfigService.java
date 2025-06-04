@@ -2,6 +2,7 @@ package org.dromara.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.storage.balancer.FileServer;
 import org.dromara.system.domain.SysStorageConfig;
 import org.dromara.system.domain.bo.SysStorageConfigBo;
 import org.dromara.system.domain.query.SysStorageConfigQuery;
@@ -9,6 +10,7 @@ import org.dromara.system.domain.vo.SysStorageConfigVo;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 存储配置Service接口
@@ -73,4 +75,18 @@ public interface ISysStorageConfigService extends IService<SysStorageConfig> {
      * @param status          状态
      */
     boolean updateConfigStatus(Long storageConfigId, Integer status);
+
+     /**
+     * 获取缓存列表
+     *
+     * @return 缓存列表
+     */
+    Map<Long, SysStorageConfig> getCacheMap();
+
+    /**
+     * 获取缓存列表
+     *
+     * @return 缓存列表
+     */
+    List<FileServer> getFileServerList();
 }

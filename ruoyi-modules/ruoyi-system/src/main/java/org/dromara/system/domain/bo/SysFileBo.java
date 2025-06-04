@@ -35,10 +35,6 @@ public class SysFileBo implements Serializable {
     @Length(max = 256, message = "原始文件名不能大于{max}个字符", groups = {AddGroup.class, EditGroup.class})
     private String originalFilename;
     /**
-     * 文件用户元数据
-     */
-    private String userMetadata;
-    /**
      * 分类id
      */
     @NotNull(message = "分类id不能为空", groups = {AddGroup.class, EditGroup.class})
@@ -48,4 +44,12 @@ public class SysFileBo implements Serializable {
      */
     @NotNull(message = "是否锁定状态不能为空", groups = {AddGroup.class, EditGroup.class})
     private Integer isLock;
+    /**
+     * 用户类型
+     */
+    private String userType;
+    /**
+     * 上传人
+     */
+    private Long createBy;
 }

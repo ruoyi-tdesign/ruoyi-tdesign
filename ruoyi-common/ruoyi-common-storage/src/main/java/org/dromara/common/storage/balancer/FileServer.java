@@ -7,7 +7,11 @@ public interface FileServer {
     /** 获取服务器唯一标识 */
     String getId();
 
-    /** 获取平台标识 */
+    /**
+     * 获取平台标识
+     *
+     * @see org.dromara.common.storage.enums.StorageEnum#getCode
+     */
     String getPlatform();
 
     /**

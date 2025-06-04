@@ -1,32 +1,39 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
+import org.dromara.common.core.enums.YesNoEnum;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.storage.balancer.DefaultFileServer;
+import org.dromara.common.storage.balancer.FileServer;
+import org.dromara.common.storage.balancer.FileStorageLoadBalancer;
+import org.dromara.common.storage.balancer.RedisRoundRobinAlgorithm;
+import org.dromara.common.storage.utils.FileStorageUtil;
 import org.dromara.system.domain.SysFile;
+import org.dromara.system.domain.SysFileCategory;
+import org.dromara.system.domain.SysStorageConfig;
 import org.dromara.system.domain.bo.SysFileBo;
 import org.dromara.system.domain.query.SysFileQuery;
 import org.dromara.system.domain.vo.SysFileVo;
 import org.dromara.system.mapper.SysFileMapper;
-import org.dromara.system.service.ISysFilePartService;
+import org.dromara.system.service.ISysFileCategoryService;
 import org.dromara.system.service.ISysFileService;
+import org.dromara.system.service.ISysStorageConfigService;
 import org.dromara.x.file.storage.core.FileInfo;
-import org.dromara.x.file.storage.core.hash.HashInfo;
-import org.dromara.x.file.storage.core.upload.FilePartInfo;
-import org.dromara.x.file.storage.core.upload.UploadPretreatment;
+import org.dromara.x.file.storage.core.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 文件记录Service业务层处理
@@ -38,7 +45,11 @@ import java.util.Map;
 public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> implements ISysFileService {
 
     @Autowired
-    private ISysFilePartService filePartService;
+    private ISysStorageConfigService storageConfigService;
+    @Autowired
+    private SysFileRecorder fileRecorder;
+    @Autowired
+    private ISysFileCategoryService categoryService;
 
     /**
      * 查询文件记录
@@ -82,8 +93,17 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateByBo(SysFileBo bo) {
-        SysFile update = MapstructUtils.convert(bo, SysFile.class);
-        return updateById(update);
+        checkCategory(bo.getFileCategoryId(), bo.getUserType(), bo.getCreateBy());
+        SysFile oss = new SysFile();
+        oss.setFileId(bo.getFileId());
+        oss.setOriginalFilename(bo.getOriginalFilename());
+        oss.setFileCategoryId(bo.getFileCategoryId());
+        oss.setIsLock(bo.getIsLock());
+        return update(oss, lambdaQuery()
+            .eq(SysFile::getFileId, bo.getFileId())
+            .eq(SysFile::getUserType, bo.getUserType())
+            .eq(SysFile::getCreateBy, bo.getCreateBy())
+            .getWrapper());
     }
 
     /**
@@ -95,132 +115,184 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
+        boolean exists = lambdaQuery()
+            .in(SysFile::getFileId, ids)
+            .eq(SysFile::getIsLock, YesNoEnum.YES.getCodeNum())
+            .exists();
+        if (exists) {
+            throw new ServiceException("加锁文件必须解锁后才能删除");
+        }
+        List<SysFile> list = baseMapper.selectByIds(ids);
+        boolean b = removeByIds(ids);
+        if (b) {
+            realRemoveFile(list);
+        }
         return removeByIds(ids);
+    }
+
+    private void realRemoveFile(List<SysFile> list) {
+        for (SysFile file : list) {
+            SysStorageConfig config = storageConfigService.getById(file.getStorageConfigId());
+            if (config == null) {
+                throw new ServiceException("文件【%s】存储配置不存在".formatted(file.getOriginalFilename()));
+            }
+            FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
+            FileStorageService service = getFileStorageService(config);
+            service.delete(fileInfo);
+        }
     }
 
     /**
      * 上传文件
      *
+     * @param bo
      * @param file 文件
-     * @return 文件上传预处理器
+     * @return 文件
      */
     @Override
-    public UploadPretreatment getUploader(MultipartFile file) {
-        return null;
+    @Transactional(rollbackFor = Exception.class)
+    public SysFile upload(SysFileBo bo, MultipartFile file) {
+        FileStorageService service = getFileStorageService();
+        FileInfo upload = service.of(file).upload();
+        SysFile sysFile = MapstructUtils.convert(upload, SysFile.class);
+        long id = Long.parseLong(upload.getId());
+        sysFile.setFileId(id);
+        updateById(sysFile);
+        return getById(id);
     }
 
     /**
-     * 保存文件信息到数据库
-     */
-    @SneakyThrows
-    @Override
-    public boolean save(FileInfo info) {
-        SysFile detail = toSysFile(info);
-        boolean b = save(detail);
-        if (b) {
-            info.setId(detail.getFileId().toString());
-        }
-        return b;
-    }
-
-    /**
-     * 更新文件记录，可以根据文件 ID 或 URL 来更新文件记录，
-     * 主要用在手动分片上传文件-完成上传，作用是更新文件信息
-     */
-    @Override
-    public void update(FileInfo info) {
-        SysFile detail = toSysFile(info);
-        lambdaUpdate()
-            .eq(detail.getUrl() != null, SysFile::getUrl, detail.getUrl())
-            .eq(detail.getFileId() != null, SysFile::getFileId, detail.getFileId())
-            .update(detail);
-    }
-
-    /**
-     * 根据 url 查询文件信息
-     */
-    @Override
-    public FileInfo getByUrl(String url) {
-        return toFileInfo(lambdaQuery().eq(SysFile::getUrl, url).one());
-    }
-
-    /**
-     * 根据 url 删除文件信息
-     */
-    @Override
-    public boolean delete(String url) {
-        lambdaUpdate().eq(SysFile::getUrl, url).remove();
-        return true;
-    }
-
-    /**
-     * 保存文件分片信息
+     * 下载文件
      *
-     * @param filePartInfo 文件分片信息
+     * @param fileId   文件ID
+     * @param response 响应
      */
     @Override
-    public void saveFilePart(FilePartInfo filePartInfo) {
-        filePartService.saveFilePart(filePartInfo);
+    @SneakyThrows(IOException.class)
+    public void download(Long fileId, HttpServletResponse response) {
+        SysFile file = getById(fileId);
+        if (file == null) {
+            throw new ServiceException("文件不存在");
+        }
+        SysStorageConfig config = storageConfigService.getById(file.getStorageConfigId());
+        if (config == null) {
+            throw new ServiceException("文件存储配置不存在");
+        }
+        FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
+        FileStorageService service = getFileStorageService(config);
+        service.download(fileInfo).outputStream(response.getOutputStream());
+    }
+
+    private static FileStorageService getFileStorageService(SysStorageConfig config) {
+        DefaultFileServer fileServer = new DefaultFileServer();
+        fileServer.setId(config.getStorageConfigId().toString());
+        fileServer.setPlatform(config.getPlatform());
+        fileServer.setWeight(config.getWeight());
+        fileServer.setProperties(config.getConfigJson());
+        return FileStorageUtil.getFileStorageService(fileServer);
     }
 
     /**
-     * 删除文件分片信息
+     * 根据ID列表查询文件
+     *
+     * @param fileIds 文件ID列表
+     * @return 文件列表
      */
     @Override
-    public void deleteFilePartByUploadId(String uploadId) {
-        filePartService.deleteFilePartByUploadId(uploadId);
+    public List<SysFileVo> listVoByIds(List<Long> fileIds) {
+        List<SysFile> list = lambdaQuery().in(SysFile::getFileId, fileIds).list();
+        return MapstructUtils.convert(list, SysFileVo.class);
     }
 
     /**
-     * 将 FileInfo 转为 SysFile
+     * 获取文件存储服务
      */
-    public SysFile toSysFile(FileInfo info) {
-        SysFile detail = BeanUtil.copyProperties(
-            info, SysFile.class, "metadata", "userMetadata", "thMetadata", "thUserMetadata", "attr", "hashInfo");
-
-        // 这里手动获 元数据 并转成 json 字符串，方便存储在数据库中
-        detail.setMetadata(JsonUtils.toJsonString(info.getMetadata()));
-        detail.setUserMetadata(JsonUtils.toJsonString(info.getUserMetadata()));
-        detail.setThMetadata(JsonUtils.toJsonString(info.getThMetadata()));
-        detail.setThUserMetadata(JsonUtils.toJsonString(info.getThUserMetadata()));
-        // 这里手动获 取附加属性字典 并转成 json 字符串，方便存储在数据库中
-        detail.setAttr(JsonUtils.toJsonString(info.getAttr()));
-        // 这里手动获 哈希信息 并转成 json 字符串，方便存储在数据库中
-        detail.setHashInfo(JsonUtils.toJsonString(info.getHashInfo()));
-        return detail;
+    private FileStorageService getFileStorageService() {
+        List<FileServer> servers = storageConfigService.getFileServerList();
+        FileStorageLoadBalancer balancer = new FileStorageLoadBalancer(new RedisRoundRobinAlgorithm(), servers);
+        balancer.setFileRecorder(fileRecorder);
+        return balancer.getService();
     }
 
     /**
-     * 将 SysFile 转为 FileInfo
+     * 删除我的文件存储
+     *
+     * @param fileIds   文件ID列表
+     * @param loginType 登录类型
+     * @param userId    用户ID
      */
-    public FileInfo toFileInfo(SysFile detail) {
-        FileInfo info = BeanUtil.copyProperties(
-            detail, FileInfo.class, "metadata", "userMetadata", "thMetadata", "thUserMetadata", "attr", "hashInfo");
-
-        // 这里手动获取数据库中的 json 字符串 并转成 元数据，方便使用
-        info.setMetadata(jsonToMetadata(detail.getMetadata()));
-        info.setUserMetadata(jsonToMetadata(detail.getUserMetadata()));
-        info.setThMetadata(jsonToMetadata(detail.getThMetadata()));
-        info.setThUserMetadata(jsonToMetadata(detail.getThUserMetadata()));
-        // 这里手动获取数据库中的 json 字符串 并转成 附加属性字典，方便使用
-        info.setAttr(JsonUtils.parseMap(detail.getAttr()));
-        // 这里手动获取数据库中的 json 字符串 并转成 哈希信息，方便使用
-        info.setHashInfo(jsonToHashInfo(detail.getHashInfo()));
-        return info;
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean deleteMyIds(List<Long> fileIds, String loginType, Long userId) {
+        boolean exists = lambdaQuery()
+            .in(SysFile::getFileId, fileIds)
+            .eq(SysFile::getIsLock, YesNoEnum.YES.getCodeNum())
+            .exists();
+        if (exists) {
+            throw new ServiceException("加锁文件必须解锁后才能删除");
+        }
+        List<SysFile> fileList = lambdaQuery()
+            .in(SysFile::getFileId, fileIds)
+            .eq(SysFile::getUserType, loginType)
+            .eq(SysFile::getCreateBy, userId)
+            .list();
+        boolean remove = lambdaUpdate()
+            .in(SysFile::getFileId, fileIds)
+            .eq(SysFile::getUserType, loginType)
+            .eq(SysFile::getCreateBy, userId)
+            .remove();
+        if (remove) {
+            realRemoveFile(fileList);
+        }
+        return remove;
     }
 
     /**
-     * 将 json 字符串转换成元数据对象
+     * 移动到分类
+     *
+     * @param categoryId 分类ID
+     * @param fileIds    文件ID列表
+     * @param loginType  登录类型
+     * @param userId     用户ID
      */
-    public Map<String, String> jsonToMetadata(String json) {
-        return JsonUtils.parseObject(json, new TypeReference<>() {
-        });
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void move(Long categoryId, List<Long> fileIds, String loginType, Long userId) {
+        checkCategory(categoryId, loginType, userId);
+        // 安全过滤
+        List<SysFile> ossList = lambdaQuery()
+            .in(SysFile::getFileId, fileIds)
+            .eq(SysFile::getUserType, loginType)
+            .eq(SysFile::getCreateBy, userId)
+            .select(SysFile::getFileId)
+            .list();
+        fileIds = StreamUtils.toList(ossList, SysFile::getFileId);
+        List<SysFile> list = fileIds.stream().map(id -> {
+            SysFile file = new SysFile();
+            file.setFileId(id);
+            file.setFileCategoryId(categoryId);
+            return file;
+        }).toList();
+        updateBatchById(list);
     }
 
     /**
-     * 将 json 字符串转换成哈希信息对象
+     * 检查分类是否存在
+     *
+     * @param fileCategoryId 分类id
+     * @param loginType      登录类型
+     * @param userId         用户id
      */
-    public HashInfo jsonToHashInfo(String json) {
-        return JsonUtils.parseObject(json, HashInfo.class);
+    private void checkCategory(Long fileCategoryId, String loginType, Long userId) {
+        if (!fileCategoryId.equals(0L)) {
+            boolean exists = categoryService.lambdaQuery()
+                .eq(SysFileCategory::getFileCategoryId, fileCategoryId)
+                .eq(SysFileCategory::getLoginType, loginType)
+                .eq(SysFileCategory::getCreateBy, userId)
+                .exists();
+            if (!exists) {
+                throw new ServiceException("分类不存在");
+            }
+        }
     }
 }

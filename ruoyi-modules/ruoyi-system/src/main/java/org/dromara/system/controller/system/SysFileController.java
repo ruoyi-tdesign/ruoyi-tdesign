@@ -6,24 +6,20 @@ import cn.hutool.core.util.ObjectUtil;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.context.SaSecurityContext;
-import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
+import org.dromara.system.domain.SysFile;
 import org.dromara.system.domain.bo.SysFileBo;
-import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.query.SysFileQuery;
+import org.dromara.system.domain.vo.SysFileUploadVo;
 import org.dromara.system.domain.vo.SysFileVo;
-import org.dromara.system.domain.vo.SysOssUploadVo;
-import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.service.ISysFileCategoryService;
 import org.dromara.system.service.ISysFileService;
-import org.dromara.x.file.storage.core.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -47,8 +43,6 @@ public class SysFileController extends BaseController {
     private ISysFileService fileService;
     @Autowired
     private ISysFileCategoryService fileCategoryService;
-//    @Autowired
-//    private FileStorageService fileStorageService;
 
     /**
      * 查询文件记录列表
@@ -62,7 +56,6 @@ public class SysFileController extends BaseController {
     /**
      * 查询我的文件列表
      */
-    @SaCheckPermission(value = {"system:file:list", "system:fileCategory:list", "system:fileCategory:query", "system:fileCategory:edit"}, mode = SaMode.OR)
     @GetMapping("/my/list")
     public TableDataInfo<SysFileVo> myList(SysFileQuery query) {
         query.setCreateBy(SaSecurityContext.getContext().getUserId());
@@ -98,39 +91,40 @@ public class SysFileController extends BaseController {
      *
      * @param file 文件
      */
-    @SaCheckPermission("system:file:upload")
     @Log(title = "文件存储", businessType = BusinessType.INSERT)
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public R<SysOssUploadVo> upload(@RequestPart("file") MultipartFile file, Long ossCategoryId) {
+    public R<SysFileUploadVo> upload(@RequestPart("file") MultipartFile file, Long fileCategoryId) {
         if (ObjectUtil.isNull(file)) {
             return R.fail("上传文件不能为空");
         }
         String loginType = SaSecurityContext.getContext().getLoginType();
         Long userId = SaSecurityContext.getContext().getUserId();
-        boolean exist = fileCategoryService.hasId(ossCategoryId, loginType, userId);
+        boolean exist = fileCategoryService.hasId(fileCategoryId, loginType, userId);
 
-//        SysOssBo bo = new SysOssBo();
-//        bo.setCreateBy(LoginHelper.getUserId());
-//        bo.setUserTypeEnum(UserType.SYS_USER);
-//        bo.setIsLock(0);
-//
-//        bo.setOssCategoryId(exist ? ossCategoryId : 0L);
-//        SysOssVo oss = ossService.upload(file, bo);
-//        SysOssUploadVo uploadVo = new SysOssUploadVo();
-//        uploadVo.setUrl(oss.getUrl());
-//        uploadVo.setFileName(oss.getOriginalName());
-//        uploadVo.setOssId(oss.getOssId().toString());
-//        return R.ok(uploadVo);
+        SysFileBo bo = new SysFileBo();
+        bo.setCreateBy(userId);
+        bo.setUserType(loginType);
+        bo.setIsLock(0);
+        bo.setFileCategoryId(exist ? fileCategoryId : 0L);
+        SysFile upload = fileService.upload(bo, file);
+
+        SysFileUploadVo uploadVo = new SysFileUploadVo();
+        uploadVo.setFileId(upload.getFileId().toString());
+        uploadVo.setFileName(upload.getFilename());
+        return R.ok(uploadVo);
     }
 
     /**
      * 修改文件记录
      */
-    @SaCheckPermission("system:file:edit")
     @Log(title = "文件记录", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysFileBo bo) {
+    @PutMapping("/my")
+    public R<Void> myEdit(@Validated(EditGroup.class) @RequestBody SysFileBo bo) {
+        String loginType = SaSecurityContext.getContext().getLoginType();
+        Long userId = SaSecurityContext.getContext().getUserId();
+        bo.setUserType(loginType);
+        bo.setCreateBy(userId);
         return toAjax(fileService.updateByBo(bo));
     }
 
@@ -144,5 +138,35 @@ public class SysFileController extends BaseController {
     @DeleteMapping("/{fileIds}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空") @PathVariable Long[] fileIds) {
         return toAjax(fileService.deleteWithValidByIds(List.of(fileIds)));
+    }
+
+    /**
+     * 删除我的文件存储
+     *
+     * @param fileIds 文件ID串
+     */
+    @Log(title = "文件记录", businessType = BusinessType.DELETE)
+    @DeleteMapping("/my/{fileIds}")
+    public R<Void> removeMyIds(@NotEmpty(message = "主键不能为空") @PathVariable Long[] fileIds) {
+        String loginType = SaSecurityContext.getContext().getLoginType();
+        Long userId = SaSecurityContext.getContext().getUserId();
+        return toAjax(fileService.deleteMyIds(List.of(fileIds), loginType, userId));
+    }
+
+    /**
+     * 移动到分类
+     *
+     * @param categoryId 分类id
+     * @param fileIds    主键id
+     * @return
+     */
+    @PostMapping("/{categoryId}/move")
+    @Log(title = "文件记录", businessType = BusinessType.UPDATE)
+    public R<Void> move(@NotNull(message = "分类id不能为空") @PathVariable Long categoryId,
+                        @RequestBody @NotEmpty(message = "主键不能为空") List<Long> fileIds) {
+        String loginType = SaSecurityContext.getContext().getLoginType();
+        Long userId = SaSecurityContext.getContext().getUserId();
+        fileService.move(categoryId, fileIds, loginType, userId);
+        return R.ok();
     }
 }
