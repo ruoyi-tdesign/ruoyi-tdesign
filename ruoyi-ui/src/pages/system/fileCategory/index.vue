@@ -213,8 +213,8 @@ import type {
 } from '@/api/system/model/fileCategoryModel';
 import type { SysFileVo } from '@/api/system/model/fileModel';
 
+import FileList from './FileList.vue';
 import type { FileListProps } from './FileList.vue';
-import FileList from './components/FileList.vue';
 
 export interface FileCategoryProps extends Omit<FileListProps, 'categoryId'> {}
 const props = withDefaults(defineProps<FileCategoryProps>(), {

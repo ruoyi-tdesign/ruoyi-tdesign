@@ -10,6 +10,36 @@ import { blobValidate } from '@/utils/ruoyi';
 const baseURL = import.meta.env.VITE_APP_BASE_API;
 
 export default {
+  file(ossId: number | string) {
+    const { token } = useUserStore();
+    const url = `${baseURL}/system/file/download/${ossId}`;
+    const downloadLoadingInstance = LoadingPlugin({
+      text: '正在下载数据，请稍候',
+      attach: 'body',
+      fullscreen: true,
+      zIndex: 99999,
+    });
+    axios({
+      method: 'get',
+      url,
+      responseType: 'blob',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        const isBlob = blobValidate(res.data);
+        if (isBlob) {
+          const blob = new Blob([res.data], { type: 'application/octet-stream' });
+          this.saveAs(blob, decodeURI(res.headers['download-filename']));
+        } else {
+          this.printErrMsg(res.data);
+        }
+      })
+      .catch((r) => {
+        console.error(r);
+        MessagePlugin.error('下载文件出现错误，请联系管理员！');
+      })
+      .finally(() => downloadLoadingInstance.hide());
+  },
   oss(ossId: number | string) {
     const { token } = useUserStore();
     const url = `${baseURL}/resource/oss/download/${ossId}`;

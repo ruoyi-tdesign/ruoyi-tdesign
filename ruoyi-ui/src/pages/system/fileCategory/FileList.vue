@@ -62,7 +62,7 @@
             class="list-card-gallery-item"
             role="checkbox"
             :tabindex="index"
-            :title="file.originalName"
+            :title="file.originalFilename"
             @mousedown.stop
             @dblclick.stop="handleUpdate(file)"
             @click.exact.stop="handleClick(file)"
@@ -76,7 +76,7 @@
             >
               <figure class="list-card-gallery-figure" data-visible="true">
                 <figcaption class="list-card-gallery-figure__caption">
-                  {{ file.fileSuffix?.substring(1) }}
+                  {{ file.ext?.substring(1) }}
                   <template v-if="thumbnailSize >= 100"> ({{ bytesToSize(file.size).replace(' ', '') }}) </template>
                 </figcaption>
                 <div class="list-card-gallery-figure__content">
@@ -91,14 +91,14 @@
                       draggable="false"
                       class="list-card-gallery-responsive-image__img--fit list-card-gallery-responsive-image__img--cover"
                       :src="file.url"
-                      :alt="file.originalName"
+                      :alt="file.originalFilename"
                     />
                   </picture>
                 </div>
               </figure>
               <div class="list-card-gallery-item__details">
                 <span class="list-card-gallery-item__name">
-                  <lock-on-icon v-if="file.isLock === 1" /><span>{{ file.originalName }}</span>
+                  <lock-on-icon v-if="file.isLock === 1" /><span>{{ file.originalFilename }}</span>
                 </span>
                 <button
                   class="gallery-btn gallery-btn--neutral gallery-btn--plain gallery-btn--small gallery-btn--icon-only-small list-card-gallery-item__checkmark"
@@ -209,8 +209,8 @@
           <t-form-item label="fileId" name="fileId">
             {{ form.fileId }}
           </t-form-item>
-          <t-form-item label="原名" name="originalName">
-            <t-input v-model="form.originalName" placeholder="请输入原名" clearable />
+          <t-form-item label="原名" name="originalFilename">
+            <t-input v-model="form.originalFilename" placeholder="请输入原名" clearable />
           </t-form-item>
           <t-form-item label="分类" name="fileCategoryId">
             <t-tree-select
@@ -319,6 +319,8 @@ import type { FormInstanceFunctions, FormRule, PageInfo, SubmitContext } from 't
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
+import { delMyFile, getFile, listMyFile, moveFile, updateFile } from '@/api/system/file';
+import { listFileCategory } from '@/api/system/fileCategory';
 import type { SysFileCategoryVo } from '@/api/system/model/fileCategoryModel';
 import type { SysFileActiveVo, SysFileForm, SysFileQuery, SysFileVo } from '@/api/system/model/fileModel';
 import ArchiveSvg from '@/assets/file-type/archive.svg?component';
@@ -436,7 +438,7 @@ const rowType = computed({
 });
 
 const rules = ref<Record<string, Array<FormRule>>>({
-  originalName: [
+  originalFilename: [
     { required: true, message: '原名不能为空' },
     { pattern: /^[^.][^\\/<>:?"|*]*$/, message: '文件名不能包含下列任何字符：\\/<>:?"|*' },
   ],

@@ -28,6 +28,11 @@ public class SysFile implements Serializable {
     private Long fileId;
 
     /**
+     * 租户编号
+     */
+    private String tenantId;
+
+    /**
      * 文件访问地址
      */
     private String url;

@@ -188,6 +188,12 @@ public class SysFileVo implements Serializable {
     private Long fileCategoryId;
 
     /**
+     * 分类路径
+     */
+    @ExcelProperty(value = "分类路径")
+    private String categoryPath;
+
+    /**
      * 用户类型
      */
     @ExcelProperty(value = "用户类型")
@@ -211,4 +217,9 @@ public class SysFileVo implements Serializable {
     @ExcelProperty(value = "创建时间")
     private Date createTime;
 
+    /**
+     * 上传人名称
+     */
+    @ExcelProperty(value = "上传人名称")
+    private String createByName;
 }

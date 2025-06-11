@@ -1,5 +1,4 @@
 import type { BaseEntity } from '@/api/model/resultModel';
-import type { SysOssVo } from '@/api/system/model/ossModel';
 
 /**
  * 文件记录查询对象
@@ -16,7 +15,7 @@ export interface SysFileQuery extends BaseEntity {
   /** 文件扩展名 */
   ext?: string;
   /** MIME类型 */
-  contentTypes?: string[];
+  contentType?: string;
   /** 文件ACL */
   fileAcl?: string;
   /** 分类id */
@@ -25,12 +24,16 @@ export interface SysFileQuery extends BaseEntity {
   userType?: string;
   /** 是否锁定状态 */
   isLock?: number;
+  /** 上传人 */
+  createBy?: number;
+  /** 上传人 */
+  createByName?: string;
+  /** 多个文件后缀 */
+  suffixes?: string[];
   /** 文件最大字节长度 */
   maxSize?: number;
-  /** 创建时间 */
-  createTime?: any;
-  /** 多个文件后缀，忽略大小写 */
-  suffixes?: string[];
+  /** 内容类型 */
+  contentTypes?: string[];
 }
 /**
  * 文件记录业务对象
@@ -125,8 +128,6 @@ export interface SysFileActiveVo extends SysFileVo {
  * 上传对象信息
  */
 export interface SysFileUploadVo {
-  /** URL地址 */
-  url?: string;
   /** 文件名 */
   fileName?: string;
   /** 对象存储主键 */

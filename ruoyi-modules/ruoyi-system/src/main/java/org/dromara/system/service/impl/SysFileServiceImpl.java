@@ -59,7 +59,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      */
     @Override
     public SysFileVo queryById(Long fileId) {
-        return baseMapper.selectVoById(fileId);
+        return baseMapper.queryById(fileId);
     }
 
     /**

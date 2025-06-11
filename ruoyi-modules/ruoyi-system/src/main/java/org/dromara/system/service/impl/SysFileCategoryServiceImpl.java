@@ -137,7 +137,7 @@ public class SysFileCategoryServiceImpl extends ServiceImpl<SysFileCategoryMappe
         }
         return update(category, lambdaQuery()
             .eq(SysFileCategory::getFileCategoryId, category.getFileCategoryId())
-            .eq(SysFileCategory::getLoginType, bo.getUserType())
+            .eq(SysFileCategory::getLoginType, bo.getLoginType())
             .eq(SysFileCategory::getCreateBy, bo.getCreateBy())
             .getWrapper());
     }

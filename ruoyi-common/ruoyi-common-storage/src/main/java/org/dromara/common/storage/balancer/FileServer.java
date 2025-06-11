@@ -18,7 +18,7 @@ public interface FileServer {
      * 获取服务器权重，用于负载均衡算法计算
      * 权重越高，表示服务器处理能力越强，应分配更多请求
      */
-    int getWeight();
+    Integer getWeight();
 
     /**
      * 获取服务器配置信息

@@ -1,5 +1,6 @@
 package org.dromara.system.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.dromara.system.domain.SysFile;
 import org.dromara.system.domain.bo.SysFileBo;
 import org.dromara.system.domain.query.SysFileQuery;
@@ -23,4 +24,12 @@ public interface SysFileMapper extends BaseMapperPlus<SysFile, SysFileVo> {
      * @return {@link SysFileVo}
      */
     List<SysFileVo> queryList(SysFileQuery query);
+
+    /**
+     * 根据ID查询文件记录
+     *
+     * @param fileId 文件记录ID
+     * @return {@link SysFileVo}
+     */
+    SysFileVo queryById(@Param("fileId") Long fileId);
 }

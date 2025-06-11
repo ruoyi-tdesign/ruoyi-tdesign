@@ -70,6 +70,11 @@ public class SysFileQuery extends BasePageQuery {
     private Long createBy;
 
     /**
+     * 上传人
+     */
+    private String createByName;
+
+    /**
      * 多个文件后缀
      */
     private String[] suffixes;
