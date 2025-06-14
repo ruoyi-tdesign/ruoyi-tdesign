@@ -36,6 +36,7 @@ import java.util.List;
 public class PlusDataPermissionInterceptor extends BaseMultiTableInnerInterceptor implements InnerInterceptor {
 
     private final PlusDataPermissionHandler dataPermissionHandler;
+    private static final String SUFFIX = "_COUNT";
 
     /**
      * 构造函数，初始化 PlusDataPermissionHandler 实例
@@ -59,17 +60,22 @@ public class PlusDataPermissionInterceptor extends BaseMultiTableInnerIntercepto
      */
     @Override
     public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+        String effectiveMsId = ms.getId();
+        if (ms.getId().endsWith(SUFFIX)) {
+            effectiveMsId = ms.getId().substring(0, ms.getId().length() - SUFFIX.length());
+        }
         // 检查是否需要忽略数据权限处理
-        if (InterceptorIgnoreHelper.willIgnoreDataPermission(ms.getId())) {
+        if (InterceptorIgnoreHelper.willIgnoreDataPermission(effectiveMsId)) {
             return;
         }
         // 检查是否缺少有效的数据权限注解
-        if (dataPermissionHandler.invalid(ms.getId())) {
+        if (dataPermissionHandler.invalid(effectiveMsId)) {
             return;
         }
+        log.debug("[数据权限拦截器] - ID: {}", ms.getId());
         // 解析 sql 分配对应方法
         PluginUtils.MPBoundSql mpBs = PluginUtils.mpBoundSql(boundSql);
-        mpBs.sql(parserSingle(mpBs.sql(), ms.getId()));
+        mpBs.sql(parserSingle(mpBs.sql(), effectiveMsId));
     }
 
     /**

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
  * @author hexm
  * @date 2024/4/18
  */
+@Slf4j
 public class CompatibleTenantLineInnerInterceptor extends TenantLineInnerInterceptor {
 
     private static final String SUFFIX = "_COUNT";
@@ -38,6 +40,7 @@ public class CompatibleTenantLineInnerInterceptor extends TenantLineInnerInterce
         if (InterceptorIgnoreHelper.willIgnoreTenantLine(effectiveMsId)) {
             return;
         }
+        log.debug("[租户拦截器] - ID: {}", ms.getId());
         PluginUtils.MPBoundSql mpBs = PluginUtils.mpBoundSql(boundSql);
         mpBs.sql(parserSingle(mpBs.sql(), null));
     }
