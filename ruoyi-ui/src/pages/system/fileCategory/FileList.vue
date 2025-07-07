@@ -76,7 +76,7 @@
             >
               <figure class="list-card-gallery-figure" data-visible="true">
                 <figcaption class="list-card-gallery-figure__caption">
-                  {{ file.ext?.substring(1) }}
+                  {{ file.ext }}
                   <template v-if="thumbnailSize >= 100"> ({{ bytesToSize(file.size).replace(' ', '') }}) </template>
                 </figcaption>
                 <div class="list-card-gallery-figure__content">
@@ -318,7 +318,7 @@ import type { FormInstanceFunctions, FormRule, PageInfo, SubmitContext } from 't
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import {delMyFile, getFile, getFilePath, listMyFile, moveFile, updateFile} from '@/api/system/file';
+import { delMyFile, getFile, getFilePath, listMyFile, moveFile, updateFile } from '@/api/system/file';
 import { listFileCategory } from '@/api/system/fileCategory';
 import type { SysFileCategoryVo } from '@/api/system/model/fileCategoryModel';
 import type { SysFileActiveVo, SysFileForm, SysFileQuery, SysFileVo } from '@/api/system/model/fileModel';
@@ -497,7 +497,7 @@ const pagination = computed(() => {
 
 /** 获取媒体类型 */
 function getMediaType(file: SysFileVo) {
-  const suffix = file.ext?.substring(1)?.toLowerCase();
+  const suffix = file.ext?.toLowerCase();
   if (suffix) {
     const entries = Object.entries(fileType);
     const type = entries.find((value) => {
