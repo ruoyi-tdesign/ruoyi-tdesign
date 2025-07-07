@@ -12,7 +12,7 @@ const baseURL = import.meta.env.VITE_APP_BASE_API;
 export default {
   file(fileId: number | string) {
     const { token } = useUserStore();
-    const url = `${baseURL}/resource/file/${fileId}`;
+    const url = `${baseURL}/resource/file/download/${fileId}`;
     const downloadLoadingInstance = LoadingPlugin({
       text: '正在下载数据，请稍候',
       attach: 'body',

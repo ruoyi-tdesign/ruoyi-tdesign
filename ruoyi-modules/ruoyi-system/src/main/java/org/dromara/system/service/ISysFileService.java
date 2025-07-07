@@ -70,6 +70,14 @@ public interface ISysFileService extends IService<SysFile> {
     SysFile upload(SysFileBo bo, MultipartFile file);
 
     /**
+     * 预览文件
+     *
+     * @param fileId   文件ID
+     * @param response 响应
+     */
+    void preview(Long fileId, HttpServletResponse response);
+
+    /**
      * 下载文件
      *
      * @param fileId   文件ID

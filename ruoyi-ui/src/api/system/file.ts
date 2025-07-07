@@ -108,5 +108,5 @@ export function moveFile(categoryId: number, fileIds: number[]) {
  */
 export function getFilePath(fileId: number | string) {
   const baseUrl = import.meta.env.VITE_APP_BASE_API;
-  return `${baseUrl}/resource/file/${fileId}`;
+  return `${baseUrl}/resource/file/preview/${fileId}`;
 }

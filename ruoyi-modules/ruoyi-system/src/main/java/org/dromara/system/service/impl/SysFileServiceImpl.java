@@ -170,6 +170,30 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     }
 
     /**
+     * 预览文件
+     *
+     * @param fileId   文件ID
+     * @param response 响应
+     */
+    @Override
+    @IgnoreTenant
+    @SneakyThrows(IOException.class)
+    public void preview(Long fileId, HttpServletResponse response) {
+        SysFile file = getById(fileId);
+        if (file == null) {
+            throw new ServiceException("文件不存在");
+        }
+        SysStorageConfig config = storageConfigService.getById(file.getStorageConfigId());
+        if (config == null) {
+            throw new ServiceException("文件存储配置不存在");
+        }
+        FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
+        FileStorageService service = getFileStorageService(config);
+        response.setContentType(fileInfo.getContentType());
+        service.download(fileInfo).outputStream(response.getOutputStream());
+    }
+
+    /**
      * 下载文件
      *
      * @param fileId   文件ID
@@ -190,6 +214,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
         FileStorageService service = getFileStorageService(config);
         FileUtils.setAttachmentResponseHeader(response, fileInfo.getOriginalFilename());
+        response.setContentType(fileInfo.getContentType());
         service.download(fileInfo).outputStream(response.getOutputStream());
     }
 

@@ -24,12 +24,24 @@ public class FileResourceController {
     private ISysFileService fileService;
 
     /**
-     * 文件下载
+     * 文件预览
+     *
      * @param fileId 文件ID
      */
     @SaIgnore
-    @RequestMapping("/{fileId}")
+    @RequestMapping("/preview/{fileId}")
     public void preview(@PathVariable Long fileId, HttpServletResponse response) {
+        fileService.preview(fileId, response);
+    }
+
+    /**
+     * 文件下载
+     *
+     * @param fileId 文件ID
+     */
+    @SaIgnore
+    @RequestMapping("/download/{fileId}")
+    public void download(@PathVariable Long fileId, HttpServletResponse response) {
         fileService.download(fileId, response);
     }
 }
