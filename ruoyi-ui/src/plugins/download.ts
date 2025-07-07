@@ -10,9 +10,9 @@ import { blobValidate } from '@/utils/ruoyi';
 const baseURL = import.meta.env.VITE_APP_BASE_API;
 
 export default {
-  file(ossId: number | string) {
+  file(fileId: number | string) {
     const { token } = useUserStore();
-    const url = `${baseURL}/system/file/download/${ossId}`;
+    const url = `${baseURL}/resource/file/${fileId}`;
     const downloadLoadingInstance = LoadingPlugin({
       text: '正在下载数据，请稍候',
       attach: 'body',

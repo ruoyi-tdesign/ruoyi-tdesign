@@ -7,6 +7,7 @@ import org.dromara.common.core.enums.YesNoEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
+import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.storage.balancer.DefaultFileServer;
@@ -188,6 +189,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         }
         FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
         FileStorageService service = getFileStorageService(config);
+        FileUtils.setAttachmentResponseHeader(response, fileInfo.getOriginalFilename());
         service.download(fileInfo).outputStream(response.getOutputStream());
     }
 
