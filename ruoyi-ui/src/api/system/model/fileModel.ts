@@ -118,6 +118,8 @@ export interface SysFileVo {
   updateTime?: any;
   /** 创建时间 */
   createTime?: any;
+  /** 分类路径 */
+  categoryPath?: string;
 }
 
 export interface SysFileActiveVo extends SysFileVo {

@@ -1,14 +1,15 @@
 package org.dromara.system.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.dromara.common.core.constant.CacheNames;
+import org.dromara.common.core.constant.CacheConstants;
 import org.dromara.common.core.enums.NormalDisableEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
-import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.redis.utils.RedisLockUtil;
+import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.storage.balancer.DefaultFileServer;
 import org.dromara.common.storage.balancer.FileServer;
 import org.dromara.common.storage.config.StorageConfigData;
@@ -19,8 +20,6 @@ import org.dromara.system.domain.query.SysStorageConfigQuery;
 import org.dromara.system.domain.vo.SysStorageConfigVo;
 import org.dromara.system.mapper.SysStorageConfigMapper;
 import org.dromara.system.service.ISysStorageConfigService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,9 +78,9 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(cacheNames = CacheNames.SYS_STORAGE_CONFIG)
     public Boolean insertByBo(SysStorageConfigBo bo) {
         validateConfig(bo);
+        RedisUtils.deleteObject(CacheConstants.SYS_STORAGE_CONFIG);
         SysStorageConfig add = MapstructUtils.convert(bo, SysStorageConfig.class);
         return save(add);
     }
@@ -94,9 +93,9 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(cacheNames = CacheNames.SYS_STORAGE_CONFIG)
     public Boolean updateByBo(SysStorageConfigBo bo) {
         validateConfig(bo);
+        RedisUtils.deleteObject(CacheConstants.SYS_STORAGE_CONFIG);
         SysStorageConfig update = MapstructUtils.convert(bo, SysStorageConfig.class);
         return updateById(update);
     }
@@ -116,8 +115,8 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(cacheNames = CacheNames.SYS_STORAGE_CONFIG)
     public Boolean deleteWithValidByIds(Collection<Long> ids) {
+        RedisUtils.deleteObject(CacheConstants.SYS_STORAGE_CONFIG);
         return removeByIds(ids);
     }
 
@@ -128,8 +127,8 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
      * @param status          状态
      */
     @Override
-    @CacheEvict(cacheNames = CacheNames.SYS_STORAGE_CONFIG)
     public boolean updateConfigStatus(Long storageConfigId, Integer status) {
+        RedisUtils.deleteObject(CacheConstants.SYS_STORAGE_CONFIG);
         return lambdaUpdate()
             .set(SysStorageConfig::getStatus, status)
             .eq(SysStorageConfig::getStorageConfigId, storageConfigId)
@@ -142,12 +141,13 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
      * @return 缓存列表
      */
     @Override
-    @Cacheable(cacheNames = CacheNames.SYS_STORAGE_CONFIG)
     public Map<Long, SysStorageConfig> getCacheMap() {
-        List<SysStorageConfig> list = lambdaQuery()
-            .eq(SysStorageConfig::getStatus, NormalDisableEnum.NORMAL.getCode())
-            .list();
-        return StreamUtils.toIdentityMap(list, SysStorageConfig::getStorageConfigId);
+        return RedisLockUtil.getOrSave(CacheConstants.SYS_STORAGE_CONFIG, () -> {
+            List<SysStorageConfig> list = lambdaQuery()
+                .eq(SysStorageConfig::getStatus, NormalDisableEnum.NORMAL.getCode())
+                .list();
+            return StreamUtils.toIdentityMap(list, SysStorageConfig::getStorageConfigId);
+        });
     }
 
     /**
@@ -157,8 +157,7 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
      */
     @Override
     public List<FileServer> getFileServerList() {
-        ISysStorageConfigService service = SpringUtils.getBean(ISysStorageConfigService.class);
-        Map<Long, SysStorageConfig> cacheMap = service.getCacheMap();
+        Map<Long, SysStorageConfig> cacheMap = getCacheMap();
         return cacheMap.values().stream().map(item -> {
             DefaultFileServer fileServer = new DefaultFileServer();
             fileServer.setId(item.getStorageConfigId().toString());

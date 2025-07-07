@@ -4,6 +4,7 @@ import org.dromara.common.storage.balancer.FileServer;
 import org.dromara.common.storage.config.StorageConfigData;
 import org.dromara.common.storage.config.StorageFieldConfig;
 import org.dromara.common.storage.expcetion.StorageServiceException;
+import org.dromara.common.storage.wrapper.MultipartFileWrapperAdapter;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.FileStorageService;
 import org.dromara.x.file.storage.core.FileStorageServiceBuilder;
@@ -30,6 +31,10 @@ public class FileStorageUtil {
         FileStorageProperties properties = new FileStorageProperties();
         properties.setDefaultPlatform(server.getId());
         config.addStorageProperties(properties, server.getId(), server.getProperties());
-        return FileStorageServiceBuilder.create(properties).useDefault().build();
+        return FileStorageServiceBuilder
+            .create(properties)
+            .useDefault()
+            .addFileWrapperAdapter(new MultipartFileWrapperAdapter())
+            .build();
     }
 }

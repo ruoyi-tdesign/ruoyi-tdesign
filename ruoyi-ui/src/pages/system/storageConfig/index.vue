@@ -324,6 +324,7 @@ const columns = ref<Array<PrimaryTableCol>>([
 ]);
 // 提交表单对象
 const form = ref<SysStorageConfigVo & SysStorageConfigForm>({
+  status: 1,
   configObject: {},
 });
 // 查询对象
@@ -490,8 +491,15 @@ function handleDelete(row?: SysStorageConfigVo) {
 
 /** 状态修改  */
 function handleStatusChange(row: SysStorageConfigVo) {
-  handleChangeStatus(storageConfigList.value, row, 'storageConfigId', 'status', `${row.name}配置`, (config) =>
-    updateStorageStatus(config.storageConfigId, config.status).then(() => getList()),
+  handleChangeStatus(
+    storageConfigList.value,
+    row,
+    'storageConfigId',
+    'status',
+    `${row.name}配置`,
+    (config) => updateStorageStatus(config.storageConfigId, config.status).then(() => getList()),
+    1,
+    0,
   );
 }
 

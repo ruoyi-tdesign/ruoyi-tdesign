@@ -101,3 +101,12 @@ export function moveFile(categoryId: number, fileIds: number[]) {
     data: fileIds,
   });
 }
+
+/**
+ * 获取文件路径
+ * @param fileId 文件id
+ */
+export function getFilePath(fileId: number | string) {
+  const baseUrl = import.meta.env.VITE_APP_BASE_API;
+  return `${baseUrl}/resource/file/${fileId}`;
+}

@@ -90,7 +90,7 @@
                     <img
                       draggable="false"
                       class="list-card-gallery-responsive-image__img--fit list-card-gallery-responsive-image__img--cover"
-                      :src="file.url"
+                      :src="getFilePath(file.fileId)"
                       :alt="file.originalFilename"
                     />
                   </picture>
@@ -155,29 +155,28 @@
           <t-switch v-model="isCompress" />
         </t-form-item>
         <t-form-item :label="rowType === 0 ? '选择文件' : '选择图片'">
-          <file-upload
-            v-if="rowType === 0 && fileUpload"
-            v-model="uploadForm.file"
-            :limit="0"
-            theme="file-flow"
-            :support-select-file="false"
-            :support-url="false"
-            :file-type="fileUploadProps?.fileType"
-            :file-size="fileUploadProps?.fileSize"
-            :accept="fileUploadProps?.accept"
-            :oss-category-id="categoryId"
-          />
-          <image-upload
+          <!--          <x-file-upload-->
+          <!--            v-if="rowType === 0 && fileUpload"-->
+          <!--            v-model="uploadForm.file"-->
+          <!--            :limit="0"-->
+          <!--            theme="file-flow"-->
+          <!--            :support-select-file="false"-->
+          <!--            :support-url="false"-->
+          <!--            :file-type="fileUploadProps?.fileType"-->
+          <!--            :file-size="fileUploadProps?.fileSize"-->
+          <!--            :accept="fileUploadProps?.accept"-->
+          <!--            :file-category-id="categoryId"-->
+          <!--          />-->
+          <x-image-upload
             v-if="rowType === 1 && imageUpload"
             v-model="uploadForm.file"
             :limit="0"
             theme="image-flow"
             :support-select-file="false"
-            :support-url="false"
             :file-size="imageUploadProps?.fileSize"
             :file-type="imageUploadProps?.fileType"
             :accept="imageUploadProps?.accept"
-            :oss-category-id="categoryId"
+            :file-category-id="categoryId"
             :compress-support="isCompress"
           />
         </t-form-item>
@@ -238,11 +237,11 @@
                   word-break: break-all;
                 "
               >
-                {{ form.url }}
+                {{ getFilePath(form.fileId) }}
               </div>
               <t-space>
                 <my-link @click="handleDownload(form.fileId)">下载</my-link>
-                <my-link @click="copyText(form.url)">复制链接URL</my-link>
+                <my-link @click="copyText(getFilePath(form.fileId))">复制链接URL</my-link>
               </t-space>
             </t-space>
           </t-form-item>
@@ -319,7 +318,7 @@ import type { FormInstanceFunctions, FormRule, PageInfo, SubmitContext } from 't
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import { delMyFile, getFile, listMyFile, moveFile, updateFile } from '@/api/system/file';
+import {delMyFile, getFile, getFilePath, listMyFile, moveFile, updateFile} from '@/api/system/file';
 import { listFileCategory } from '@/api/system/fileCategory';
 import type { SysFileCategoryVo } from '@/api/system/model/fileCategoryModel';
 import type { SysFileActiveVo, SysFileForm, SysFileQuery, SysFileVo } from '@/api/system/model/fileModel';
@@ -333,9 +332,7 @@ import UnknownSvg from '@/assets/file-type/unknown.svg?component';
 import VideoSvg from '@/assets/file-type/video.svg?component';
 import WordSvg from '@/assets/file-type/word.svg?component';
 import type { FileUploadProps } from '@/components/file-upload/index.vue';
-import FileUpload from '@/components/file-upload/index.vue';
 import type { ImageUploadProps } from '@/components/image-upload/index.vue';
-import ImageUpload from '@/components/image-upload/index.vue';
 import RectSelect from '@/components/rect-select/index.vue';
 
 defineOptions({
@@ -370,7 +367,7 @@ const props = withDefaults(defineProps<FileListProps>(), {
   multiple: true,
   thumbnailSize: 120,
 });
-const fileUploadProps = computed(() => props.fileUploadProps);
+// const fileUploadProps = computed(() => props.fileUploadProps);
 const imageUploadProps = computed(() => props.imageUploadProps);
 watch(
   () => [props.categoryId, props.queryParam],
@@ -480,7 +477,7 @@ const previewList = computed(() => {
     .filter((file) => {
       return file.active && getMediaType(file) === 'image';
     })
-    .map((value) => value.url);
+    .map((value) => getFilePath(value.fileId));
 });
 
 // 分页

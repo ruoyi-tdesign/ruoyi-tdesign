@@ -14,6 +14,7 @@ import org.dromara.common.storage.balancer.FileServer;
 import org.dromara.common.storage.balancer.FileStorageLoadBalancer;
 import org.dromara.common.storage.balancer.RedisRoundRobinAlgorithm;
 import org.dromara.common.storage.utils.FileStorageUtil;
+import org.dromara.common.tenant.annotation.IgnoreTenant;
 import org.dromara.system.domain.SysFile;
 import org.dromara.system.domain.SysFileCategory;
 import org.dromara.system.domain.SysStorageConfig;
@@ -26,6 +27,7 @@ import org.dromara.system.service.ISysFileService;
 import org.dromara.system.service.ISysStorageConfigService;
 import org.dromara.x.file.storage.core.FileInfo;
 import org.dromara.x.file.storage.core.FileStorageService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -127,7 +129,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         if (b) {
             realRemoveFile(list);
         }
-        return removeByIds(ids);
+        return b;
     }
 
     private void realRemoveFile(List<SysFile> list) {
@@ -154,9 +156,14 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     public SysFile upload(SysFileBo bo, MultipartFile file) {
         FileStorageService service = getFileStorageService();
         FileInfo upload = service.of(file).upload();
-        SysFile sysFile = MapstructUtils.convert(upload, SysFile.class);
+        SysFile sysFile = new SysFile();
+        BeanUtils.copyProperties(upload, sysFile);
         long id = Long.parseLong(upload.getId());
         sysFile.setFileId(id);
+        sysFile.setCreateBy(bo.getCreateBy());
+        sysFile.setUserType(bo.getUserType());
+        sysFile.setIsLock(bo.getIsLock());
+        sysFile.setFileCategoryId(bo.getFileCategoryId());
         updateById(sysFile);
         return getById(id);
     }
@@ -168,6 +175,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      * @param response 响应
      */
     @Override
+    @IgnoreTenant
     @SneakyThrows(IOException.class)
     public void download(Long fileId, HttpServletResponse response) {
         SysFile file = getById(fileId);

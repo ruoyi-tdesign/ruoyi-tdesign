@@ -119,6 +119,7 @@ public class SysFileRecorder implements FileRecorder {
         FileInfo info = BeanUtil.copyProperties(
             detail, FileInfo.class, "metadata", "userMetadata", "thMetadata", "thUserMetadata", "attr", "hashInfo");
 
+        info.setPlatform(detail.getStorageConfigId().toString());
         // 这里手动获取数据库中的 json 字符串 并转成 元数据，方便使用
         info.setMetadata(jsonToMetadata(detail.getMetadata()));
         info.setUserMetadata(jsonToMetadata(detail.getUserMetadata()));

@@ -99,9 +99,4 @@ public interface CacheNames {
      * 消息配置
      */
     String SYS_MESSAGE_CONFIG = GlobalConstants.GLOBAL_REDIS_KEY + "sys_message_config#30d";
-
-    /**
-     * 文件存储配置
-     */
-    String SYS_STORAGE_CONFIG = "sys_storage_config";
 }

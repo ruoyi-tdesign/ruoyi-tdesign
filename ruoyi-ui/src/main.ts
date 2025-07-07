@@ -16,6 +16,7 @@ import FileUpload from '@/components/file-upload/index.vue';
 import ImagePreview from '@/components/image-preview/index.vue';
 // 图片上传组件
 import ImageUpload from '@/components/image-upload/index.vue';
+import Layout from '@/layouts/index.vue';
 import { useDict } from '@/utils/dict';
 import { download } from '@/utils/request';
 import {
@@ -56,6 +57,7 @@ app.component('DictTag', DictTag);
 app.component('FileUpload', FileUpload);
 app.component('ImageUpload', ImageUpload);
 app.component('ImagePreview', ImagePreview);
+app.component('LayoutComponent', Layout);
 
 app.use(i18n);
 app.use(store);
