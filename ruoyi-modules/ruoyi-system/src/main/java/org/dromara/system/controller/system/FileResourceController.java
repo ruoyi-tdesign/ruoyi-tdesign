@@ -26,22 +26,22 @@ public class FileResourceController {
     /**
      * 文件预览
      *
-     * @param fileId 文件ID
+     * @param fileName 文件名称
      */
     @SaIgnore
-    @RequestMapping("/preview/{fileId}")
-    public void preview(@PathVariable Long fileId, HttpServletResponse response) {
-        fileService.preview(fileId, response);
+    @RequestMapping("/preview/{fileName}")
+    public void preview(@PathVariable String fileName, HttpServletResponse response) {
+        fileService.preview(fileName, response);
     }
 
     /**
      * 文件下载
      *
-     * @param fileId 文件ID
+     * @param fileName 文件名称
      */
     @SaIgnore
-    @RequestMapping("/download/{fileId}")
-    public void download(@PathVariable Long fileId, HttpServletResponse response) {
-        fileService.download(fileId, response);
+    @RequestMapping("/download/{fileName}")
+    public void download(@PathVariable String fileName, HttpServletResponse response) {
+        fileService.download(fileName, response);
     }
 }

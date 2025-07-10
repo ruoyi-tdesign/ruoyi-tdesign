@@ -90,7 +90,7 @@
                     <img
                       draggable="false"
                       class="list-card-gallery-responsive-image__img--fit list-card-gallery-responsive-image__img--cover"
-                      :src="getFilePath(file.fileId)"
+                      :src="getPreviewUrl(file.filename)"
                       :alt="file.originalFilename"
                     />
                   </picture>
@@ -237,11 +237,11 @@
                   word-break: break-all;
                 "
               >
-                {{ getFilePath(form.fileId) }}
+                {{ getPreviewUrl(form.filename) }}
               </div>
               <t-space>
-                <my-link @click="handleDownload(form.fileId)">下载</my-link>
-                <my-link @click="copyText(getFilePath(form.fileId))">复制链接URL</my-link>
+                <my-link @click="handleDownload(form.filename)">下载</my-link>
+                <my-link @click="copyText(getPreviewUrl(form.filename))">复制链接URL</my-link>
               </t-space>
             </t-space>
           </t-form-item>
@@ -318,7 +318,7 @@ import type { FormInstanceFunctions, FormRule, PageInfo, SubmitContext } from 't
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import { delMyFile, getFile, getFilePath, listMyFile, moveFile, updateFile } from '@/api/system/file';
+import { delMyFile, getFile, getPreviewUrl, listMyFile, moveFile, updateFile } from '@/api/system/file';
 import { listFileCategory } from '@/api/system/fileCategory';
 import type { SysFileCategoryVo } from '@/api/system/model/fileCategoryModel';
 import type { SysFileActiveVo, SysFileForm, SysFileQuery, SysFileVo } from '@/api/system/model/fileModel';
@@ -477,7 +477,7 @@ const previewList = computed(() => {
     .filter((file) => {
       return file.active && getMediaType(file) === 'image';
     })
-    .map((value) => getFilePath(value.fileId));
+    .map((value) => getPreviewUrl(value.filename));
 });
 
 // 分页
@@ -665,8 +665,10 @@ function copyText(text: string) {
     });
 }
 /** 下载按钮操作 */
-function handleDownload(fileId?: number) {
-  proxy.$download.file(fileId ?? ids.value.at(0));
+function handleDownload(fileName?: string) {
+  const fileId = ids.value.at(0);
+  const file = fileList.value.find((value) => fileId === value.fileId);
+  proxy.$download.file(fileName ?? file.filename);
 }
 /** 删除按钮操作 */
 function handleDelete() {

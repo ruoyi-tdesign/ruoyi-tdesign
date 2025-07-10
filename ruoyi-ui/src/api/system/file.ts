@@ -103,10 +103,27 @@ export function moveFile(categoryId: number, fileIds: number[]) {
 }
 
 /**
- * 获取文件路径
- * @param fileId 文件id
+ * 获取文件预览路径
+ * @param fileName 文件名
  */
-export function getFilePath(fileId: number | string) {
+export function getPreviewUrl(fileName: string) {
   const baseUrl = import.meta.env.VITE_APP_BASE_API;
-  return `${baseUrl}/resource/file/preview/${fileId}`;
+  const url = `${baseUrl}/resource/file/preview/${fileName}`;
+  if (url.startsWith('http')) {
+    return url;
+  }
+  return new URL(url, window.location.origin).toString();
+}
+
+/**
+ * 获取文件下载路径
+ * @param fileName 文件名
+ */
+export function getDownloadUrl(fileName: string) {
+  const baseUrl = import.meta.env.VITE_APP_BASE_API;
+  const url = `${baseUrl}/resource/file/download/${fileName}`;
+  if (url.startsWith('http')) {
+    return url;
+  }
+  return new URL(url, window.location.origin).toString();
 }

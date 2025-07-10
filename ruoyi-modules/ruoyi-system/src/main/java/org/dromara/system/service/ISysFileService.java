@@ -29,6 +29,14 @@ public interface ISysFileService extends IService<SysFile> {
     SysFileVo queryById(Long fileId);
 
     /**
+     * 根据文件名查询文件
+     *
+     * @param fileName 文件名
+     * @return 文件
+     */
+    SysFile getByFileName(String fileName);
+
+    /**
      * 分页查询文件记录列表
      *
      * @param query 查询对象
@@ -72,18 +80,18 @@ public interface ISysFileService extends IService<SysFile> {
     /**
      * 预览文件
      *
-     * @param fileId   文件ID
+     * @param fileName 文件ID
      * @param response 响应
      */
-    void preview(Long fileId, HttpServletResponse response);
+    void preview(String fileName, HttpServletResponse response);
 
     /**
      * 下载文件
      *
-     * @param fileId   文件ID
+     * @param fileName 文件ID
      * @param response 响应
      */
-    void download(Long fileId, HttpServletResponse response);
+    void download(String fileName, HttpServletResponse response);
 
     /**
      * 根据ID列表查询文件

@@ -66,6 +66,17 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     }
 
     /**
+     * 根据文件名查询文件
+     *
+     * @param fileName 文件名
+     * @return 文件
+     */
+    @Override
+    public SysFile getByFileName(String fileName) {
+        return lambdaQuery().eq(SysFile::getFilename, fileName).one();
+    }
+
+    /**
      * 分页查询文件记录列表
      *
      * @param query 查询对象
@@ -172,14 +183,14 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     /**
      * 预览文件
      *
-     * @param fileId   文件ID
+     * @param fileName 文件ID
      * @param response 响应
      */
     @Override
     @IgnoreTenant
     @SneakyThrows(IOException.class)
-    public void preview(Long fileId, HttpServletResponse response) {
-        SysFile file = getById(fileId);
+    public void preview(String fileName, HttpServletResponse response) {
+        SysFile file = getByFileName(fileName);
         if (file == null) {
             throw new ServiceException("文件不存在");
         }
@@ -196,14 +207,14 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     /**
      * 下载文件
      *
-     * @param fileId   文件ID
+     * @param fileName 文件ID
      * @param response 响应
      */
     @Override
     @IgnoreTenant
     @SneakyThrows(IOException.class)
-    public void download(Long fileId, HttpServletResponse response) {
-        SysFile file = getById(fileId);
+    public void download(String fileName, HttpServletResponse response) {
+        SysFile file = getByFileName(fileName);
         if (file == null) {
             throw new ServiceException("文件不存在");
         }

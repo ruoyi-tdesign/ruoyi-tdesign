@@ -69,7 +69,7 @@ import { CloudUploadIcon } from 'tdesign-icons-vue-next';
 import type { SuccessContext, UploadFile, UploadRemoveContext, UploadValidateType } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import { delFile, getFilePath, listByIds } from '@/api/system/file';
+import { delFile, getPreviewUrl, listByIds } from '@/api/system/file';
 import type { SelectFile } from '@/components/upload-select/index.vue';
 import type { FileListProps } from '@/pages/system/fileCategory/FileList.vue';
 import { useUserStore } from '@/store';
@@ -175,7 +175,7 @@ watch(
               status: 'success',
               size: file.size,
               uploadTime: file.createTime,
-              url: getFilePath(file.fileId),
+              url: getPreviewUrl(file.filename),
               fileId: file.fileId,
             };
           });
@@ -335,7 +335,7 @@ function handleOneUploadSuccess(context: Pick<SuccessContext, 'e' | 'file' | 're
   if (context.response.code !== 200) {
     proxy.$modal.msgError(context.response.msg);
   } else {
-    proxy.$modal.msgSuccess(`文件【${context.response.data.fileName}】上传成功！`);
+    proxy.$modal.msgSuccess(`文件【${context.response.data.filename}】上传成功！`);
   }
 }
 
@@ -345,8 +345,8 @@ function handleUploadSuccess(context: SuccessContext) {
     .filter((value) => value.response.code === 200)
     .map((value) => {
       return {
-        name: value.response.data.fileName,
-        url: getFilePath(value.response.data.fileId),
+        name: value.response.data.filename,
+        url: getPreviewUrl(value.response.data.filename),
         fileId: value.response.data.fileId,
       };
     });
