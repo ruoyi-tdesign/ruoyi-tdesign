@@ -26,6 +26,7 @@ import org.dromara.system.mapper.SysFileMapper;
 import org.dromara.system.service.ISysFileCategoryService;
 import org.dromara.system.service.ISysFileService;
 import org.dromara.system.service.ISysStorageConfigService;
+import org.dromara.system.utils.SysFileUtil;
 import org.dromara.x.file.storage.core.FileInfo;
 import org.dromara.x.file.storage.core.FileStorageService;
 import org.springframework.beans.BeanUtils;
@@ -62,7 +63,11 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      */
     @Override
     public SysFileVo queryById(Long fileId) {
-        return baseMapper.queryById(fileId);
+        SysFileVo vo = baseMapper.queryById(fileId);
+        if (vo != null) {
+            SysFileUtil.packedPreviewAndDownloadUrl(vo);
+        }
+        return vo;
     }
 
     /**
@@ -84,7 +89,11 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      */
     @Override
     public TableDataInfo<SysFileVo> queryPageList(SysFileQuery query) {
-        return PageQuery.of(() -> baseMapper.queryList(query));
+        return PageQuery.of(() -> {
+            List<SysFileVo> vos = baseMapper.queryList(query);
+            SysFileUtil.packedPreviewAndDownloadUrl(vos);
+            return vos;
+        });
     }
 
     /**
@@ -95,7 +104,9 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      */
     @Override
     public List<SysFileVo> queryList(SysFileQuery query) {
-        return baseMapper.queryList(query);
+        List<SysFileVo> vos = baseMapper.queryList(query);
+        SysFileUtil.packedPreviewAndDownloadUrl(vos);
+        return vos;
     }
 
     /**
@@ -247,7 +258,9 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Override
     public List<SysFileVo> listVoByIds(List<Long> fileIds) {
         List<SysFile> list = lambdaQuery().in(SysFile::getFileId, fileIds).list();
-        return MapstructUtils.convert(list, SysFileVo.class);
+        List<SysFileVo> vos = MapstructUtils.convert(list, SysFileVo.class);
+        SysFileUtil.packedPreviewAndDownloadUrl(vos);
+        return vos;
     }
 
     /**

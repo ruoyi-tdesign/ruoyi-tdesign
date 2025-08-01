@@ -60,6 +60,10 @@ export interface SysFileVo {
   fileId?: number;
   /** 文件访问地址 */
   url?: string;
+  /** 预览地址 */
+  previewUrl?: string;
+  /** 文件下载地址 */
+  downloadUrl?: string;
   /** 文件大小，单位字节 */
   size?: number;
   /** 文件名称 */

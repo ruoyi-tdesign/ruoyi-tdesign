@@ -1,19 +1,19 @@
 <template>
-  <div class="component-upload-image">
+  <div class="upload-file">
     <t-upload
-      ref="imageUpload"
+      ref="fileUpload"
       v-model="fileList"
       multiple
       :abridge-name="abridgeName"
       :theme="theme"
       :accept="rawAccept"
-      :action="uploadImgUrl"
+      :action="uploadFileUrl"
       :before-upload="handleBeforeUpload"
       :max="limit"
       :on-fail="handleUploadError"
       :headers="headers"
       :draggable="draggable"
-      :size-limit="{ size: fileSize, unit: 'MB', message: '上传图片大小不能超过 {sizeLimit} MB!' }"
+      :size-limit="{ size: fileSize, unit: 'MB', message: '上传文件大小不能超过 {sizeLimit} MB!' }"
       :disabled="disabled"
       :allow-upload-duplicate-file="allowUploadDuplicateFile"
       :data="{ fileCategoryId: fileCategoryId || '' }"
@@ -24,7 +24,7 @@
       @click="handleOpenUpload($event)"
     >
       <template v-if="isShowTip" #tips>
-        请上传大小不超过 {{ fileSize }}MB 的图片，
+        请上传大小不超过 {{ fileSize }}MB 的文件
         <t-tooltip>
           <template #content>
             <p v-for="item in rawAccept?.split(',')" :key="item" style="word-break: break-all">
@@ -46,13 +46,13 @@
     <x-upload-select
       v-if="supportSelectFile"
       v-model:visible="open"
-      title="选择图片"
+      title="选择文件"
       :support-url="false"
       :support-select-file="supportSelectFile"
       :query-param="queryParam"
       :multiple="limit > 1"
-      :file-upload="false"
-      :image-upload-props="{
+      :image-upload="false"
+      :file-upload-props="{
         accept: accept,
         fileSize: fileSize,
         fileType: fileType,
@@ -63,20 +63,18 @@
 </template>
 
 <script lang="ts" setup>
-import { compressAccurately } from 'image-conversion';
 import { storeToRefs } from 'pinia';
 import { CloudUploadIcon } from 'tdesign-icons-vue-next';
 import type { SuccessContext, UploadFile, UploadRemoveContext, UploadValidateType } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
 import { delFile, getVisitUrl, listByIds } from '@/api/system/file';
-import type { SelectFile } from '@/components/x-upload-select/index.vue';
+import type { SelectFile } from '@/components/upload-select/index.vue';
 import type { FileListProps } from '@/pages/system/fileCategory/FileList.vue';
 import { useUserStore } from '@/store';
-import { blobToFile } from '@/utils/file';
 import { getHttpFileSuffix } from '@/utils/ruoyi';
 
-export interface ImageUploadProps {
+export interface FileUploadProps {
   modelValue?: string | string[];
   // 文件名过长时，需要省略中间的文本，保留首尾文本。示例：[10, 7]，表示首尾分别保留的文本长度。
   abridgeName?: Array<number>;
@@ -88,24 +86,27 @@ export interface ImageUploadProps {
   fileSize?: number;
   // 接受上传的文件类型
   accept?: Array<
-    | 'image/gif'
-    | 'image/jpeg'
-    | 'image/png'
-    | 'image/svg+xml'
-    | 'image/tiff'
-    | 'image/vnd.wap.wbmp'
-    | 'image/webp'
-    | 'image/x-icon'
-    | 'image/x-jng'
-    | 'image/x-ms-bmp'
-    | 'image/*'
+    | 'video/*'
+    | 'audio/*'
+    | 'text/plain'
+    | 'application/x-gzip'
+    | 'application/zip'
+    | 'application/x-rar-compressed'
+    | 'application/x-7z-compressed'
+    | 'application/msword'
+    | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    | 'application/vnd.ms-excel'
+    | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    | 'application/vnd.ms-powerpoint'
+    | 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    | 'application/pdf'
     | string
   >;
   // 文件类型, 例如['png', 'jpg', 'jpeg']
   fileType?: string[];
   // 是否显示提示
   isShowTip?: boolean;
-  theme?: 'custom' | 'image' | 'image-flow';
+  theme?: 'custom' | 'file' | 'file-input' | 'file-flow';
   // 禁用组件
   disabled?: boolean;
   // 是否允许重复上传相同文件名的文件
@@ -114,23 +115,17 @@ export interface ImageUploadProps {
   supportSelectFile?: boolean;
   // file分类id
   fileCategoryId?: number;
-  // 是否支持压缩，默认否
-  compressSupport?: boolean;
-  // 压缩目标大小，单位KB。默认300KB以上文件才压缩，并压缩至300KB以内
-  compressTargetSize?: number;
 }
 
-const props = withDefaults(defineProps<ImageUploadProps>(), {
+const props = withDefaults(defineProps<FileUploadProps>(), {
   limit: 5,
   fileSize: 5,
-  fileType: () => ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'],
+  fileType: () => ['doc', 'docx', 'xlsx', 'xls', 'csv', 'ppt', 'pptx', 'txt', 'pdf'],
   isShowTip: true,
-  theme: 'image',
+  theme: 'file',
   disabled: false,
   allowUploadDuplicateFile: false,
   supportSelectFile: true,
-  compressSupport: false,
-  compressTargetSize: 300,
 });
 
 const queryParam = computed<FileListProps['queryParam']>(() => {
@@ -151,7 +146,7 @@ const { token } = storeToRefs(useUserStore());
 const { proxy } = getCurrentInstance();
 const emit = defineEmits(['update:modelValue', 'change']);
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
-const uploadImgUrl = ref(`${baseUrl}/system/file/upload`); // 上传的图片服务器地址
+const uploadFileUrl = ref(`${baseUrl}/system/file/upload`); // 上传文件服务器地址
 const headers = ref({ Authorization: `Bearer ${token.value}` });
 const fileList = ref<UploadFile[]>([]);
 const rawAccept = computed(() => {
@@ -259,7 +254,7 @@ function handleSelectSubmit(values: SelectFile[]) {
       }
     });
     if (arr2.length) {
-      proxy.$modal.msgWarning(`文件格式不正确, 已自动过滤非${props.fileType.join('/')}图片格式文件!`);
+      proxy.$modal.msgWarning(`文件格式不正确, 已自动过滤非${props.fileType.join('/')}格式文件!`);
     } else {
       rowValues = arr1;
     }
@@ -298,34 +293,21 @@ function handleSelectSubmit(values: SelectFile[]) {
   return true;
 }
 
-// 上传前loading加载
-async function handleBeforeUpload(file: UploadFile) {
-  let isImg: boolean;
+// 上传前校检格式和大小
+function handleBeforeUpload(file: UploadFile) {
+  // 校检文件类型
   if (props.fileType.length) {
-    let fileExtension = '';
-    if (file.name.lastIndexOf('.') > -1) {
-      fileExtension = getHttpFileSuffix(file.name);
+    const fileExt = getHttpFileSuffix(file.name);
+    const isTypeOk = props.fileType.indexOf(fileExt) >= 0;
+    if (!isTypeOk) {
+      proxy.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}格式文件!`);
+      return false;
     }
-    isImg = props.fileType.some((type) => {
-      if (file.type.indexOf(type) > -1) return true;
-      return fileExtension && fileExtension.indexOf(type) > -1;
-    });
-  } else {
-    isImg = file.type.indexOf('image') > -1;
   }
-  if (!isImg) {
-    proxy.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}图片格式文件!`);
-    return false;
-  }
+  // 校检文件名是否包含特殊字符
   if (file.name.includes(',')) {
     proxy?.$modal.msgError('文件名不正确，不能包含英文逗号!');
     return false;
-  }
-  // 压缩图片，开启压缩并且大于指定的压缩大小时才压缩
-  if (props.compressSupport && file.size / 1024 > props.compressTargetSize) {
-    const blob = await compressAccurately(file.raw, props.compressTargetSize);
-    file.raw = blobToFile(blob, file.name, file.type);
-    file.size = file.raw.size;
   }
   return true;
 }
@@ -353,7 +335,7 @@ function handleUploadSuccess(context: SuccessContext) {
   uploadedSuccessfully(uploadList);
 }
 
-// 删除图片
+// 删除文件
 function handleDelete({ file }: UploadRemoveContext) {
   const { fileId, name } = file;
   // 直接上传时，删除旧数据
@@ -377,7 +359,7 @@ function uploadedSuccessfully(uploadList: UploadFile[]) {
 
 // 上传失败
 function handleUploadError() {
-  proxy.$modal.msgError('上传图片失败');
+  proxy.$modal.msgError('上传文件失败');
 }
 
 // 对象转成指定字符串分隔

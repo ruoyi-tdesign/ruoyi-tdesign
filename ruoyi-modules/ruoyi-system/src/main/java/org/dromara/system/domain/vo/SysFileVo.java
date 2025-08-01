@@ -38,6 +38,18 @@ public class SysFileVo implements Serializable {
     private String url;
 
     /**
+     * 预览地址
+     */
+    @ExcelProperty(value = "预览地址")
+    private String previewUrl;
+
+    /**
+     * 下载地址
+     */
+    @ExcelProperty(value = "下载地址")
+    private String downloadUrl;
+
+    /**
      * 文件大小，单位字节
      */
     @ExcelProperty(value = "文件大小，单位字节")

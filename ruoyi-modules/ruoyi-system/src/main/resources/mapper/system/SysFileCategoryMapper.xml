@@ -68,7 +68,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 </where>) as file_count
         from sys_file_category sfc
         <where>
-            sfc.file_category_id = #{ossCategoryId}
+            sfc.file_category_id = #{fileCategoryId}
             <if test="loginType != null and loginType != ''"> and sfc.login_type = #{loginType}</if>
             <if test="createBy != null"> and sfc.create_by = #{createBy}</if>
         </where>

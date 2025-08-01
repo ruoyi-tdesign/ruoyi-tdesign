@@ -56,6 +56,6 @@ public class SysFileCategoryQuery extends BasePageQuery {
      * 分类id
      */
     @NotNull(message = "分类id不能为空", groups = QueryOneGroup.class)
-    private Long categoryId;
+    private Long fileCategoryId;
 
 }

@@ -1,15 +1,14 @@
 package org.dromara.system.domain.vo;
 
-import org.dromara.system.domain.SysFileCategory;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import org.dromara.common.excel.annotation.ExcelDictFormat;
-import org.dromara.common.excel.convert.ExcelDictConvert;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
-import java.util.Date;
+import org.dromara.system.domain.SysFileCategory;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 文件分类视图对象 sys_file_category
@@ -42,6 +41,12 @@ public class SysFileCategoryVo implements Serializable {
      */
     @ExcelProperty(value = "父级分类id")
     private Long parentId;
+
+    /**
+     * 父级分类名称
+     */
+    @ExcelProperty(value = "父级分类名称")
+    private String parentCategoryName;
 
     /**
      * 分类路径
@@ -84,5 +89,11 @@ public class SysFileCategoryVo implements Serializable {
      */
     @ExcelProperty(value = "创建时间")
     private Date createTime;
+
+    /**
+     * 文件数量
+     */
+    @ExcelProperty(value = "文件数量")
+    private Long fileCount;
 
 }

@@ -90,7 +90,7 @@
                     <img
                       draggable="false"
                       class="list-card-gallery-responsive-image__img--fit list-card-gallery-responsive-image__img--cover"
-                      :src="getPreviewUrl(file.filename)"
+                      :src="getVisitUrl(file.previewUrl)"
                       :alt="file.originalFilename"
                     />
                   </picture>
@@ -155,18 +155,17 @@
           <t-switch v-model="isCompress" />
         </t-form-item>
         <t-form-item :label="rowType === 0 ? '选择文件' : '选择图片'">
-          <!--          <x-file-upload-->
-          <!--            v-if="rowType === 0 && fileUpload"-->
-          <!--            v-model="uploadForm.file"-->
-          <!--            :limit="0"-->
-          <!--            theme="file-flow"-->
-          <!--            :support-select-file="false"-->
-          <!--            :support-url="false"-->
-          <!--            :file-type="fileUploadProps?.fileType"-->
-          <!--            :file-size="fileUploadProps?.fileSize"-->
-          <!--            :accept="fileUploadProps?.accept"-->
-          <!--            :file-category-id="categoryId"-->
-          <!--          />-->
+          <x-file-upload
+            v-if="rowType === 0 && fileUpload"
+            v-model="uploadForm.file"
+            :limit="0"
+            theme="file-flow"
+            :support-select-file="false"
+            :file-type="fileUploadProps?.fileType"
+            :file-size="fileUploadProps?.fileSize"
+            :accept="fileUploadProps?.accept"
+            :file-category-id="categoryId"
+          />
           <x-image-upload
             v-if="rowType === 1 && imageUpload"
             v-model="uploadForm.file"
@@ -208,6 +207,9 @@
           <t-form-item label="fileId" name="fileId">
             {{ form.fileId }}
           </t-form-item>
+          <t-form-item label="文件名" name="filename">
+            {{ form.filename }}
+          </t-form-item>
           <t-form-item label="原名" name="originalFilename">
             <t-input v-model="form.originalFilename" placeholder="请输入原名" clearable />
           </t-form-item>
@@ -237,11 +239,11 @@
                   word-break: break-all;
                 "
               >
-                {{ getPreviewUrl(form.filename) }}
+                {{ getVisitUrl(form.previewUrl) }}
               </div>
               <t-space>
-                <my-link @click="handleDownload(form.filename)">下载</my-link>
-                <my-link @click="copyText(getPreviewUrl(form.filename))">复制链接URL</my-link>
+                <my-link @click="handleDownload(form.downloadUrl)">下载</my-link>
+                <my-link @click="copyText(getVisitUrl(form.previewUrl))">复制链接URL</my-link>
               </t-space>
             </t-space>
           </t-form-item>
@@ -318,7 +320,7 @@ import type { FormInstanceFunctions, FormRule, PageInfo, SubmitContext } from 't
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import { delMyFile, getFile, getPreviewUrl, listMyFile, moveFile, updateFile } from '@/api/system/file';
+import { delMyFile, getFile, getVisitUrl, listMyFile, moveFile, updateFile } from '@/api/system/file';
 import { listFileCategory } from '@/api/system/fileCategory';
 import type { SysFileCategoryVo } from '@/api/system/model/fileCategoryModel';
 import type { SysFileActiveVo, SysFileForm, SysFileQuery, SysFileVo } from '@/api/system/model/fileModel';
@@ -477,7 +479,7 @@ const previewList = computed(() => {
     .filter((file) => {
       return file.active && getMediaType(file) === 'image';
     })
-    .map((value) => getPreviewUrl(value.filename));
+    .map((value) => getVisitUrl(value.previewUrl));
 });
 
 // 分页
@@ -665,10 +667,10 @@ function copyText(text: string) {
     });
 }
 /** 下载按钮操作 */
-function handleDownload(fileName?: string) {
+function handleDownload(downloadUrl?: string) {
   const fileId = ids.value.at(0);
   const file = fileList.value.find((value) => fileId === value.fileId);
-  proxy.$download.file(fileName ?? file.filename);
+  proxy.$download.file(downloadUrl ?? file.downloadUrl);
 }
 /** 删除按钮操作 */
 function handleDelete() {

@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * 上传对象信息
  *
- * @author Michelle.Chung
+ * @author hexm
  */
 @Data
 public class SysFileUploadVo implements Serializable {
@@ -15,11 +15,22 @@ public class SysFileUploadVo implements Serializable {
     /**
      * 文件名
      */
-    private String fileName;
+    private String filename;
 
     /**
      * 主键
      */
     private String fileId;
+
+
+    /**
+     * 预览地址
+     */
+    private String previewUrl;
+
+    /**
+     * 下载地址
+     */
+    private String downloadUrl;
 
 }

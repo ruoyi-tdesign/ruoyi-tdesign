@@ -3,7 +3,7 @@ import axios from 'axios';
 import { saveAs } from 'file-saver';
 import { LoadingPlugin, MessagePlugin } from 'tdesign-vue-next';
 
-import { getDownloadUrl } from '@/api/system/file';
+import { getVisitUrl } from '@/api/system/file';
 import { useUserStore } from '@/store';
 import errorCode from '@/utils/errorCode';
 import { blobValidate } from '@/utils/ruoyi';
@@ -11,9 +11,9 @@ import { blobValidate } from '@/utils/ruoyi';
 const baseURL = import.meta.env.VITE_APP_BASE_API;
 
 export default {
-  file(fileName: string) {
+  file(downloadUrl: string) {
     const { token } = useUserStore();
-    const url = getDownloadUrl(fileName);
+    const url = getVisitUrl(downloadUrl);
     const downloadLoadingInstance = LoadingPlugin({
       text: '正在下载数据，请稍候',
       attach: 'body',

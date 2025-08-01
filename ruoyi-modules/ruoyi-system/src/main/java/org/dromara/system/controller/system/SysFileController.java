@@ -20,6 +20,7 @@ import org.dromara.system.domain.vo.SysFileUploadVo;
 import org.dromara.system.domain.vo.SysFileVo;
 import org.dromara.system.service.ISysFileCategoryService;
 import org.dromara.system.service.ISysFileService;
+import org.dromara.system.utils.SysFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -110,7 +111,8 @@ public class SysFileController extends BaseController {
 
         SysFileUploadVo uploadVo = new SysFileUploadVo();
         uploadVo.setFileId(upload.getFileId().toString());
-        uploadVo.setFileName(upload.getFilename());
+        uploadVo.setFilename(upload.getFilename());
+        SysFileUtil.packedPreviewAndDownloadUrl(uploadVo);
         return R.ok(uploadVo);
     }
 
