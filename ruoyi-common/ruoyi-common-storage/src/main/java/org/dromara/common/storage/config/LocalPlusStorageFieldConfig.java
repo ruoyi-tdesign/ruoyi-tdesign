@@ -34,13 +34,13 @@ public class LocalPlusStorageFieldConfig implements StorageFieldConfig {
             .useInput()
             .value("/")
             .label("存储路径")
-            .help("存储路径，上传的文件都会存储在这个路径下面，默认“/”，注意“/”结尾。<br />主要用于配合 Nginx 实现文件对外访问，文件上传后的实际存储地址为 存储路径 + 基础路径 + 上传路径 + 文件名，不会对外暴露，仅在本地升级版、FTP、SFTP 等需要自行搭建访问服务存储平台的配置文件中，对象存储等自带访问服务的存储平台没有此参数，例如 /www/wwwroot/file.abc.com/ 就刚好可配合 Nginx 实现文件对外访问")
+            .help("存储路径，上传的文件都会存储在这个路径下面，默认“/”，注意“/”结尾。<br />主要用于配合 Nginx 实现文件对外访问，文件上传后的实际存储地址为 存储路径 + 基础路径 + 上传路径 + 文件名，不会对外暴露，仅在本地升级版、FTP、SFTP 等需要自行搭建访问服务存储平台的配置文件中，对象存储等自带访问服务的存储平台没有此参数，例如 /www/wwwroot/file.abc.com/或者D:/Temp/ 就刚好可配合 Nginx 实现文件对外访问")
             .required(true)
             .build();
         this.domain = FieldConfig.<String>builder()
             .useInput()
             .label("访问域名")
-            .help("访问域名，如果不需要可以留空。最终url实际就是 访问域名 + 基础路径 + 上传路径 + 文件名")
+            .help("访问域名，如果不需要可以留空。最终url实际就是 访问域名 + 基础路径 + 上传路径 + 文件名。<br/>例如：“http://127.0.0.1:8030/file/”，“/”结尾，本地存储建议使用相对路径，方便后期更换域名")
             .required(false)
             .build();
     }

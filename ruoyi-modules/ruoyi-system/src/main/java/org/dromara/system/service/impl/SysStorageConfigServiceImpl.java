@@ -12,14 +12,19 @@ import org.dromara.common.redis.utils.RedisLockUtil;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.storage.balancer.DefaultFileServer;
 import org.dromara.common.storage.balancer.FileServer;
+import org.dromara.common.storage.balancer.FileStorageLoadBalancer;
+import org.dromara.common.storage.balancer.RedisRoundRobinAlgorithm;
 import org.dromara.common.storage.config.StorageConfigData;
 import org.dromara.common.storage.config.StorageFieldConfig;
+import org.dromara.common.storage.utils.FileStorageUtil;
 import org.dromara.system.domain.SysStorageConfig;
 import org.dromara.system.domain.bo.SysStorageConfigBo;
 import org.dromara.system.domain.query.SysStorageConfigQuery;
 import org.dromara.system.domain.vo.SysStorageConfigVo;
 import org.dromara.system.mapper.SysStorageConfigMapper;
 import org.dromara.system.service.ISysStorageConfigService;
+import org.dromara.x.file.storage.core.FileStorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +41,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMapper, SysStorageConfig> implements ISysStorageConfigService {
+
+    @Autowired
+    private SysFileRecorder fileRecorder;
 
     /**
      * 查询存储配置
@@ -166,5 +174,38 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
             fileServer.setProperties(item.getConfigJson());
             return fileServer;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取文件存储服务
+     *
+     * @return 文件存储服务
+     */
+    @Override
+    public FileStorageService getFileStorageService() {
+        List<FileServer> servers = getFileServerList();
+        FileStorageLoadBalancer balancer = new FileStorageLoadBalancer(new RedisRoundRobinAlgorithm(), servers);
+        balancer.setFileRecorder(fileRecorder);
+        return balancer.getService();
+    }
+
+    /**
+     * 获取文件存储服务
+     *
+     * @param id id
+     * @return 文件存储服务
+     */
+    @Override
+    public FileStorageService getFileStorageService(Long id) {
+        SysStorageConfig config = getById(id);
+        if (config == null) {
+            return null;
+        }
+        DefaultFileServer fileServer = new DefaultFileServer();
+        fileServer.setId(config.getStorageConfigId().toString());
+        fileServer.setPlatform(config.getPlatform());
+        fileServer.setWeight(config.getWeight());
+        fileServer.setProperties(config.getConfigJson());
+        return FileStorageUtil.getFileStorageService(fileServer);
     }
 }

@@ -7,6 +7,7 @@ import org.dromara.system.domain.SysStorageConfig;
 import org.dromara.system.domain.bo.SysStorageConfigBo;
 import org.dromara.system.domain.query.SysStorageConfigQuery;
 import org.dromara.system.domain.vo.SysStorageConfigVo;
+import org.dromara.x.file.storage.core.FileStorageService;
 
 import java.util.Collection;
 import java.util.List;
@@ -89,4 +90,19 @@ public interface ISysStorageConfigService extends IService<SysStorageConfig> {
      * @return 缓存列表
      */
     List<FileServer> getFileServerList();
+
+    /**
+     * 获取文件存储服务
+     *
+     * @return 文件存储服务
+     */
+    FileStorageService getFileStorageService();
+
+    /**
+     * 获取文件存储服务
+     *
+     * @param id id
+     * @return 文件存储服务
+     */
+    FileStorageService getFileStorageService(Long id);
 }

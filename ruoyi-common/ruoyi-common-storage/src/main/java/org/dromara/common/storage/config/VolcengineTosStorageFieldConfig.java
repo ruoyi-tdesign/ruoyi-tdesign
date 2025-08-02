@@ -12,18 +12,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 腾讯云 COS 字段配置
+ * 火山引擎 TOS存储字段配置
  *
  * @author hexm
- * @date 2025/5/3
+ * @date 2025/8/2
  */
 @Data
-public class TencentCosStorageFieldConfig implements StorageFieldConfig {
+public class VolcengineTosStorageFieldConfig implements StorageFieldConfig {
     /** Access Key */
-    private FieldConfig<String> secretId;
+    private FieldConfig<String> accessKey;
     /** Access Key Secret */
     private FieldConfig<String> secretKey;
-    /** 存储区域 */
+    /** 访问站点 */
+    private FieldConfig<String> endPoint;
+    /** 地域 */
     private FieldConfig<String> region;
     /** 存储桶名称 */
     private FieldConfig<String> bucketName;
@@ -31,29 +33,34 @@ public class TencentCosStorageFieldConfig implements StorageFieldConfig {
     private FieldConfig<String> domain;
     /** 基础路径 */
     private FieldConfig<String> basePath;
-    /** 默认的 ACL，详情 {@link Constant.TencentCosACL} */
+    /** 默认的 ACL，详情 {@link Constant.VolcengineTosACL} */
     private FieldConfig<String> defaultAcl;
     /** 自动分片上传阈值，达到此大小则使用分片上传，默认 128MB */
     private FieldConfig<Integer> multipartThreshold;
     /** 自动分片上传时每个分片大小，默认 32MB */
     private FieldConfig<Integer> multipartPartSize;
 
-    public TencentCosStorageFieldConfig() {
-        this.secretId = FieldConfig.<String>builder()
+    public VolcengineTosStorageFieldConfig() {
+        this.accessKey = FieldConfig.<String>builder()
             .useInput()
-            .label("secretId")
+            .label("accessKey")
             .required(true)
             .build();
         this.secretKey = FieldConfig.<String>builder()
-            .useInput()
+            .inputComponent().type("password").end()
             .label("secretKey")
             .required(true)
-            .inputComponent().type("password").end()
+            .build();
+        this.endPoint = FieldConfig.<String>builder()
+            .useInput()
+            .label("访问站点")
+            .help("终端节点")
+            .required(true)
             .build();
         this.region = FieldConfig.<String>builder()
             .useInput()
-            .label("存储区域(region)")
-            .help("存仓库所在地域")
+            .label("地域")
+            .help("地区")
             .required(true)
             .build();
         this.bucketName = FieldConfig.<String>builder()
@@ -65,7 +72,7 @@ public class TencentCosStorageFieldConfig implements StorageFieldConfig {
             .useInput()
             .value("")
             .label("访问域名")
-            .help("访问域名，注意“/”结尾，例如：https://abc.cos.ap-nanjing.myqcloud.com/")
+            .help("访问域名，注意\"/\"结尾，例如：https://your-bucket.tos-cn-beijing.volces.com/")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()
@@ -76,14 +83,20 @@ public class TencentCosStorageFieldConfig implements StorageFieldConfig {
         this.defaultAcl = FieldConfig.<String>builder()
             .label("默认的 ACL")
             .help("文件的访问控制列表，一般情况下只有对象存储支持该功能")
-            .selectComponent().options(List.of(
+            .selectComponent()
+            .options(List.of(
                 new FieldOptionGroup<>("默认ACL", List.of(
                     new FieldOption<>("私有", "private"),
                     new FieldOption<>("公共读", "public-read"),
                     new FieldOption<>("公共读写", "public-read-write")
                 )),
-                new FieldOptionGroup<>("腾讯云COS ACL", List.of(
-                    new FieldOption<>("default", "default")
+                new FieldOptionGroup<>("火山引擎TOS ACL", List.of(
+                    new FieldOption<>("authenticated-read", "authenticated-read"),
+                    new FieldOption<>("bucket-owner-read", "bucket-owner-read"),
+                    new FieldOption<>("bucket-owner-full-control", "bucket-owner-full-control"),
+                    new FieldOption<>("log-delivery-write", "log-delivery-write"),
+                    new FieldOption<>("bucket-owner-entrusted", "bucket-owner-entrusted"),
+                    new FieldOption<>("unknown", "unknown")
                 ))
             ))
             .end()
@@ -106,13 +119,13 @@ public class TencentCosStorageFieldConfig implements StorageFieldConfig {
 
     @Override
     public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
-        FileStorageProperties.TencentCosConfig tencentCosConfig = JsonUtils.parseObject(json, FileStorageProperties.TencentCosConfig.class);
-        tencentCosConfig.setPlatform(platform);
-        if (properties.getTencentCos() == null) {
-            properties.setTencentCos(new ArrayList<>());
+        FileStorageProperties.VolcengineTosConfig volcengineTosConfig = JsonUtils.parseObject(json, FileStorageProperties.VolcengineTosConfig.class);
+        volcengineTosConfig.setPlatform(platform);
+        if (properties.getVolcengineTos() == null) {
+            properties.setVolcengineTos(new ArrayList<>());
         }
-        List<FileStorageProperties.TencentCosConfig> list = (List<FileStorageProperties.TencentCosConfig>) properties.getTencentCos();
-        list.add(tencentCosConfig);
+        List<FileStorageProperties.VolcengineTosConfig> list = (List<FileStorageProperties.VolcengineTosConfig>) properties.getVolcengineTos();
+        list.add(volcengineTosConfig);
         return properties;
     }
 }

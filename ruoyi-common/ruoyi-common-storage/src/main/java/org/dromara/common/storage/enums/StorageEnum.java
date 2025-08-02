@@ -26,8 +26,12 @@ public enum StorageEnum {
     BAIDU_BOS("baidu_bos", "百度云 BOS", "com.baidubce.services.bos.BosClient"),
     /** 又拍云 USS */
     UPYUN_USS("upyun_uss", "又拍云 USS", "com.upyun.RestManager"),
+    /** 火山引擎 TOS */
+    VOLCENGINE_TOS("volcengine_tos", "火山引擎 TOS", "com.volcengine.tos.TOSV2"),
     /** MinIO */
     MINIO("minio", "MinIO", "io.minio.MinioClient"),
+    /** Amazon S3 V2 */
+    AMAZON_S3_V2("amazon_s3_v2", "Amazon S3 V2", "software.amazon.awssdk.services.s3.S3Client"),
     /** Amazon S3 */
     AMAZON_S3("amazon_s3", "Amazon S3", "com.amazonaws.services.s3.AmazonS3"),
     /** FTP */
@@ -40,6 +44,10 @@ public enum StorageEnum {
     GOOGLE_CLOUD_STORAGE("google_cloud_storage", "GoogleCloud Storage", "com.google.cloud.storage.Storage"),
     /** FastDFS */
     FAST_DFS("fast_dfs", "FastDFS", "org.csource.fastdfs.StorageClient"),
+    /** GoFastDFS */
+    GO_FAST_DFS("go_fast_dfs", "GoFastDFS", "cn.hutool.http.HttpUtil"),
+    /** MongoGridFs */
+    MONGO_GRID_FS("mongo_grid_fs", "MongoGridFs", "com.mongodb.client.MongoClient"),
     /** Azure Blob Storage */
     AZURE_BLOB_STORAGE("azure_blob_storage", "Azure Blob Storage", "com.azure.storage.blob.BlobServiceClient");
 
@@ -47,6 +55,6 @@ public enum StorageEnum {
     private final String code;
     /** 存储平台描述 */
     private final String desc;
-    /** 客户端类名 */
+    /** 客户端类名，检查该类是否存在，如果不存在则不在前端中显示 */
     private final String clientClassName;
 }

@@ -12,7 +12,7 @@
     <artifactId>ruoyi-common-storage</artifactId>
 
     <description>
-        ruoyi-common-storage 存储服务模块
+        ruoyi-common-storage 存储服务模块，封装了各种存储服务，如果要使用对应的服务，请在引入模块时添加对应平台的依赖或者将对应平台的pom类型删掉。
     </description>
 
     <dependencies>
@@ -65,42 +65,49 @@
             <groupId>com.huaweicloud</groupId>
             <artifactId>esdk-obs-java</artifactId>
             <version>3.24.9</version>
+            <type>pom</type>
         </dependency>
         <!-- 阿里云OSS -->
         <dependency>
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>3.18.2</version>
+            <type>pom</type>
         </dependency>
         <!-- 七牛云Kodo -->
         <dependency>
             <groupId>com.qiniu</groupId>
             <artifactId>qiniu-java-sdk</artifactId>
             <version>7.12.1</version>
+            <type>pom</type>
         </dependency>
         <!-- 腾讯云COS -->
         <dependency>
             <groupId>com.qcloud</groupId>
             <artifactId>cos_api</artifactId>
             <version>5.6.245</version>
+            <type>pom</type>
         </dependency>
         <!-- 百度云BOS -->
 <!--        <dependency>-->
 <!--            <groupId>com.baidubce</groupId>-->
 <!--            <artifactId>bce-java-sdk</artifactId>-->
 <!--            <version>0.10.372</version>-->
+<!--            <type>pom</type>-->
 <!--        </dependency>-->
         <!-- 又拍云USS -->
         <dependency>
             <groupId>com.upyun</groupId>
             <artifactId>java-sdk</artifactId>
             <version>4.2.3</version>
+            <type>pom</type>
         </dependency>
         <!-- MinIO -->
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
             <version>8.5.17</version>
+            <type>pom</type>
         </dependency>
 
         <!-- AWS S3 -->
@@ -108,6 +115,10 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-s3</artifactId>
             <version>1.12.700</version>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
         </dependency>
         <!-- WebDAV -->
         <dependency>
@@ -120,24 +131,42 @@
                     <artifactId>slf4j-simple</artifactId>
                 </exclusion>
             </exclusions>
+            <type>pom</type>
         </dependency>
         <!-- GoogleCloud Storage -->
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>google-cloud-storage</artifactId>
             <version>2.43.1</version>
+            <type>pom</type>
         </dependency>
         <!--FastDFS-->
         <dependency>
             <groupId>io.github.rui8832</groupId>
             <artifactId>fastdfs-client-java</artifactId>
             <version>1.30-20230328</version>
+            <type>pom</type>
         </dependency>
         <!--Azure Blob Storage-->
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-storage-blob</artifactId>
             <version>12.28.1</version>
+            <type>pom</type>
+        </dependency>
+        <!-- 火山引擎 TOS -->
+        <dependency>
+            <groupId>com.volcengine</groupId>
+            <artifactId>ve-tos-java-sdk</artifactId>
+            <version>2.8.8</version>
+            <type>pom</type>
+        </dependency>
+        <!-- Mongo GridFS 项目中没有 Mongo 相关依赖，引入这个就可以了 -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>4.6.1</version>
+            <type>pom</type>
         </dependency>
     </dependencies>
 

@@ -14,7 +14,7 @@ public interface StorageFieldConfig {
      * 增加存储属性
      *
      * @param properties 属性
-     * @param platform   平台
+     * @param platform   平台（一般是配置的id）
      * @param json       配置json
      * @return 存储属性
      */

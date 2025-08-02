@@ -27,7 +27,7 @@ public class AmazonS3StorageFieldConfig implements StorageFieldConfig {
     private FieldConfig<String> region;
     /** 访问站点 */
     private FieldConfig<String> endPoint;
-    /** 存储空间名 */
+    /** 存储桶名称 */
     private FieldConfig<String> bucketName;
     /** 访问域名 */
     private FieldConfig<String> domain;
@@ -44,6 +44,7 @@ public class AmazonS3StorageFieldConfig implements StorageFieldConfig {
         this.accessKey = FieldConfig.<String>builder()
             .useInput()
             .label("accessKey")
+            .help("若要使用第三方兼容的存储平台，使用这种方式（1.x）兼容性会好些，否则请使用 Amazon S3 V2 版本")
             .required(true)
             .build();
         this.secretKey = FieldConfig.<String>builder()
@@ -54,27 +55,31 @@ public class AmazonS3StorageFieldConfig implements StorageFieldConfig {
         this.region = FieldConfig.<String>builder()
             .useInput()
             .label("存储区域(region)")
-            .required(true)
+            .help("与 endPoint 参数至少填一个。例如：ap-east-1")
+            .required(false)
             .build();
         this.endPoint = FieldConfig.<String>builder()
             .useInput()
             .label("访问站点(endPoint)")
-            .required(true)
+            .help("与 region 参数至少填一个。例如：https://s3.ap-east-1.amazonaws.com/")
+            .required(false)
             .build();
         this.bucketName = FieldConfig.<String>builder()
             .useInput()
-            .label("存储空间名")
+            .label("存储桶名称")
             .required(true)
             .build();
         this.domain = FieldConfig.<String>builder()
             .useInput()
             .value("")
             .label("访问域名")
+            .help("访问域名，注意“/”结尾，例如：https://abcd.s3.ap-east-1.amazonaws.com/")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()
             .useInput()
             .label("基础路径")
+            .help("例如：s3/")
             .required(false)
             .build();
         this.defaultAcl = FieldConfig.<String>builder()

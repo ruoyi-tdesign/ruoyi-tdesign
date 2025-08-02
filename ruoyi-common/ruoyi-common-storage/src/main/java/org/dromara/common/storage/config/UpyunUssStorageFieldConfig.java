@@ -20,7 +20,7 @@ public class UpyunUssStorageFieldConfig implements StorageFieldConfig {
     private FieldConfig<String> username;
     /** 密码 */
     private FieldConfig<String> password;
-    /** 存储空间名 */
+    /** 存储桶名称 */
     private FieldConfig<String> bucketName;
     /** 访问域名 */
     private FieldConfig<String> domain;
@@ -47,13 +47,14 @@ public class UpyunUssStorageFieldConfig implements StorageFieldConfig {
             .build();
         this.bucketName = FieldConfig.<String>builder()
             .useInput()
-            .label("存储空间名")
+            .label("存储桶名称")
             .required(true)
             .build();
         this.domain = FieldConfig.<String>builder()
             .useInput()
             .value("")
             .label("访问域名")
+            .help("访问域名，注意“/”结尾，例如：http://abc.test.upcdn.net/")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()

@@ -58,6 +58,14 @@ public class AzureBlobStorageFieldConfig implements StorageFieldConfig {
         this.endPoint = FieldConfig.<String>builder()
             .useInput()
             .label("访问站点")
+            .help("终结点 AzureBlob控制台-设置-终结点-主终结点-Blob服务" +
+                "<br/>兼容性说明：<br/>" +
+                "Azure Blob Storage 主要要注意的地方就是 ACL （访问控制列表）功能，无法做到像 Amazon S3 那样针对单个文件设置公开访问， 即使将文件的 ACL 设置为 公共读PUBLIC_READ ，上传成功后的 url 也无法通过浏览器直接公开访问，但实际上已经设置成功了， 可以在 AzureBlob 控制台看到，现有有以下解决办法可以参考：<br/>" +
+                "方式一：可以使用 预签名 URL 获取临时授权访问代替<br/>" +
+                "方式二：将数据湖和容器同时开启公开访问，这样所有文件就都可以公开访问了（无法针对单个文件设置）<br/>" +
+                "数据湖：AzureBlob控制台-设置-配置-允许Blob匿名访问-勾选已启用<br/>" +
+                "容器：AzureBlob控制台-数据存储-容器-勾选对应容器-点击顶部匿名访问级别-选择第二个Blob（仅匿名读取访问blob）<br/>" +
+                "方式三：将 domain 参数设置为自己的服务器地址，在服务器上编写对应接口，这样上传文件后的 url 就是后台地址了，当访问这个 url 时， 后台根据 url 解析出文件信息或从数据中查询出文件信息，校验是否有权限访问，如果有则再使用 预签名 URL 获取临时授权访问地址， 最后发起重定向到此地址即可。我觉得这可能是兼容性最好的方式了，只要编写这一个重定向接口，所有操作同其它存储平台一样")
             .required(true)
             .build();
         this.containerName = FieldConfig.<String>builder()
@@ -70,6 +78,7 @@ public class AzureBlobStorageFieldConfig implements StorageFieldConfig {
             .useInput()
             .value("")
             .label("访问域名")
+            .help("访问域名，注意“/”结尾，与 end-point 保持一致")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()
@@ -111,7 +120,7 @@ public class AzureBlobStorageFieldConfig implements StorageFieldConfig {
             .useInputNumber()
             .value(8)
             .label("最大上传并行度")
-            .help("最大上传并行度<br/>分片后 同时进行上传的 数量<br/>数量太大会占用大量缓冲区<br/>默认 8")
+            .help("最大上传并行度，分片后同时进行上传的数量，数量太大会占用大量缓冲区。默认 8")
             .required(true)
             .build();
         this.methodToPermissionMap = FieldConfig.<List<String>>builder()

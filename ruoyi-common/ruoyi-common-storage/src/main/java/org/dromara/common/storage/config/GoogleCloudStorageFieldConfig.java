@@ -23,7 +23,7 @@ public class GoogleCloudStorageFieldConfig implements StorageFieldConfig {
     private FieldConfig<String> projectId;
     /** 证书路径，兼容Spring的ClassPath路径、文件路径、HTTP路径等 */
     private FieldConfig<String> credentialsPath;
-    /** 存储空间名 */
+    /** 存储桶名称 */
     private FieldConfig<String> bucketName;
     /** 访问域名 */
     private FieldConfig<String> domain;
@@ -36,23 +36,25 @@ public class GoogleCloudStorageFieldConfig implements StorageFieldConfig {
         this.projectId = FieldConfig.<String>builder()
             .useInput()
             .label("projectId")
+            .help("项目 id")
             .required(true)
             .build();
         this.credentialsPath = FieldConfig.<String>builder()
             .useInput()
             .label("证书路径")
-            .help("证书路径，兼容Spring的ClassPath路径、文件路径、HTTP路径等")
+            .help("授权 key json 路径，兼容Spring的ClassPath路径、文件路径、HTTP路径等。例如：file:/deploy/example-key.json")
             .required(true)
             .build();
         this.bucketName = FieldConfig.<String>builder()
             .useInput()
-            .label("存储空间名")
+            .label("存储桶名称")
             .required(true)
             .build();
         this.domain = FieldConfig.<String>builder()
             .useInput()
             .value("")
             .label("访问域名")
+            .help("访问域名，注意“/”结尾，例如：https://storage.googleapis.com/test-bucket/")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()

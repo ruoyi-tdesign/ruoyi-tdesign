@@ -57,6 +57,7 @@ public class FtpStorageFieldConfig implements StorageFieldConfig {
         this.host = FieldConfig.<String>builder()
             .useInput()
             .label("主机")
+            .help("主机，例如：192.168.1.105")
             .required(true)
             .build();
         this.port = FieldConfig.<Integer>builder()
@@ -128,12 +129,13 @@ public class FtpStorageFieldConfig implements StorageFieldConfig {
             .useInput()
             .value("/")
             .label("存储路径")
-            .help("存储路径，上传的文件都会存储在这个路径下面，默认“/”，注意“/”结尾")
+            .help("存储路径，上传的文件都会存储在这个路径下面，默认“/”，注意“/”结尾。例如：/www/wwwroot/file.abc.com/")
             .required(true)
             .build();
         this.domain = FieldConfig.<String>builder()
             .useInput()
             .label("访问域名")
+            .help("访问域名，注意“/”结尾，例如：ftp://192.168.1.105/")
             .required(false)
             .build();
     }

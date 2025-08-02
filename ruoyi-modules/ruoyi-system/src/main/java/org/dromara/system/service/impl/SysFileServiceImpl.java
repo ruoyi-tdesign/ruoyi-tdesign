@@ -10,15 +10,10 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.storage.balancer.DefaultFileServer;
-import org.dromara.common.storage.balancer.FileServer;
-import org.dromara.common.storage.balancer.FileStorageLoadBalancer;
-import org.dromara.common.storage.balancer.RedisRoundRobinAlgorithm;
 import org.dromara.common.storage.utils.FileStorageUtil;
 import org.dromara.common.tenant.annotation.IgnoreTenant;
 import org.dromara.system.domain.SysFile;
 import org.dromara.system.domain.SysFileCategory;
-import org.dromara.system.domain.SysStorageConfig;
 import org.dromara.system.domain.bo.SysFileBo;
 import org.dromara.system.domain.query.SysFileQuery;
 import org.dromara.system.domain.vo.SysFileVo;
@@ -50,8 +45,6 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
 
     @Autowired
     private ISysStorageConfigService storageConfigService;
-    @Autowired
-    private SysFileRecorder fileRecorder;
     @Autowired
     private ISysFileCategoryService categoryService;
 
@@ -157,13 +150,13 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
 
     private void realRemoveFile(List<SysFile> list) {
         for (SysFile file : list) {
-            SysStorageConfig config = storageConfigService.getById(file.getStorageConfigId());
-            if (config == null) {
-                throw new ServiceException("文件【%s】存储配置不存在".formatted(file.getOriginalFilename()));
+            FileStorageService service = storageConfigService.getFileStorageService(file.getStorageConfigId());
+            if (service == null) {
+                throw new ServiceException("文件存储配置不存在");
             }
             FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
-            FileStorageService service = getFileStorageService(config);
             service.delete(fileInfo);
+            FileStorageUtil.serviceRecycle(service);
         }
     }
 
@@ -177,8 +170,9 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SysFile upload(SysFileBo bo, MultipartFile file) {
-        FileStorageService service = getFileStorageService();
+        FileStorageService service = storageConfigService.getFileStorageService();
         FileInfo upload = service.of(file).upload();
+        FileStorageUtil.serviceRecycle(service);
         SysFile sysFile = new SysFile();
         BeanUtils.copyProperties(upload, sysFile);
         long id = Long.parseLong(upload.getId());
@@ -205,14 +199,14 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         if (file == null) {
             throw new ServiceException("文件不存在");
         }
-        SysStorageConfig config = storageConfigService.getById(file.getStorageConfigId());
-        if (config == null) {
+        FileStorageService service = storageConfigService.getFileStorageService(file.getStorageConfigId());
+        if (service == null) {
             throw new ServiceException("文件存储配置不存在");
         }
         FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
-        FileStorageService service = getFileStorageService(config);
         response.setContentType(fileInfo.getContentType());
         service.download(fileInfo).outputStream(response.getOutputStream());
+        FileStorageUtil.serviceRecycle(service);
     }
 
     /**
@@ -229,24 +223,15 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         if (file == null) {
             throw new ServiceException("文件不存在");
         }
-        SysStorageConfig config = storageConfigService.getById(file.getStorageConfigId());
-        if (config == null) {
+        FileStorageService service = storageConfigService.getFileStorageService(file.getStorageConfigId());
+        if (service == null) {
             throw new ServiceException("文件存储配置不存在");
         }
         FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
-        FileStorageService service = getFileStorageService(config);
         FileUtils.setAttachmentResponseHeader(response, fileInfo.getOriginalFilename());
         response.setContentType(fileInfo.getContentType());
         service.download(fileInfo).outputStream(response.getOutputStream());
-    }
-
-    private static FileStorageService getFileStorageService(SysStorageConfig config) {
-        DefaultFileServer fileServer = new DefaultFileServer();
-        fileServer.setId(config.getStorageConfigId().toString());
-        fileServer.setPlatform(config.getPlatform());
-        fileServer.setWeight(config.getWeight());
-        fileServer.setProperties(config.getConfigJson());
-        return FileStorageUtil.getFileStorageService(fileServer);
+        FileStorageUtil.serviceRecycle(service);
     }
 
     /**
@@ -261,16 +246,6 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         List<SysFileVo> vos = MapstructUtils.convert(list, SysFileVo.class);
         SysFileUtil.packedPreviewAndDownloadUrl(vos);
         return vos;
-    }
-
-    /**
-     * 获取文件存储服务
-     */
-    private FileStorageService getFileStorageService() {
-        List<FileServer> servers = storageConfigService.getFileServerList();
-        FileStorageLoadBalancer balancer = new FileStorageLoadBalancer(new RedisRoundRobinAlgorithm(), servers);
-        balancer.setFileRecorder(fileRecorder);
-        return balancer.getService();
     }
 
     /**

@@ -8,6 +8,7 @@ import org.dromara.common.storage.wrapper.MultipartFileWrapperAdapter;
 import org.dromara.x.file.storage.core.FileStorageProperties;
 import org.dromara.x.file.storage.core.FileStorageService;
 import org.dromara.x.file.storage.core.FileStorageServiceBuilder;
+import org.dromara.x.file.storage.core.platform.FileStorage;
 
 /**
  * 文件存储工具类
@@ -36,5 +37,16 @@ public class FileStorageUtil {
             .useDefault()
             .addFileWrapperAdapter(new MultipartFileWrapperAdapter())
             .build();
+    }
+
+    /**
+     * 释放文件存储服务
+     *
+     * @param service 文件存储服务
+     */
+    public static void serviceRecycle(FileStorageService service) {
+        for (FileStorage storage : service.getFileStorageList()) {
+            storage.close();
+        }
     }
 }

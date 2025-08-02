@@ -327,8 +327,8 @@ export function handleChangeStatus<T>(
   status: keyof T,
   title: string,
   ok: (row: T) => Promise<any>,
-  yesValue = '1',
-  noValue = '0',
+  yesValue: string | number = '1',
+  noValue: string | number = '0',
 ) {
   const rowObj: T = list.find((value) => value[id] === obj[id]);
   const text = rowObj[status] === yesValue ? '启用' : '停用';

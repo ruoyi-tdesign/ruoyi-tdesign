@@ -62,6 +62,7 @@ public class WebDavStorageFieldConfig implements StorageFieldConfig {
         this.domain = FieldConfig.<String>builder()
             .useInput()
             .label("访问域名")
+            .help("访问域名，注意“/”结尾，例如：https://file.abc.com/")
             .required(false)
             .build();
     }

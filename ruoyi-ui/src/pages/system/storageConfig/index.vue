@@ -135,7 +135,7 @@
       :header="title"
       destroy-on-close
       :close-on-overlay-click="false"
-      width="min(800px, 100%)"
+      width="min(1000px, 100%)"
       placement="center"
       attach="body"
       :confirm-btn="{

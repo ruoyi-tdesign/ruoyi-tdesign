@@ -68,7 +68,8 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
     public FastDfsStorageFieldConfig() {
         this.runMod = FieldConfig.<String>builder()
             .label("运行模式")
-            .help("运行模式，由于 FastDFS 比较特殊，不支持自定义文件名及路径，所以使用运行模式来解决这个问题。<br/>" +
+            .value("COVER")
+            .help("运行模式，默认 COVER（覆盖模式），强制用 FastDFS 返回的路径及文件名覆盖 FileInfo 中的 path 及 filename。<br/>由于 FastDFS 比较特殊，不支持自定义文件名及路径，所以使用运行模式来解决这个问题。<br/>" +
                 "详情请查看：https://x-file-storage.xuyanwu.cn/2.2.0/#/%E5%AD%98%E5%82%A8%E5%B9%B3%E5%8F%B0?id=OCI_FastDFS")
             .required(true)
             .selectComponent().options(List.of(
@@ -190,6 +191,7 @@ public class FastDfsStorageFieldConfig implements StorageFieldConfig {
             .useInput()
             .value("")
             .label("访问域名")
+            .help("访问域名，注意“/”结尾，例如：https://file.abc.com/")
             .required(false)
             .build();
         this.basePath = FieldConfig.<String>builder()
