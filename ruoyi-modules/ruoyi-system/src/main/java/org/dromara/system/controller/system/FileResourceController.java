@@ -2,6 +2,7 @@ package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import jakarta.servlet.http.HttpServletResponse;
+import org.dromara.system.domain.dto.FileResourceDto;
 import org.dromara.system.service.ISysFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,8 +31,8 @@ public class FileResourceController {
      */
     @SaIgnore
     @RequestMapping("/preview/{fileName}")
-    public void preview(@PathVariable String fileName, HttpServletResponse response) {
-        fileService.preview(fileName, response);
+    public void preview(@PathVariable String fileName, @Validated FileResourceDto dto, HttpServletResponse response) {
+        fileService.preview(fileName, dto, response);
     }
 
     /**
@@ -41,7 +42,7 @@ public class FileResourceController {
      */
     @SaIgnore
     @RequestMapping("/download/{fileName}")
-    public void download(@PathVariable String fileName, HttpServletResponse response) {
-        fileService.download(fileName, response);
+    public void download(@PathVariable String fileName, @Validated FileResourceDto dto, HttpServletResponse response) {
+        fileService.download(fileName, dto, response);
     }
 }

@@ -2,7 +2,7 @@ package org.dromara.system.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.enums.YesNoEnum;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
@@ -15,6 +15,7 @@ import org.dromara.common.tenant.annotation.IgnoreTenant;
 import org.dromara.system.domain.SysFile;
 import org.dromara.system.domain.SysFileCategory;
 import org.dromara.system.domain.bo.SysFileBo;
+import org.dromara.system.domain.dto.FileResourceDto;
 import org.dromara.system.domain.query.SysFileQuery;
 import org.dromara.system.domain.vo.SysFileVo;
 import org.dromara.system.mapper.SysFileMapper;
@@ -40,6 +41,7 @@ import java.util.List;
  * @author yixiacoco
  * @date 2025-05-12
  */
+@Slf4j
 @Service
 public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> implements ISysFileService {
 
@@ -189,12 +191,12 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      * 预览文件
      *
      * @param fileName 文件ID
+     * @param dto
      * @param response 响应
      */
     @Override
     @IgnoreTenant
-    @SneakyThrows(IOException.class)
-    public void preview(String fileName, HttpServletResponse response) {
+    public void preview(String fileName, FileResourceDto dto, HttpServletResponse response) {
         SysFile file = getByFileName(fileName);
         if (file == null) {
             throw new ServiceException("文件不存在");
@@ -205,7 +207,14 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         }
         FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
         response.setContentType(fileInfo.getContentType());
-        service.download(fileInfo).outputStream(response.getOutputStream());
+        service.download(fileInfo).inputStream((is) -> {
+            try {
+                SysFileUtil.handleImage(dto, is, response.getOutputStream());
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                throw new ServiceException(e.getMessage());
+            }
+        });
         FileStorageUtil.serviceRecycle(service);
     }
 
@@ -213,12 +222,12 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      * 下载文件
      *
      * @param fileName 文件ID
+     * @param dto
      * @param response 响应
      */
     @Override
     @IgnoreTenant
-    @SneakyThrows(IOException.class)
-    public void download(String fileName, HttpServletResponse response) {
+    public void download(String fileName, FileResourceDto dto, HttpServletResponse response) {
         SysFile file = getByFileName(fileName);
         if (file == null) {
             throw new ServiceException("文件不存在");
@@ -230,7 +239,14 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
         FileUtils.setAttachmentResponseHeader(response, fileInfo.getOriginalFilename());
         response.setContentType(fileInfo.getContentType());
-        service.download(fileInfo).outputStream(response.getOutputStream());
+        service.download(fileInfo).inputStream((is) -> {
+            try {
+                SysFileUtil.handleImage(dto, is, response.getOutputStream());
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                throw new ServiceException(e.getMessage());
+            }
+        });
         FileStorageUtil.serviceRecycle(service);
     }
 

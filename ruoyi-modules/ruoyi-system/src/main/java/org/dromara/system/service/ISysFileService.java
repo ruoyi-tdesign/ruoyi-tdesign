@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.system.domain.SysFile;
 import org.dromara.system.domain.bo.SysFileBo;
+import org.dromara.system.domain.dto.FileResourceDto;
 import org.dromara.system.domain.query.SysFileQuery;
 import org.dromara.system.domain.vo.SysFileVo;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,17 +82,19 @@ public interface ISysFileService extends IService<SysFile> {
      * 预览文件
      *
      * @param fileName 文件ID
+     * @param dto
      * @param response 响应
      */
-    void preview(String fileName, HttpServletResponse response);
+    void preview(String fileName, FileResourceDto dto, HttpServletResponse response);
 
     /**
      * 下载文件
      *
      * @param fileName 文件ID
+     * @param dto
      * @param response 响应
      */
-    void download(String fileName, HttpServletResponse response);
+    void download(String fileName, FileResourceDto dto, HttpServletResponse response);
 
     /**
      * 根据ID列表查询文件

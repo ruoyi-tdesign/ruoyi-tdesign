@@ -90,7 +90,7 @@
                     <img
                       draggable="false"
                       class="list-card-gallery-responsive-image__img--fit list-card-gallery-responsive-image__img--cover"
-                      :src="getVisitUrl(file.previewUrl)"
+                      :src="`${getVisitUrl(file.previewUrl)}?w=250&q=0.8`"
                       :alt="file.originalFilename"
                     />
                   </picture>
