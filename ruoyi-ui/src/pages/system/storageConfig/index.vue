@@ -20,6 +20,16 @@
             <t-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label" :value="dict.value" />
           </t-select>
         </t-form-item>
+        <t-form-item label="请求模式" name="requestMode">
+          <t-select v-model="queryParams.requestMode" placeholder="请选择请求模式" clearable>
+            <t-option
+              v-for="dict in sys_storage_request_mode"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            />
+          </t-select>
+        </t-form-item>
         <t-form-item label-width="0px">
           <t-button theme="primary" @click="handleQuery">
             <template #icon> <search-icon /></template>
@@ -108,6 +118,9 @@
             @click.stop
           ></t-switch>
         </template>
+        <template #requestMode="{ row }">
+          <dict-tag :options="sys_storage_request_mode" :value="row.requestMode" />
+        </template>
         <template #operation="{ row }">
           <t-space :size="8" break-line>
             <my-link v-hasPermi="['system:storageConfig:query']" @click.stop="handleDetail(row)">
@@ -178,6 +191,36 @@
                 <t-switch v-model="form.status" :custom-value="[1, 0]" />
               </t-form-item>
             </t-col>
+            <t-col :span="12">
+              <t-form-item label="请求模式" name="requestMode">
+                <template #help>
+                  <p>
+                    <b>代理转发请求：</b>
+                    由后端服务提供统一的接口，将请求转发给对应的存储方案，接口提供统一的图片处理逻辑。该方案可以访问私有ACL和本地存储文件，但使用的流量和图片处理速度由服务器配置决定
+                  </p>
+                  <p>
+                    <b>源地址重定向请求：</b>
+                    直接将请求转发给对应的存储方案，存储方案返回的url为源地址，该方案不支持私有ACL。注意：例如本地存储需要配合nginx配置媒体文件访问，并且需要配置访问域名
+                    <br />
+                    图片处理逻辑由存储方案提供，需要存储方案支持该功能
+                  </p>
+                  <p>
+                    <b>预签名重定向请求：</b>
+                    请求对应的存储方案，返回预签名地址，默认过期时间一小时，该方案可以访问私有ACL，且有效防止盗链。注意：不支持该操作的存储方案将回退到代理转发请求。
+                    <br />
+                    图片处理逻辑由存储方案提供，需要存储方案支持该功能
+                  </p>
+                </template>
+                <t-select v-model="form.requestMode" auto-width placeholder="请选择请求模式" clearable>
+                  <t-option
+                    v-for="dict in sys_storage_request_mode"
+                    :key="dict.value"
+                    :label="dict.label"
+                    :value="dict.value"
+                  />
+                </t-select>
+              </t-form-item>
+            </t-col>
             <form-field-renders
               :key="form.storageConfigId"
               v-model="form.configObject"
@@ -218,6 +261,9 @@
           <t-descriptions-item label="负载均衡权重">{{ form.weight }}</t-descriptions-item>
           <t-descriptions-item label="启用状态">
             <dict-tag :options="sys_normal_disable" :value="form.status" />
+          </t-descriptions-item>
+          <t-descriptions-item label="请求模式">
+            <dict-tag :options="sys_storage_request_mode" :value="form.requestMode" />
           </t-descriptions-item>
         </template>
         <template #suffix>
@@ -269,7 +315,10 @@ import { ArrayOps } from '@/utils/array';
 import { handleChangeStatus } from '@/utils/ruoyi';
 
 const { proxy } = getCurrentInstance();
-const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
+const { sys_storage_request_mode, sys_normal_disable } = proxy.useDict(
+  'sys_storage_request_mode',
+  'sys_normal_disable',
+);
 
 const openView = ref(false);
 const openViewLoading = ref(false);
@@ -307,6 +356,10 @@ const rules = ref<Record<string, Array<FormRule>>>({
   ],
   weight: [{ required: true, message: '负载均衡权重不能为空' }],
   status: [{ required: true, message: '启用状态不能为空' }],
+  requestMode: [
+    { required: true, message: '请求模式不能为空' },
+    { max: 255, message: '请求模式不能超过255个字符' },
+  ],
   remark: [{ max: 500, message: '备注不能超过500个字符' }],
 });
 
@@ -317,6 +370,7 @@ const columns = ref<Array<PrimaryTableCol>>([
   { title: `平台`, colKey: 'platform', align: 'center' },
   { title: `负载均衡权重`, colKey: 'weight', align: 'center' },
   { title: `启用状态`, colKey: 'status', align: 'center' },
+  { title: `请求模式`, colKey: 'requestMode', align: 'center' },
   { title: `创建时间`, colKey: 'createTime', align: 'center', minWidth: 112, width: 180 },
   { title: `更新时间`, colKey: 'updateTime', align: 'center', minWidth: 112, width: 180 },
   { title: `备注`, colKey: 'remark', align: 'center', ellipsis: true },
@@ -334,6 +388,7 @@ const queryParams = ref<SysStorageConfigQuery>({
   name: undefined,
   platform: undefined,
   status: undefined,
+  requestMode: undefined,
 });
 // 分页
 const pagination = computed(() => {

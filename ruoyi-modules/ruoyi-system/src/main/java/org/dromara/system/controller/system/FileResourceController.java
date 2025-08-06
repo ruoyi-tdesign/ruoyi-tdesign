@@ -26,6 +26,7 @@ public class FileResourceController {
 
     /**
      * 文件预览
+     * TODO: 新增过期+签名功能，防盗链
      *
      * @param fileName 文件名称
      */
@@ -37,6 +38,7 @@ public class FileResourceController {
 
     /**
      * 文件下载
+     * TODO: 新增过期+签名功能，防盗链
      *
      * @param fileName 文件名称
      */

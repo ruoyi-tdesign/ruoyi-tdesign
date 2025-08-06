@@ -1,12 +1,18 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.net.url.UrlBuilder;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.enums.StorageRequestMode;
 import org.dromara.common.core.enums.YesNoEnum;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.StreamUtils;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -14,6 +20,7 @@ import org.dromara.common.storage.utils.FileStorageUtil;
 import org.dromara.common.tenant.annotation.IgnoreTenant;
 import org.dromara.system.domain.SysFile;
 import org.dromara.system.domain.SysFileCategory;
+import org.dromara.system.domain.SysStorageConfig;
 import org.dromara.system.domain.bo.SysFileBo;
 import org.dromara.system.domain.dto.FileResourceDto;
 import org.dromara.system.domain.query.SysFileQuery;
@@ -25,6 +32,8 @@ import org.dromara.system.service.ISysStorageConfigService;
 import org.dromara.system.utils.SysFileUtil;
 import org.dromara.x.file.storage.core.FileInfo;
 import org.dromara.x.file.storage.core.FileStorageService;
+import org.dromara.x.file.storage.core.constant.Constant;
+import org.dromara.x.file.storage.core.presigned.GeneratePresignedUrlResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,8 +41,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * 文件记录Service业务层处理
@@ -173,7 +188,9 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Transactional(rollbackFor = Exception.class)
     public SysFile upload(SysFileBo bo, MultipartFile file) {
         FileStorageService service = storageConfigService.getFileStorageService();
-        FileInfo upload = service.of(file).upload();
+        // 生成日期路径
+        String datePath = DateUtils.datePath() + StringUtils.SLASH;
+        FileInfo upload = service.of(file).setPath(datePath).upload();
         FileStorageUtil.serviceRecycle(service);
         SysFile sysFile = new SysFile();
         BeanUtils.copyProperties(upload, sysFile);
@@ -197,25 +214,18 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Override
     @IgnoreTenant
     public void preview(String fileName, FileResourceDto dto, HttpServletResponse response) {
-        SysFile file = getByFileName(fileName);
-        if (file == null) {
-            throw new ServiceException("文件不存在");
-        }
-        FileStorageService service = storageConfigService.getFileStorageService(file.getStorageConfigId());
-        if (service == null) {
-            throw new ServiceException("文件存储配置不存在");
-        }
-        FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
-        response.setContentType(fileInfo.getContentType());
-        service.download(fileInfo).inputStream((is) -> {
-            try {
-                SysFileUtil.handleImage(dto, is, response.getOutputStream());
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-                throw new ServiceException(e.getMessage());
-            }
+        handleFileAccess(fileName, dto, response, fileInfo -> {
+            // 设置缓存控制头信息
+            // 缓存有效期为1天
+            response.setHeader("Cache-Control", "public, max-age=86400");
+
+            // 设置过期时间（GMT格式）
+            ZonedDateTime expirationTime = ZonedDateTime.now().plusDays(1);
+            String formattedExpiration = expirationTime.format(DateTimeFormatter.RFC_1123_DATE_TIME);
+            response.setHeader("Expires", formattedExpiration);
+            response.setHeader("ETag", fileInfo.getFilename());
+            response.setContentType(fileInfo.getContentType());
         });
-        FileStorageUtil.serviceRecycle(service);
     }
 
     /**
@@ -228,25 +238,75 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Override
     @IgnoreTenant
     public void download(String fileName, FileResourceDto dto, HttpServletResponse response) {
+        handleFileAccess(fileName, dto, response, fileInfo -> {
+            FileUtils.setAttachmentResponseHeader(response, fileInfo.getOriginalFilename());
+            response.setContentType(fileInfo.getContentType());
+        });
+    }
+
+    /**
+     * 处理文件访问
+     * @param fileName
+     * @param dto
+     * @param response
+     */
+    private void handleFileAccess(String fileName, FileResourceDto dto, HttpServletResponse response, Consumer<FileInfo> process) {
         SysFile file = getByFileName(fileName);
         if (file == null) {
             throw new ServiceException("文件不存在");
         }
-        FileStorageService service = storageConfigService.getFileStorageService(file.getStorageConfigId());
+        SysStorageConfig config = storageConfigService.getById(file.getStorageConfigId());
+        FileStorageService service = storageConfigService.getFileStorageService(config);
         if (service == null) {
             throw new ServiceException("文件存储配置不存在");
         }
         FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
-        FileUtils.setAttachmentResponseHeader(response, fileInfo.getOriginalFilename());
-        response.setContentType(fileInfo.getContentType());
-        service.download(fileInfo).inputStream((is) -> {
+        if (process != null) {
+            process.accept(fileInfo);
+        }
+        StorageRequestMode requestMode = StorageRequestMode.valueOf(config.getRequestMode());
+        if (requestMode == StorageRequestMode.direct) {
+            UrlBuilder urlBuilder = UrlBuilder.of(fileInfo.getUrl(), StandardCharsets.UTF_8);
+            Map<String, String> paramMap = ServletUtils.getParamMap(ServletUtils.getRequest());
+            paramMap.forEach(urlBuilder::addQuery);
             try {
-                SysFileUtil.handleImage(dto, is, response.getOutputStream());
+                response.sendRedirect(urlBuilder.build());
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 throw new ServiceException(e.getMessage());
             }
-        });
+        } else if (requestMode == StorageRequestMode.direct_signature && service.isSupportPresignedUrl()) {
+            Map<String, String> paramMap = ServletUtils.getParamMap(ServletUtils.getRequest());
+
+            // 生成下载或访问用的 URL
+            GeneratePresignedUrlResult presigned = service
+                .generatePresignedUrl()
+                .setPath(fileInfo.getPath()) // 文件路径
+                .setFilename(fileInfo.getFilename()) // 文件名，也可以换成缩略图的文件名
+                .setMethod(Constant.GeneratePresignedUrl.Method.GET) // 签名方法
+                .setExpiration(DateUtil.offsetHour(new Date(), 1)) // 过期时间 1 小时
+                .putResponseHeaders(Constant.Metadata.CONTENT_DISPOSITION, FileUtils.getContentDispositionValue(fileInfo.getOriginalFilename()))
+                .putQueryParamsAll(paramMap)
+                .generatePresignedUrl();
+
+            String presignedUrl = presigned.getUrl();
+            try {
+                response.sendRedirect(presignedUrl);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                throw new ServiceException(e.getMessage());
+            }
+        } else {
+            response.setContentType(fileInfo.getContentType());
+            service.download(fileInfo).inputStream((is) -> {
+                try {
+                    SysFileUtil.handleImage(dto, is, response.getOutputStream());
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                    throw new ServiceException(e.getMessage());
+                }
+            });
+        }
         FileStorageUtil.serviceRecycle(service);
     }
 

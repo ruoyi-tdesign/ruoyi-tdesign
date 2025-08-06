@@ -101,6 +101,14 @@ public interface ISysStorageConfigService extends IService<SysStorageConfig> {
     /**
      * 获取文件存储服务
      *
+     * @param config 配置
+     * @return 文件存储服务
+     */
+    FileStorageService getFileStorageService(SysStorageConfig config);
+
+    /**
+     * 获取文件存储服务
+     *
      * @param id id
      * @return 文件存储服务
      */

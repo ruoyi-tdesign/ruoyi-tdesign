@@ -30,6 +30,11 @@ public class FileUtils extends FileUtil {
         response.setHeader("download-filename", percentEncodedFileName);
     }
 
+    public static String getContentDispositionValue(String realFileName) {
+        String percentEncodedFileName = percentEncode(realFileName);
+        return "attachment; filename=%s;filename*=utf-8''%s".formatted(percentEncodedFileName, percentEncodedFileName);
+    }
+
     /**
      * 百分号编码工具方法
      *

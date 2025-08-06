@@ -63,6 +63,13 @@ public class SysStorageConfigVo implements Serializable {
     private String configJson;
 
     /**
+     * 请求模式 proxy：代理转发请求 direct：源地址重定向请求 direct_signature：预签名重定向请求
+     */
+    @ExcelProperty(value = "请求模式", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "sys_storage_request_mode")
+    private String requestMode;
+
+    /**
      * 创建时间
      */
     @ExcelProperty(value = "创建时间")

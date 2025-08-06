@@ -192,12 +192,11 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
     /**
      * 获取文件存储服务
      *
-     * @param id id
+     * @param config 配置
      * @return 文件存储服务
      */
     @Override
-    public FileStorageService getFileStorageService(Long id) {
-        SysStorageConfig config = getById(id);
+    public FileStorageService getFileStorageService(SysStorageConfig config) {
         if (config == null) {
             return null;
         }
@@ -207,5 +206,17 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
         fileServer.setWeight(config.getWeight());
         fileServer.setProperties(config.getConfigJson());
         return FileStorageUtil.getFileStorageService(fileServer);
+    }
+
+    /**
+     * 获取文件存储服务
+     *
+     * @param id id
+     * @return 文件存储服务
+     */
+    @Override
+    public FileStorageService getFileStorageService(Long id) {
+        SysStorageConfig config = getById(id);
+        return getFileStorageService(config);
     }
 }

@@ -58,6 +58,11 @@ public class SysStorageConfig implements Serializable {
     private String configJson;
 
     /**
+     * 请求模式 proxy：代理转发请求 direct：源地址重定向请求 direct_signature：预签名重定向请求
+     */
+    private String requestMode;
+
+    /**
      * 删除标志
      */
     @TableLogic

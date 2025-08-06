@@ -60,6 +60,12 @@ public class SysStorageConfigBo implements Serializable {
     @Length(max = 2000, message = "配置json不能大于{max}个字符", groups = {AddGroup.class, EditGroup.class})
     private String configJson;
     /**
+     * 请求模式 proxy：代理转发请求 direct：源地址重定向请求 direct_signature：预签名重定向请求
+     */
+    @NotBlank(message = "请求模式不能为空", groups = {AddGroup.class, EditGroup.class})
+    @Length(max = 255, message = "请求模式不能大于{max}个字符", groups = {AddGroup.class, EditGroup.class})
+    private String requestMode;
+    /**
      * 备注
      */
     @Length(max = 500, message = "备注不能大于{max}个字符", groups = {AddGroup.class, EditGroup.class})

@@ -90,7 +90,7 @@
                     <img
                       draggable="false"
                       class="list-card-gallery-responsive-image__img--fit list-card-gallery-responsive-image__img--cover"
-                      :src="`${getVisitUrl(file.previewUrl)}?w=250&q=0.8`"
+                      :src="`${getVisitUrl(file.previewUrl)}?x-oss-process=image/auto-orient,1/resize,m_lfit,w_300/quality,q_90&w=300&q=0.9`"
                       :alt="file.originalFilename"
                     />
                   </picture>
