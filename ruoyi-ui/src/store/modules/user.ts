@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { getInfo, isLogin, login, logout } from '@/api/login';
 import type { LoginParam, UserInfo } from '@/api/model/loginModel';
 import type { R } from '@/api/model/resultModel';
+import { getVisitUrl } from '@/api/system/file';
 import defAva from '@/assets/images/profile.jpg';
 
 export const useUserStore = defineStore('user', {
@@ -54,7 +55,7 @@ export const useUserStore = defineStore('user', {
         getInfo()
           .then((res) => {
             const { user } = res.data;
-            const avatar = !user.avatar ? defAva : user.avatar;
+            const avatar = !user.avatarUrl ? defAva : getVisitUrl(user.avatarUrl);
 
             if (res.data.roles && res.data.roles.length > 0) {
               // 验证返回的roles是否是一个非空数组

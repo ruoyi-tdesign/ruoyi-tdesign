@@ -119,9 +119,9 @@ public class SysFileController extends BaseController {
     /**
      * 修改文件记录
      */
-    @Log(title = "文件记录", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping("/my")
+    @Log(title = "文件存储", businessType = BusinessType.UPDATE)
     public R<Void> myEdit(@Validated(EditGroup.class) @RequestBody SysFileBo bo) {
         String loginType = SaSecurityContext.getContext().getLoginType();
         Long userId = SaSecurityContext.getContext().getUserId();
@@ -136,8 +136,8 @@ public class SysFileController extends BaseController {
      * @param fileIds 主键串
      */
     @SaCheckPermission("system:file:remove")
-    @Log(title = "文件记录", businessType = BusinessType.DELETE)
     @DeleteMapping("/{fileIds}")
+    @Log(title = "文件存储", businessType = BusinessType.DELETE)
     public R<Void> remove(@NotEmpty(message = "主键不能为空") @PathVariable Long[] fileIds) {
         return toAjax(fileService.deleteWithValidByIds(List.of(fileIds)));
     }
@@ -147,7 +147,7 @@ public class SysFileController extends BaseController {
      *
      * @param fileIds 文件ID串
      */
-    @Log(title = "文件记录", businessType = BusinessType.DELETE)
+    @Log(title = "文件存储", businessType = BusinessType.DELETE)
     @DeleteMapping("/my/{fileIds}")
     public R<Void> removeMyIds(@NotEmpty(message = "主键不能为空") @PathVariable Long[] fileIds) {
         String loginType = SaSecurityContext.getContext().getLoginType();
@@ -162,13 +162,44 @@ public class SysFileController extends BaseController {
      * @param fileIds    主键id
      * @return
      */
+    @SaCheckPermission("system:file:edit")
     @PostMapping("/{categoryId}/move")
-    @Log(title = "文件记录", businessType = BusinessType.UPDATE)
+    @Log(title = "文件存储", businessType = BusinessType.UPDATE)
     public R<Void> move(@NotNull(message = "分类id不能为空") @PathVariable Long categoryId,
                         @RequestBody @NotEmpty(message = "主键不能为空") List<Long> fileIds) {
         String loginType = SaSecurityContext.getContext().getLoginType();
         Long userId = SaSecurityContext.getContext().getUserId();
         fileService.move(categoryId, fileIds, loginType, userId);
+        return R.ok();
+    }
+
+    /**
+     * 解锁文件
+     *
+     * @param fileIds 文件ID串
+     */
+    @SaCheckPermission("system:file:edit")
+    @PostMapping("/unlock")
+    @Log(title = "文件存储", businessType = BusinessType.UPDATE)
+    public R<Void> unlock(@NotEmpty(message = "主键不能为空") @RequestBody List<Long> fileIds) {
+        String loginType = SaSecurityContext.getContext().getLoginType();
+        Long userId = SaSecurityContext.getContext().getUserId();
+        fileService.securityLockOps(fileIds, loginType, userId, false);
+        return R.ok();
+    }
+
+    /**
+     * 锁定文件
+     *
+     * @param fileIds 文件ID串
+     */
+    @SaCheckPermission("system:file:edit")
+    @PostMapping("/lock")
+    @Log(title = "文件存储", businessType = BusinessType.UPDATE)
+    public R<Void> lock(@NotEmpty(message = "主键不能为空") @RequestBody List<Long> fileIds) {
+        String loginType = SaSecurityContext.getContext().getLoginType();
+        Long userId = SaSecurityContext.getContext().getUserId();
+        fileService.securityLockOps(fileIds, loginType, userId, true);
         return R.ok();
     }
 }

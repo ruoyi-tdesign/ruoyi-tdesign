@@ -122,4 +122,14 @@ public interface ISysFileService extends IService<SysFile> {
      * @param userId     用户ID
      */
     void move(Long categoryId, List<Long> fileIds, String loginType, Long userId);
+
+    /**
+     * 锁定或解锁文件
+     *
+     * @param fileIds   文件ID列表
+     * @param loginType 登录类型
+     * @param userId    用户ID
+     * @param lock      是否锁定
+     */
+    void securityLockOps(List<Long> fileIds, String loginType, Long userId, boolean lock);
 }

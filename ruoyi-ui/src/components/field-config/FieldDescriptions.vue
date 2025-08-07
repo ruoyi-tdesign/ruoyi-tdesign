@@ -17,7 +17,7 @@
           <dict-tag :options="fieldConfig.options" :value="configValue[key]" />
         </template>-->
         <template v-else-if="['image-upload'].includes(fieldConfig.component)">
-          <image-preview :src="getValue(fieldConfig, key)" width="60px" height="60px" />
+          <x-image-preview :src="getValue(fieldConfig, key)" width="60px" height="60px" />
         </template>
         <template v-else>
           {{ getValue(fieldConfig, key) }}

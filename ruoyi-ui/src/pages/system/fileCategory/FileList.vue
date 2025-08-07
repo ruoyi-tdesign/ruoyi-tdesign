@@ -35,6 +35,14 @@
           <template #icon> <swap-icon /> </template>
           移动到
         </t-button>
+        <t-button v-hasPermi="['system:file:edit']" :disabled="ids.length === 0" @click="handleUnlock()">
+          <template #icon> <lock-off-icon /> </template>
+          解锁
+        </t-button>
+        <t-button v-hasPermi="['system:file:edit']" :disabled="ids.length === 0" @click="handleLock()">
+          <template #icon> <lock-on-icon /> </template>
+          加锁
+        </t-button>
         <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline">
           <t-form-item label-width="0px" name="originalFilename">
             <t-input v-model="queryParams.originalFilename" placeholder="搜索文件名" @enter="handleQuery">
@@ -312,6 +320,7 @@ import {
   DeleteIcon,
   DownloadIcon,
   InfoCircleIcon,
+  LockOffIcon,
   LockOnIcon,
   SearchIcon,
   SwapIcon,
@@ -320,7 +329,16 @@ import type { FormInstanceFunctions, FormRule, PageInfo, SubmitContext } from 't
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import { delMyFile, getFile, getVisitUrl, listMyFile, moveFile, updateFile } from '@/api/system/file';
+import {
+  delMyFile,
+  getFile,
+  getVisitUrl,
+  listMyFile,
+  lockFile,
+  moveFile,
+  unlockFile,
+  updateFile,
+} from '@/api/system/file';
 import { listFileCategory } from '@/api/system/fileCategory';
 import type { SysFileCategoryVo } from '@/api/system/model/fileCategoryModel';
 import type { SysFileActiveVo, SysFileForm, SysFileQuery, SysFileVo } from '@/api/system/model/fileModel';
@@ -528,7 +546,6 @@ function getMediaType(file: SysFileVo) {
 function getList() {
   loading.value = true;
   queryParams.value.fileCategoryId = props.categoryId;
-  queryParams.value.suffixes = props.queryParam?.suffixes?.map((value) => `.${value}`);
   queryParams.value.maxSize = props.queryParam?.maxSize;
   queryParams.value.contentTypes = props.queryParam?.contentTypes;
   listMyFile(queryParams.value)
@@ -594,6 +611,50 @@ async function handleMove() {
   title.value = '移动文件存储';
   await getCategoryOptions();
   buttonLoading.value = false;
+}
+/** 解锁按钮操作 */
+function handleUnlock() {
+  const fileIds = ids.value;
+  const files = fileList.value.filter((value) => ids.value.includes(value.fileId));
+  let content;
+  if (files.length === 1) {
+    content = `是否确认解锁文件【"${files.at(0).originalFilename}"】?`;
+  } else {
+    content = `是否确认解锁选中的${fileIds.length}项文件?`;
+  }
+  proxy.$modal.confirm(content, () => {
+    const msgLoading = proxy.$modal.msgLoading('正在解锁中...');
+    return unlockFile(fileIds)
+      .then(() => {
+        ids.value = [];
+        getList();
+        emit('update');
+        proxy.$modal.msgSuccess('解锁成功');
+      })
+      .finally(() => proxy.$modal.msgClose(msgLoading));
+  });
+}
+/** 加锁按钮操作 */
+function handleLock() {
+  const fileIds = ids.value;
+  const files = fileList.value.filter((value) => ids.value.includes(value.fileId));
+  let content;
+  if (files.length === 1) {
+    content = `是否确认加锁文件【"${files.at(0).originalFilename}"】?`;
+  } else {
+    content = `是否确认加锁选中的${fileIds.length}项文件?`;
+  }
+  proxy.$modal.confirm(content, () => {
+    const msgLoading = proxy.$modal.msgLoading('正在加锁中...');
+    return lockFile(fileIds)
+      .then(() => {
+        ids.value = [];
+        getList();
+        emit('update');
+        proxy.$modal.msgSuccess('加锁成功');
+      })
+      .finally(() => proxy.$modal.msgClose(msgLoading));
+  });
 }
 /** 上传提交按钮 */
 function submitUploadForm() {

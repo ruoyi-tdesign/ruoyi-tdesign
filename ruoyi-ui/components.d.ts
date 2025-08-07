@@ -112,6 +112,7 @@ declare module 'vue' {
     UploadSelect: typeof import('./src/components/upload-select/index.vue')['default']
     UserSelect: typeof import('./src/components/user-select/index.vue')['default']
     XFileUpload: typeof import('./src/components/x-file-upload/index.vue')['default']
+    XImagePreview: typeof import('./src/components/x-image-preview/index.vue')['default']
     XImageUpload: typeof import('./src/components/x-image-upload/index.vue')['default']
     XUploadSelect: typeof import('./src/components/x-upload-select/index.vue')['default']
   }

@@ -1,13 +1,18 @@
 package org.dromara.system.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.net.url.UrlBuilder;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.domain.dto.FileDTO;
 import org.dromara.common.core.enums.StorageRequestMode;
 import org.dromara.common.core.enums.YesNoEnum;
 import org.dromara.common.core.exception.ServiceException;
+import org.dromara.common.core.service.FileService;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.ServletUtils;
@@ -44,6 +49,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -58,7 +64,7 @@ import java.util.function.Consumer;
  */
 @Slf4j
 @Service
-public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> implements ISysFileService {
+public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> implements ISysFileService, FileService {
 
     @Autowired
     private ISysStorageConfigService storageConfigService;
@@ -246,6 +252,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
 
     /**
      * 处理文件访问
+     *
      * @param fileName
      * @param dto
      * @param response
@@ -370,17 +377,45 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     public void move(Long categoryId, List<Long> fileIds, String loginType, Long userId) {
         checkCategory(categoryId, loginType, userId);
         // 安全过滤
-        List<SysFile> ossList = lambdaQuery()
+        List<SysFile> fileList = lambdaQuery()
             .in(SysFile::getFileId, fileIds)
             .eq(SysFile::getUserType, loginType)
             .eq(SysFile::getCreateBy, userId)
             .select(SysFile::getFileId)
             .list();
-        fileIds = StreamUtils.toList(ossList, SysFile::getFileId);
+        fileIds = StreamUtils.toList(fileList, SysFile::getFileId);
         List<SysFile> list = fileIds.stream().map(id -> {
             SysFile file = new SysFile();
             file.setFileId(id);
             file.setFileCategoryId(categoryId);
+            return file;
+        }).toList();
+        updateBatchById(list);
+    }
+
+    /**
+     * 锁定或解锁文件
+     *
+     * @param fileIds   文件ID列表
+     * @param loginType 登录类型
+     * @param userId    用户ID
+     * @param lock      是否锁定
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void securityLockOps(List<Long> fileIds, String loginType, Long userId, boolean lock) {
+        // 安全过滤
+        List<SysFile> fileList = lambdaQuery()
+            .in(SysFile::getFileId, fileIds)
+            .eq(SysFile::getUserType, loginType)
+            .eq(SysFile::getCreateBy, userId)
+            .select(SysFile::getFileId)
+            .list();
+        fileIds = StreamUtils.toList(fileList, SysFile::getFileId);
+        List<SysFile> list = fileIds.stream().map(id -> {
+            SysFile file = new SysFile();
+            file.setFileId(id);
+            file.setIsLock(lock ? 1 : 0);
             return file;
         }).toList();
         updateBatchById(list);
@@ -404,5 +439,43 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
                 throw new ServiceException("分类不存在");
             }
         }
+    }
+
+    /**
+     * 通过fileId查询对应的url
+     *
+     * @param fileIds fileId串逗号分隔
+     * @return url串逗号分隔
+     */
+    @Override
+    public String selectUrlByIds(String fileIds) {
+        List<Long> ids = StringUtils.splitTo(fileIds, Convert::toLong);
+        List<SysFileVo> fileVos = listVoByIds(ids);
+        SysFileUtil.packedPreviewAndDownloadUrl(fileVos);
+        return StreamUtils.join(fileVos, SysFileVo::getPreviewUrl);
+    }
+
+    /**
+     * 通过fileId查询列表
+     *
+     * @param fileIds fileId串逗号分隔
+     * @return 列表
+     */
+    @Override
+    public List<FileDTO> selectByIds(String fileIds) {
+        List<FileDTO> list = new ArrayList<>();
+        for (Long id : StringUtils.splitTo(fileIds, Convert::toLong)) {
+            SysFileVo vo = queryById(id);
+            if (ObjectUtil.isNotNull(vo)) {
+                try {
+                    SysFileUtil.packedPreviewAndDownloadUrl(vo);
+                    list.add(BeanUtil.toBean(vo, FileDTO.class));
+                } catch (Exception ignored) {
+                    // 如果oss异常无法连接则将数据直接返回
+                    list.add(BeanUtil.toBean(vo, FileDTO.class));
+                }
+            }
+        }
+        return list;
     }
 }

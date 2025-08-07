@@ -39,7 +39,7 @@ export function listByIds(fileIds: string | string[]) {
  * 查询文件存储详细
  * @param fileId
  */
-export function getFile(fileId: number) {
+export function getFile(fileId: number | string) {
   return request.get<R<SysFileVo>>({
     url: `/system/file/${fileId}`,
   });
@@ -98,6 +98,28 @@ export function uploader(formData: FormData) {
 export function moveFile(categoryId: number, fileIds: number[]) {
   return request.post<R>({
     url: `/system/file/${categoryId}/move`,
+    data: fileIds,
+  });
+}
+
+/**
+ * 解锁文件
+ * @param fileIds 文件id
+ */
+export function unlockFile(fileIds: Array<number | string>) {
+  return request.post<R>({
+    url: '/system/file/unlock',
+    data: fileIds,
+  });
+}
+
+/**
+ * 加锁文件
+ * @param fileIds 文件id
+ */
+export function lockFile(fileIds: Array<number | string>) {
+  return request.post<R>({
+    url: '/system/file/lock',
     data: fileIds,
   });
 }

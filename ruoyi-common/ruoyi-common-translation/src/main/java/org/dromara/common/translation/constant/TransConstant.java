@@ -33,6 +33,11 @@ public interface TransConstant {
     String OSS_ID_TO_URL = "oss_id_to_url";
 
     /**
+     * fileId转url
+     */
+    String FILE_ID_TO_URL = "file_id_to_url";
+
+    /**
      * 租户Id转租户企业名称
      */
     String TENANT_ID_TO_NAME = "tenant_id_to_name";
