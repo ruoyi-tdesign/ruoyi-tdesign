@@ -262,11 +262,11 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         if (file == null) {
             throw new ServiceException("文件不存在");
         }
-        SysStorageConfig config = storageConfigService.getById(file.getStorageConfigId());
-        FileStorageService service = storageConfigService.getFileStorageService(config);
-        if (service == null) {
+        SysStorageConfig config = storageConfigService.getCacheMap().get(file.getStorageConfigId().toString());
+        if (config == null) {
             throw new ServiceException("文件存储配置不存在");
         }
+        FileStorageService service = storageConfigService.getFileStorageService(config);
         FileInfo fileInfo = SysFileRecorder.toFileInfo(file);
         if (process != null) {
             process.accept(fileInfo);

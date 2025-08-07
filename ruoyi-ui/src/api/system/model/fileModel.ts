@@ -138,4 +138,8 @@ export interface SysFileUploadVo {
   fileName?: string;
   /** 对象存储主键 */
   fileId?: string;
+  /** 预览地址 */
+  previewUrl?: string;
+  /** 下载地址 */
+  downloadUrl?: string;
 }

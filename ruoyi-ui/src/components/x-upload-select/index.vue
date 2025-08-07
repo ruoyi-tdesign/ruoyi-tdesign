@@ -68,6 +68,7 @@ export interface SelectFile {
   name: string;
   fileId?: number;
   size?: number;
+  contentType?: string;
 }
 
 defineOptions({
@@ -130,7 +131,7 @@ watch(
 const rules = ref<Record<string, Array<FormRule>>>({
   url: [
     { required: true, message: '外链地址不能为空' },
-    { pattern: /^(https?:\/\/[^.\\/]+\.[^\n]+\/[^\n]+\n?)+$/, message: '地址格式错误' },
+    { pattern: /^(http(s)?:\/\/[^.\\/]+\.[^\n]+\/[^\n]+\n?)+$/, message: '地址格式错误' },
     { validator: UrlValidator },
   ],
 });
@@ -176,7 +177,7 @@ function UrlValidator(val: string): CustomValidateResolveType {
 
 const width = computed(() => {
   if (activeTab.value === 'myFile') {
-    return 'min(1200px, 100vw)';
+    return 'min(1400px, 100%)';
   }
   return '600px';
 });
@@ -201,6 +202,7 @@ function submitForm({ validateResult, firstError }: SubmitContext) {
         name: value.originalFilename,
         fileId: value.fileId,
         size: value.size,
+        contentType: value.contentType,
       }));
       const result = props.onSubmit.call(this, values);
       if (result) {

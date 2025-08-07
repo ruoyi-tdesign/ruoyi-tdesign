@@ -82,7 +82,7 @@ public interface ISysStorageConfigService extends IService<SysStorageConfig> {
      *
      * @return 缓存列表
      */
-    Map<Long, SysStorageConfig> getCacheMap();
+    Map<String, SysStorageConfig> getCacheMap();
 
     /**
      * 获取缓存列表

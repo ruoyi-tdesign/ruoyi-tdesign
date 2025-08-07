@@ -35,6 +35,6 @@ public interface CacheConstants {
     /**
      * 文件存储配置
      */
-    String SYS_STORAGE_CONFIG = "sys_storage_config";
+    String SYS_STORAGE_CONFIG = GlobalConstants.GLOBAL_REDIS_KEY + "sys_storage_config";
 
 }

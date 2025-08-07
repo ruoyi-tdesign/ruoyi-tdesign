@@ -250,7 +250,7 @@
                 {{ getVisitUrl(form.previewUrl) }}
               </div>
               <t-space>
-                <my-link @click="handleDownload(form.downloadUrl)">下载</my-link>
+                <my-link @click="handleDownload(form.downloadUrl, form.originalFilename)">下载</my-link>
                 <my-link @click="copyText(getVisitUrl(form.previewUrl))">复制链接URL</my-link>
               </t-space>
             </t-space>
@@ -728,10 +728,10 @@ function copyText(text: string) {
     });
 }
 /** 下载按钮操作 */
-function handleDownload(downloadUrl?: string) {
+function handleDownload(downloadUrl?: string, filename?: string) {
   const fileId = ids.value.at(0);
   const file = fileList.value.find((value) => fileId === value.fileId);
-  proxy.$download.file(downloadUrl ?? file.downloadUrl);
+  proxy.$download.file(downloadUrl ?? file.downloadUrl, filename ?? file.originalFilename);
 }
 /** 删除按钮操作 */
 function handleDelete() {

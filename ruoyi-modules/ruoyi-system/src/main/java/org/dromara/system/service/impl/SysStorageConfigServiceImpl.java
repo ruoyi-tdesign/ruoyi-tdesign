@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -149,12 +150,10 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
      * @return 缓存列表
      */
     @Override
-    public Map<Long, SysStorageConfig> getCacheMap() {
+    public Map<String, SysStorageConfig> getCacheMap() {
         return RedisLockUtil.getOrSave(CacheConstants.SYS_STORAGE_CONFIG, () -> {
-            List<SysStorageConfig> list = lambdaQuery()
-                .eq(SysStorageConfig::getStatus, NormalDisableEnum.NORMAL.getCode())
-                .list();
-            return StreamUtils.toIdentityMap(list, SysStorageConfig::getStorageConfigId);
+            List<SysStorageConfig> list = lambdaQuery().list();
+            return StreamUtils.toIdentityMap(list, config -> config.getStorageConfigId().toString());
         });
     }
 
@@ -165,15 +164,17 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
      */
     @Override
     public List<FileServer> getFileServerList() {
-        Map<Long, SysStorageConfig> cacheMap = getCacheMap();
-        return cacheMap.values().stream().map(item -> {
-            DefaultFileServer fileServer = new DefaultFileServer();
-            fileServer.setId(item.getStorageConfigId().toString());
-            fileServer.setPlatform(item.getPlatform());
-            fileServer.setWeight(item.getWeight());
-            fileServer.setProperties(item.getConfigJson());
-            return fileServer;
-        }).collect(Collectors.toList());
+        Map<String, SysStorageConfig> cacheMap = getCacheMap();
+        return cacheMap.values().stream()
+            .filter(config -> Objects.equals(config.getStatus(), NormalDisableEnum.NORMAL.getCodeNum()))
+            .map(item -> {
+                DefaultFileServer fileServer = new DefaultFileServer();
+                fileServer.setId(item.getStorageConfigId().toString());
+                fileServer.setPlatform(item.getPlatform());
+                fileServer.setWeight(item.getWeight());
+                fileServer.setProperties(item.getConfigJson());
+                return fileServer;
+            }).collect(Collectors.toList());
     }
 
     /**
@@ -216,7 +217,7 @@ public class SysStorageConfigServiceImpl extends ServiceImpl<SysStorageConfigMap
      */
     @Override
     public FileStorageService getFileStorageService(Long id) {
-        SysStorageConfig config = getById(id);
+        SysStorageConfig config = getCacheMap().get(id.toString());
         return getFileStorageService(config);
     }
 }

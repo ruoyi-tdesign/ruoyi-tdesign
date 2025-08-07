@@ -22,7 +22,6 @@ public class SysFileUploadVo implements Serializable {
      */
     private String fileId;
 
-
     /**
      * 预览地址
      */

@@ -2,6 +2,7 @@ package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaIgnore;
 import jakarta.servlet.http.HttpServletResponse;
+import org.dromara.common.tenant.annotation.IgnoreTenant;
 import org.dromara.system.domain.dto.FileResourceDto;
 import org.dromara.system.service.ISysFileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,6 @@ public class FileResourceController {
 
     /**
      * 文件下载
-     * TODO: 新增过期+签名功能，防盗链
      *
      * @param fileName 文件名称
      */

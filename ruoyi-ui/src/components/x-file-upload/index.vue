@@ -69,10 +69,10 @@ import type { SuccessContext, UploadFile, UploadRemoveContext, UploadValidateTyp
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
 import { delFile, getVisitUrl, listByIds } from '@/api/system/file';
-import type { SelectFile } from '@/components/upload-select/index.vue';
+import type { SelectFile } from '@/components/x-upload-select/index.vue';
 import type { FileListProps } from '@/pages/system/fileCategory/FileList.vue';
 import { useUserStore } from '@/store';
-import { getHttpFileSuffix } from '@/utils/ruoyi';
+import { getHttpFileSuffix, isMimeTypeIncluded } from '@/utils/ruoyi';
 
 export interface FileUploadProps {
   modelValue?: string | string[];
@@ -242,7 +242,23 @@ function handleSelectSubmit(values: SelectFile[]) {
     onValidate(validate);
   }
   // 检查文件类型
-  if (props.fileType?.length) {
+  if (props.accept?.length) {
+    const arr1: SelectFile[] = [];
+    const arr2: SelectFile[] = [];
+    // eslint-disable-next-line consistent-return
+    rowValues.forEach((value) => {
+      if (props.accept.some((item) => isMimeTypeIncluded(item, value.contentType))) {
+        arr1.push(value);
+      } else {
+        arr2.push(value);
+      }
+    });
+    if (arr2.length) {
+      proxy.$modal.msgWarning(`文件格式不正确, 已自动过滤非${props.accept.join(',')}格式文件!`);
+    } else {
+      rowValues = arr1;
+    }
+  } else if (props.fileType?.length) {
     const arr1: SelectFile[] = [];
     const arr2: SelectFile[] = [];
     rowValues.forEach((value) => {
@@ -296,7 +312,13 @@ function handleSelectSubmit(values: SelectFile[]) {
 // 上传前校检格式和大小
 function handleBeforeUpload(file: UploadFile) {
   // 校检文件类型
-  if (props.fileType.length) {
+  if (props.accept.length) {
+    // eslint-disable-next-line array-callback-return
+    if (!props.accept.some((value) => isMimeTypeIncluded(value, file.type))) {
+      proxy.$modal.msgError(`文件格式不正确, 请上传${props.accept.join(',')}格式文件!`);
+      return false;
+    }
+  } else if (props.fileType.length) {
     const fileExt = getHttpFileSuffix(file.name);
     const isTypeOk = props.fileType.indexOf(fileExt) >= 0;
     if (!isTypeOk) {

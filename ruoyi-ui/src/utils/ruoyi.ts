@@ -387,3 +387,22 @@ export function getHttpFileName(http: string) {
   }
   return http.substring(http.lastIndexOf('/') + 1);
 }
+
+/**
+ * 获取文件类型
+ * @param wildcardType 通配符类型
+ * @param specificType 具体类型
+ */
+export function isMimeTypeIncluded(wildcardType: string, specificType: string) {
+  // 检查通配符是否为 "*/*"，匹配所有类型
+  if (wildcardType === '*/*') {
+    return true;
+  }
+
+  // 分割类型和子类型
+  const [specificMain, specificSub] = specificType.split('/');
+  const [wildcardMain, wildcardSub] = wildcardType.split('/');
+
+  // 主类型必须匹配，子类型为*表示匹配所有子类型
+  return specificMain === wildcardMain && (specificSub === wildcardSub || wildcardSub === '*');
+}

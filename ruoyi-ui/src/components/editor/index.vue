@@ -2,7 +2,7 @@
   <div>
     <!--  文档:https://www.tiny.cloud/docs/tinymce/6/-->
     <editor ref="editorRef" :model-value="modelValue" :init="conf" :disabled="disabled" v-bind="$attrs" />
-    <upload-select
+    <x-upload-select
       v-if="selectFile"
       v-model:visible="open"
       :title="title"
@@ -71,7 +71,7 @@ import contentDarkURL from 'tinymce/skins/content/tinymce-5-dark/content.min.css
 import contentURL from 'tinymce/skins/content/default/content.min.css?url';
 import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue';
 
-import { uploader } from '@/api/system/oss';
+import { getVisitUrl, uploader } from '@/api/system/file';
 import { useSettingStore } from '@/store';
 import type { MyOssProps } from '@/pages/system/ossCategory/components/myOss.vue';
 import type { SelectFile } from '@/components/upload-select/index.vue';
@@ -216,7 +216,7 @@ function uploadHandle(file: File, fileType: 'file' | 'image' | 'media') {
     uploader(formData)
       .then((res) => {
         proxy.$modal.msgSuccess(`文件【${file.name}】上传成功！`);
-        resolve(res.data.url);
+        resolve(getVisitUrl(res.data.previewUrl));
       })
       .catch((reason) => reject(reason))
       .finally(() => proxy.$modal.msgClose(msgLoading));
