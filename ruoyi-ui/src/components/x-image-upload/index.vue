@@ -69,12 +69,12 @@ import { CloudUploadIcon } from 'tdesign-icons-vue-next';
 import type { SuccessContext, UploadFile, UploadRemoveContext, UploadValidateType } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import { delFile, getVisitUrl, listByIds } from '@/api/system/file';
+import { delFile, listByIds } from '@/api/system/file';
 import type { SelectFile } from '@/components/x-upload-select/index.vue';
 import type { FileListProps } from '@/pages/system/fileCategory/FileList.vue';
 import { useUserStore } from '@/store';
 import { blobToFile } from '@/utils/file';
-import {getHttpFileSuffix, isMimeTypeIncluded} from '@/utils/ruoyi';
+import { getHttpFileSuffix, getVisitUrl, isMimeTypeIncluded } from '@/utils/ruoyi';
 
 export interface ImageUploadProps {
   modelValue?: string | string[];

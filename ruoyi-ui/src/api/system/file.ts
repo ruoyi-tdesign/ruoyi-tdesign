@@ -1,7 +1,10 @@
+import isString from 'lodash/isString';
+
 import type { R, TableDataInfo } from '@/api/model/resultModel';
 import type { SysFileForm, SysFileQuery, SysFileUploadVo, SysFileVo } from '@/api/system/model/fileModel';
 import { ContentTypeEnum } from '@/constants';
 import { request } from '@/utils/request';
+import { isHttp } from '@/utils/validate';
 
 /**
  * 查询文件存储列表
@@ -122,21 +125,4 @@ export function lockFile(fileIds: Array<number | string>) {
     url: '/system/file/lock',
     data: fileIds,
   });
-}
-
-/**
- * 获取访问路径
- * @param rawUrl 原始路径
- */
-export function getVisitUrl(rawUrl: string) {
-  if (!rawUrl) {
-    return '';
-  }
-  const baseUrl = import.meta.env.VITE_APP_BASE_API;
-  const delimiter = !baseUrl.endsWith('/') && !rawUrl.startsWith('/') ? '/' : '';
-  const url = `${baseUrl}${delimiter}${rawUrl}`;
-  if (url.startsWith('http')) {
-    return url;
-  }
-  return new URL(url, window.location.origin).toString();
 }

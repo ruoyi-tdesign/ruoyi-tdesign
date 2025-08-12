@@ -1,10 +1,8 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.net.url.UrlBuilder;
-import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -222,11 +220,11 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     public void preview(String fileName, FileResourceDto dto, HttpServletResponse response) {
         handleFileAccess(fileName, dto, response, fileInfo -> {
             // 设置缓存控制头信息
-            // 缓存有效期为1天
+            // 缓存有效期为1小时
             response.setHeader("Cache-Control", "public, max-age=86400");
 
             // 设置过期时间（GMT格式）
-            ZonedDateTime expirationTime = ZonedDateTime.now().plusDays(1);
+            ZonedDateTime expirationTime = ZonedDateTime.now().plusHours(1);
             String formattedExpiration = expirationTime.format(DateTimeFormatter.RFC_1123_DATE_TIME);
             response.setHeader("Expires", formattedExpiration);
             response.setHeader("ETag", fileInfo.getFilename());
@@ -324,7 +322,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      * @return 文件列表
      */
     @Override
-    public List<SysFileVo> listVoByIds(List<Long> fileIds) {
+    public List<SysFileVo> listVoByIds(Collection<Long> fileIds) {
         List<SysFile> list = lambdaQuery().in(SysFile::getFileId, fileIds).list();
         List<SysFileVo> vos = MapstructUtils.convert(list, SysFileVo.class);
         SysFileUtil.packedPreviewAndDownloadUrl(vos);
@@ -448,9 +446,8 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      * @return url串逗号分隔
      */
     @Override
-    public String selectUrlByIds(String fileIds) {
-        List<Long> ids = StringUtils.splitTo(fileIds, Convert::toLong);
-        List<SysFileVo> fileVos = listVoByIds(ids);
+    public String selectUrlByIds(Collection<Long> fileIds) {
+        List<SysFileVo> fileVos = listVoByIds(fileIds);
         SysFileUtil.packedPreviewAndDownloadUrl(fileVos);
         return StreamUtils.join(fileVos, SysFileVo::getPreviewUrl);
     }
@@ -462,19 +459,12 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
      * @return 列表
      */
     @Override
-    public List<FileDTO> selectByIds(String fileIds) {
+    public List<FileDTO> selectByIds(Collection<Long> fileIds) {
         List<FileDTO> list = new ArrayList<>();
-        for (Long id : StringUtils.splitTo(fileIds, Convert::toLong)) {
-            SysFileVo vo = queryById(id);
-            if (ObjectUtil.isNotNull(vo)) {
-                try {
-                    SysFileUtil.packedPreviewAndDownloadUrl(vo);
-                    list.add(BeanUtil.toBean(vo, FileDTO.class));
-                } catch (Exception ignored) {
-                    // 如果oss异常无法连接则将数据直接返回
-                    list.add(BeanUtil.toBean(vo, FileDTO.class));
-                }
-            }
+        List<SysFileVo> fileVos = listVoByIds(fileIds);
+        for (SysFileVo vo : fileVos) {
+            SysFileUtil.packedPreviewAndDownloadUrl(vo);
+            list.add(BeanUtil.toBean(vo, FileDTO.class));
         }
         return list;
     }

@@ -102,7 +102,7 @@ public interface ISysFileService extends IService<SysFile> {
      * @param fileIds 文件ID列表
      * @return 文件列表
      */
-    List<SysFileVo> listVoByIds(List<Long> fileIds);
+    List<SysFileVo> listVoByIds(Collection<Long> fileIds);
 
     /**
      * 删除我的文件存储

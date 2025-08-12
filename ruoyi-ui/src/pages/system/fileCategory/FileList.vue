@@ -329,16 +329,7 @@ import type { FormInstanceFunctions, FormRule, PageInfo, SubmitContext } from 't
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import {
-  delMyFile,
-  getFile,
-  getVisitUrl,
-  listMyFile,
-  lockFile,
-  moveFile,
-  unlockFile,
-  updateFile,
-} from '@/api/system/file';
+import { delMyFile, getFile, listMyFile, lockFile, moveFile, unlockFile, updateFile } from '@/api/system/file';
 import { listFileCategory } from '@/api/system/fileCategory';
 import type { SysFileCategoryVo } from '@/api/system/model/fileCategoryModel';
 import type { SysFileActiveVo, SysFileForm, SysFileQuery, SysFileVo } from '@/api/system/model/fileModel';
@@ -354,6 +345,7 @@ import WordSvg from '@/assets/file-type/word.svg?component';
 import type { FileUploadProps } from '@/components/file-upload/index.vue';
 import type { ImageUploadProps } from '@/components/image-upload/index.vue';
 import RectSelect from '@/components/rect-select/index.vue';
+import { getVisitUrl } from '@/utils/ruoyi';
 
 defineOptions({
   name: 'FileList',

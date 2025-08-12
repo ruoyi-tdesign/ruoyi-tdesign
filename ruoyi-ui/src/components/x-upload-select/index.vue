@@ -57,11 +57,10 @@
 import type { CustomValidateResolveType, FormInstanceFunctions, FormRule, SubmitContext } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import { getVisitUrl } from '@/api/system/file';
 import type { SysFileVo } from '@/api/system/model/fileModel';
 import type { FileCategoryProps } from '@/pages/system/fileCategory/index.vue';
 import FileCategory from '@/pages/system/fileCategory/index.vue';
-import { getHttpFileName, getHttpFileSuffix } from '@/utils/ruoyi';
+import { getHttpFileName, getHttpFileSuffix, getVisitUrl } from '@/utils/ruoyi';
 
 export interface SelectFile {
   url: string;

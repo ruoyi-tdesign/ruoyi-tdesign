@@ -21,7 +21,7 @@ import { useDict } from '@/utils/dict';
 import { download } from '@/utils/request';
 import {
   addDateRange,
-  bytesToSize,
+  bytesToSize, editorRender,
   handleTree,
   parseTime,
   resetForm,
@@ -51,6 +51,7 @@ app.config.globalProperties.handleTree = handleTree;
 app.config.globalProperties.addDateRange = addDateRange;
 app.config.globalProperties.selectDictLabel = selectDictLabel;
 app.config.globalProperties.selectDictLabels = selectDictLabels;
+app.config.globalProperties.editorRender = editorRender;
 
 // 全局组件挂载
 app.component('DictTag', DictTag);

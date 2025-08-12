@@ -3,8 +3,8 @@ import { defineStore } from 'pinia';
 import { getInfo, isLogin, login, logout } from '@/api/login';
 import type { LoginParam, UserInfo } from '@/api/model/loginModel';
 import type { R } from '@/api/model/resultModel';
-import { getVisitUrl } from '@/api/system/file';
 import defAva from '@/assets/images/profile.jpg';
+import { getVisitUrl } from '@/utils/ruoyi';
 
 export const useUserStore = defineStore('user', {
   state: () => ({

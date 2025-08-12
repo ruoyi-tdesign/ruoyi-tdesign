@@ -10,6 +10,7 @@ import type { download } from '@/utils/request';
 import type {
   addDateRange,
   bytesToSize,
+  editorRender,
   handleTree,
   parseTime,
   resetForm,
@@ -30,6 +31,7 @@ declare module '@vue/runtime-core' {
     addDateRange: typeof addDateRange;
     selectDictLabel: typeof selectDictLabel;
     selectDictLabels: typeof selectDictLabels;
+    editorRender: typeof editorRender;
     $auth: typeof auth;
     $cache: typeof cache;
     $modal: typeof modal;

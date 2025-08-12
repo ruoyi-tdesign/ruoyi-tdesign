@@ -3,10 +3,9 @@ import axios from 'axios';
 import { saveAs } from 'file-saver';
 import { LoadingPlugin, MessagePlugin } from 'tdesign-vue-next';
 
-import { getVisitUrl } from '@/api/system/file';
 import { useUserStore } from '@/store';
 import errorCode from '@/utils/errorCode';
-import { blobValidate } from '@/utils/ruoyi';
+import { blobValidate, getVisitUrl } from '@/utils/ruoyi';
 
 const baseURL = import.meta.env.VITE_APP_BASE_API;
 

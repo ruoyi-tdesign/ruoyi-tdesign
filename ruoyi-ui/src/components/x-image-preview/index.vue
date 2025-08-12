@@ -66,8 +66,9 @@ import type { TdImageProps, TdImageViewerProps } from 'tdesign-vue-next';
 import type { PropType } from 'vue';
 import { computed, ref, watchEffect } from 'vue';
 
-import { getVisitUrl, listByIds } from '@/api/system/file';
+import { listByIds } from '@/api/system/file';
 import type { SysFileVo } from '@/api/system/model/fileModel';
+import { getVisitUrl } from '@/utils/ruoyi';
 
 const props = defineProps({
   // 显示地址

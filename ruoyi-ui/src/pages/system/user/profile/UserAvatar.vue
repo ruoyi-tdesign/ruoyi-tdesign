@@ -153,7 +153,7 @@ import type { UploadFile, UploadInstanceFunctions } from 'tdesign-vue-next';
 import { getCurrentInstance, reactive, ref } from 'vue';
 import { VueCropper } from 'vue-cropper';
 
-import { getVisitUrl } from '@/api/system/file';
+import { getVisitUrl } from '@/utils/ruoyi';
 import { removeAvatar, uploadAvatar } from '@/api/system/profile';
 import type { SelectFile } from '@/components/upload-select/index.vue';
 import { useUserStore } from '@/store/modules/user';

@@ -6,6 +6,7 @@ import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import org.dromara.common.excel.annotation.ExcelDictFormat;
 import org.dromara.common.excel.convert.ExcelDictConvert;
+import org.dromara.common.translation.annotation.EditorValue;
 import org.dromara.common.translation.annotation.Translation;
 import org.dromara.common.translation.constant.TransConstant;
 import org.dromara.system.domain.SysNotice;
@@ -49,6 +50,7 @@ public class SysNoticeVo implements Serializable {
     /**
      * 公告内容
      */
+    @EditorValue
     @ExcelProperty(value = "公告内容")
     private String noticeContent;
 
