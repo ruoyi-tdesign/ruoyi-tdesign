@@ -221,7 +221,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         handleFileAccess(fileName, dto, response, fileInfo -> {
             // 设置缓存控制头信息
             // 缓存有效期为1小时
-            response.setHeader("Cache-Control", "public, max-age=86400");
+            response.setHeader("Cache-Control", "private, max-age=3600");
 
             // 设置过期时间（GMT格式）
             ZonedDateTime expirationTime = ZonedDateTime.now().plusHours(1);
@@ -304,7 +304,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
         } else {
             response.setContentType(fileInfo.getContentType());
             service.download(fileInfo).inputStream((is) -> {
-                try {
+                try (is) {
                     SysFileUtil.handleImage(dto, is, response.getOutputStream());
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);

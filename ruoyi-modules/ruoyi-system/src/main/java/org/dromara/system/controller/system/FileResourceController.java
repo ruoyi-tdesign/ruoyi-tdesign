@@ -1,15 +1,19 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaIgnore;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.dromara.common.tenant.annotation.IgnoreTenant;
+import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.system.domain.dto.FileResourceDto;
 import org.dromara.system.service.ISysFileService;
+import org.dromara.system.utils.SysFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Objects;
 
 /**
  * 资源控制器
@@ -27,13 +31,23 @@ public class FileResourceController {
 
     /**
      * 文件预览
-     * TODO: 新增过期+签名功能，防盗链
      *
      * @param fileName 文件名称
      */
     @SaIgnore
-    @RequestMapping("/preview/{fileName}")
-    public void preview(@PathVariable String fileName, @Validated FileResourceDto dto, HttpServletResponse response) {
+    @RequestMapping("/preview/{encryptStr}/{fileName}")
+    public void preview(@PathVariable String encryptStr,
+                        @PathVariable String fileName,
+                        @Validated FileResourceDto dto,
+                        HttpServletRequest request,
+                        HttpServletResponse response) {
+        // 协商缓存
+        String ifNoneMatch = ServletUtils.getHeader(request, "If-None-Match");
+        if (Objects.equals(ifNoneMatch, fileName)) {
+            response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+            return;
+        }
+        SysFileUtil.verifySign(encryptStr);
         fileService.preview(fileName, dto, response);
     }
 
@@ -43,8 +57,12 @@ public class FileResourceController {
      * @param fileName 文件名称
      */
     @SaIgnore
-    @RequestMapping("/download/{fileName}")
-    public void download(@PathVariable String fileName, @Validated FileResourceDto dto, HttpServletResponse response) {
+    @RequestMapping("/download/{encryptStr}/{fileName}")
+    public void download(@PathVariable String encryptStr,
+                         @PathVariable String fileName,
+                         @Validated FileResourceDto dto,
+                         HttpServletResponse response) {
+        SysFileUtil.verifySign(encryptStr);
         fileService.download(fileName, dto, response);
     }
 }
