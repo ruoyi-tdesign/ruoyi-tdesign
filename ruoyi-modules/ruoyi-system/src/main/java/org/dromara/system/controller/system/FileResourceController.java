@@ -3,6 +3,7 @@ package org.dromara.system.controller.system;
 import cn.dev33.satoken.annotation.SaIgnore;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.system.domain.dto.FileResourceDto;
 import org.dromara.system.service.ISysFileService;
@@ -21,6 +22,7 @@ import java.util.Objects;
  * @author hexm
  * @date 2025/7/6
  */
+@Slf4j
 @Validated
 @Controller
 @RequestMapping("/resource/file")
@@ -47,7 +49,13 @@ public class FileResourceController {
             response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
             return;
         }
-        SysFileUtil.verifySign(encryptStr);
+        try {
+            SysFileUtil.verifySign(encryptStr);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
         fileService.preview(fileName, dto, response);
     }
 
@@ -62,7 +70,13 @@ public class FileResourceController {
                          @PathVariable String fileName,
                          @Validated FileResourceDto dto,
                          HttpServletResponse response) {
-        SysFileUtil.verifySign(encryptStr);
+        try {
+            SysFileUtil.verifySign(encryptStr);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
         fileService.download(fileName, dto, response);
     }
 }
