@@ -178,13 +178,11 @@ public class SysFileController extends BaseController {
      *
      * @param fileIds 文件ID串
      */
-    @SaCheckPermission("system:file:edit")
+    @SaCheckPermission("system:file:lock")
     @PostMapping("/unlock")
     @Log(title = "文件存储", businessType = BusinessType.UPDATE)
     public R<Void> unlock(@NotEmpty(message = "主键不能为空") @RequestBody List<Long> fileIds) {
-        String loginType = SaSecurityContext.getContext().getLoginType();
-        Long userId = SaSecurityContext.getContext().getUserId();
-        fileService.securityLockOps(fileIds, loginType, userId, false);
+        fileService.lockOps(fileIds, false);
         return R.ok();
     }
 
@@ -193,10 +191,37 @@ public class SysFileController extends BaseController {
      *
      * @param fileIds 文件ID串
      */
-    @SaCheckPermission("system:file:edit")
+    @SaCheckPermission("system:file:lock")
     @PostMapping("/lock")
     @Log(title = "文件存储", businessType = BusinessType.UPDATE)
     public R<Void> lock(@NotEmpty(message = "主键不能为空") @RequestBody List<Long> fileIds) {
+        fileService.lockOps(fileIds, true);
+        return R.ok();
+    }
+
+
+    /**
+     * 解锁我的文件
+     *
+     * @param fileIds 文件ID串
+     */
+    @PostMapping("/my/unlock")
+    @Log(title = "文件存储", businessType = BusinessType.UPDATE)
+    public R<Void> myUnlock(@NotEmpty(message = "主键不能为空") @RequestBody List<Long> fileIds) {
+        String loginType = SaSecurityContext.getContext().getLoginType();
+        Long userId = SaSecurityContext.getContext().getUserId();
+        fileService.securityLockOps(fileIds, loginType, userId, false);
+        return R.ok();
+    }
+
+    /**
+     * 锁定我的文件
+     *
+     * @param fileIds 文件ID串
+     */
+    @PostMapping("/my/lock")
+    @Log(title = "文件存储", businessType = BusinessType.UPDATE)
+    public R<Void> myLock(@NotEmpty(message = "主键不能为空") @RequestBody List<Long> fileIds) {
         String loginType = SaSecurityContext.getContext().getLoginType();
         Long userId = SaSecurityContext.getContext().getUserId();
         fileService.securityLockOps(fileIds, loginType, userId, true);

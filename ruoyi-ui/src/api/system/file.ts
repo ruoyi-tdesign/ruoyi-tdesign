@@ -1,10 +1,7 @@
-import isString from 'lodash/isString';
-
 import type { R, TableDataInfo } from '@/api/model/resultModel';
 import type { SysFileForm, SysFileQuery, SysFileUploadVo, SysFileVo } from '@/api/system/model/fileModel';
 import { ContentTypeEnum } from '@/constants';
 import { request } from '@/utils/request';
-import { isHttp } from '@/utils/validate';
 
 /**
  * 查询文件存储列表
@@ -123,6 +120,28 @@ export function unlockFile(fileIds: Array<number | string>) {
 export function lockFile(fileIds: Array<number | string>) {
   return request.post<R>({
     url: '/system/file/lock',
+    data: fileIds,
+  });
+}
+
+/**
+ * 解锁我的文件
+ * @param fileIds 文件id
+ */
+export function unlockMyFile(fileIds: Array<number | string>) {
+  return request.post<R>({
+    url: '/system/file/my/unlock',
+    data: fileIds,
+  });
+}
+
+/**
+ * 加锁我的文件
+ * @param fileIds 文件id
+ */
+export function lockMyFile(fileIds: Array<number | string>) {
+  return request.post<R>({
+    url: '/system/file/my/lock',
     data: fileIds,
   });
 }

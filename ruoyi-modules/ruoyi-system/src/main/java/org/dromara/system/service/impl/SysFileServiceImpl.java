@@ -420,6 +420,24 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     }
 
     /**
+     * 锁定或解锁文件
+     *
+     * @param fileIds 文件ID列表
+     * @param lock    是否锁定
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void lockOps(List<Long> fileIds, boolean lock) {
+        List<SysFile> list = fileIds.stream().map(id -> {
+            SysFile file = new SysFile();
+            file.setFileId(id);
+            file.setIsLock(lock ? 1 : 0);
+            return file;
+        }).toList();
+        updateBatchById(list);
+    }
+
+    /**
      * 检查分类是否存在
      *
      * @param fileCategoryId 分类id

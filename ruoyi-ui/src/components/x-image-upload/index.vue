@@ -71,7 +71,7 @@ import { computed, getCurrentInstance, ref, watch } from 'vue';
 
 import { delFile, listByIds } from '@/api/system/file';
 import type { SelectFile } from '@/components/x-upload-select/index.vue';
-import type { FileListProps } from '@/pages/system/fileCategory/FileList.vue';
+import type { FileListProps } from '@/pages/system/myFile/FileList.vue';
 import { useUserStore } from '@/store';
 import { blobToFile } from '@/utils/file';
 import { getHttpFileSuffix, getVisitUrl, isMimeTypeIncluded } from '@/utils/ruoyi';

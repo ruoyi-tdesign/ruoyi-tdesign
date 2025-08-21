@@ -132,4 +132,12 @@ public interface ISysFileService extends IService<SysFile> {
      * @param lock      是否锁定
      */
     void securityLockOps(List<Long> fileIds, String loginType, Long userId, boolean lock);
+
+    /**
+     * 锁定或解锁文件
+     *
+     * @param fileIds   文件ID列表
+     * @param lock      是否锁定
+     */
+    void lockOps(List<Long> fileIds, boolean lock);
 }

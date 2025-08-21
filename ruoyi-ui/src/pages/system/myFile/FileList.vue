@@ -2,44 +2,39 @@
   <div>
     <t-space direction="vertical" style="width: 100%">
       <t-space>
-        <t-button
-          v-if="imageUpload || fileUpload"
-          v-hasPermi="['system:file:upload']"
-          theme="primary"
-          @click="handleUpload"
-        >
+        <t-button v-if="imageUpload || fileUpload" theme="primary" @click="handleUpload">
           <template #icon> <cloud-upload-icon /></template>
           上传
         </t-button>
-        <t-button v-hasPermi="['system:file:remove']" theme="danger" :disabled="!ids.length" @click="handleDelete()">
+        <t-button theme="danger" :disabled="!ids.length" @click="handleDelete()">
           <template #icon> <delete-icon /> </template>
           删除
         </t-button>
-        <t-button v-hasPermi="['system:file:download']" :disabled="ids.length !== 1" @click="handleDownload()">
+        <t-button :disabled="ids.length !== 1" @click="handleDownload()">
           <template #icon> <download-icon /> </template>
           下载
         </t-button>
         <t-image-viewer v-model:index="imagePreviewIndex" :images="previewList" :z-index="5000">
           <template #trigger="{ open }">
-            <t-button v-hasPermi="['system:file:query']" :disabled="previewList.length === 0" @click="open">
+            <t-button :disabled="previewList.length === 0" @click="open">
               <template #icon> <browse-icon /> </template>
               预览
             </t-button>
           </template>
         </t-image-viewer>
-        <t-button v-hasPermi="['system:file:edit']" :disabled="ids.length !== 1" @click="handleUpdate()">
+        <t-button :disabled="ids.length !== 1" @click="handleUpdate()">
           <template #icon> <info-circle-icon /> </template>
           属性
         </t-button>
-        <t-button v-hasPermi="['system:file:edit']" :disabled="ids.length === 0" @click="handleMove()">
+        <t-button :disabled="ids.length === 0" @click="handleMove()">
           <template #icon> <swap-icon /> </template>
           移动到
         </t-button>
-        <t-button v-hasPermi="['system:file:edit']" :disabled="ids.length === 0" @click="handleUnlock()">
+        <t-button :disabled="ids.length === 0" @click="handleUnlock()">
           <template #icon> <lock-off-icon /> </template>
           解锁
         </t-button>
-        <t-button v-hasPermi="['system:file:edit']" :disabled="ids.length === 0" @click="handleLock()">
+        <t-button :disabled="ids.length === 0" @click="handleLock()">
           <template #icon> <lock-on-icon /> </template>
           加锁
         </t-button>
@@ -334,7 +329,7 @@ import type { FormInstanceFunctions, FormRule, PageInfo, SubmitContext } from 't
 import { MessagePlugin } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
-import { delMyFile, getFile, listMyFile, lockFile, moveFile, unlockFile, updateFile } from '@/api/system/file';
+import { delMyFile, getFile, listMyFile, lockMyFile, moveFile, unlockMyFile, updateFile } from '@/api/system/file';
 import { listFileCategory } from '@/api/system/fileCategory';
 import type { SysFileCategoryVo } from '@/api/system/model/fileCategoryModel';
 import type { SysFileActiveVo, SysFileForm, SysFileQuery, SysFileVo } from '@/api/system/model/fileModel';
@@ -621,7 +616,7 @@ function handleUnlock() {
   }
   proxy.$modal.confirm(content, () => {
     const msgLoading = proxy.$modal.msgLoading('正在解锁中...');
-    return unlockFile(fileIds)
+    return unlockMyFile(fileIds)
       .then(() => {
         ids.value = [];
         getList();
@@ -643,7 +638,7 @@ function handleLock() {
   }
   proxy.$modal.confirm(content, () => {
     const msgLoading = proxy.$modal.msgLoading('正在加锁中...');
-    return lockFile(fileIds)
+    return lockMyFile(fileIds)
       .then(() => {
         ids.value = [];
         getList();

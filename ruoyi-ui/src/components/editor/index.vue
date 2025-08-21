@@ -73,7 +73,7 @@ import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue';
 
 import { uploader } from '@/api/system/file';
 import { useSettingStore } from '@/store';
-import type { FileListProps } from '@/pages/system/fileCategory/FileList.vue';
+import type { FileListProps } from '@/pages/system/myFile/FileList.vue';
 import type { SelectFile } from '@/components/x-upload-select/index.vue';
 import { getVisitUrl } from '@/utils/ruoyi';
 

@@ -58,8 +58,8 @@ import type { CustomValidateResolveType, FormInstanceFunctions, FormRule, Submit
 import { computed, getCurrentInstance, ref, watch } from 'vue';
 
 import type { SysFileVo } from '@/api/system/model/fileModel';
-import type { FileCategoryProps } from '@/pages/system/fileCategory/index.vue';
-import FileCategory from '@/pages/system/fileCategory/index.vue';
+import type { FileCategoryProps } from '@/pages/system/myFile/index.vue';
+import FileCategory from '@/pages/system/myFile/index.vue';
 import { getHttpFileName, getHttpFileSuffix, getVisitUrl } from '@/utils/ruoyi';
 
 export interface SelectFile {
