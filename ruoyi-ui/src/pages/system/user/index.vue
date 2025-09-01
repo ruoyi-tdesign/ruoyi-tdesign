@@ -122,7 +122,7 @@
               <t-switch v-model="row.status" :custom-value="['1', '0']" @click.stop @change="handleStatusChange(row)" />
             </template>
             <template #avatar="{ row }">
-              <image-preview :src="row.avatar" width="60px" height="60px" />
+              <x-image-preview :src="row.avatarUrl" width="60px" height="60px" />
             </template>
             <template #operation="{ row }">
               <t-space :size="8" break-line>
@@ -353,7 +353,7 @@
           <dict-tag :options="sys_user_sex" :value="formView.sex" />
         </t-descriptions-item>
         <t-descriptions-item label="头像地址">
-          <image-preview :src="formView.avatar" :width="60" :height="60" />
+          <x-image-preview :src="formView.avatar" :width="60" :height="60" />
         </t-descriptions-item>
         <t-descriptions-item label="帐号状态">
           <dict-tag :options="sys_normal_disable" :value="formView.status" />

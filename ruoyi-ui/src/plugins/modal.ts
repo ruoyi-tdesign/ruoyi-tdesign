@@ -17,6 +17,7 @@ let loadingInstance: LoadingInstance;
 export function messageOptionMerge(message: string | MessageInfoOptions) {
   if (typeof message === 'string') {
     message = {
+      attach: 'body',
       content: message as string,
       zIndex: 100001,
     };

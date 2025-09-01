@@ -11,6 +11,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.spring.SpringUtils;
+import org.dromara.common.json.config.JacksonConfig;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,7 +27,19 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JsonUtils {
 
-    private static final ObjectMapper OBJECT_MAPPER = SpringUtils.getBean(ObjectMapper.class);
+    private static final ObjectMapper OBJECT_MAPPER;
+
+    static {
+        if (SpringUtils.getApplicationContext() != null) {
+            OBJECT_MAPPER = SpringUtils.getBean(ObjectMapper.class);
+        } else {
+            // 兼容非Spring环境
+            Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+            JacksonConfig jacksonConfig = new JacksonConfig();
+            jacksonConfig.customizer().customize(builder);
+            OBJECT_MAPPER = builder.createXmlMapper(false).build();
+        }
+    }
 
     public static ObjectMapper getObjectMapper() {
         return OBJECT_MAPPER;
@@ -170,8 +184,9 @@ public class JsonUtils {
 
     /**
      * 将Object对象转为Map
+     *
      * @param obj Object对象
-     * @return 转换后的Map,如果为null则返回null
+     * @return 转换后的Map, 如果为null则返回null
      */
     public static Map<String, Object> convertMap(Object obj) {
         if (obj != null) {
@@ -183,6 +198,7 @@ public class JsonUtils {
 
     /**
      * 将Object对象转为List&lt;Map&gt;
+     *
      * @param obj Object对象
      * @return 转换后的List&lt;Map&gt;,如果为null则返回null
      */

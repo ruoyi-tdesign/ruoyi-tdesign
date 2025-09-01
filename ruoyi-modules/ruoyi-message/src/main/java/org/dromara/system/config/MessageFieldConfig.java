@@ -3,6 +3,7 @@ package org.dromara.system.config;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.dromara.common.core.enums.MessageTypeEnum;
+import org.dromara.common.core.ui.FieldConfig;
 
 import java.util.Map;
 

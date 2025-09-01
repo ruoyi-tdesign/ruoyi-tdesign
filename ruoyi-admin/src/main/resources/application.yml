@@ -185,6 +185,8 @@ tenant:
     - sys_dict_data
     - sys_dict_type
     - sys_sensitive_word
+    - sys_file_category
+    - sys_storage_config
 
 # MyBatisPlus配置
 # https://baomidou.com/config/

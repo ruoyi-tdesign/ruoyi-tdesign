@@ -184,7 +184,7 @@
 #end
 #if($column.isList() && $column.htmlType == "imageUpload")
         <template #${javaField}="{ row }">
-          <image-preview :src="row.${javaField}" :width="60" :height="60" />
+          <x-image-preview :src="row.${javaField}" :width="60" :height="60" />
         </template>
 #elseif($column.isList() && $column.dictType && "" != $column.dictType)
         <template #${javaField}="{ row }">
@@ -206,7 +206,7 @@
             </my-link>
 #end
 #if($isUseRemoveMethod)
-            <my-link v-hasPermi="['${moduleName}:${businessName}:remove']" size="small" @click.stop="handleDelete(row)">
+            <my-link v-hasPermi="['${moduleName}:${businessName}:remove']" theme="danger" @click.stop="handleDelete(row)">
               <template #prefix-icon><delete-icon /></template>删除
             </my-link>
 #end
@@ -222,7 +222,6 @@
     <t-dialog
       v-model:visible="open"
       :header="title"
-      destroy-on-close
       :close-on-overlay-click="false"
       width="min(500px, 100%)"
       attach="body"
@@ -373,7 +372,7 @@
 #if($column.isDetail())
 #if($column.htmlType == "imageUpload")
         <t-descriptions-item label="${comment}">
-          <image-preview :src="form.${javaField}" :width="60" :height="60" />
+          <x-image-preview :src="form.${javaField}" :width="60" :height="60" />
         </t-descriptions-item>
 #elseif($column.htmlType == "datetime")
         <t-descriptions-item label="${comment}">{{ parseTime(form.${javaField}) }}</t-descriptions-item>
@@ -702,6 +701,12 @@ function handleDetail(row: ${vo}) {
   openViewLoading.value = true;
   const ${pkColumn.javaField} = row.${pkColumn.javaField};
   get${BusinessName}(${pkColumn.javaField}).then((response) => {
+#foreach($column in $columns)
+#set($javaField=$column.javaField)
+#if($column.htmlType == "editor")
+    proxy.editorRender(response.data, '${javaField}');
+#end
+#end
     form.value = response.data;
     openViewLoading.value = false;
   });
@@ -718,6 +723,12 @@ function handleUpdate(row?: ${vo}) {
   const ${pkColumn.javaField} = row?.${pkColumn.javaField}#if($isUseQueryMethod) || ids.value.at(0)#end;
   get${BusinessName}(${pkColumn.javaField}).then((response) => {
     buttonLoading.value = false;
+#foreach($column in $columns)
+#set($javaField=$column.javaField)
+#if($column.htmlType == "editor")
+    proxy.editorRender(response.data, '${javaField}');
+#end
+#end
     form.value = response.data;
   });
 }

@@ -63,7 +63,7 @@ export function get${BusinessName}(${pkColumn.javaField}: $idType) {
  * @param data 表单数据
  */
 export function add${BusinessName}(data: ${bo}) {
-  return request.post<R<void>>({
+  return request.post<R>({
     url: '/${moduleName}/${businessName}',
     data,
   });
@@ -73,10 +73,10 @@ export function add${BusinessName}(data: ${bo}) {
 
 /**
  * 修改${functionName}
- * @param data
+ * @param data 表单数据
  */
 export function update${BusinessName}(data: ${bo}) {
-  return request.put<R<void>>({
+  return request.put<R>({
     url: '/${moduleName}/${businessName}',
     data,
   });
@@ -89,7 +89,7 @@ export function update${BusinessName}(data: ${bo}) {
  * @param ${pkColumn.javaField}s 主键串
  */
 export function del${BusinessName}(${pkColumn.javaField}s: $idType | Array<$idType>) {
-  return request.delete<R<void>>({
+  return request.delete<R>({
     url: `/${moduleName}/${businessName}/${${pkColumn.javaField}s}`,
   });
 }

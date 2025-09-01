@@ -32,4 +32,9 @@ public interface CacheConstants {
      */
     String SYS_ALL_DICT_TYPE_KEY = GlobalConstants.GLOBAL_REDIS_KEY + "sys_all_dict_type";
 
+    /**
+     * 文件存储配置
+     */
+    String SYS_STORAGE_CONFIG = GlobalConstants.GLOBAL_REDIS_KEY + "sys_storage_config";
+
 }

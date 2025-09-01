@@ -9,11 +9,10 @@ import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
-#foreach ($import in $importList)
+#foreach ($import in $importBoList)
 import ${import};
 #end
 
-import java.util.Date;
 import java.io.Serial;
 #if($isUseQuery || !$isUseQueryMethod)
 import java.io.Serializable;
@@ -43,15 +42,15 @@ public class ${ClassName}Bo#if(!$isUseQuery && $isUseQueryMethod) extends BaseEn
 #set($Group = $StringUtils.join($Group0, ", "))
 #if($column.isRequired())
 #if($column.javaType == 'String')
-    @NotBlank(message = "$column.columnComment不能为空"#if($Group), groups = {${Group}}#end)
+    @NotBlank(message = "${column.simpleComment()}不能为空"#if($Group), groups = {${Group}}#end)
 #else
-    @NotNull(message = "${column.columnComment}不能为空"#if($Group), groups = {${Group}}#end)
+    @NotNull(message = "${column.simpleComment()}不能为空"#if($Group), groups = {${Group}}#end)
 #end
 #end
 #if($column.javaType == 'String')
     #set($length = $GenUtil.getColumnLength($column.getColumnType()))
     #if($length > 0)
-    @Length(max = $length, message = "${column.columnComment}不能大于{max}个字符"#if($Group), groups = {${Group}}#end)
+    @Length(max = $length, message = "${column.simpleComment()}不能大于{max}个字符"#if($Group), groups = {${Group}}#end)
     #end
 #end
     private $column.javaType $column.javaField;

@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.system.config.FieldConfig;
+import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.system.config.SignatureSmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -26,45 +26,45 @@ public class NeteaseSmsFieldConfigs extends SignatureSmsFieldConfigs {
 
     public NeteaseSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
-            .name("accessKey")
+            .useInput()
+            .label("accessKey")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .component("input")
-            .name("accessKeySecret")
+            .useInput()
+            .label("accessKeySecret")
             .help("访问键秘钥")
             .required(true)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
-            .component("input")
-            .name("默认短信签名")
+            .useInput()
+            .label("默认短信签名")
             .required(true)
             .build();
         this.templateUrl = FieldConfig.<String>builder()
             .value("https://api.netease.im/sms/sendtemplate.action")
-            .component("input")
-            .name("模板短信请求地址")
+            .useInput()
+            .label("模板短信请求地址")
             .required(true)
             .build();
         this.codeUrl = FieldConfig.<String>builder()
             .value("https://api.netease.im/sms/sendcode.action")
-            .component("input")
-            .name("验证码短信请求地址")
+            .useInput()
+            .label("验证码短信请求地址")
             .required(true)
             .build();
         this.verifyUrl = FieldConfig.<String>builder()
             .value("https://api.netease.im/sms/verifycode.action")
-            .component("input")
-            .name("验证码验证请求地址")
+            .useInput()
+            .label("验证码验证请求地址")
             .required(true)
             .build();
         this.needUp = FieldConfig.<Boolean>builder()
             .value(false)
-            .component("switch")
-            .name("支持短信上行")
+            .useSwitch()
+            .label("支持短信上行")
             .help("是否需要支持短信上行。true:需要，false:不需要 说明：如果开通了短信上行抄送功能，该参数需要设置为true，其它情况设置无效\n")
             .required(true)
             .build();

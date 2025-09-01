@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.system.mapper.SysFilePartMapper">
+
+    <resultMap id="SysFilePartResult" autoMapping="true" type="org.dromara.system.domain.SysFilePart">
+        <id property="filePartId" column="file_part_id"/>
+    </resultMap>
+    <resultMap id="SysFilePartResultVo" autoMapping="true" type="org.dromara.system.domain.vo.SysFilePartVo">
+        <id property="filePartId" column="file_part_id"/>
+    </resultMap>
+
+    <sql id="selectSysFilePartVo">
+        select sfp.file_part_id, sfp.storage_config_id, sfp.upload_id, sfp.e_tag, sfp.part_number, sfp.part_size, sfp.hash_info, sfp.create_dept, sfp.update_by, sfp.create_by, sfp.update_time, sfp.create_time from sys_file_part sfp
+    </sql>
+    <select id="queryList" parameterType="org.dromara.system.domain.query.SysFilePartQuery" resultMap="SysFilePartResultVo">
+        <include refid="selectSysFilePartVo"/>
+        <where>
+            <if test="storageConfigId != null"> and sfp.storage_config_id = #{storageConfigId}</if>
+            <if test="uploadId != null and uploadId != ''"> and sfp.upload_id = #{uploadId}</if>
+            <if test="eTag != null and eTag != ''"> and sfp.e_tag = #{eTag}</if>
+            <if test="partNumber != null"> and sfp.part_number = #{partNumber}</if>
+            <if test="partSize != null"> and sfp.part_size = #{partSize}</if>
+            <if test="hashInfo != null and hashInfo != ''"> and sfp.hash_info = #{hashInfo}</if>
+        </where>
+    </select>
+
+</mapper>

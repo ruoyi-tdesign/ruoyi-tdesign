@@ -19,15 +19,13 @@ import jakarta.validation.constraints.*;
 #end
 #end
 
-#foreach ($import in $importList)
+#foreach ($import in $importDomainList)
 import ${import};
 #end
 #if($isUseQuery || $isUseBO)
 import java.io.Serial;
 import java.io.Serializable;
 #end
-import java.util.Date;
-import java.math.BigDecimal;
 
 /**
  * ${functionName}对象 ${tableName}
@@ -57,9 +55,9 @@ public class ${ClassName} #if(!$isUseQuery && !$isUseBO)extends BaseEntity#{else
 #if(($column.isEdit() || $column.isPk()) && $Group0.add('EditGroup.class'))#end
 #set($Group = $StringUtils.join($Group0, ", "))
 #if($column.javaType == 'String')
-    @NotBlank(message = "$column.columnComment不能为空"#if($Group), groups = {${Group}}#end)
+    @NotBlank(message = "${column.simpleComment()}不能为空"#if($Group), groups = {${Group}}#end)
 #else
-    @NotNull(message = "$column.columnComment不能为空"#if($Group), groups = {${Group}}#end)
+    @NotNull(message = "${column.simpleComment()}不能为空"#if($Group), groups = {${Group}}#end)
 #end
 #end
 #if($column.javaField=='version')

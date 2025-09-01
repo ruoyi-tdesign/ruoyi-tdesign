@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.dromara.common.core.constant.RegexConstants;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.MimeTypeUtils;
@@ -18,11 +17,13 @@ import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.helper.DataPermissionHelper;
+import org.dromara.common.satoken.context.SaSecurityContext;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.core.BaseController;
+import org.dromara.system.domain.SysFile;
 import org.dromara.system.domain.SysUser;
-import org.dromara.system.domain.bo.SysOssBo;
+import org.dromara.system.domain.bo.SysFileBo;
 import org.dromara.system.domain.bo.SysUserBo;
 import org.dromara.system.domain.bo.SysUserPasswordBo;
 import org.dromara.system.domain.bo.SysUserProfileBo;
@@ -30,11 +31,11 @@ import org.dromara.system.domain.query.SysLogininforQuery;
 import org.dromara.system.domain.vo.AvatarVo;
 import org.dromara.system.domain.vo.ProfileVo;
 import org.dromara.system.domain.vo.SysLogininforVo;
-import org.dromara.system.domain.vo.SysOssVo;
 import org.dromara.system.domain.vo.SysUserVo;
+import org.dromara.system.service.ISysFileService;
 import org.dromara.system.service.ISysLogininforService;
-import org.dromara.system.service.ISysOssService;
 import org.dromara.system.service.ISysUserService;
+import org.dromara.system.utils.SysFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -56,7 +57,7 @@ public class SysProfileController extends BaseController {
     @Autowired
     private ISysUserService userService;
     @Autowired
-    private ISysOssService ossService;
+    private ISysFileService fileService;
     @Autowired
     private ISysLogininforService logininforService;
 
@@ -170,17 +171,20 @@ public class SysProfileController extends BaseController {
             if (!StringUtils.equalsAnyIgnoreCase(extension, MimeTypeUtils.IMAGE_EXTENSION)) {
                 return R.fail("文件格式不正确，请上传" + Arrays.toString(MimeTypeUtils.IMAGE_EXTENSION) + "格式");
             }
-            SysOssBo bo = new SysOssBo();
-            bo.setCreateBy(LoginHelper.getUserId());
-            bo.setUserTypeEnum(UserType.SYS_USER);
+
+            String loginType = SaSecurityContext.getContext().getLoginType();
+            Long userId = SaSecurityContext.getContext().getUserId();
+
+            SysFileBo bo = new SysFileBo();
+            bo.setCreateBy(userId);
+            bo.setUserType(loginType);
             bo.setIsLock(1);
-            bo.setOssCategoryId(0L);
-            SysOssVo oss = ossService.upload(avatarfile, bo);
-            String avatar = oss.getUrl();
-            boolean updateSuccess = DataPermissionHelper.ignore(() -> userService.updateUserAvatar(LoginHelper.getUserId(), oss.getOssId()));
+            bo.setFileCategoryId(0L);
+            SysFile file = fileService.upload(bo, avatarfile);
+            boolean updateSuccess = DataPermissionHelper.ignore(() -> userService.updateUserAvatar(LoginHelper.getUserId(), file.getFileId()));
             if (updateSuccess) {
                 AvatarVo avatarVo = new AvatarVo();
-                avatarVo.setImgUrl(avatar);
+                avatarVo.setImgUrl(SysFileUtil.getPreviewUrl(file.getFilename()));
                 return R.ok(avatarVo);
             }
         }

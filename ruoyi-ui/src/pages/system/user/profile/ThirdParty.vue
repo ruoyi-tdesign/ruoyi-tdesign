@@ -2,7 +2,7 @@
   <t-space direction="vertical" style="width: 100%">
     <t-table :loading="loading" hover row-key="id" :data="socialList" :columns="columns" style="font-size: 12px">
       <template #avatar="{ row }">
-        <image-preview :src="row.avatar" preview-text="" :width="45" :height="45" />
+        <x-image-preview :src="row.avatar" preview-text="" :width="45" :height="45" />
       </template>
       <template #operation="{ row }">
         <t-link theme="primary" hover="color" @click.stop="unlockAuth(row)"> 解绑 </t-link>

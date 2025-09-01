@@ -84,8 +84,13 @@ public class SysUserVo implements Serializable {
     /**
      * 头像地址
      */
-    @Translation(type = TransConstant.OSS_ID_TO_URL)
     private Long avatar;
+
+    /**
+     * 头像地址
+     */
+    @Translation(type = TransConstant.FILE_ID_TO_URL, mapper = "avatar")
+    private Long avatarUrl;
 
     /**
      * 密码

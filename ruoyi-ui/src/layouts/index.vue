@@ -1,11 +1,12 @@
 <template>
   <t-watermark
-    :watermark-content="{ text: name }"
-    :y="100"
+    :watermark-content="watermarkContent"
+    :y="180"
     :x="80"
-    :width="name.length * 20"
+    :width="Math.max(watermarkContent[0].text.length * 20, watermarkContent[1].text.length * 20)"
     :height="40"
     :z-index="1000"
+    :alpha="0.5"
   >
     <div>
       <template v-if="setting.layout.value === 'side'">
@@ -41,6 +42,7 @@ import { useRoute } from 'vue-router';
 
 import { prefix } from '@/config/global';
 import { useSettingStore, useTabsRouterStore, useUserStore } from '@/store';
+import { dateFormat } from '@/utils/date';
 
 import LayoutContent from './components/LayoutContent.vue';
 import LayoutHeader from './components/LayoutHeader.vue';
@@ -56,6 +58,17 @@ const { name } = storeToRefs(useUserStore());
 const mainLayoutCls = computed(() => [
   {
     't-layout--with-sider': settingStore.showSidebar,
+  },
+]);
+
+const watermarkContent = computed(() => [
+  {
+    text: name.value,
+    fontColor: 'rgba(174,174,174,0.5)',
+  },
+  {
+    text: dateFormat(new Date(), 'YYYY-MM-DD HH:mm:ss'),
+    fontColor: 'rgba(174,174,174,0.5)',
   },
 ]);
 

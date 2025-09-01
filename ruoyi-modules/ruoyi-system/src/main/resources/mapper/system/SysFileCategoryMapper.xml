@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.dromara.system.mapper.SysFileCategoryMapper">
+
+    <resultMap id="SysFileCategoryResult" autoMapping="true" type="org.dromara.system.domain.SysFileCategory">
+        <id property="fileCategoryId" column="file_category_id"/>
+    </resultMap>
+    <resultMap id="SysFileCategoryResultVo" autoMapping="true" type="org.dromara.system.domain.vo.SysFileCategoryVo">
+        <id property="fileCategoryId" column="file_category_id"/>
+    </resultMap>
+
+    <sql id="selectSysFileCategoryVo">
+        select sfc.file_category_id, sfc.category_name, sfc.parent_id, sfc.category_path, sfc.level, sfc.order_num, sfc.login_type, sfc.create_by, sfc.update_time, sfc.create_time from sys_file_category sfc
+    </sql>
+    <select id="queryList" parameterType="org.dromara.system.domain.query.SysFileCategoryQuery" resultMap="SysFileCategoryResultVo">
+        select sfc.file_category_id,
+               sfc.category_name,
+               sfc.parent_id,
+               sfc.category_path,
+               sfc.level,
+               sfc.order_num,
+               sfc.login_type,
+               sfc.create_by,
+               sfc.update_time,
+               sfc.create_time,
+               (select count(*) from sys_file sf
+                <where> sf.file_category_id = sfc.file_category_id
+                    <if test="maxSize != null"> and sf.size &lt;= #{maxSize}</if>
+                    <foreach collection="contentTypes" item="item" open="and (" separator=" or " close=")" nullable="true">
+                        sf.content_type like #{item}
+                    </foreach>
+                    <foreach collection="suffixes" item="item" open="and sf.ext in(" separator="," close=")" nullable="true">
+                        #{item}
+                    </foreach>
+                </where>) as file_count
+        from sys_file_category sfc
+        <where>
+            <if test="categoryName != null and categoryName != ''"> and sfc.category_name like concat(concat('%', #{categoryName}), '%')</if>
+            <if test="parentId != null"> and sfc.parent_id = #{parentId}</if>
+            <if test="loginType != null and loginType != ''"> and sfc.login_type = #{loginType}</if>
+            <if test="createBy != null"> and sfc.create_by = #{createBy}</if>
+        </where>
+        order by sfc.order_num
+    </select>
+    <select id="queryVoById" resultMap="SysFileCategoryResultVo">
+        select sfc.file_category_id,
+               sfc.category_name,
+               sfc.parent_id,
+               sfc.category_path,
+               sfc.level,
+               sfc.order_num,
+               sfc.login_type,
+               sfc.create_by,
+               sfc.update_time,
+               sfc.create_time,
+               (select category_name from sys_file_category sfc1 where sfc1.file_category_id = sfc.parent_id) as parent_category_name,
+               (select count(*) from sys_file sf
+                <where> sf.file_category_id = sfc.file_category_id
+                    <if test="maxSize != null"> and sf.size &lt;= #{maxSize}</if>
+                    <foreach collection="contentTypes" item="item" open="and (" separator=" or " close=")" nullable="true">
+                        sf.content_type like #{item}
+                    </foreach>
+                    <foreach collection="suffixes" item="item" open="and sf.ext in(" separator="," close=")" nullable="true">
+                        #{item}
+                    </foreach>
+                </where>) as file_count
+        from sys_file_category sfc
+        <where>
+            sfc.file_category_id = #{fileCategoryId}
+            <if test="loginType != null and loginType != ''"> and sfc.login_type = #{loginType}</if>
+            <if test="createBy != null"> and sfc.create_by = #{createBy}</if>
+        </where>
+    </select>
+
+</mapper>

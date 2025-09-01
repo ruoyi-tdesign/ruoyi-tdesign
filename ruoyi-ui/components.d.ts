@@ -14,6 +14,7 @@ declare module 'vue' {
     DictTag: typeof import('./src/components/dict-tag/index.vue')['default']
     Editor: typeof import('./src/components/editor/index.vue')['default']
     EditorPreview: typeof import('./src/components/editor-preview/index.vue')['default']
+    FieldDescriptions: typeof import('./src/components/field-config/FieldDescriptions.vue')['default']
     FileUpload: typeof import('./src/components/file-upload/index.vue')['default']
     HtmlImagePreview: typeof import('./src/components/html-image-preview/index.vue')['default']
     IconSelect: typeof import('./src/components/icon-select/index.vue')['default']
@@ -110,5 +111,9 @@ declare module 'vue' {
     UploadExcel: typeof import('./src/components/upload-excel/index.vue')['default']
     UploadSelect: typeof import('./src/components/upload-select/index.vue')['default']
     UserSelect: typeof import('./src/components/user-select/index.vue')['default']
+    XFileUpload: typeof import('./src/components/x-file-upload/index.vue')['default']
+    XImagePreview: typeof import('./src/components/x-image-preview/index.vue')['default']
+    XImageUpload: typeof import('./src/components/x-image-upload/index.vue')['default']
+    XUploadSelect: typeof import('./src/components/x-upload-select/index.vue')['default']
   }
 }

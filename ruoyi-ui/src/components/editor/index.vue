@@ -2,7 +2,7 @@
   <div>
     <!--  文档:https://www.tiny.cloud/docs/tinymce/6/-->
     <editor ref="editorRef" :model-value="modelValue" :init="conf" :disabled="disabled" v-bind="$attrs" />
-    <upload-select
+    <x-upload-select
       v-if="selectFile"
       v-model:visible="open"
       :title="title"
@@ -71,10 +71,11 @@ import contentDarkURL from 'tinymce/skins/content/tinymce-5-dark/content.min.css
 import contentURL from 'tinymce/skins/content/default/content.min.css?url';
 import { computed, getCurrentInstance, onMounted, ref, watch } from 'vue';
 
-import { uploader } from '@/api/system/oss';
+import { uploader } from '@/api/system/file';
 import { useSettingStore } from '@/store';
-import type { MyOssProps } from '@/pages/system/ossCategory/components/myOss.vue';
-import type { SelectFile } from '@/components/upload-select/index.vue';
+import type { FileListProps } from '@/pages/system/myFile/FileList.vue';
+import type { SelectFile } from '@/components/x-upload-select/index.vue';
+import { getVisitUrl } from '@/utils/ruoyi';
 
 export type TinyEditor = Parameters<RawEditorOptions['setup']>[0];
 
@@ -144,8 +145,8 @@ const settingStore = useSettingStore();
 const useDarkMode = computed(() => settingStore.displayMode === 'dark');
 const editorRef = ref<any>();
 const title = ref('');
-const fileAccept = ref<MyOssProps['fileUploadProps']['accept']>([]);
-const query = ref<MyOssProps['queryParam']>({
+const fileAccept = ref<FileListProps['fileUploadProps']['accept']>([]);
+const query = ref<FileListProps['queryParam']>({
   maxSize: 5 * 1024 * 1024,
 });
 const open = ref(false);
@@ -156,7 +157,9 @@ const filePickerCallback = ref<Parameters<RawEditorOptions['file_picker_callback
 
 // 选择文件后的回调处理
 function handleSelectSubmit(values: SelectFile[]) {
-  filePickerCallback.value?.call(this, values[0].url, { title: values[0].name });
+  filePickerCallback.value?.call(this, getVisitUrl(values[0].url, { sourceId: values[0].fileId }), {
+    title: values[0].name,
+  });
   filePickerCallback.value = null;
   return true;
 }
@@ -216,7 +219,7 @@ function uploadHandle(file: File, fileType: 'file' | 'image' | 'media') {
     uploader(formData)
       .then((res) => {
         proxy.$modal.msgSuccess(`文件【${file.name}】上传成功！`);
-        resolve(res.data.url);
+        resolve(getVisitUrl(res.data.previewUrl, { sourceId: res.data.fileId }));
       })
       .catch((reason) => reject(reason))
       .finally(() => proxy.$modal.msgClose(msgLoading));
@@ -406,7 +409,7 @@ const conf = computed<RawEditorOptions>(() => {
 });
 
 watch(conf, () => {
-  editorRef.value.rerender(conf.value);
+  editorRef.value?.rerender(conf.value);
 });
 onMounted(() => {
   tinymce.init({});
