@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.system.config.FieldConfig;
 import org.dromara.system.config.SignatureSmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -20,27 +20,27 @@ public class UniSmsFieldConfigs extends SignatureSmsFieldConfigs {
 
     public UniSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .useInput()
-            .label("accessKeyId")
+            .component("input")
+            .name("accessKeyId")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .useInput()
-            .label("accessKeySecret")
+            .component("input")
+            .name("accessKeySecret")
             .help("访问键秘钥 简易模式不需要配置")
             .required(false)
-            .inputComponent().type("password").end()
+            .type("password")
             .build();
         this.signature = FieldConfig.<String>builder()
-            .useInput()
-            .label("默认短信签名")
+            .component("input")
+            .name("默认短信签名")
             .required(true)
             .build();
         this.isSimple = FieldConfig.<Boolean>builder()
             .value(true)
-            .useSwitch()
-            .label("简易模式")
+            .component("switch")
+            .name("简易模式")
             .help("是否为简易模式 默认为true")
             .required(true)
             .build();

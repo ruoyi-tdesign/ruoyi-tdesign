@@ -126,7 +126,7 @@ const props = withDefaults(defineProps<FileUploadProps>(), {
   fileType: () => ['doc', 'docx', 'xlsx', 'xls', 'csv', 'ppt', 'pptx', 'txt', 'pdf'],
   isShowTip: true,
   theme: 'file',
-  mode: 'id',
+  mode: 'url',
   disabled: false,
   allowUploadDuplicateFile: false,
   supportSelectFile: true,

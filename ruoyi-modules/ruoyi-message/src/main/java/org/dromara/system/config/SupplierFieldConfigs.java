@@ -3,7 +3,6 @@ package org.dromara.system.config;
 
 import cn.hutool.core.util.ReflectUtil;
 import org.dromara.common.core.enums.MessageTypeEnum;
-import org.dromara.common.core.ui.FieldConfig;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

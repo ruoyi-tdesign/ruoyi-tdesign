@@ -14,7 +14,7 @@ export function isPathMatch(pattern: string, path: string) {
  * @param url
  */
 export function isHttp(url: string) {
-  return url.startsWith('http://') || url.startsWith('https://');
+  return url.indexOf('http://') !== -1 || url.indexOf('https://') !== -1;
 }
 
 /**

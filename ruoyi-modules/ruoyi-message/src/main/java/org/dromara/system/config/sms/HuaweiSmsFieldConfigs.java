@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.system.config.FieldConfig;
 import org.dromara.system.config.SignatureSmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -24,38 +24,38 @@ public class HuaweiSmsFieldConfigs extends SignatureSmsFieldConfigs {
 
     public HuaweiSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .useInput()
-            .label("appkey")
+            .component("input")
+            .name("appkey")
             .help("华为短信应用appkey")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .useInput()
-            .label("appSecret")
+            .component("input")
+            .name("appSecret")
             .help("华为云的appSecret")
             .required(true)
-            .inputComponent().type("password").end()
+            .type("password")
             .build();
         this.signature = FieldConfig.<String>builder()
-            .useInput()
-            .label("默认短信签名")
+            .component("input")
+            .name("默认短信签名")
             .required(true)
             .build();
         this.sender = FieldConfig.<String>builder()
-            .useInput()
-            .label("短信签名通道号")
+            .component("input")
+            .name("短信签名通道号")
             .required(true)
             .build();
         this.statusCallBack = FieldConfig.<String>builder()
-            .useInput()
-            .label("短信状态回调")
+            .component("input")
+            .name("短信状态回调")
             .help("华为云国内短信状态报告接收地址")
             .required(false)
             .build();
         this.url = FieldConfig.<String>builder()
             .value("https://smsapi.cn-xxxxx-4.myhuaweicloud.com:443")
-            .useInput()
-            .label("APP接入地址")
+            .component("input")
+            .name("APP接入地址")
             .help("APP接入地址 建立短信应用后获取到的地址")
             .required(true)
             .build();

@@ -1,6 +1,6 @@
 package ${packageName}.domain.vo;
 
-#foreach ($import in $importVoList)
+#foreach ($import in $importList)
 import ${import};
 #end
 import ${packageName}.domain.${ClassName};
@@ -10,6 +10,7 @@ import org.dromara.common.excel.annotation.ExcelDictFormat;
 import org.dromara.common.excel.convert.ExcelDictConvert;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import java.util.Date;
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -32,14 +33,17 @@ public class ${ClassName}Vo implements Serializable {
     /**
      * $column.columnComment
      */
-#if($column.htmlType == "editor")
-    @EditorValue
+#set($parentheseIndex=$column.columnComment.indexOf("（"))
+#if($parentheseIndex != -1)
+#set($comment=$column.columnComment.substring(0, $parentheseIndex))
+#else
+#set($comment=$column.columnComment)
 #end
 #if(${column.dictType} && ${column.dictType} != '')
-    @ExcelProperty(value = "${column.simpleComment()}", converter = ExcelDictConvert.class)
+    @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
     @ExcelDictFormat(dictType = "${column.dictType}")
 #else
-    @ExcelProperty(value = "${column.simpleComment()}")
+    @ExcelProperty(value = "${comment}")
 #end
     private $column.javaType $column.javaField;
 

@@ -1,4 +1,3 @@
-import { evalFieldConfigs } from '@/api/model/fieldConfigModel';
 import type { R, TableDataInfo } from '@/api/model/resultModel';
 import type {
   MessageFieldConfig,
@@ -64,7 +63,11 @@ export function getMessageFieldConfigs() {
     })
     .then((res) => {
       Object.entries(res.data).forEach(([, value]) => {
-        evalFieldConfigs(value.supplierConfig);
+        Object.entries(value.supplierConfig).forEach(([, v]) => {
+          v.rules?.forEach((rule) => {
+            rule.pattern = new RegExp(rule.pattern);
+          });
+        });
       });
       return res;
     });

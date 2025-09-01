@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.system.config.FieldConfig;
 import org.dromara.system.config.SignatureSmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -30,66 +30,64 @@ public class TencentSmsFieldConfigs extends SignatureSmsFieldConfigs {
 
     public TencentSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .useInput()
-            .label("accessKey")
+            .component("input")
+            .name("accessKey")
             .help("腾讯云的accessKey。SecretId、SecretKey 查询: https://console.cloud.tencent.com/cam/capi")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .useInput()
-            .label("accessKeySecret")
+            .component("input")
+            .name("accessKeySecret")
             .help("腾讯云的accessKeySecret")
             .required(true)
-            .inputComponent().type("password").end()
+            .type("password")
             .build();
         this.signature = FieldConfig.<String>builder()
-            .useInput()
-            .label("默认短信签名")
+            .component("input")
+            .name("默认短信签名")
             .help("签名信息可前往 [国内短信](https://console.cloud.tencent.com/smsv2/csms-sign) 或<br />[国际/港澳台短信](https://console.cloud.tencent.com/smsv2/isms-sign) 的签名管理查看")
             .required(true)
             .build();
         this.sdkAppId = FieldConfig.<String>builder()
-            .useInput()
-            .label("短信应用ID")
+            .component("input")
+            .name("短信应用ID")
             .help("短信sdkAppId。应用 ID 可前往 [短信控制台](https://console.cloud.tencent.com/smsv2/app-manage) 查看")
             .required(true)
             .build();
         this.territory = FieldConfig.<String>builder()
             .value("ap-guangzhou")
-            .useInput()
-            .label("地域")
+            .component("input")
+            .name("地域")
             .help("地域信息默认为 ap-guangzhou 如无特殊改变可不用设置")
             .required(true)
             .build();
         this.connTimeout = FieldConfig.<Integer>builder()
             .value(60)
-            .useInputNumber()
-            .label("请求超时时间")
+            .component("input-number")
+            .name("请求超时时间")
             .help("请求超时时间 默认60秒")
             .required(true)
-            .inputNumberComponent()
-            .min(30L)
-            .max(180L)
-            .end()
+            .min(30)
+            .max(180)
             .build();
         this.requestUrl = FieldConfig.<String>builder()
             .value("sms.tencentcloudapi.com")
-            .useInput()
-            .label("请求地址")
+            .component("input")
+            .name("请求地址")
             .help("请求地址默认为 sms.tencentcloudapi.com 如无特殊改变可不用设置")
             .required(true)
             .build();
         this.action = FieldConfig.<String>builder()
             .value("SendSms")
-            .useInput()
-            .label("接口方法")
+            .component("input")
+            .name("接口方法")
             .help("接口方法默认为 SendSms 如无特殊改变可以不用设置")
             .required(true)
             .build();
         this.version = FieldConfig.<String>builder()
             .value("2021-01-11")
-            .useInput()
-            .label("接口版本号")
+            .component("input")
+            .name("接口版本号")
             .help("接口版本默认为 2021-01-11 如无特殊改变可不用设置")
             .required(true)
             .build();

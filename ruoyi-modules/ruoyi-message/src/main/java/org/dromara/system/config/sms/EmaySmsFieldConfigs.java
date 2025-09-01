@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.system.config.FieldConfig;
 import org.dromara.system.config.SmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -20,21 +20,21 @@ public class EmaySmsFieldConfigs extends SmsFieldConfigs {
 
     public EmaySmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .useInput()
-            .label("appId")
+            .component("input")
+            .name("appId")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .useInput()
-            .label("secretKey")
+            .component("input")
+            .name("secretKey")
             .help("访问键秘钥")
             .required(true)
-            .inputComponent().type("password").end()
+            .type("password")
             .build();
         this.requestUrl = FieldConfig.<String>builder()
-            .useInput()
-            .label("请求地址")
+            .component("input")
+            .name("请求地址")
             .help("短信发送请求地址")
             .required(true)
             .build();

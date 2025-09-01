@@ -12,7 +12,6 @@
 </template>
 
 <script lang="ts" setup>
-import { useMutationObserver } from '@vueuse/core';
 import debounce from 'lodash/debounce';
 import { ref, useSlots } from 'vue';
 

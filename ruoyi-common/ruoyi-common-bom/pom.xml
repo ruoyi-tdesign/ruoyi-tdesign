@@ -185,13 +185,6 @@
                 <version>${revision}</version>
             </dependency>
 
-            <!-- 存储模块 -->
-            <dependency>
-                <groupId>org.dromara</groupId>
-                <artifactId>ruoyi-common-storage</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 </project>

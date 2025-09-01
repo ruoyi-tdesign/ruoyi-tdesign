@@ -4,7 +4,6 @@ import { getInfo, isLogin, login, logout } from '@/api/login';
 import type { LoginParam, UserInfo } from '@/api/model/loginModel';
 import type { R } from '@/api/model/resultModel';
 import defAva from '@/assets/images/profile.jpg';
-import { getVisitUrl } from '@/utils/ruoyi';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -55,7 +54,7 @@ export const useUserStore = defineStore('user', {
         getInfo()
           .then((res) => {
             const { user } = res.data;
-            const avatar = !user.avatarUrl ? defAva : getVisitUrl(user.avatarUrl);
+            const avatar = !user.avatar ? defAva : user.avatar;
 
             if (res.data.roles && res.data.roles.length > 0) {
               // 验证返回的roles是否是一个非空数组

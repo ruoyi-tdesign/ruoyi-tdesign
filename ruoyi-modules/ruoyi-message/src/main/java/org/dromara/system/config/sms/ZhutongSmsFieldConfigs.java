@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.system.config.FieldConfig;
 import org.dromara.system.config.SignatureSmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -22,34 +22,34 @@ public class ZhutongSmsFieldConfigs extends SignatureSmsFieldConfigs {
 
     public ZhutongSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .useInput()
-            .label("accessKey")
+            .component("input")
+            .name("accessKey")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .useInput()
-            .label("accessKeySecret")
+            .component("input")
+            .name("accessKeySecret")
             .help("访问键秘钥")
             .required(true)
-            .inputComponent().type("password").end()
+            .type("password")
             .build();
         this.signature = FieldConfig.<String>builder()
-            .useInput()
-            .label("短信签名")
+            .component("input")
+            .name("短信签名")
             .help("短信签名可以为空，为空发送【自定义短信】无需要提前创建短信模板; 不为空发送:【模板短信】")
             .required(false)
             .build();
         this.requestUrl = FieldConfig.<String>builder()
             .value("https://api.mix2.zthysms.com/")
-            .useInput()
-            .label("默认请求地址")
+            .component("input")
+            .name("默认请求地址")
             .help("默认请求地址 不同区域，可切换请求地址，也可以不修改，请参考官方文档：https://doc.zthysms.com/web/#/1/236")
             .required(true)
             .build();
         this.templateName = FieldConfig.<String>builder()
-            .useInput()
-            .label("模板变量名称")
+            .component("input")
+            .name("模板变量名称")
             .help("模板变量名称 查看地址：https://mix2.zthysms.com/index.html#/TemplateManagement 允许为空，为空，使用无模板形式，发送短信")
             .required(false)
             .build();

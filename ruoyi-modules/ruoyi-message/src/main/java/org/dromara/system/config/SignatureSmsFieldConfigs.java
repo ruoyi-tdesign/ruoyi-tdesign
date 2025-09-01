@@ -2,7 +2,6 @@ package org.dromara.system.config;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.core.ui.FieldConfig;
 
 /**
  * 签名短信基本配置对象

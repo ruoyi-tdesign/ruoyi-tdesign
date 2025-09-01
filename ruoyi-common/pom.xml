@@ -34,7 +34,6 @@
         <module>ruoyi-common-websocket</module>
         <module>ruoyi-common-sse</module>
         <module>ruoyi-common-amqp</module>
-        <module>ruoyi-common-storage</module>
     </modules>
 
     <artifactId>ruoyi-common</artifactId>

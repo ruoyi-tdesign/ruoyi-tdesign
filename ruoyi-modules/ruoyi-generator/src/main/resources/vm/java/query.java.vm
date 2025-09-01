@@ -3,7 +3,9 @@ package ${packageName}.domain.query;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-#foreach ($import in $importQueryList)
+import java.util.Date;
+
+#foreach ($import in $importList)
 import ${import};
 #end
 import org.dromara.common.mybatis.core.domain.BasePageQuery;

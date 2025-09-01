@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.system.config.FieldConfig;
 import org.dromara.system.config.SmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -22,27 +22,27 @@ public class CloopenSmsFieldConfigs extends SmsFieldConfigs {
 
     public CloopenSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .useInput()
-            .label("accessKeyId")
+            .component("input")
+            .name("accessKeyId")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .useInput()
-            .label("accessKeySecret")
+            .component("input")
+            .name("accessKeySecret")
             .help("访问键秘钥")
             .required(true)
-            .inputComponent().type("password").end()
+            .type("password")
             .build();
         this.sdkAppId = FieldConfig.<String>builder()
-            .useInput()
-            .label("应用 ID")
+            .component("input")
+            .name("应用 ID")
             .required(true)
             .build();
         this.baseUrl = FieldConfig.<String>builder()
             .value("https://app.cloopen.com:8883/2013-12-26")
-            .useInput()
-            .label("BaseURL")
+            .component("input")
+            .name("BaseURL")
             .required(true)
             .build();
     }

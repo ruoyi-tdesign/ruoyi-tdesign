@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.system.config.FieldConfig;
 import org.dromara.system.config.SmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -20,22 +20,22 @@ public class DingZhongSmsFieldConfigs extends SmsFieldConfigs {
 
     public DingZhongSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .useInput()
-            .label("cdkey")
+            .component("input")
+            .name("cdkey")
             .help("短信帐号")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .useInput()
-            .label("password")
+            .component("input")
+            .name("password")
             .help("密码")
             .required(true)
-            .inputComponent().type("password").end()
+            .type("password")
             .build();
         this.requestUrl = FieldConfig.<String>builder()
             .value("http://demoapi.321sms.com:8201")
-            .useInput()
-            .label("请求地址")
+            .component("input")
+            .name("请求地址")
             .help("短信发送请求地址： （演示及测试域名：http://demoapi.321sms.com:8201；正式域名：http://api.321sms.com）")
             .required(true)
             .build();
