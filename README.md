@@ -17,6 +17,7 @@
 
 > 交流与讨论: [交流群](https://github.com/ruoyi-tdesign/ruoyi-tdesign/wiki/%E4%BA%A4%E6%B5%81%E7%BE%A4)<br>
 > 系统演示(感谢 [疯狂的麦克粥](https://gitee.com/CrazyMikePorridge) 贡献的演示服务器): [传送门](https://ruoyi-tdesign.hexm.online)
+> 账号：admin 密码：admin123
 
 > 查看项目[更新日志](./CHANGELOG.md)
 
