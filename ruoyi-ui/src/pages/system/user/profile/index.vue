@@ -46,7 +46,7 @@
             <dict-tag :options="sys_user_sex" :value="userInfo.user?.sex" />
           </t-descriptions-item>
           <t-descriptions-item label="最后登录IP">{{ userInfo.user?.loginIp }}</t-descriptions-item>
-          <t-descriptions-item label="用户账号">{{ userInfo.user?.loginDate }}</t-descriptions-item>
+          <t-descriptions-item label="最后登录时间">{{ userInfo.user?.loginDate }}</t-descriptions-item>
           <t-descriptions-item v-if="tenantEnabled" label="租户">{{ userInfo.user?.tenantId }}</t-descriptions-item>
           <t-descriptions-item v-if="tenantEnabled" label="租户企业名称">
             {{ userInfo.user?.tenantName }}

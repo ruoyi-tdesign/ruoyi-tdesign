@@ -89,6 +89,11 @@
             <artifactId>ruoyi-common-sse</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-storage</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

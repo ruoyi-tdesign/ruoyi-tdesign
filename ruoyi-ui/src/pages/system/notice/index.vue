@@ -169,9 +169,9 @@
             <t-col :span="12">
               <t-form-item label="状态">
                 <t-radio-group v-model="form.status">
-                  <t-radio v-for="dict in sys_notice_status" :key="dict.value" :value="dict.value">{{
-                    dict.label
-                  }}</t-radio>
+                  <t-radio v-for="dict in sys_notice_status" :key="dict.value" :value="dict.value">
+                    {{ dict.label }}
+                  </t-radio>
                 </t-radio-group>
               </t-form-item>
             </t-col>

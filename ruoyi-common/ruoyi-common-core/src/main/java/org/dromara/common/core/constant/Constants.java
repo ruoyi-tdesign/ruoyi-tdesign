@@ -72,5 +72,9 @@ public interface Constants {
      */
     String ADMIN_ROLE = "admin";
 
+    /**
+     * 根路径
+     */
+    String ROOT_PATH = "/";
 }
 

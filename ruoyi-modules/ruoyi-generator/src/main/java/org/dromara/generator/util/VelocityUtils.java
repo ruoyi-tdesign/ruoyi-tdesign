@@ -60,7 +60,7 @@ public class VelocityUtils {
         velocityContext.put("author", genTable.getFunctionAuthor());
         velocityContext.put("datetime", DateUtils.getDate());
         velocityContext.put("pkColumn", genTable.getPkColumn());
-        velocityContext.put("importList", getImportList(genTable));
+        getImportList(velocityContext, genTable);
         velocityContext.put("permissionPrefix", getPermissionPrefix(moduleName, businessName));
         velocityContext.put("columns", genTable.getColumns());
         velocityContext.put("table", genTable);
@@ -225,23 +225,50 @@ public class VelocityUtils {
     /**
      * 根据列类型获取导入包
      *
-     * @param genTable 业务表对象
+     * @param velocityContext
+     * @param genTable        业务表对象
      * @return 返回需要导入的包列表
      */
-    public static HashSet<String> getImportList(GenTableVo genTable) {
+    public static void getImportList(VelocityContext velocityContext, GenTableVo genTable) {
+        HashSet<String> importBoList = new HashSet<>();
+        HashSet<String> importDomainList = new HashSet<>();
+        HashSet<String> importQueryList = new HashSet<>();
+        HashSet<String> importVoList = new HashSet<>();
         List<GenTableColumn> columns = genTable.getColumns();
-        HashSet<String> importList = new HashSet<>();
         for (GenTableColumn column : columns) {
-            if (!column.isSuperColumn() && GenConstants.TYPE_DATE.equals(column.getJavaType())) {
-                importList.add("java.util.Date");
-                importList.add("com.fasterxml.jackson.annotation.JsonFormat");
-            } else if (!column.isSuperColumn() && GenConstants.TYPE_BIGDECIMAL.equals(column.getJavaType())) {
-                importList.add("java.math.BigDecimal");
-            } else if (!column.isSuperColumn() && GenConstants.TYPE_TIME.equals(column.getJavaType())) {
-                importList.add("java.sql.Time");
+            // bo
+            if (column.isPk() || column.isInsert() || column.isEdit()) {
+                setImportList(importBoList, column);
             }
+            // vo
+            if (column.isList() || column.isPk() || column.isEdit() || column.isInsert() || column.isDetail()) {
+                setImportList(importVoList, column);
+                if (Objects.equals(column.getHtmlType(), "editor")) {
+                    importVoList.add("org.dromara.common.translation.annotation.EditorValue");
+                }
+            }
+            // query
+            if (column.isQuery() && !Objects.equals(column.getQueryType(), "BETWEEN")) {
+                setImportList(importQueryList, column);
+            }
+            setImportList(importDomainList, column);
         }
-        return importList;
+
+        velocityContext.put("importBoList", importBoList);
+        velocityContext.put("importDomainList", importDomainList);
+        velocityContext.put("importQueryList", importQueryList);
+        velocityContext.put("importVoList", importVoList);
+    }
+
+    private static void setImportList(Set<String> importList, GenTableColumn column) {
+        if (GenConstants.TYPE_DATE.equals(column.getJavaType())) {
+            importList.add("java.util.Date");
+//            importList.add("com.fasterxml.jackson.annotation.JsonFormat");
+        } else if (GenConstants.TYPE_BIGDECIMAL.equals(column.getJavaType())) {
+            importList.add("java.math.BigDecimal");
+        } else if (GenConstants.TYPE_TIME.equals(column.getJavaType())) {
+            importList.add("java.sql.Time");
+        }
     }
 
     /**

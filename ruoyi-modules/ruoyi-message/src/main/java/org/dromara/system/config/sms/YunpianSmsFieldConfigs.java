@@ -3,7 +3,7 @@ package org.dromara.system.config.sms;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.core.enums.MessageTypeEnum;
-import org.dromara.system.config.FieldConfig;
+import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.system.config.SupplierFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -25,20 +25,20 @@ public class YunpianSmsFieldConfigs extends SupplierFieldConfigs {
 
     public YunpianSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
-            .name("apikey")
+            .useInput()
+            .label("apikey")
             .help("账号唯一标识")
             .required(true)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
-            .component("input")
-            .name("默认短信签名")
+            .useInput()
+            .label("默认短信签名")
             .required(false)
             .build();
         this.callbackUrl = FieldConfig.<String>builder()
-            .component("input")
-            .name("回调地址")
+            .useInput()
+            .label("回调地址")
             .help("云片官方回调地址，无需求可以不设置")
             .required(false)
             .build();

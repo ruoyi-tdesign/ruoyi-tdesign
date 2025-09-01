@@ -1,44 +1,46 @@
 <template>
-  <t-card title="基本信息" header-bordered>
-    <t-form :data="form" label-width="calc(4em + 12px)">
-      <t-row>
-        <t-col :span="4" :offset="1">
-          <t-form-item label="用户昵称" prop="nickName">
-            <t-input v-model="form.nickName" disabled />
-          </t-form-item>
-        </t-col>
-        <t-col :span="4" :offset="1">
-          <t-form-item label="登录账号" prop="userName">
-            <t-input v-model="form.userName" disabled />
-          </t-form-item>
-        </t-col>
-      </t-row>
-    </t-form>
-  </t-card>
+  <div>
+    <t-card title="基本信息" header-bordered>
+      <t-form :data="form" label-width="calc(4em + 12px)">
+        <t-row>
+          <t-col :span="4" :offset="1">
+            <t-form-item label="用户昵称" prop="nickName">
+              <t-input v-model="form.nickName" disabled />
+            </t-form-item>
+          </t-col>
+          <t-col :span="4" :offset="1">
+            <t-form-item label="登录账号" prop="userName">
+              <t-input v-model="form.userName" disabled />
+            </t-form-item>
+          </t-col>
+        </t-row>
+      </t-form>
+    </t-card>
 
-  <br />
+    <br />
 
-  <t-card title="角色信息" header-bordered>
-    <t-table
-      hover
-      :loading="loading"
-      row-key="roleId"
-      :columns="columns"
-      :data="roles.slice((pageNum - 1) * pageSize, pageNum * pageSize)"
-      :selected-row-keys="roleIds"
-      select-on-row-click
-      :pagination="pagination"
-      @select-change="handleSelectionChange"
-    >
-    </t-table>
+    <t-card title="角色信息" header-bordered>
+      <t-table
+        hover
+        :loading="loading"
+        row-key="roleId"
+        :columns="columns"
+        :data="roles.slice((pageNum - 1) * pageSize, pageNum * pageSize)"
+        :selected-row-keys="roleIds"
+        select-on-row-click
+        :pagination="pagination"
+        @select-change="handleSelectionChange"
+      >
+      </t-table>
 
-    <t-form label-width="100px">
-      <div style="text-align: center; margin-top: 30px">
-        <t-button theme="primary" @click="submitForm()">提交</t-button>
-        <t-button theme="default" variant="outline" @click="close()">返回</t-button>
-      </div>
-    </t-form>
-  </t-card>
+      <t-form label-width="100px">
+        <div style="text-align: center; margin-top: 30px">
+          <t-button theme="primary" @click="submitForm()">提交</t-button>
+          <t-button theme="default" variant="outline" @click="close()">返回</t-button>
+        </div>
+      </t-form>
+    </t-card>
+  </div>
 </template>
 <script lang="ts" setup>
 defineOptions({

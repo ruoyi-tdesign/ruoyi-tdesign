@@ -1,0 +1,81 @@
+package org.dromara.common.storage.config;
+
+import lombok.Data;
+import org.dromara.common.core.ui.FieldConfig;
+import org.dromara.common.json.utils.JsonUtils;
+import org.dromara.x.file.storage.core.FileStorageProperties;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * WebDav字段配置
+ *
+ * @author hexm
+ * @date 2025/5/3
+ */
+@Data
+public class WebDavStorageFieldConfig implements StorageFieldConfig {
+    /** 服务器地址，注意“/”结尾，例如：http://192.168.1.105:8405/ */
+    private FieldConfig<String> server;
+    /** 用户名 */
+    private FieldConfig<String> user;
+    /** 密码 */
+    private FieldConfig<String> password;
+    /** 基础路径 */
+    private FieldConfig<String> basePath;
+    /** 存储路径，上传的文件都会存储在这个路径下面，默认“/”，注意“/”结尾 */
+    private FieldConfig<String> storagePath;
+    /** 访问域名 */
+    private FieldConfig<String> domain;
+
+    public WebDavStorageFieldConfig() {
+        this.server = FieldConfig.<String>builder()
+            .useInput()
+            .label("服务器地址")
+            .help("服务器地址，注意“/”结尾，例如：http://192.168.1.105:8405/")
+            .required(true)
+            .build();
+        this.user = FieldConfig.<String>builder()
+            .useInput()
+            .label("用户名")
+            .required(true)
+            .build();
+        this.password = FieldConfig.<String>builder()
+            .useInput()
+            .label("密码")
+            .inputComponent().type("password").end()
+            .required(false)
+            .build();
+        this.basePath = FieldConfig.<String>builder()
+            .useInput()
+            .label("基础路径")
+            .required(false)
+            .build();
+        this.storagePath = FieldConfig.<String>builder()
+            .useInput()
+            .value("/")
+            .label("存储路径")
+            .help("存储路径，上传的文件都会存储在这个路径下面，默认“/”，注意“/”结尾")
+            .required(true)
+            .build();
+        this.domain = FieldConfig.<String>builder()
+            .useInput()
+            .label("访问域名")
+            .help("访问域名，注意“/”结尾，例如：https://file.abc.com/")
+            .required(false)
+            .build();
+    }
+
+    @Override
+    public FileStorageProperties addStorageProperties(FileStorageProperties properties, String platform, String json) {
+        FileStorageProperties.WebDavConfig webDavConfig = JsonUtils.parseObject(json, FileStorageProperties.WebDavConfig.class);
+        webDavConfig.setPlatform(platform);
+        if (properties.getWebdav() == null) {
+            properties.setWebdav(new ArrayList<>());
+        }
+        List<FileStorageProperties.WebDavConfig> list = (List<FileStorageProperties.WebDavConfig>) properties.getWebdav();
+        list.add(webDavConfig);
+        return properties;
+    }
+}

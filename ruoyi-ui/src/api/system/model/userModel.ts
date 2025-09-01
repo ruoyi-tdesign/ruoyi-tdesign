@@ -94,8 +94,10 @@ export interface SysUserVo {
   phonenumber?: string;
   /** 用户性别（0男 1女 2未知） */
   sex?: string;
-  /** 头像地址 */
+  /** 头像图片id */
   avatar?: string;
+  /** 头像地址 */
+  avatarUrl?: string;
   /** 密码 */
   password?: string;
   /** 帐号状态（1正常 0停用） */

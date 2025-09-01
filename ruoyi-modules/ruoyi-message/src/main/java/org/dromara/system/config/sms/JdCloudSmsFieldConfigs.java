@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.system.config.FieldConfig;
+import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.system.config.SignatureSmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -20,27 +20,27 @@ public class JdCloudSmsFieldConfigs extends SignatureSmsFieldConfigs {
 
     public JdCloudSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
-            .name("accessKeyId")
+            .useInput()
+            .label("accessKeyId")
             .help("访问键标识")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .component("input")
-            .name("accessKeySecret")
+            .useInput()
+            .label("accessKeySecret")
             .help("访问键秘钥")
             .required(false)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.signature = FieldConfig.<String>builder()
-            .component("input")
-            .name("默认短信签名")
+            .useInput()
+            .label("默认短信签名")
             .required(true)
             .build();
         this.region = FieldConfig.<String>builder()
             .value("cn-north-1")
-            .component("input")
-            .name("地域信息")
+            .useInput()
+            .label("地域信息")
             .required(true)
             .build();
     }

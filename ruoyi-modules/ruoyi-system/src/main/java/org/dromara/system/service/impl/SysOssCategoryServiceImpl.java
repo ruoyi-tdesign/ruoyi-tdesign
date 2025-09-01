@@ -2,6 +2,7 @@ package org.dromara.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
@@ -29,7 +30,6 @@ import java.util.List;
 @Service
 public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper, SysOssCategory> implements ISysOssCategoryService {
 
-    public static final String ROOT_PATH = "/";
     @Autowired
     private ISysOssService ossService;
 
@@ -67,7 +67,7 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
         SysOssCategory category = MapstructUtils.convert(bo, SysOssCategory.class);
         // 设置路径、层级
         if (bo.getParentId().equals(0L)) {
-            category.setCategoryPath(ROOT_PATH + category.getCategoryName());
+            category.setCategoryPath(Constants.ROOT_PATH + category.getCategoryName());
             category.setLevel(0);
             category.setParentId(0L);
         } else {
@@ -76,11 +76,11 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
                 throw new ServiceException("父分类不存在！");
             }
             // 检查父类是否是当前分类或子分类下
-            if ((parent.getCategoryPath() + ROOT_PATH).startsWith(category.getCategoryPath() + ROOT_PATH)) {
+            if ((parent.getCategoryPath() + Constants.ROOT_PATH).startsWith(category.getCategoryPath() + Constants.ROOT_PATH)) {
                 throw new ServiceException("父分类不能为当前分类或子分类下");
             }
             category.setParentId(parent.getOssCategoryId());
-            category.setCategoryPath(parent.getCategoryPath() + ROOT_PATH + category.getCategoryName());
+            category.setCategoryPath(parent.getCategoryPath() + Constants.ROOT_PATH + category.getCategoryName());
             category.setLevel(parent.getLevel() + 1);
         }
         checkRepeat(category);
@@ -104,7 +104,7 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
             int levelDiff;
             if (bo.getParentId().equals(0L)) {
                 levelDiff = category.getLevel();
-                category.setCategoryPath(ROOT_PATH + category.getCategoryName());
+                category.setCategoryPath(Constants.ROOT_PATH + category.getCategoryName());
                 category.setLevel(0);
                 category.setParentId(0L);
             } else {
@@ -113,19 +113,19 @@ public class SysOssCategoryServiceImpl extends ServiceImpl<SysOssCategoryMapper,
                     throw new ServiceException("父分类不存在！");
                 }
                 // 检查父类是否是当前分类或子分类下
-                if ((parent.getCategoryPath() + ROOT_PATH).startsWith(category.getCategoryPath() + ROOT_PATH)) {
+                if ((parent.getCategoryPath() + Constants.ROOT_PATH).startsWith(category.getCategoryPath() + Constants.ROOT_PATH)) {
                     throw new ServiceException("父分类不能为当前分类或子分类下");
                 }
                 levelDiff = level - (parent.getLevel() + 1);
                 category.setParentId(parent.getOssCategoryId());
-                category.setCategoryPath(parent.getCategoryPath() + ROOT_PATH + category.getCategoryName());
+                category.setCategoryPath(parent.getCategoryPath() + Constants.ROOT_PATH + category.getCategoryName());
                 category.setLevel(parent.getLevel() + 1);
             }
             // 检查分类名称是否重复
             checkRepeat(category);
             // 获取子分类，更新子分类的路径
             List<SysOssCategory> children = lambdaQuery()
-                .likeRight(SysOssCategory::getCategoryPath, path + ROOT_PATH)
+                .likeRight(SysOssCategory::getCategoryPath, path + Constants.ROOT_PATH)
                 .select(SysOssCategory::getOssCategoryId, SysOssCategory::getCategoryPath, SysOssCategory::getLevel)
                 .list();
             for (SysOssCategory child : children) {

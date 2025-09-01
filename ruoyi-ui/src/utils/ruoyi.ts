@@ -2,8 +2,12 @@
  * 通用js方法封装处理
  * Copyright (c) 2019 ruoyi
  */
+import isString from 'lodash/isString';
+
 import modal from '@/plugins/modal';
 import type { DictModel } from '@/utils/dict';
+import type { StringKeys } from '@/utils/types';
+import { isHttp } from '@/utils/validate';
 
 // 日期格式化
 export function parseTime(time: Date | string | number, pattern?: string) {
@@ -327,8 +331,8 @@ export function handleChangeStatus<T>(
   status: keyof T,
   title: string,
   ok: (row: T) => Promise<any>,
-  yesValue = '1',
-  noValue = '0',
+  yesValue: string | number = '1',
+  noValue: string | number = '0',
 ) {
   const rowObj: T = list.find((value) => value[id] === obj[id]);
   const text = rowObj[status] === yesValue ? '启用' : '停用';
@@ -386,4 +390,84 @@ export function getHttpFileName(http: string) {
     http = http.substring(0, http.indexOf('?'));
   }
   return http.substring(http.lastIndexOf('/') + 1);
+}
+
+/**
+ * 获取文件类型
+ * @param wildcardType 通配符类型
+ * @param specificType 具体类型
+ */
+export function isMimeTypeIncluded(wildcardType: string, specificType: string) {
+  // 检查通配符是否为 "*/*"，匹配所有类型
+  if (wildcardType === '*/*') {
+    return true;
+  }
+
+  // 分割类型和子类型
+  const [specificMain, specificSub] = specificType.split('/');
+  const [wildcardMain, wildcardSub] = wildcardType.split('/');
+
+  // 主类型必须匹配，子类型为*表示匹配所有子类型
+  return specificMain === wildcardMain && (specificSub === wildcardSub || wildcardSub === '*');
+}
+
+/**
+ * 获取访问路径
+ * @param rawUrl 原始路径
+ * @param query  查询参数
+ */
+export function getVisitUrl(rawUrl: string, query?: Record<string, any> | string) {
+  if (!rawUrl) {
+    return '';
+  }
+  let url: string;
+  if (isHttp(rawUrl)) {
+    url = rawUrl;
+  } else {
+    const baseUrl = import.meta.env.VITE_APP_BASE_API ?? '';
+    const delimiter = !baseUrl.endsWith('/') && !rawUrl.startsWith('/') ? '/' : '';
+    url = `${baseUrl}${delimiter}${rawUrl}`;
+  }
+
+  let urlObj;
+  if (isHttp(url)) {
+    urlObj = new URL(url);
+  } else {
+    urlObj = new URL(url, window.location.origin);
+  }
+  if (query) {
+    if (isString(query)) {
+      urlObj.search = urlObj.search ? `${urlObj.search}&${query}` : (query as string);
+    } else if (Object.keys(query).length > 0) {
+      urlObj.search = urlObj.search
+        ? `${urlObj.search}&${new URLSearchParams(query).toString()}`
+        : new URLSearchParams(query).toString();
+    }
+  }
+  return urlObj.toString();
+}
+
+/**
+ * 渲染富文本中的链接
+ * @param obj
+ * @param arr
+ */
+export function editorRender<T extends Object, K extends StringKeys<T>>(obj: T | string, ...arr: K[]) {
+  if (!obj) {
+    return obj;
+  }
+  const regExp = /(src=")([^"]*sid=(\d+)[^"]*?)(")/g;
+  if (isString(obj)) {
+    return obj.replaceAll(regExp, (match, p1, p2, p3, p4) => {
+      return p1 + getVisitUrl(p2) + p4;
+    });
+  }
+  for (const key of arr) {
+    if (obj[key]) {
+      obj[key] = (obj[key] as string).replaceAll(regExp, (match, p1, p2, p3, p4) => {
+        return p1 + getVisitUrl(p2) + p4;
+      }) as T[K];
+    }
+  }
+  return obj;
 }

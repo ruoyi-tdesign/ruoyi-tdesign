@@ -71,10 +71,10 @@
               选择
             </t-button>
             <t-dropdown-menu>
-              <t-dropdown-item @click="uploadRef.triggerUpload()">
+              <t-dropdown-item @click="handleOpenUpload">
                 <t-upload
                   ref="uploadRef"
-                  accept=".jpg,.jpeg,.png"
+                  accept=".jpg,.jpeg,.png,.bmp"
                   action="#"
                   :show-file-list="false"
                   :before-upload="beforeUpload"
@@ -82,23 +82,22 @@
                   上传
                 </t-upload>
               </t-dropdown-item>
-              <t-dropdown-item v-if="useHasPermission(['system:ossCategory:list'])" @click="selectOpen = true">
+              <t-dropdown-item v-if="useHasPermission(['system:file:list'])" @click="selectOpen = true">
                 我的文件
               </t-dropdown-item>
             </t-dropdown-menu>
           </t-dropdown>
         </t-col>
-        <upload-select
+        <x-upload-select
           v-model:visible="selectOpen"
           title="选择图片"
-          :support-url="false"
           :support-select-file="true"
-          :query-param="{ suffixes: ['jpg', 'jpeg', 'png'] }"
+          :query-param="{ suffixes: ['jpg', 'jpeg', 'png', 'bmp'] }"
           :multiple="false"
           :file-upload="false"
           :image-upload-props="{
             fileSize: 5,
-            fileType: ['jpg', 'jpeg', 'png'],
+            fileType: ['jpg', 'jpeg', 'png', 'bmp'],
           }"
           :on-submit="handleSelectSubmit"
         />
@@ -154,6 +153,7 @@ import type { UploadFile, UploadInstanceFunctions } from 'tdesign-vue-next';
 import { getCurrentInstance, reactive, ref } from 'vue';
 import { VueCropper } from 'vue-cropper';
 
+import { getVisitUrl } from '@/utils/ruoyi';
 import { removeAvatar, uploadAvatar } from '@/api/system/profile';
 import type { SelectFile } from '@/components/upload-select/index.vue';
 import { useUserStore } from '@/store/modules/user';
@@ -216,10 +216,14 @@ function handleSelectSubmit(values: SelectFile[]) {
   options.filename = file.name;
   return true;
 }
+/** 打开上传文件弹窗 */
+function handleOpenUpload() {
+  uploadRef.value.triggerUpload();
+}
 /** 上传预处理 */
 function beforeUpload(file: UploadFile) {
   if (file.type.indexOf('image/') === -1) {
-    proxy.$modal.msgError('文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。');
+    proxy.$modal.msgError('文件格式错误，请上传图片类型：JPG，PNG，BMP后缀的文件。');
   } else {
     const reader = new FileReader();
     reader.readAsDataURL(file.raw);
@@ -239,7 +243,7 @@ function uploadImg() {
     uploadAvatar(formData)
       .then((response) => {
         open.value = false;
-        options.img = response.data.imgUrl;
+        options.img = getVisitUrl(response.data.imgUrl);
         userStore.updateAvatar(options.img);
         proxy.$modal.msgSuccess('修改成功');
         visible.value = false;

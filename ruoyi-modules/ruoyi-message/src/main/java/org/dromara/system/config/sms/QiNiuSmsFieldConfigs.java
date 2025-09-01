@@ -2,7 +2,7 @@ package org.dromara.system.config.sms;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.system.config.FieldConfig;
+import org.dromara.common.core.ui.FieldConfig;
 import org.dromara.system.config.SmsFieldConfigs;
 import org.dromara.system.config.TemplateMode;
 
@@ -28,45 +28,45 @@ public class QiNiuSmsFieldConfigs extends SmsFieldConfigs {
 
     public QiNiuSmsFieldConfigs() {
         this.accessKeyId = FieldConfig.<String>builder()
-            .component("input")
-            .name("AccessKey")
+            .useInput()
+            .label("AccessKey")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()
-            .component("input")
-            .name("SecretKey")
+            .useInput()
+            .label("SecretKey")
             .required(true)
-            .type("password")
+            .inputComponent().type("password").end()
             .build();
         this.baseUrl = FieldConfig.<String>builder()
             .value("https://sms.qiniuapi.com")
-            .component("input")
-            .name("请求地址")
+            .useInput()
+            .label("请求地址")
             .help("默认请求地址为 https://sms.qiniuapi.com")
             .required(true)
             .build();
         this.templateName = FieldConfig.<String>builder()
-            .component("input")
-            .name("模板变量名称")
+            .useInput()
+            .label("模板变量名称")
             .required(false)
             .build();
         this.singleMsgUrl = FieldConfig.<String>builder()
             .value("/v1/message/single")
-            .component("input")
-            .name("单发链接")
+            .useInput()
+            .label("单发链接")
             .help("默认单发链接为 /v1/message/single")
             .required(true)
             .build();
         this.massMsgUrl = FieldConfig.<String>builder()
             .value("/v1/message")
-            .component("input")
-            .name("群发链接")
+            .useInput()
+            .label("群发链接")
             .help("默认群发链接为 /v1/message")
             .required(true)
             .build();
         this.signatureId = FieldConfig.<String>builder()
-            .component("input")
-            .name("签名ID")
+            .useInput()
+            .label("签名ID")
             .required(false)
             .build();
     }

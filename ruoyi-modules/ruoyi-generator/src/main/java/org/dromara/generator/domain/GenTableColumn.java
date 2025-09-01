@@ -235,4 +235,11 @@ public class GenTableColumn extends BaseEntity {
             return this.columnComment;
         }
     }
+
+    public String simpleComment() {
+        if (StringUtils.isNotBlank(this.columnComment)) {
+            return this.columnComment.replaceAll("[（(].*?[)）]", "");
+        }
+        return this.columnComment;
+    }
 }
