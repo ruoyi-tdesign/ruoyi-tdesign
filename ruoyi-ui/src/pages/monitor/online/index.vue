@@ -73,19 +73,19 @@
       :footer="false"
     >
       <my-descriptions>
-        <t-descriptions-item label="会话编号">{{ form.tokenId }}</t-descriptions-item>
-        <t-descriptions-item label="租户id">{{ form.tenantId }}</t-descriptions-item>
-        <t-descriptions-item label="部门名称">{{ form.deptName }}</t-descriptions-item>
-        <t-descriptions-item label="用户名称">{{ form.userName }}</t-descriptions-item>
-        <t-descriptions-item label="客户端">{{ form.clientKey }}</t-descriptions-item>
+        <t-descriptions-item label="会话编号"> {{ form?.tokenId ?? '-' }}</t-descriptions-item>
+        <t-descriptions-item label="租户id">{{ form?.tenantId ?? '-' }}</t-descriptions-item>
+        <t-descriptions-item label="部门名称">{{ form?.deptName ?? '-' }}</t-descriptions-item>
+        <t-descriptions-item label="用户名称">{{ form?.userName ?? '-' }}</t-descriptions-item>
+        <t-descriptions-item label="客户端">{{ form?.clientKey ?? '-' }}</t-descriptions-item>
         <t-descriptions-item label="设备类型">
-          <dict-tag :options="sys_device_type" :value="form.deviceType" />
+          <dict-tag :options="sys_device_type" :value="form?.deviceType ?? '-'" />
         </t-descriptions-item>
-        <t-descriptions-item label="登录IP地址">{{ form.ipaddr }}</t-descriptions-item>
-        <t-descriptions-item label="登录地址">{{ form.loginLocation }}</t-descriptions-item>
-        <t-descriptions-item label="浏览器类型">{{ form.browser }}</t-descriptions-item>
-        <t-descriptions-item label="操作系统">{{ form.os }}</t-descriptions-item>
-        <t-descriptions-item label="登录时间">{{ parseTime(form.loginTime) }}</t-descriptions-item>
+        <t-descriptions-item label="登录IP地址">{{ form?.ipaddr ?? '-' }}</t-descriptions-item>
+        <t-descriptions-item label="登录地址">{{ form?.loginLocation ?? '-' }}</t-descriptions-item>
+        <t-descriptions-item label="浏览器类型">{{ form?.browser ?? '-' }}</t-descriptions-item>
+        <t-descriptions-item label="操作系统">{{ form?.os ?? '-' }}</t-descriptions-item>
+        <t-descriptions-item label="登录时间">{{ parseTime(form?.loginTime) ?? '-' }}</t-descriptions-item>
       </my-descriptions>
     </t-dialog>
   </t-card>
