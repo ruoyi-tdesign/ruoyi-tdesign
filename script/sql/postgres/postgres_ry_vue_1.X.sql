@@ -831,9 +831,9 @@ create table if not exists sys_oper_log
     constraint sys_oper_log_pk primary key (oper_id)
 );
 
-create index idx_sys_oper_log_bt ON sys_oper_log (business_type);
-create index idx_sys_oper_log_s ON sys_oper_log (status);
-create index idx_sys_oper_log_ot ON sys_oper_log (oper_time);
+create index if not exists idx_sys_oper_log_bt ON sys_oper_log (business_type);
+create index if not exists idx_sys_oper_log_s ON sys_oper_log (status);
+create index if not exists idx_sys_oper_log_ot ON sys_oper_log (oper_time);
 
 comment on table sys_oper_log                   is '操作日志记录';
 comment on column sys_oper_log.oper_id          is '日志主键';
@@ -874,7 +874,7 @@ create table if not exists sys_dict_type
     constraint sys_dict_type_pk primary key (dict_id)
 );
 
-create unique index sys_dict_type_index1 ON sys_dict_type (tenant_id, dict_type);
+create unique index if not exists idx_sys_dict_type_tenant_id ON sys_dict_type (tenant_id, dict_type);
 
 comment on table sys_dict_type                  is '字典类型表';
 comment on column sys_dict_type.dict_id         is '字典主键';
@@ -1081,8 +1081,8 @@ create table if not exists sys_logininfor
     constraint sys_logininfor_pk primary key (info_id)
 );
 
-create index idx_sys_logininfor_s ON sys_logininfor (status);
-create index idx_sys_logininfor_lt ON sys_logininfor (login_time);
+create index if not exists idx_sys_logininfor_s ON sys_logininfor (status);
+create index if not exists idx_sys_logininfor_lt ON sys_logininfor (login_time);
 
 comment on table sys_logininfor                 is '系统访问记录';
 comment on column sys_logininfor.info_id        is '访问ID';
@@ -1262,7 +1262,7 @@ create table if not exists sys_oss
     file_suffix     varchar(10)  default ''::varchar not null,
     url             varchar(500) default ''::varchar not null,
     ext1            varchar(500) default ''::varchar,
-    size            int8         default ''::varchar not null,
+    size            int8         default 0 not null,
     content_type    varchar(255),
     oss_category_id int8         default 0           not null,
     user_type       varchar(20)  default ''::varchar not null,
@@ -1275,10 +1275,10 @@ create table if not exists sys_oss
     service         varchar(20)  default 'minio'::varchar,
     constraint sys_oss_pk primary key (oss_id)
 );
-create index idx_oss_category_id on sys_oss using btree (oss_category_id);
-create index idx_user on sys_oss using btree (create_by,user_type,create_time);
-comment on index idx_oss_category_id is '分类索引';
-comment on index idx_user is '用户索引';
+create index if not exists idx_sys_oss_category_id on sys_oss using btree (oss_category_id);
+create index if not exists idx_sys_oss_user on sys_oss using btree (create_by,user_type,create_time);
+comment on index idx_sys_oss_category_id is '分类索引';
+comment on index idx_sys_oss_user is '用户索引';
 comment on table sys_oss                    is 'OSS对象存储表';
 comment on column sys_oss.oss_id            is '对象存储主键';
 comment on column sys_oss.tenant_id         is '租户编码';
@@ -1299,6 +1299,7 @@ comment on column sys_oss.update_by         is '更新者';
 comment on column sys_oss.update_time       is '更新时间';
 comment on column sys_oss.service           is '服务商';
 
+
 -- ----------------------------
 -- OSS分类表
 -- ----------------------------
@@ -1315,7 +1316,7 @@ create table sys_oss_category
     update_time     timestamp,
     create_time     timestamp     not null
 );
-CREATE INDEX idx_user ON sys_oss_category USING btree (create_by,user_type,order_num);
+CREATE INDEX if not exists idx_sys_oss_category_user ON sys_oss_category USING btree (create_by,user_type,order_num);
 comment on table sys_oss_category is 'OSS分类表';
 comment on column sys_oss_category.oss_category_id is 'oss分类id';
 comment on column sys_oss_category.category_name is '分类名称';
@@ -1326,7 +1327,7 @@ comment on column sys_oss_category.order_num is '显示顺序';
 comment on column sys_oss_category.user_type is '用户类型';
 comment on column sys_oss_category.create_by is '上传人';
 comment on column sys_oss_category.update_time is '更新时间';
-comment on column sys_oss_category.create_time is '创建时间';
+comment on column sys_oss_category.create_time is '创建时间';comment on index idx_sys_oss_category_user is '用户索引';
 
 -- ----------------------------
 -- OSS对象存储动态配置表
@@ -1378,7 +1379,7 @@ comment on column sys_oss_config.update_by      is '更新者';
 comment on column sys_oss_config.update_time    is '更新时间';
 comment on column sys_oss_config.remark         is '备注';
 
-insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.0.1:9000',                '','N', '',             '1' ,'1', null,103, 1, now(), 1, now(), null);
+insert into sys_oss_config values (1, '000000', 'minio',  'ruoyi',            'ruoyi123',        'ruoyi',             '', '127.0.00.1:9000',                '','N', '',             '1' ,'1', null,103, 1, now(), 1, now(), null);
 insert into sys_oss_config values (2, '000000', 'qiniu',  'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 's3-cn-north-1.qiniucs.com',     '','N', '',             '1' ,'0', null,103, 1, now(), 1, now(), null);
 insert into sys_oss_config values (3, '000000', 'aliyun', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi',             '', 'oss-cn-beijing.aliyuncs.com',   '','N', '',             '1' ,'0', null,103, 1, now(), 1, now(), null);
 insert into sys_oss_config values (4, '000000', 'qcloud', 'XXXXXXXXXXXXXXX',  'XXXXXXXXXXXXXXX', 'ruoyi-1250000000',  '', 'cos.ap-beijing.myqcloud.com',   '','N', 'ap-beijing',   '1' ,'0', null,103, 1, now(), 1, now(), null);
@@ -1519,7 +1520,7 @@ create table sys_message_config (
   create_time           timestamp,
   constraint sys_message_config_pk primary key (message_config_id)
 );
-create index idx_sys_message_type on sys_message_config using btree (message_type,status);
+create index if not exists idx_sys_message_config_type on sys_message_config using btree (message_type,status);
 comment on table sys_message_config                     is '消息配置表';
 comment on column sys_message_config.message_config_id  is '消息设置id';
 comment on column sys_message_config.title              is '标题';
@@ -1582,7 +1583,7 @@ create table sys_message_log (
   cost_time             int8,
   constraint sys_message_log_pk primary key (message_log_id)
 );
-create index idx_sys_message_template_id on sys_message_log using btree (message_template_id);
+create index if not exists idx_sys_message_log_template_id on sys_message_log using btree (message_template_id);
 comment on table  sys_message_log                           is '消息发送记录表';
 comment on column sys_message_log.message_log_id            is '消息发送记录id';
 comment on column sys_message_log.message_template_id       is '消息模板id';
@@ -1626,8 +1627,8 @@ create table sys_message_template (
   create_time           timestamp,
   constraint sys_message_template_pk primary key (message_template_id)
 );
-create index idx_message_key_id on sys_message_template using btree (message_key_id);
-create index idx_message_key on sys_message_template using btree (message_key,message_type,status);
+create index if not exists idx_sys_message_template_key_id on sys_message_template using btree (message_key_id);
+create index if not exists idx_sys_message_template_key on sys_message_template using btree (message_key,message_type,status);
 comment on table  sys_message_template                      is '消息模板表';
 comment on column sys_message_template.message_template_id  is '消息模板id';
 comment on column sys_message_template.template_name        is '模板名称';
@@ -1676,6 +1677,194 @@ comment on column sys_sensitive_word.create_by      is '创建者';
 comment on column sys_sensitive_word.update_by      is '更新者';
 comment on column sys_sensitive_word.update_time    is '更新时间';
 comment on column sys_sensitive_word.create_time    is '创建时间';
+
+-- ----------------------------
+-- 文件记录表
+-- ----------------------------
+DROP TABLE IF EXISTS sys_file;
+CREATE TABLE sys_file (
+  file_id bigint NOT NULL,
+  tenant_id varchar(20) NULL DEFAULT '000000',
+  url varchar(512) NOT NULL,
+  size bigint NULL DEFAULT NULL,
+  filename varchar(256) NULL DEFAULT NULL,
+  original_filename varchar(256) NULL DEFAULT NULL,
+  base_path varchar(256) NULL DEFAULT NULL,
+  path varchar(256) NULL DEFAULT NULL,
+  ext varchar(32) NULL DEFAULT NULL,
+  content_type varchar(128) NULL DEFAULT NULL,
+  storage_config_id bigint NULL DEFAULT NULL,
+  th_url varchar(512) NULL DEFAULT NULL,
+  th_filename varchar(256) NULL DEFAULT NULL,
+  th_size bigint NULL DEFAULT NULL,
+  th_content_type varchar(128) NULL DEFAULT NULL,
+  object_id varchar(32) NULL DEFAULT NULL,
+  object_type varchar(32) NULL DEFAULT NULL,
+  metadata text NULL,
+  user_metadata text NULL,
+  th_metadata text NULL,
+  th_user_metadata text NULL,
+  attr text NULL,
+  file_acl varchar(32) NULL DEFAULT NULL,
+  th_file_acl varchar(32) NULL DEFAULT NULL,
+  hash_info text NULL,
+  upload_id varchar(128) NULL DEFAULT NULL,
+  upload_status int NULL DEFAULT NULL,
+  file_category_id bigint NOT NULL DEFAULT 0,
+  user_type varchar(20) NOT NULL DEFAULT '',
+  is_lock smallint NOT NULL DEFAULT 0,  -- PostgreSQL 中没有 tinyint，使用 smallint
+  create_dept bigint NULL DEFAULT NULL,
+  update_by bigint NULL DEFAULT NULL,
+  create_by bigint NULL DEFAULT NULL,
+  update_time timestamp NULL DEFAULT NULL,
+  create_time timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (file_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_filename ON sys_file (filename);
+
+COMMENT ON TABLE sys_file IS '文件记录表';
+COMMENT ON COLUMN sys_file.file_id IS '文件id';
+COMMENT ON COLUMN sys_file.tenant_id IS '租户编号';
+COMMENT ON COLUMN sys_file.url IS '文件访问地址';
+COMMENT ON COLUMN sys_file.size IS '文件大小，单位字节';
+COMMENT ON COLUMN sys_file.filename IS '文件名称';
+COMMENT ON COLUMN sys_file.original_filename IS '原始文件名';
+COMMENT ON COLUMN sys_file.base_path IS '基础存储路径';
+COMMENT ON COLUMN sys_file.path IS '存储路径';
+COMMENT ON COLUMN sys_file.ext IS '文件扩展名';
+COMMENT ON COLUMN sys_file.content_type IS 'MIME类型';
+COMMENT ON COLUMN sys_file.storage_config_id IS '存储配置id';
+COMMENT ON COLUMN sys_file.th_url IS '缩略图访问路径';
+COMMENT ON COLUMN sys_file.th_filename IS '缩略图名称';
+COMMENT ON COLUMN sys_file.th_size IS '缩略图大小，单位字节';
+COMMENT ON COLUMN sys_file.th_content_type IS '缩略图MIME类型';
+COMMENT ON COLUMN sys_file.object_id IS '文件所属对象id';
+COMMENT ON COLUMN sys_file.object_type IS '文件所属对象类型，例如用户头像，评价图片';
+COMMENT ON COLUMN sys_file.metadata IS '文件元数据';
+COMMENT ON COLUMN sys_file.user_metadata IS '文件用户元数据';
+COMMENT ON COLUMN sys_file.th_metadata IS '缩略图元数据';
+COMMENT ON COLUMN sys_file.th_user_metadata IS '缩略图用户元数据';
+COMMENT ON COLUMN sys_file.attr IS '附加属性';
+COMMENT ON COLUMN sys_file.file_acl IS '文件ACL';
+COMMENT ON COLUMN sys_file.th_file_acl IS '缩略图文件ACL';
+COMMENT ON COLUMN sys_file.hash_info IS '哈希信息';
+COMMENT ON COLUMN sys_file.upload_id IS '上传ID，仅在手动分片上传时使用';
+COMMENT ON COLUMN sys_file.upload_status IS '上传状态，仅在手动分片上传时使用，1：初始化完成，2：上传完成';
+COMMENT ON COLUMN sys_file.file_category_id IS '分类id';
+COMMENT ON COLUMN sys_file.user_type IS '用户类型';
+COMMENT ON COLUMN sys_file.is_lock IS '是否锁定状态';
+COMMENT ON COLUMN sys_file.create_dept IS '创建部门';
+COMMENT ON COLUMN sys_file.update_by IS '更新人';
+COMMENT ON COLUMN sys_file.create_by IS '上传人';
+COMMENT ON COLUMN sys_file.update_time IS '更新时间';
+COMMENT ON COLUMN sys_file.create_time IS '创建时间';
+
+-- ----------------------------
+-- 文件分类表
+-- ----------------------------
+DROP TABLE IF EXISTS sys_file_category;
+CREATE TABLE sys_file_category (
+  file_category_id bigint NOT NULL,
+  category_name varchar(255) NOT NULL,
+  parent_id bigint NOT NULL,
+  category_path varchar(2000) NOT NULL,
+  level int NOT NULL,
+  order_num int NOT NULL,
+  login_type varchar(20) NOT NULL,
+  create_by bigint NOT NULL,
+  update_time timestamp NULL DEFAULT NULL,
+  create_time timestamp NOT NULL,
+  PRIMARY KEY (file_category_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user ON sys_file_category (create_by, login_type, order_num);
+
+COMMENT ON TABLE sys_file_category IS '文件分类表';
+COMMENT ON COLUMN sys_file_category.file_category_id IS '文件分类id';
+COMMENT ON COLUMN sys_file_category.category_name IS '分类名称';
+COMMENT ON COLUMN sys_file_category.parent_id IS '父级分类id';
+COMMENT ON COLUMN sys_file_category.category_path IS '分类路径';
+COMMENT ON COLUMN sys_file_category.level IS '层级';
+COMMENT ON COLUMN sys_file_category.order_num IS '显示顺序';
+COMMENT ON COLUMN sys_file_category.login_type IS '用户类型';
+COMMENT ON COLUMN sys_file_category.create_by IS '上传人';
+COMMENT ON COLUMN sys_file_category.update_time IS '更新时间';
+COMMENT ON COLUMN sys_file_category.create_time IS '创建时间';
+
+-- ----------------------------
+-- 文件分片信息表，仅在手动分片上传时使用
+-- ----------------------------
+DROP TABLE IF EXISTS sys_file_part;
+CREATE TABLE sys_file_part (
+  file_part_id bigint NOT NULL,
+  storage_config_id bigint NULL DEFAULT NULL,
+  upload_id varchar(128) NULL DEFAULT NULL,
+  e_tag varchar(255) NULL DEFAULT NULL,
+  part_number int NULL DEFAULT NULL,
+  part_size bigint NULL DEFAULT NULL,
+  hash_info text NULL,
+  create_dept bigint NULL DEFAULT NULL,
+  update_by bigint NULL DEFAULT NULL,
+  create_by bigint NULL DEFAULT NULL,
+  update_time timestamp NULL DEFAULT NULL,
+  create_time timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (file_part_id)
+);
+
+COMMENT ON TABLE sys_file_part IS '文件分片信息表，仅在手动分片上传时使用';
+COMMENT ON COLUMN sys_file_part.file_part_id IS '分片id';
+COMMENT ON COLUMN sys_file_part.storage_config_id IS '存储配置id';
+COMMENT ON COLUMN sys_file_part.upload_id IS '上传ID，仅在手动分片上传时使用';
+COMMENT ON COLUMN sys_file_part.e_tag IS '分片 ETag';
+COMMENT ON COLUMN sys_file_part.part_number IS '分片号。每一个上传的分片都有一个分片号，一般情况下取值范围是1~10000';
+COMMENT ON COLUMN sys_file_part.part_size IS '文件大小，单位字节';
+COMMENT ON COLUMN sys_file_part.hash_info IS '哈希信息';
+COMMENT ON COLUMN sys_file_part.create_dept IS '创建部门';
+COMMENT ON COLUMN sys_file_part.update_by IS '更新人';
+COMMENT ON COLUMN sys_file_part.create_by IS '上传人';
+COMMENT ON COLUMN sys_file_part.update_time IS '更新时间';
+COMMENT ON COLUMN sys_file_part.create_time IS '创建时间';
+
+-- ----------------------------
+-- 存储配置
+-- ----------------------------
+DROP TABLE IF EXISTS sys_storage_config;
+CREATE TABLE sys_storage_config (
+  storage_config_id bigint NOT NULL,
+  tenant_id varchar(20) NULL DEFAULT '000000',
+  name varchar(255) NOT NULL,
+  platform varchar(50) NOT NULL,
+  weight int NOT NULL,
+  status smallint NOT NULL,  -- PostgreSQL 中没有 tinyint，使用 smallint
+  config_json varchar(2000) NOT NULL,
+  request_mode varchar(255) NULL DEFAULT NULL,
+  del_flag char(1) NULL DEFAULT '0',
+  create_dept bigint NULL DEFAULT NULL,
+  create_by bigint NULL DEFAULT NULL,
+  create_time timestamp NULL DEFAULT NULL,
+  update_by bigint NULL DEFAULT NULL,
+  update_time timestamp NULL DEFAULT NULL,
+  remark varchar(500) NULL DEFAULT NULL,
+  PRIMARY KEY (storage_config_id)
+);
+
+COMMENT ON TABLE sys_storage_config IS '存储配置';
+COMMENT ON COLUMN sys_storage_config.storage_config_id IS '主键';
+COMMENT ON COLUMN sys_storage_config.tenant_id IS '租户编号';
+COMMENT ON COLUMN sys_storage_config.name IS '配置名称';
+COMMENT ON COLUMN sys_storage_config.platform IS '平台';
+COMMENT ON COLUMN sys_storage_config.weight IS '负载均衡权重';
+COMMENT ON COLUMN sys_storage_config.status IS '启用状态';
+COMMENT ON COLUMN sys_storage_config.config_json IS '配置json';
+COMMENT ON COLUMN sys_storage_config.request_mode IS '请求模式 proxy：代理转发请求 direct：源地址重定向请求 direct_signature：预签名重定向请求';
+COMMENT ON COLUMN sys_storage_config.del_flag IS '删除标志';
+COMMENT ON COLUMN sys_storage_config.create_dept IS '创建部门';
+COMMENT ON COLUMN sys_storage_config.create_by IS '创建者';
+COMMENT ON COLUMN sys_storage_config.create_time IS '创建时间';
+COMMENT ON COLUMN sys_storage_config.update_by IS '更新者';
+COMMENT ON COLUMN sys_storage_config.update_time IS '更新时间';
+COMMENT ON COLUMN sys_storage_config.remark IS '备注';
 
 -- 字符串自动转时间 避免框架时间查询报错问题
 create or replace function cast_varchar_to_timestamp(varchar) returns timestamptz as $$

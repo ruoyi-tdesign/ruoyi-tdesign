@@ -14,7 +14,7 @@ create table if not exists test_demo
     create_by   int8,
     update_time timestamp,
     update_by   int8,
-    del_flag    int4            default 0
+    del_flag    int4            default 0  
 );
 
 comment on table test_demo is '测试单表';
@@ -32,6 +32,13 @@ comment on column test_demo.create_by is '创建人';
 comment on column test_demo.update_time is '更新时间';
 comment on column test_demo.update_by is '更新人';
 comment on column test_demo.del_flag is '删除标志';
+
+CREATE INDEX IF NOT EXISTS idx_test_demo_tenant_id ON test_demo(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_test_demo_dept_id ON test_demo(dept_id);
+CREATE INDEX IF NOT EXISTS idx_test_demo_user_id ON test_demo(user_id);
+CREATE INDEX IF NOT EXISTS idx_test_demo_order_num ON test_demo(order_num);
+CREATE INDEX IF NOT EXISTS idx_test_demo_test_key ON test_demo(test_key);
+CREATE INDEX IF NOT EXISTS idx_test_demo_del_flag ON test_demo(del_flag);
 
 DROP TABLE if EXISTS test_tree;
 create table if not exists test_tree
@@ -65,6 +72,13 @@ comment on column test_tree.create_by is '创建人';
 comment on column test_tree.update_time is '更新时间';
 comment on column test_tree.update_by is '更新人';
 comment on column test_tree.del_flag is '删除标志';
+
+CREATE INDEX IF NOT EXISTS idx_test_tree_tenant_id ON test_tree(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_test_tree_parent_id ON test_tree(parent_id);
+CREATE INDEX IF NOT EXISTS idx_test_tree_dept_id ON test_tree(dept_id);
+CREATE INDEX IF NOT EXISTS idx_test_tree_user_id ON test_tree(user_id);
+CREATE INDEX IF NOT EXISTS idx_test_tree_tree_name ON test_tree(tree_name);
+CREATE INDEX IF NOT EXISTS idx_test_tree_del_flag ON test_tree(del_flag);
 
 INSERT INTO sys_user(user_id, tenant_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (3, '000000', 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', now(), 103, 1, now(), 3, now(), NULL);
 INSERT INTO sys_user(user_id, tenant_id, dept_id, user_name, nick_name, user_type, email, phonenumber, sex, avatar, password, status, del_flag, login_ip, login_date, create_dept, create_by, create_time, update_by, update_time, remark) VALUES (4, '000000', 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', now(), 103, 1, now(), 4, now(), NULL);
