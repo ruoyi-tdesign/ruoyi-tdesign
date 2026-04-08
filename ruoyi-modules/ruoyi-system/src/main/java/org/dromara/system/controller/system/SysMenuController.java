@@ -17,7 +17,6 @@ import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.bo.SysMenuBo;
 import org.dromara.system.domain.query.SysMenuQuery;
-import org.dromara.system.domain.vo.MenuTreeSelectVo;
 import org.dromara.system.domain.vo.RouterVo;
 import org.dromara.system.domain.vo.SysMenuVo;
 import org.dromara.system.service.ISysMenuService;
@@ -110,9 +109,9 @@ public class SysMenuController extends BaseController {
     @GetMapping(value = "/roleMenuTreeSelect/{roleId}")
     public R<MenuTreeSelectVo> roleMenuTreeSelect(@PathVariable("roleId") Long roleId) {
         List<SysMenuVo> menus = menuService.selectMenuList(LoginHelper.getUserId());
-        MenuTreeSelectVo selectVo = new MenuTreeSelectVo();
-        selectVo.setCheckedKeys(menuService.selectMenuListByRoleId(roleId));
-        selectVo.setMenus(menuService.buildMenuTreeSelect(menus));
+        MenuTreeSelectVo selectVo = new MenuTreeSelectVo(
+            menuService.selectMenuListByRoleId(roleId),
+            menuService.buildMenuTreeSelect(menus));
         return R.ok(selectVo);
     }
 
@@ -126,9 +125,9 @@ public class SysMenuController extends BaseController {
     @GetMapping(value = "/tenantPackageMenuTreeSelect/{packageId}")
     public R<MenuTreeSelectVo> tenantPackageMenuTreeSelect(@PathVariable("packageId") Long packageId) {
         List<SysMenuVo> menus = menuService.selectMenuList(LoginHelper.getUserId());
-        MenuTreeSelectVo selectVo = new MenuTreeSelectVo();
-        selectVo.setCheckedKeys(menuService.selectMenuListByPackageId(packageId));
-        selectVo.setMenus(menuService.buildMenuTreeSelect(menus));
+        MenuTreeSelectVo selectVo = new MenuTreeSelectVo(
+            menuService.selectMenuListByPackageId(packageId),
+            menuService.buildMenuTreeSelect(menus));
         return R.ok(selectVo);
     }
 
@@ -165,6 +164,9 @@ public class SysMenuController extends BaseController {
     @DeleteMapping("/{menuId}")
     public R<Void> remove(@NotNull(message = "主键不能为空") @PathVariable("menuId") Long menuId) {
         return toAjax(menuService.deleteMenuById(menuId));
+    }
+
+    public record MenuTreeSelectVo(List<Long> checkedKeys, List<Tree<Long>> menus) {
     }
 
 }

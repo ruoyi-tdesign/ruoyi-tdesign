@@ -19,6 +19,7 @@ import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.mybatis.helper.DataPermissionHelper;
 import org.dromara.common.satoken.context.SaSecurityContext;
 import org.dromara.common.satoken.utils.LoginHelper;
+import org.dromara.common.sensitive.annotation.SensitiveIgnore;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.core.BaseController;
 import org.dromara.system.domain.SysFile;
@@ -28,8 +29,6 @@ import org.dromara.system.domain.bo.SysUserBo;
 import org.dromara.system.domain.bo.SysUserPasswordBo;
 import org.dromara.system.domain.bo.SysUserProfileBo;
 import org.dromara.system.domain.query.SysLogininforQuery;
-import org.dromara.system.domain.vo.AvatarVo;
-import org.dromara.system.domain.vo.ProfileVo;
 import org.dromara.system.domain.vo.SysLogininforVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.service.ISysFileService;
@@ -67,10 +66,9 @@ public class SysProfileController extends BaseController {
     @GetMapping
     public R<ProfileVo> profile() {
         SysUserVo user = userService.selectUserById(LoginHelper.getUserId());
-        ProfileVo profileVo = new ProfileVo();
-        profileVo.setUser(user);
-        profileVo.setRoleGroup(userService.selectUserRoleGroup(user.getUserId()));
-        profileVo.setPostGroup(userService.selectUserPostGroup(user.getUserId()));
+        String roleGroup = userService.selectUserRoleGroup(user.getUserId());
+        String postGroup = userService.selectUserPostGroup(user.getUserId());
+        ProfileVo profileVo = new ProfileVo(user, roleGroup, postGroup);
         return R.ok(profileVo);
     }
 
@@ -183,9 +181,7 @@ public class SysProfileController extends BaseController {
             SysFile file = fileService.upload(bo, avatarfile);
             boolean updateSuccess = DataPermissionHelper.ignore(() -> userService.updateUserAvatar(LoginHelper.getUserId(), file.getFileId()));
             if (updateSuccess) {
-                AvatarVo avatarVo = new AvatarVo();
-                avatarVo.setImgUrl(SysFileUtil.getPreviewUrl(file.getFilename()));
-                return R.ok(avatarVo);
+                return R.ok(new AvatarVo(SysFileUtil.getPreviewUrl(file.getFilename())));
             }
         }
         return R.fail("上传图片异常，请联系管理员");
@@ -212,4 +208,9 @@ public class SysProfileController extends BaseController {
         query.setUserId(LoginHelper.getUserId());
         return logininforService.queryPageList(query);
     }
+
+    public record AvatarVo(String imgUrl) {}
+
+    public record ProfileVo(@SensitiveIgnore SysUserVo user, String roleGroup, String postGroup) {}
+
 }
