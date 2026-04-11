@@ -45,6 +45,9 @@
             <foreach collection="deptIds" item="item" index="index" open="and sp.dept_id in (" separator="," close=")" nullable="true">
                 #{item}
             </foreach>
+            <if test="params.beginCreateTime != null and params.endCreateTime != null">
+                and sp.create_time between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
         </where>
         order by create_time desc
     </select>

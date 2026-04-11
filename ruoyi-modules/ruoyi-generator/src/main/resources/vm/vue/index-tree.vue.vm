@@ -62,7 +62,7 @@
         <t-form-item label="${comment}">
           <t-date-range-picker
             v-model="dateRange${AttrName}"
-            style="width: 240px"
+            style="width: 255px"
             allow-input
             clearable
             separator="-"

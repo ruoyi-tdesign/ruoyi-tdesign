@@ -40,6 +40,16 @@
                 />
               </t-select>
             </t-form-item>
+            <t-form-item label="创建时间">
+              <t-date-range-picker
+                v-model="dateRangeCreateTime"
+                style="width: 255px"
+                allow-input
+                clearable
+                separator="-"
+                :placeholder="['开始日期', '结束日期']"
+              />
+            </t-form-item>
             <t-form-item label-width="0px">
               <t-button theme="primary" @click="handleQuery">
                 <template #icon> <search-icon /></template>
@@ -271,6 +281,7 @@ const columnControllerVisible = ref(false);
 const sort = ref<TableSort>();
 const deptActived = ref<number[]>([]);
 const deptOptions = ref<Array<TreeModel<number>>>([]);
+const dateRangeCreateTime = ref([]);
 
 // 校验规则
 const rules = ref<Record<string, Array<FormRule>>>({
@@ -329,6 +340,7 @@ async function getDeptTree() {
 function getList() {
   loading.value = true;
   queryParams.value.deptId = deptActived.value.at(0);
+  proxy.addDateRange(queryParams.value, dateRangeCreateTime.value, 'CreateTime');
   listPost(queryParams.value)
     .then((response) => {
       postList.value = response.rows;
@@ -349,13 +361,16 @@ function reset() {
   deptActived.value = [];
   proxy.resetForm('postRef');
 }
+
 /** 搜索按钮操作 */
 function handleQuery() {
   queryParams.value.pageNum = 1;
   getList();
 }
+
 /** 重置按钮操作 */
 function resetQuery() {
+  dateRangeCreateTime.value = [];
   proxy.resetForm('queryRef');
   queryParams.value.pageNum = 1;
   handleSortChange(null);
@@ -445,6 +460,7 @@ function submitForm({ validateResult, firstError }: SubmitContext) {
     proxy.$modal.msgError(firstError);
   }
 }
+
 /** 删除按钮操作 */
 function handleDelete(row?: SysPostVo) {
   const postIds = row?.postId || ids.value;
@@ -463,6 +479,7 @@ function handleDelete(row?: SysPostVo) {
 /** 导出按钮操作 */
 function handleExport() {
   queryParams.value.deptId = deptActived.value.at(0);
+  proxy.addDateRange(queryParams.value, dateRangeCreateTime.value, 'CreateTime');
   proxy.download(
     'system/post/export',
     {

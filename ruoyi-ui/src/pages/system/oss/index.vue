@@ -14,7 +14,7 @@
         <t-form-item label="创建时间">
           <t-date-range-picker
             v-model="daterangeCreateTime"
-            style="width: 240px"
+            style="width: 255px"
             allow-input
             clearable
             separator="-"

@@ -36,7 +36,7 @@
         <t-form-item label="登录时间">
           <t-date-range-picker
             v-model="dateRange"
-            style="width: 240px"
+            style="width: 255px"
             allow-input
             clearable
             separator="-"

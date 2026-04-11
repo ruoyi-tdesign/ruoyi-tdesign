@@ -47,7 +47,7 @@
         <t-form-item label="记录时间">
           <t-date-range-picker
             v-model="dateRangeLogTime"
-            style="width: 240px"
+            style="width: 255px"
             allow-input
             clearable
             separator="-"

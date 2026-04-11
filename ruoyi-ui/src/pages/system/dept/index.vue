@@ -26,6 +26,16 @@
             <t-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label" :value="dict.value" />
           </t-select>
         </t-form-item>
+        <t-form-item label="创建时间">
+          <t-date-range-picker
+            v-model="dateRangeCreateTime"
+            style="width: 255px"
+            allow-input
+            clearable
+            separator="-"
+            :placeholder="['开始日期', '结束日期']"
+          />
+        </t-form-item>
         <t-form-item label-width="0px">
           <t-button theme="primary" @click="handleQuery">
             <template #icon> <search-icon /></template>
@@ -269,6 +279,7 @@ const deptRef = ref<FormInstanceFunctions>();
 const columnControllerVisible = ref(false);
 const deptUserList = ref<SysUserVo[]>([]);
 const expandedTreeNodes = ref([]);
+const dateRangeCreateTime = ref([]);
 
 // 校验规则
 const rules = ref<Record<string, Array<FormRule>>>({
@@ -306,6 +317,7 @@ const isExpand = computed(() => {
 /** 查询部门列表 */
 function getList() {
   loading.value = true;
+  proxy.addDateRange(queryParams.value, dateRangeCreateTime.value, 'CreateTime');
   listDept(queryParams.value)
     .then((response) => {
       deptList.value = proxy.handleTree(response.data, 'deptId', 'parentId');
@@ -327,15 +339,19 @@ function reset() {
   };
   proxy.resetForm('deptRef');
 }
+
 /** 搜索按钮操作 */
 function handleQuery() {
   getList();
 }
+
 /** 重置按钮操作 */
 function resetQuery() {
+  dateRangeCreateTime.value = [];
   proxy.resetForm('queryRef');
   handleSortChange(null);
 }
+
 /** 排序触发事件 */
 function handleSortChange(value?: TableSort) {
   sort.value = value;
@@ -431,6 +447,7 @@ function submitForm({ validateResult, firstError }: SubmitContext) {
     proxy.$modal.msgError(firstError);
   }
 }
+
 /** 删除按钮操作 */
 function handleDelete(row: SysDeptVo) {
   proxy.$modal.confirm(`是否确认删除名称为"${row.deptName}"的数据项?`, () => {
@@ -446,6 +463,7 @@ function handleDelete(row: SysDeptVo) {
 
 /** 导出按钮操作 */
 function handleExport() {
+  proxy.addDateRange(queryParams.value, dateRangeCreateTime.value, 'CreateTime');
   proxy.download(
     'system/dept/export',
     {

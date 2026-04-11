@@ -36,7 +36,7 @@
         <t-form-item label="操作时间">
           <t-date-range-picker
             v-model="dateRangeOperTime"
-            style="width: 240px"
+            style="width: 255px"
             allow-input
             clearable
             separator="-"

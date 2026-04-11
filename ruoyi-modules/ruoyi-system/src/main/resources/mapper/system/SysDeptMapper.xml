@@ -24,6 +24,9 @@
             <if test="deptName != null and deptName != ''"> and sd.dept_name like concat(concat('%', #{deptName}), '%')</if>
             <if test="deptCategory != null and deptCategory != ''"> and sd.dept_category like concat(concat('%', #{deptCategory}), '%')</if>
             <if test="status != null and status != ''"> and sd.status = #{status}</if>
+            <if test="params.beginCreateTime != null and params.endCreateTime != null">
+                and sd.create_time between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
         </where>
         order by parent_id,order_num
     </select>

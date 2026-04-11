@@ -49,8 +49,8 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         SysRoleQuery query = new SysRoleQuery();
         query.setPageSize(taskQuery.getPageSize());
         query.setPageNum(taskQuery.getPageNum());
-        query.setRoleName(taskQuery.getHandlerCode());
-        query.setRoleKey(taskQuery.getHandlerName());
+        query.setRoleKey(taskQuery.getHandlerCode());
+        query.setRoleName(taskQuery.getHandlerName());
         Map<String, Object> params = query.getParams();
         params.put("beginTime", taskQuery.getBeginTime());
         params.put("endTime", taskQuery.getEndTime());
