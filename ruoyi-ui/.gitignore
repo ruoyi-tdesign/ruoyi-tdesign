@@ -28,7 +28,5 @@ yarn-error.log
 *.zip
 .history
 .stylelintcache
-yarn.lock
-pnpm-lock.yaml
 .env.local
 .env.*.local

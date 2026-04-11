@@ -381,7 +381,8 @@ export function download(url: string, data: any, filename: string, config?: Axio
         const blob = new Blob([data]);
         saveAs(blob, filename);
       } else {
-        const resText = await data.text();
+        const blob = new Blob([data]);
+        const resText = await blob.text();
         const rspObj = JSON.parse(resText);
         // @ts-ignore
         const errMsg = errorCode[rspObj.code] || rspObj.msg || errorCode.default;

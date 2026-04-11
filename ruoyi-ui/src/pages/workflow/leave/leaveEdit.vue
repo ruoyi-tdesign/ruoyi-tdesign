@@ -232,9 +232,9 @@ const submitForm = async (status: string) => {
       buttonLoading.value = true;
       let res: R<LeaveVo>;
       if (form.value.id) {
-        res = await updateLeave(form.value);
+        res = await updateLeave(form.value).finally(() => (buttonLoading.value = false));
       } else {
-        res = await addLeave(form.value);
+        res = await addLeave(form.value).finally(() => (buttonLoading.value = false));
       }
       form.value = res.data;
       if (status === 'draft') {
@@ -272,7 +272,9 @@ const handleStartWorkFlow = async (data: LeaveForm) => {
     submitFormData.value.businessId = data.id;
     // 流程变量
     taskVariables.value = {
+      // leave2/6 使用的流程变量
       leaveDays: data.leaveDays,
+      // leave4/5 使用的流程变量
       userList: ['1', '3', '4'],
     };
     submitFormData.value.variables = taskVariables.value;
