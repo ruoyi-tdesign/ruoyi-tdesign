@@ -31,6 +31,9 @@
         :pagination="pagination"
         @select-change="handleSelectionChange"
       >
+        <template #status="{ row }">
+          <dict-tag :options="sys_normal_disable" :value="row.status" />
+        </template>
       </t-table>
 
       <t-form label-width="100px">
@@ -46,7 +49,7 @@
 defineOptions({
   name: 'AuthRole',
 });
-import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
+import type { PageInfo, PrimaryTableCol, TableRowData } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, nextTick, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -56,6 +59,7 @@ import { getAuthRole, updateAuthRole } from '@/api/system/user';
 import { useTabsRouterStore } from '@/store';
 
 const { proxy } = getCurrentInstance();
+const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
 const loading = ref(true);
 const total = ref(0);
@@ -73,10 +77,18 @@ const form = ref<SysUserVo>({
 // 列显隐信息
 const columns = ref<Array<PrimaryTableCol>>([
   { title: '序号', colKey: 'serial-number', width: 80, align: 'center' },
-  { colKey: 'row-select', type: 'multiple', width: 55, align: 'center' },
+  {
+    colKey: 'row-select',
+    type: 'multiple',
+    width: 55,
+    align: 'center',
+    disabled: (options: { row: TableRowData; rowIndex: number }) =>
+      options.row.status === '0' && !roleIds.value.some((roleId) => roleId === options.row.roleId),
+  },
   { title: `角色编号`, colKey: 'roleId', align: 'center' },
   { title: `角色名称`, colKey: 'roleName', align: 'center' },
   { title: `权限字符`, colKey: 'roleKey', align: 'center' },
+  { title: `状态`, colKey: 'status', align: 'center' },
   { title: `创建时间`, colKey: 'createTime', width: 180, align: 'center' },
 ]);
 
