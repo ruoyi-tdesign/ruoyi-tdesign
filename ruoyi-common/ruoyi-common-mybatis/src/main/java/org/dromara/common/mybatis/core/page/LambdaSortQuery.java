@@ -11,6 +11,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandleProxies;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Executable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 支持lambda表达式的排序查询实体类
@@ -115,6 +117,8 @@ public class LambdaSortQuery<T> extends SortQuery {
         return sortQuery.addOrderByColumn(func, isAsc);
     }
 
+    private static final Map<Func1<?, ?>, String> cache = new HashMap<>();
+
     /**
      * 获取lambda字段信息
      *
@@ -122,7 +126,10 @@ public class LambdaSortQuery<T> extends SortQuery {
      * @return 字段使用下划线方式返回
      */
     private static <T> String getColumn(Func1<T, ?> func) {
-        String fieldName;
+        String fieldName = cache.get(func);
+        if (fieldName != null) {
+            return fieldName;
+        }
         // IDEA 调试模式下 lambda 表达式是一个代理
         if (MethodHandleProxies.isWrapperInstance(func)) {
             MethodHandle dmh = MethodHandleProxies.wrapperInstanceTarget(func);
@@ -132,6 +139,7 @@ public class LambdaSortQuery<T> extends SortQuery {
             fieldName = LambdaUtil.getFieldName(func);
         }
         fieldName = StrUtil.toUnderlineCase(fieldName);
+        cache.put(func, fieldName);
         return fieldName;
     }
 }
