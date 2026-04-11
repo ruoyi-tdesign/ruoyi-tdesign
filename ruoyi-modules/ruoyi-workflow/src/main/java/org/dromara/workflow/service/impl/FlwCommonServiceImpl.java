@@ -10,7 +10,6 @@ import org.dromara.common.core.domain.dto.UserDTO;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.spring.SpringUtils;
-import org.dromara.common.mail.utils.MailUtils;
 import org.dromara.common.sse.dto.SseMessageDto;
 import org.dromara.common.sse.utils.SseMessageUtils;
 import org.dromara.system.helper.MessageSendHelper;
@@ -87,16 +86,19 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
         Set<User> list = new HashSet<>();
         Set<String> processedBySet = new HashSet<>();
         IFlwTaskAssigneeService taskAssigneeService = SpringUtils.getBean(IFlwTaskAssigneeService.class);
-        for (User user : userList) {
+        Map<String, List<User>> userListMap = StreamUtils.groupByKey(userList, User::getType);
+        for (Map.Entry<String, List<User>> entry : userListMap.entrySet()) {
+            List<User> entryValue = entry.getValue();
+            String processedBys = StreamUtils.join(entryValue, User::getProcessedBy);
             // 根据 processedBy 前缀判断处理人类型，分别获取用户列表
-            List<UserDTO> users = taskAssigneeService.fetchUsersByStorageId(user.getProcessedBy());
+            List<UserDTO> users = taskAssigneeService.fetchUsersByStorageId(processedBys);
             // 转换为 FlowUser 并添加到结果集合
             if (CollUtil.isNotEmpty(users)) {
                 users.forEach(dto -> {
                     String processedBy = String.valueOf(dto.getUserId());
                     if (!processedBySet.contains(processedBy)) {
                         FlowUser flowUser = new FlowUser();
-                        flowUser.setType(user.getType());
+                        flowUser.setType(entry.getKey());
                         flowUser.setProcessedBy(processedBy);
                         flowUser.setAssociated(taskId);
                         list.add(flowUser);
