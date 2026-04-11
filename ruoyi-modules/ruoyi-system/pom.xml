@@ -48,6 +48,13 @@
             <artifactId>ruoyi-common-log</artifactId>
         </dependency>
 
+        <!-- 流程相关，依赖是可选的，只有在引入本模块的地方重新依赖这个依赖，才会生效 -->
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-workflow</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- excel-->
         <dependency>
             <groupId>org.dromara</groupId>
