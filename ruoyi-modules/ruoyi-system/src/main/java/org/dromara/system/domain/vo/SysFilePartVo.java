@@ -1,15 +1,14 @@
 package org.dromara.system.domain.vo;
 
-import org.dromara.system.domain.SysFilePart;
-import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
-import com.alibaba.excel.annotation.ExcelProperty;
-import org.dromara.common.excel.annotation.ExcelDictFormat;
-import org.dromara.common.excel.convert.ExcelDictConvert;
+import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
+import cn.idev.excel.annotation.ExcelProperty;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
-import java.util.Date;
+import org.dromara.system.domain.SysFilePart;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 文件分片信息，仅在手动分片上传时使用视图对象 sys_file_part
