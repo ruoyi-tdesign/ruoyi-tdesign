@@ -71,7 +71,7 @@ onMounted(() => {
 });
 
 onMounted(() => {
-  useSSE().execute(`${import.meta.env.VITE_APP_BASE_API}/resource/sse/connect/login`);
+  useSSE().execute(`${import.meta.env.VITE_APP_BASE_API}/resource/sse/login`);
 });
 
 onBeforeUnmount(() => {

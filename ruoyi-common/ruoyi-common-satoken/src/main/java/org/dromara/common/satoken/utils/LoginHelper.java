@@ -2,6 +2,7 @@ package org.dromara.common.satoken.utils;
 
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpLogic;
+import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import lombok.AccessLevel;
@@ -64,36 +65,36 @@ public class LoginHelper {
      * @param loginUser 登录用户信息
      * @param model     配置参数
      */
-    public static void login(LoginUser loginUser, SaLoginModel model) {
-        MultipleLoginBaseHelper.login(MultipleStpUtil.SYSTEM, loginUser, loginUser.getLoginId(), model);
+    public static void login(LoginUser loginUser, SaLoginParameter model) {
+        DynamicLoginHelper.login(MultipleStpUtil.SYSTEM, loginUser, loginUser.getLoginId(), model);
     }
 
     /**
      * 获取用户(多级缓存)
      */
     public static <T extends LoginUser> T getUser() {
-        return MultipleLoginBaseHelper.getUser(MultipleStpUtil.SYSTEM);
+        return DynamicLoginHelper.getUser(MultipleStpUtil.SYSTEM);
     }
 
     /**
      * 获取用户(多级缓存)
      */
     public static <T extends LoginUser> Optional<T> getUserOptional() {
-        return MultipleLoginBaseHelper.getUserOptional(MultipleStpUtil.SYSTEM);
+        return DynamicLoginHelper.getUserOptional(MultipleStpUtil.SYSTEM);
     }
 
     /**
      * 获取用户基于token
      */
     public static <T extends LoginUser> T getUser(String token) {
-        return MultipleLoginBaseHelper.getUser(MultipleStpUtil.SYSTEM, token);
+        return DynamicLoginHelper.getUser(MultipleStpUtil.SYSTEM, token);
     }
 
     /**
      * 获取用户基于token
      */
     public static <T extends LoginUser> Optional<T> getUserOptional(String token) {
-        return MultipleLoginBaseHelper.getUserOptional(MultipleStpUtil.SYSTEM, token);
+        return DynamicLoginHelper.getUserOptional(MultipleStpUtil.SYSTEM, token);
     }
 
     /**
@@ -102,7 +103,7 @@ public class LoginHelper {
      * @param updateBy 更新回调
      */
     public static <T extends LoginUser> void updateUser(Consumer<T> updateBy) {
-        MultipleLoginBaseHelper.updateUser(MultipleStpUtil.SYSTEM, updateBy);
+        DynamicLoginHelper.updateUser(MultipleStpUtil.SYSTEM, updateBy);
     }
 
     /**
@@ -112,7 +113,7 @@ public class LoginHelper {
      * @param updateBy 更新回调
      */
     public static <T extends LoginUser> void updateUser(Object loginId, Consumer<T> updateBy) {
-        MultipleLoginBaseHelper.updateUser(MultipleStpUtil.SYSTEM, loginId, updateBy);
+        DynamicLoginHelper.updateUser(MultipleStpUtil.SYSTEM, loginId, updateBy);
     }
 
     /**
@@ -126,7 +127,7 @@ public class LoginHelper {
      * 获取用户id
      */
     public static Long getUserId() {
-        return MultipleLoginBaseHelper.getUserId(MultipleStpUtil.SYSTEM);
+        return DynamicLoginHelper.getUserId(MultipleStpUtil.SYSTEM);
     }
 
     /**
@@ -147,7 +148,7 @@ public class LoginHelper {
      * 获取租户ID
      */
     public static String getTenantId() {
-        return MultipleLoginBaseHelper.getTenantId(MultipleStpUtil.SYSTEM);
+        return DynamicLoginHelper.getTenantId(MultipleStpUtil.SYSTEM);
     }
 
     /**

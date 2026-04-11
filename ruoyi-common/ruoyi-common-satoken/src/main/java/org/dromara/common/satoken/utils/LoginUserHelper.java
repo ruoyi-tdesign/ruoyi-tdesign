@@ -61,35 +61,35 @@ public class LoginUserHelper {
      * @param baseUser 登录用户信息
      */
     public static void loginByDevice(BaseUser baseUser, DeviceType deviceType) {
-        MultipleLoginBaseHelper.loginByDevice(MultipleStpUtil.USER, baseUser, deviceType);
+        DynamicLoginHelper.loginByDevice(MultipleStpUtil.USER, baseUser, deviceType);
     }
 
     /**
      * 获取用户(多级缓存)
      */
     public static <T extends BaseUser> T getUser() {
-        return MultipleLoginBaseHelper.getUser(MultipleStpUtil.USER);
+        return DynamicLoginHelper.getUser(MultipleStpUtil.USER);
     }
 
     /**
      * 获取用户(多级缓存)
      */
     public static <T extends BaseUser> Optional<T> getUserOptional() {
-        return MultipleLoginBaseHelper.getUserOptional(MultipleStpUtil.USER);
+        return DynamicLoginHelper.getUserOptional(MultipleStpUtil.USER);
     }
 
     /**
      * 获取用户基于token
      */
     public static <T extends BaseUser> T getUser(String token) {
-        return MultipleLoginBaseHelper.getUser(MultipleStpUtil.USER, token);
+        return DynamicLoginHelper.getUser(MultipleStpUtil.USER, token);
     }
 
     /**
      * 获取用户基于token
      */
     public static <T extends BaseUser> Optional<T> getUserOptional(String token) {
-        return MultipleLoginBaseHelper.getUserOptional(MultipleStpUtil.USER, token);
+        return DynamicLoginHelper.getUserOptional(MultipleStpUtil.USER, token);
     }
 
     /**
@@ -98,7 +98,7 @@ public class LoginUserHelper {
      * @param updateBy 更新回调
      */
     public static <T extends BaseUser> void updateUser(Consumer<T> updateBy) {
-        MultipleLoginBaseHelper.updateUser(MultipleStpUtil.USER, updateBy);
+        DynamicLoginHelper.updateUser(MultipleStpUtil.USER, updateBy);
     }
 
     /**
@@ -108,28 +108,28 @@ public class LoginUserHelper {
      * @param updateBy 更新回调
      */
     public static <T extends BaseUser> void updateUser(Object loginId, Consumer<T> updateBy) {
-        MultipleLoginBaseHelper.updateUser(MultipleStpUtil.USER, loginId, updateBy);
+        DynamicLoginHelper.updateUser(MultipleStpUtil.USER, loginId, updateBy);
     }
 
     /**
      * 获取用户id
      */
     public static Long getUserId() {
-        return MultipleLoginBaseHelper.getUserId(MultipleStpUtil.USER);
+        return DynamicLoginHelper.getUserId(MultipleStpUtil.USER);
     }
 
     /**
      * 获取租户ID
      */
     public static String getTenantId() {
-        return MultipleLoginBaseHelper.getTenantId(MultipleStpUtil.USER);
+        return DynamicLoginHelper.getTenantId(MultipleStpUtil.USER);
     }
 
     /**
      * 获取用户账户
      */
     public static String getUsername() {
-        return MultipleLoginBaseHelper.getUsername(MultipleStpUtil.USER);
+        return DynamicLoginHelper.getUsername(MultipleStpUtil.USER);
     }
 
 }

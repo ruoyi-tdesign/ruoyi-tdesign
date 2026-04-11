@@ -18,8 +18,9 @@ import org.dromara.common.satoken.config.MultipleSaTokenConfig;
 import org.dromara.common.satoken.config.MultipleSaTokenProperties;
 import org.dromara.common.satoken.context.SaSecurityContext;
 import org.dromara.common.satoken.stp.DynamicStpLogic;
-import org.dromara.common.satoken.utils.MultipleLoginBaseHelper;
+import org.dromara.common.satoken.utils.DynamicLoginHelper;
 import org.dromara.common.security.config.properties.SecurityProperties;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +42,8 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     private final SecurityProperties securityProperties;
     private final MultipleSaTokenProperties multipleSaTokenProperties;
+    @Value("${sse.path}")
+    private String ssePath;
 
     /**
      * 注册sa-token的拦截器
@@ -59,7 +62,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                             .match(config.getMatch())
                             .check(() -> {
                                 if (logic.isLogin()) {
-                                    BaseUser baseUser = MultipleLoginBaseHelper.getUser(logic);
+                                    BaseUser baseUser = DynamicLoginHelper.getUser(logic);
                                     SaSecurityContext.setContext(baseUser);
                                 }
                             });
@@ -71,7 +74,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                 }
             })).addPathPatterns("/**")
             // 排除不需要拦截的路径
-            .excludePathPatterns(securityProperties.getExcludes());
+            .excludePathPatterns(securityProperties.getExcludes())
+            .excludePathPatterns(ssePath);;
     }
 
     /**

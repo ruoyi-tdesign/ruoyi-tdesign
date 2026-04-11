@@ -5,13 +5,12 @@ import cn.dev33.satoken.context.model.SaStorage;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.StpLogic;
-import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import org.dromara.common.core.domain.model.BaseUser;
-import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.DeviceType;
 import org.dromara.common.satoken.context.SaSecurityContext;
 
@@ -23,7 +22,7 @@ import java.util.function.Consumer;
 import static org.dromara.common.satoken.utils.MultipleStpUtil.*;
 
 /**
- * 登录鉴权助手的基本类
+ * 动态登录鉴权助手的类
  * <p>
  * user_type 为 用户类型 同一个用户表 可以有多种用户类型 例如 pc,app
  * deivce 为 设备类型 同一个用户类型 可以有 多种设备类型 例如 web,ios
@@ -35,7 +34,7 @@ import static org.dromara.common.satoken.utils.MultipleStpUtil.*;
  * @author hexm
  * @date 2024/03/07 10:10
  */
-public class MultipleLoginBaseHelper {
+public class DynamicLoginHelper {
 
     /**
      * 获取登录类型
@@ -58,9 +57,9 @@ public class MultipleLoginBaseHelper {
      * @param baseUser 基本登录用户信息
      */
     public static void loginByDevice(StpLogic logic, BaseUser baseUser, DeviceType deviceType) {
-        SaLoginModel model = new SaLoginModel();
+        SaLoginParameter model = new SaLoginParameter();
         if (ObjectUtil.isNotNull(deviceType)) {
-            model.setDevice(deviceType.getDevice());
+            model.setDeviceType(deviceType.getDevice());
         }
         if (StrUtil.isBlank(baseUser.getDeviceType())) {
             baseUser.setDeviceType(deviceType.getDevice());
@@ -74,7 +73,7 @@ public class MultipleLoginBaseHelper {
      *
      * @param baseUser 登录用户信息
      */
-    public static void login(StpLogic logic, BaseUser baseUser, SaLoginModel model) {
+    public static void login(StpLogic logic, BaseUser baseUser, SaLoginParameter model) {
         login(logic, baseUser, baseUser.getUserId(), model);
     }
 
@@ -82,20 +81,21 @@ public class MultipleLoginBaseHelper {
      * 登录系统 基于 设备类型
      * 针对相同用户体系不同设备
      *
-     * @param baseUser 登录用户信息
+     * @param baseUser  登录用户信息
+     * @param parameter
      */
-    public static void login(StpLogic logic, BaseUser baseUser, Object loginId, SaLoginModel model) {
+    public static void login(StpLogic logic, BaseUser baseUser, Object loginId, SaLoginParameter parameter) {
         String loginType = getLoginType(logic);
         baseUser.setLoginType(loginType);
 //        SaStorage storage = SaHolder.getStorage();
 //        storage.set(loginType + LOGIN_USER_KEY, baseUser);
 //        storage.set(loginType + TENANT_KEY, baseUser.getTenantId());
 //        storage.set(loginType + USER_KEY, baseUser.getUserId());
-        model = ObjectUtil.defaultIfNull(model, new SaLoginModel());
+        parameter = ObjectUtil.defaultIfNull(parameter, new SaLoginParameter());
         SaSecurityContext.setContext(baseUser);
-        logic.login(loginId, model);
+        logic.login(loginId, parameter);
         SaSession tokenSession = logic.getTokenSession();
-        tokenSession.updateTimeout(model.getTimeout());
+        tokenSession.updateTimeout(parameter.getTimeout());
         tokenSession.set(LOGIN_USER_KEY, baseUser);
     }
 

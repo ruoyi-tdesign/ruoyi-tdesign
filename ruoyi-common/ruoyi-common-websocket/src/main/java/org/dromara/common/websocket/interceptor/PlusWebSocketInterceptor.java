@@ -4,7 +4,7 @@ import cn.dev33.satoken.stp.StpLogic;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.model.BaseUser;
 import org.dromara.common.satoken.stp.DynamicStpLogic;
-import org.dromara.common.satoken.utils.MultipleLoginBaseHelper;
+import org.dromara.common.satoken.utils.DynamicLoginHelper;
 import org.dromara.common.websocket.config.properties.MultipleWebSocketProperties;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -44,7 +44,7 @@ public class PlusWebSocketInterceptor implements HandshakeInterceptor {
         String loginType = multipleWebSocketProperties.getMatchLoginType(request.getURI().getPath());
         if (loginType != null) {
             StpLogic logic = DynamicStpLogic.getDynamicStpLogic(loginType);
-            BaseUser user = MultipleLoginBaseHelper.getUser(logic);
+            BaseUser user = DynamicLoginHelper.getUser(logic);
             attributes.put(LOGIN_USER_KEY, user);
             return true;
         }

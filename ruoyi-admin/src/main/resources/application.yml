@@ -314,6 +314,7 @@ management:
 --- # 默认/推荐使用sse推送
 sse:
   enabled: true
+  path: /resource/sse
 
 --- # websocket
 websocket:

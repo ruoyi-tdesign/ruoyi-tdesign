@@ -3,6 +3,7 @@ package org.dromara.web.listener;
 import cn.dev33.satoken.config.SaTokenConfig;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.stp.SaLoginModel;
+import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.Header;
 import cn.hutool.http.useragent.UserAgent;
@@ -47,7 +48,7 @@ public class UserActionListener implements SaTokenListener {
      * 每次登录时触发
      */
     @Override
-    public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginModel loginModel) {
+    public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginParameter loginParameter) {
         BaseUser baseUser = SaSecurityContext.getContext();
         if (baseUser == null) {
             return;
@@ -55,11 +56,11 @@ public class UserActionListener implements SaTokenListener {
         if (Objects.equals(baseUser.getLoginType(), MultipleStpUtil.SYSTEM_TYPE)) {
             // 系统用户登录
             UserType userType = UserType.getUserType(loginId.toString());
-            Long timeout = ObjectUtil.defaultIfNull(loginModel.getTimeout(), tokenConfig.getTimeout());
+            Long timeout = ObjectUtil.defaultIfNull(loginParameter.getTimeout(), tokenConfig.getTimeout());
             if (timeout <= 0) {
-                onlineUserCacheManager.setCache(userType, tokenValue, loginModel);
+                onlineUserCacheManager.setCache(userType, tokenValue, loginParameter);
             } else {
-                onlineUserCacheManager.setCache(userType, tokenValue, loginModel, timeout);
+                onlineUserCacheManager.setCache(userType, tokenValue, loginParameter, timeout);
             }
             HttpServletRequest request = ServletUtils.getRequest();
             final UserAgent userAgent = UserAgentUtil.parse(request.getHeader(Header.USER_AGENT.getValue()));
