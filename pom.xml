@@ -63,8 +63,9 @@
         <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
         <!-- 打包默认跳过测试 -->
         <skipTests>true</skipTests>
-        <!-- docker build配置 -->
-        <docker.registry>127.0.0.1:8080</docker.registry>
+        <!-- docker镜像 -->
+        <docker.host>http://127.0.0.1:2375</docker.host>
+        <docker.registry>127.0.0.1:8082</docker.registry>
         <docker.namespace>ruoyi-design</docker.namespace>
     </properties>
 
@@ -480,42 +481,32 @@
                         <warName>${project.artifactId}</warName>
                     </configuration>
                 </plugin>
-                <!-- 新版 Spotify Dockerfile 插件 -->
+                <!-- docker build时，使用install而不是package -->
                 <plugin>
                     <groupId>com.spotify</groupId>
-                    <artifactId>dockerfile-maven-plugin</artifactId>
-                    <version>1.4.13</version>
-                    <executions>
-                        <execution>
-                            <id>default</id>
-                            <!-- 执行 mvn package 时自动构建镜像 -->
-                            <goals>
-                                <goal>build</goal>
-                                <goal>push</goal>
-                            </goals>
-                        </execution>
-                    </executions>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>1.2.2</version>
                     <configuration>
-                        <!-- 镜像名称：仓库名(仓库http地址)/镜像名:版本 -->
-                        <repository>${docker.registry}/${docker.namespace}/${project.artifactId}</repository>
-                        <tag>${project.version}</tag>
+                        <!--打包docker镜像的docker服务器-->
+                        <dockerHost>${docker.host}</dockerHost>
+                        <!--镜像名称及版本[ip:port/name:tag]-->
+                        <imageName>${docker.registry}/${docker.namespace}/${project.name}:${project.version}</imageName>
+                        <!--nexus3 hosted 仓库地址-->
+                        <registryUrl>${docker.registry}</registryUrl>
+                        <noCache>true</noCache>
                         <!--Dockerfile路径-->
-                        <!-- 构建参数（给 Dockerfile 用） -->
-                        <buildArgs>
-                            <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
-                        </buildArgs>
-                        <!--<noCache>true</noCache>-->
-                        <!-- 使用 maven settings.xml 进行身份验证 -->
-                        <!-- 然后，在您的 maven settings.xml 文件中，添加服务器的配置：
-                        <servers>
-                            <server>
-                                <id>仓库http地址</id>
-                                <username>me</username>
-                                <password>mypassword</password>
-                            </server>
-                        </servers>
-                        与配置任何其他服务器完全相同。-->
-                        <!--<useMavenSettingsForAuth>true</useMavenSettingsForAuth>-->
+                        <dockerDirectory>${project.basedir}</dockerDirectory>
+                        <!--是否强制覆盖已有镜像-->
+                        <forceTags>true</forceTags>
+                        <resources>
+                            <resource>
+                                <targetPath>/</targetPath>
+                                <directory>${project.build.directory}</directory>
+                                <include>*.jar</include>
+                            </resource>
+                        </resources>
+                        <!--在maven settings.xml中配置的server的id值-->
+                        <serverId>ruoyi-tdesign-docker-registry</serverId>
                     </configuration>
                 </plugin>
             </plugins>

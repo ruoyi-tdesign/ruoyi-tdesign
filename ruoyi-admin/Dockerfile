@@ -13,7 +13,7 @@ WORKDIR /ruoyi/server
 
 ENV SERVER_PORT=8080 SNAIL_PORT=28080 LANG=C.UTF-8 LC_ALL=C.UTF-8 JAVA_OPTS=""
 
-ARG JAR_FILE
+ARG JAR_FILE=*.jar
 COPY ${JAR_FILE} ./app.jar
 # 工作流字体文件
 COPY ./zhFonts/ /usr/share/fonts/zhFonts/

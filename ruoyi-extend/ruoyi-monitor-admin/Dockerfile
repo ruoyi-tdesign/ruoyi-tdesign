@@ -13,7 +13,7 @@ ENV LANG=C.UTF-8 LC_ALL=C.UTF-8 JAVA_OPTS=""
 
 EXPOSE 9090
 
-ARG JAR_FILE
+ARG JAR_FILE=*.jar
 COPY ${JAR_FILE} ./app.jar
 
 SHELL ["/bin/bash", "-c"]

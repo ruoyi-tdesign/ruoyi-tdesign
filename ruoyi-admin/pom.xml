@@ -34,11 +34,11 @@
 <!--            <groupId>com.oracle.database.nls</groupId>-->
 <!--            <artifactId>orai18n</artifactId>-->
 <!--        </dependency>-->
-<!--        &lt;!&ndash; PostgreSql &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.postgresql</groupId>-->
-<!--            <artifactId>postgresql</artifactId>-->
-<!--        </dependency>-->
+        <!-- PostgreSql -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
 <!--        &lt;!&ndash; SqlServer &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>com.microsoft.sqlserver</groupId>-->
@@ -144,10 +144,19 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
             </plugin>
-            <!--<plugin>
+            <plugin>
                 <groupId>com.spotify</groupId>
-                <artifactId>dockerfile-maven-plugin</artifactId>
-            </plugin>-->
+                <artifactId>docker-maven-plugin</artifactId>
+                <configuration>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.basedir}</directory>
+                            <include>zhFonts/**</include>
+                        </resource>
+                    </resources>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
