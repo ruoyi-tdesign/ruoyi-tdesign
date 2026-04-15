@@ -120,13 +120,12 @@
     ></user-select>
   </t-card>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'AllTaskWaiting',
 });
 import { BrowseIcon, EditIcon, RefreshIcon, SearchIcon, Setting1Icon, SettingIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol, TabsProps } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol, TabsProps } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 
 import type { SysUserVo } from '@/api/system/model/userModel';
@@ -143,6 +142,7 @@ const processMeddleRef = ref<InstanceType<typeof ProcessMeddle>>();
 // 选人组件
 const applyUserSelectRef = ref<InstanceType<typeof UserSelect>>();
 const columnControllerVisible = ref(false);
+const queryRef = ref<FormInstanceFunctions>();
 
 const { proxy } = getCurrentInstance();
 const routerJump = useRouterJump();
@@ -229,7 +229,7 @@ const handleQuery = () => {
 };
 /** 重置按钮操作 */
 const resetQuery = () => {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   queryParams.value.createByIds = [];
   userSelectCount.value = 0;

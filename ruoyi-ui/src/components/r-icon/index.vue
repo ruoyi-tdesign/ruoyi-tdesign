@@ -7,6 +7,11 @@
 defineOptions({
   name: 'RIcon',
 });
+const props = defineProps({
+  name: {
+    type: String,
+  },
+});
 import { manifest } from 'tdesign-icons-vue-next';
 import * as Icons from 'tdesign-icons-vue-next/lib/icons';
 import { computed } from 'vue';
@@ -21,12 +26,6 @@ Object.entries(Icons).forEach((value) => {
   if (name) {
     components.set(name, value[1]);
   }
-});
-
-const props = defineProps({
-  name: {
-    type: String,
-  },
 });
 
 const rowComponent = computed(() => {

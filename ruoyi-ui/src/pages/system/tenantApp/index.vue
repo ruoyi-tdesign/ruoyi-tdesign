@@ -203,6 +203,7 @@ import { ArrayOps } from '@/utils/array';
 const { proxy } = getCurrentInstance();
 const { sys_app_type } = proxy.useDict('sys_app_type');
 
+const queryRef = ref<FormInstanceFunctions>();
 const openView = ref(false);
 const openViewLoading = ref(false);
 const tenantAppRef = ref<FormInstanceFunctions>();
@@ -275,7 +276,7 @@ function getList() {
 // 表单重置
 function reset() {
   form.value = {};
-  proxy.resetForm('tenantAppRef');
+  tenantAppRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -286,7 +287,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
 
@@ -386,7 +387,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `tenantApp_${new Date().getTime()}.xlsx`,
+    `tenantApp_${Date.now()}.xlsx`,
   );
 }
 

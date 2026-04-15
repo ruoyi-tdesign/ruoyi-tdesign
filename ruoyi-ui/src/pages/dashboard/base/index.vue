@@ -10,7 +10,6 @@
     <output-overview class="row-container" />
   </div>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'DashboardBase',
@@ -20,7 +19,6 @@ import OutputOverview from './components/OutputOverview.vue';
 import RankList from './components/RankList.vue';
 import TopPanel from './components/TopPanel.vue';
 </script>
-
 <style scoped>
 .row-container:not(:last-child) {
   margin-bottom: 16px;

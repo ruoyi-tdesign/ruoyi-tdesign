@@ -1,9 +1,8 @@
 <template>
-  <t-loading :loading="loading" :style="'height:' + height">
+  <t-loading :loading="loading" :style="`height:${height}`">
     <iframe :src="url" frameborder="no" style="width: 100%; height: 100%" scrolling="auto" />
   </t-loading>
 </template>
-
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
 

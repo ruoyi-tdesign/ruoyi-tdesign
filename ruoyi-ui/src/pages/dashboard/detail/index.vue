@@ -37,12 +37,13 @@
           v-for="(item, index) in PRODUCT_LIST"
           :key="index"
           :product="item"
-          :class="{ 'row-margin': index !== 0, 'product-card': true }"
+          class="product-card"
+          :class="{ 'row-margin': index !== 0 }"
         />
       </t-col>
     </t-row>
     <t-card
-      :class="['dashboard-detail-card', 'row-margin']"
+      class="dashboard-detail-card row-margin"
       :title="t('pages.dashboardDetail.satisfaction.title')"
       :bordered="false"
     >
@@ -61,7 +62,6 @@
     </t-card>
   </div>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'DashboardDetail',
@@ -164,7 +164,6 @@ const onMaterialChange = (value: string[]) => {
   lineChart.setOption(getFolderLineDataSet({ dateTime: value, ...chartColors.value }));
 };
 </script>
-
 <style lang="less" scoped>
 .row-margin {
   margin-top: 16px;

@@ -34,7 +34,7 @@ type ListItemType = MenuRoute & { icon?: string };
 const props = defineProps({
   navData: {
     type: Array as PropType<ComplexRoute[]>,
-    default: () => [],
+    default: () => [] as ComplexRoute[],
   },
 });
 
@@ -75,13 +75,14 @@ const getMenuList = (list: ComplexRoute[], basePath?: string): ListItemType[] =>
     .filter((item) => item.meta && item.meta.hidden !== true);
 };
 
+const regExp = /(http|https):\/\/([\w.]+\/?)\S*/;
 const getHref = (item: MenuRoute) => {
   const { path } = item;
   const { frameSrc, frameBlank } = item.meta;
   if (frameSrc && frameBlank) {
-    return frameSrc.match(/(http|https):\/\/([\w.]+\/?)\S*/);
+    return frameSrc.match(regExp);
   }
-  return path.match(/(http|https):\/\/([\w.]+\/?)\S*/);
+  return path.match(regExp);
 };
 
 const openHref = (url: string) => {

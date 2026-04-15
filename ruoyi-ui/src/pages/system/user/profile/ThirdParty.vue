@@ -44,7 +44,6 @@
     </t-space>
   </t-space>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'ThirdParty',

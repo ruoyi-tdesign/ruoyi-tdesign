@@ -10,7 +10,7 @@
       </span>
       <t-tag
         v-else
-        :key="item.value + ''"
+        :key="`${item.value}`"
         :index="index"
         :size="size"
         :shape="shape"
@@ -27,18 +27,10 @@
     </template>
   </div>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'DictTag',
 });
-
-import { isNumber } from 'lodash';
-import type { SizeEnum } from 'tdesign-vue-next';
-import type { PropType } from 'vue';
-import { computed } from 'vue';
-
-import type { DictModel } from '@/utils/dict';
 
 const props = defineProps({
   // 数据
@@ -70,6 +62,12 @@ const props = defineProps({
     default: true,
   },
 });
+import { isNumber } from 'lodash';
+import type { SizeEnum } from 'tdesign-vue-next';
+import type { PropType } from 'vue';
+import { computed } from 'vue';
+
+import type { DictModel } from '@/utils/dict';
 
 const values = computed<Array<number | string>>(() => {
   if (props.value !== null && props.value !== undefined && typeof props.value !== 'undefined') {
@@ -93,7 +91,6 @@ const rowOptions = computed<Array<DictModel>>(() => {
   });
 });
 </script>
-
 <style lang="less" scoped>
 .t-tag + .t-tag {
   margin-left: 10px;

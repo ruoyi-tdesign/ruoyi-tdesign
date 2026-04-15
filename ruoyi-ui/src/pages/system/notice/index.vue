@@ -263,6 +263,7 @@ const total = ref(0);
 const title = ref('');
 const sort = ref<TableSort>();
 const noticeRef = ref<FormInstanceFunctions>();
+const queryRef = ref<FormInstanceFunctions>();
 
 // 校验规则
 const rules = ref<Record<string, Array<FormRule>>>({
@@ -327,7 +328,7 @@ function reset() {
   form.value = {
     status: '1',
   };
-  proxy.resetForm('noticeRef');
+  noticeRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -338,7 +339,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -448,7 +449,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `notice_${new Date().getTime()}.xlsx`,
+    `notice_${Date.now()}.xlsx`,
   );
 }
 

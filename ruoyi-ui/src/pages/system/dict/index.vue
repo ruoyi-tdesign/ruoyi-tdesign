@@ -114,7 +114,7 @@
           </t-row>
         </template>
         <template #dictType="{ row }">
-          <router-link :to="'/system/dict-data/index/' + row.dictId" class="link-type" @click.stop>
+          <router-link :to="`/system/dict-data/index/${row.dictId}`" class="link-type" @click.stop>
             <my-link>
               {{ row.dictType }}
             </my-link>
@@ -229,6 +229,7 @@ const total = ref(0);
 const title = ref('');
 const dateRange = ref([]);
 const columnControllerVisible = ref(false);
+const queryRef = ref<FormInstanceFunctions>();
 const dictRef = ref<FormInstanceFunctions>();
 const sort = ref<TableSort>();
 
@@ -291,7 +292,7 @@ function reset() {
     dictType: undefined,
     remark: undefined,
   };
-  proxy.resetForm('dictRef');
+  dictRef.value.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -301,7 +302,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -403,7 +404,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `dict_${new Date().getTime()}.xlsx`,
+    `dict_${Date.now()}.xlsx`,
   );
 }
 /** 刷新缓存按钮操作 */

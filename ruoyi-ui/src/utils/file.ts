@@ -11,6 +11,6 @@ export function blobToFile(blob: Blob, fileName: string, fileMimeType: string) {
   const newBlob = blob.slice(0, blob.size, fileMimeType);
   return new File([newBlob], fileName, {
     type: fileMimeType,
-    lastModified: new Date().getTime(),
+    lastModified: Date.now(),
   });
 }

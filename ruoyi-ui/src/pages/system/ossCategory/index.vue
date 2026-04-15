@@ -1,7 +1,7 @@
 <template>
   <t-card>
     <t-row :gutter="20">
-      <!--分类数据-->
+      <!-- 分类数据 -->
       <t-col :sm="2" :xs="12">
         <div class="head-container">
           <t-space>
@@ -18,7 +18,6 @@
         <div class="head-container">
           <t-skeleton animation="gradient" :loading="loadingOptions">
             <t-tree
-              ref="categoryTreeRef"
               v-model:actived="categoryActived"
               v-model:expanded="expandedCategoryArray"
               class="left-tree t-tree--block-node"
@@ -186,6 +185,15 @@
 defineOptions({
   name: 'OssCategory',
 });
+const props = withDefaults(defineProps<OssCategoryProps>(), {
+  imageUpload: true,
+  fileUpload: true,
+  multiple: true,
+  thumbnailSize: 120,
+});
+const emit = defineEmits<{
+  (e: 'change', selectValues: SysOssVo[]): void;
+}>();
 import {
   AddIcon,
   ArrowDownIcon,
@@ -213,12 +221,6 @@ import type { MyOssProps } from './components/myOss.vue';
 import MyOss from './components/myOss.vue';
 
 export interface OssCategoryProps extends Omit<MyOssProps, 'categoryId'> {}
-const props = withDefaults(defineProps<OssCategoryProps>(), {
-  imageUpload: true,
-  fileUpload: true,
-  multiple: true,
-  thumbnailSize: 120,
-});
 watch(
   () => props.queryParam,
   () => getCategoryTree(),
@@ -249,9 +251,6 @@ const rules = ref<Record<string, Array<FormRule>>>({
 });
 // 提交表单对象
 const form = ref<SysOssCategoryVo & SysOssCategoryForm>({});
-const emit = defineEmits<{
-  (e: 'change', selectValues: SysOssVo[]): void;
-}>();
 const queryParams = computed<SysOssCategoryQuery>(() => ({
   suffixes: props.queryParam?.suffixes?.map((value) => `.${value}`),
   maxSize: props.queryParam?.maxSize,
@@ -261,7 +260,7 @@ const queryParams = computed<SysOssCategoryQuery>(() => ({
 /** 通过条件过滤节点  */
 function filterNode(node: TreeNodeModel) {
   if (!node.value || !categoryName.value) return true;
-  return node.label.indexOf(categoryName.value) >= 0;
+  return node.label.includes(categoryName.value);
 }
 
 // 表单重置
@@ -269,7 +268,7 @@ function reset() {
   form.value = {
     orderNum: 0,
   };
-  proxy.resetForm('ossCategoryRef');
+  ossCategoryRef.value.reset();
 }
 
 /** 新增分类按钮操作 */

@@ -390,6 +390,7 @@ const deptExpand = ref(true);
 const deptNodeAll = ref(false);
 const deptOptions = ref<TreeModel<number>[]>([]);
 const openDataScope = ref(false);
+const queryRef = ref<FormInstanceFunctions>();
 const menuRef = ref<TreeInstanceFunctions>();
 const deptRef = ref<TreeInstanceFunctions>();
 const roleRef = ref<FormInstanceFunctions>();
@@ -478,7 +479,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -515,7 +516,7 @@ function handleExport() {
     {
       ...proxy.addDateRange(queryParams.value, dateRange.value),
     },
-    `role_${new Date().getTime()}.xlsx`,
+    `role_${Date.now()}.xlsx`,
   );
 }
 
@@ -568,7 +569,7 @@ function reset() {
     menuCheckStrictly: true,
     deptCheckStrictly: true,
   };
-  proxy.resetForm('roleRef');
+  roleRef.value.reset();
 }
 /** 详情按钮操作 */
 function handleDetail(row: SysRoleVo) {

@@ -6,7 +6,6 @@
     </div>
   </result>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'ResultNetworkError',

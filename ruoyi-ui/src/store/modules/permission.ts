@@ -81,12 +81,14 @@ function filterAsyncRouter(routers: RouteRecordRaw[]) {
   });
 }
 
+const regExp = /\/+/g;
+
 /** 展开路由地址 */
 export function unfoldRoutesPath(routes: RouteRecordRaw[], parentPath?: string) {
   const newRoutes: RouteRecordRaw[] = [];
   for (const route of routes) {
     const newRoute = { ...route };
-    const path = `${parentPath?.concat('/') ?? ''}${route.path}`.replaceAll(/\/+/g, '/');
+    const path = `${parentPath?.concat('/') ?? ''}${route.path}`.replaceAll(regExp, '/');
     newRoute.path = path;
     newRoutes.push(newRoute);
     if (newRoute.children && newRoute.children.length > 0) {

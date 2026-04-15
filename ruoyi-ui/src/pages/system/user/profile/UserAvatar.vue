@@ -132,7 +132,6 @@
     </t-dialog>
   </div>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'UserAvatar',
@@ -153,11 +152,11 @@ import type { UploadFile, UploadInstanceFunctions } from 'tdesign-vue-next';
 import { getCurrentInstance, reactive, ref } from 'vue';
 import { VueCropper } from 'vue-cropper';
 
-import { getVisitUrl } from '@/utils/ruoyi';
 import { removeAvatar, uploadAvatar } from '@/api/system/profile';
 import type { SelectFile } from '@/components/upload-select/index.vue';
 import { useUserStore } from '@/store/modules/user';
 import { useHasPermission } from '@/utils/auth';
+import { getVisitUrl } from '@/utils/ruoyi';
 
 const userStore = useUserStore();
 const { proxy } = getCurrentInstance();
@@ -222,7 +221,7 @@ function handleOpenUpload() {
 }
 /** 上传预处理 */
 function beforeUpload(file: UploadFile) {
-  if (file.type.indexOf('image/') === -1) {
+  if (!file.type.includes('image/')) {
     proxy.$modal.msgError('文件格式错误，请上传图片类型：JPG，PNG，BMP后缀的文件。');
   } else {
     const reader = new FileReader();
@@ -273,7 +272,6 @@ function closeDialog() {
   options.img = userStore.avatar;
 }
 </script>
-
 <style lang="less" scoped>
 .avatar-upload-preview {
   position: absolute;

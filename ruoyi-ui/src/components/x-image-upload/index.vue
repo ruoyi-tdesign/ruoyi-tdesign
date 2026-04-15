@@ -1,7 +1,6 @@
 <template>
   <div class="component-upload-image">
     <t-upload
-      ref="imageUpload"
       v-model="fileList"
       multiple
       :abridge-name="abridgeName"
@@ -53,15 +52,14 @@
       :multiple="limit > 1"
       :file-upload="false"
       :image-upload-props="{
-        accept: accept,
-        fileSize: fileSize,
-        fileType: fileType,
+        accept,
+        fileSize,
+        fileType,
       }"
       :on-submit="handleSelectSubmit"
     />
   </div>
 </template>
-
 <script lang="ts" setup>
 import { compressAccurately } from 'image-conversion';
 import { storeToRefs } from 'pinia';
@@ -133,6 +131,8 @@ const props = withDefaults(defineProps<ImageUploadProps>(), {
   compressTargetSize: 300,
 });
 
+const emit = defineEmits(['update:modelValue', 'change']);
+
 const queryParam = computed<FileListProps['queryParam']>(() => {
   const maxSize = props.fileSize * 1024 * 1024;
   if (props.accept) {
@@ -149,7 +149,6 @@ const queryParam = computed<FileListProps['queryParam']>(() => {
 
 const { token } = storeToRefs(useUserStore());
 const { proxy } = getCurrentInstance();
-const emit = defineEmits(['update:modelValue', 'change']);
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
 const uploadImgUrl = ref(`${baseUrl}/system/file/upload`); // 上传的图片服务器地址
 const headers = ref({ Authorization: `Bearer ${token.value}` });
@@ -250,7 +249,7 @@ function handleSelectSubmit(values: SelectFile[]) {
   if (props.accept?.length) {
     const arr1: SelectFile[] = [];
     const arr2: SelectFile[] = [];
-    // eslint-disable-next-line consistent-return
+
     rowValues.forEach((value) => {
       if (props.accept.some((item) => isMimeTypeIncluded(item, value.contentType))) {
         arr1.push(value);
@@ -318,22 +317,21 @@ function handleSelectSubmit(values: SelectFile[]) {
 async function handleBeforeUpload(file: UploadFile) {
   let isImg: boolean;
   if (props.accept?.length) {
-    // eslint-disable-next-line array-callback-return
     if (!props.accept.some((value) => isMimeTypeIncluded(value, file.type))) {
       proxy.$modal.msgError(`文件格式不正确, 请上传${props.accept.join(',')}图片格式文件!`);
       return false;
     }
   } else if (props.fileType?.length) {
     let fileExtension = '';
-    if (file.name.lastIndexOf('.') > -1) {
+    if (file.name.includes('.')) {
       fileExtension = getHttpFileSuffix(file.name);
     }
     isImg = props.fileType.some((type) => {
-      if (file.type.indexOf(type) > -1) return true;
-      return fileExtension && fileExtension.indexOf(type) > -1;
+      if (file.type.includes(type)) return true;
+      return fileExtension && fileExtension.includes(type);
     });
   } else {
-    isImg = file.type.indexOf('image') > -1;
+    isImg = file.type.includes('image');
   }
   if (!isImg) {
     proxy.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}图片格式文件!`);

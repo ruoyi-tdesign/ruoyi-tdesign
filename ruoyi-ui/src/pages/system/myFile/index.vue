@@ -1,7 +1,7 @@
 <template>
   <t-card>
     <t-row :gutter="20">
-      <!--分类数据-->
+      <!-- 分类数据 -->
       <t-col :sm="2" :xs="12">
         <div class="head-container">
           <t-space>
@@ -18,7 +18,6 @@
         <div class="head-container">
           <t-skeleton animation="gradient" :loading="loadingOptions">
             <t-tree
-              ref="categoryTreeRef"
               v-model:actived="categoryActived"
               v-model:expanded="expandedCategoryArray"
               class="left-tree t-tree--block-node"
@@ -186,6 +185,15 @@
 defineOptions({
   name: 'FileCategory',
 });
+const props = withDefaults(defineProps<FileCategoryProps>(), {
+  imageUpload: true,
+  fileUpload: true,
+  multiple: true,
+  thumbnailSize: 120,
+});
+const emit = defineEmits<{
+  (e: 'change', selectValues: SysFileVo[]): void;
+}>();
 import {
   AddIcon,
   ArrowDownIcon,
@@ -217,12 +225,6 @@ import type { FileListProps } from './FileList.vue';
 import FileList from './FileList.vue';
 
 export interface FileCategoryProps extends Omit<FileListProps, 'categoryId'> {}
-const props = withDefaults(defineProps<FileCategoryProps>(), {
-  imageUpload: true,
-  fileUpload: true,
-  multiple: true,
-  thumbnailSize: 120,
-});
 watch(
   () => props.queryParam,
   () => getCategoryTree(),
@@ -253,9 +255,6 @@ const rules = ref<Record<string, Array<FormRule>>>({
 });
 // 提交表单对象
 const form = ref<SysFileCategoryVo & SysFileCategoryForm>({});
-const emit = defineEmits<{
-  (e: 'change', selectValues: SysFileVo[]): void;
-}>();
 const queryParams = computed<SysFileCategoryQuery>(() => ({
   suffixes: props.queryParam?.suffixes?.map((value) => `.${value}`),
   maxSize: props.queryParam?.maxSize,
@@ -263,17 +262,20 @@ const queryParams = computed<SysFileCategoryQuery>(() => ({
 }));
 
 /** 通过条件过滤节点  */
-function filterNode(node: TreeNodeModel) {
-  if (!node.value || !categoryName.value) return true;
-  return node.label.indexOf(categoryName.value) >= 0;
-}
+const filterNode = computed(() => {
+  const value = categoryName.value;
+  return (node: TreeNodeModel) => {
+    if (!node.value || !value) return true;
+    return node.label.includes(value);
+  };
+});
 
 // 表单重置
 function reset() {
   form.value = {
     orderNum: 0,
   };
-  proxy.resetForm('fileCategoryRef');
+  fileCategoryRef.value.reset();
 }
 
 /** 新增分类按钮操作 */

@@ -1,7 +1,8 @@
 <template>
   <t-form
     ref="form"
-    :class="['item-container', `login-${type}`]"
+    class="item-container"
+    :class="[`login-${type}`]"
     :data="formData"
     :rules="FORM_RULES"
     label-width="0"
@@ -43,9 +44,9 @@
         <div class="login-code">
           <img :src="codeUrl" class="login-code-img" @click="getCode" />
         </div>
-        <!--        <t-button variant="outline" :disabled="countDown > 0" @click="sendCode">-->
-        <!--          {{ countDown === 0 ? t('pages.login.sendVerification') : `${countDown}秒后可重发` }}-->
-        <!--        </t-button>-->
+        <!--        <t-button variant="outline" :disabled="countDown > 0" @click="sendCode"> -->
+        <!--          {{ countDown === 0 ? t('pages.login.sendVerification') : `${countDown}秒后可重发` }} -->
+        <!--        </t-button> -->
       </t-form-item>
 
       <div class="check-container remember-pwd">
@@ -120,7 +121,6 @@
     </div>
   </t-form>
 </template>
-
 <script lang="ts" setup>
 import QrcodeVue from 'qrcode.vue';
 import {
@@ -266,7 +266,7 @@ const onSubmit = async (ctx: SubmitContext) => {
       const redirect = route.query.redirect as string;
       const redirectUrl = redirect ? decodeURIComponent(redirect) : '/';
       await router.push(redirectUrl);
-    } catch (e) {
+    } catch {
       // 重新获取验证码
       if (captchaEnabled.value) {
         getCode();
@@ -291,7 +291,6 @@ function doSocialLogin(type: string) {
 getCode();
 getLoginData();
 </script>
-
 <style lang="less" scoped>
 @import '../index.less';
 </style>

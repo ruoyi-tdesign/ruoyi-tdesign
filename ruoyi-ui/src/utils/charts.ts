@@ -24,7 +24,7 @@ export function getDateArray(dateTime: string[] = [], divideNum = 10): string[] 
 /**
  * 获取随机数
  *
- * @param {number} [num=100]
+ * @param {number} [num]
  * @returns
  */
 export function getRandomArray(num = 100): number {

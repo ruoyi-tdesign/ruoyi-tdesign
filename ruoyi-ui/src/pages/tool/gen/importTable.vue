@@ -58,7 +58,6 @@
         </t-form-item>
       </t-form>
       <t-table
-        ref="table"
         hover
         max-height="90vh"
         :loading="loading"
@@ -74,15 +73,16 @@
     </t-space>
   </t-dialog>
 </template>
-
 <script lang="ts" setup>
 import { RefreshIcon, SearchIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { getCurrentInstance, reactive, ref } from 'vue';
 
 import { getDataNames, importTable, listDbTable } from '@/api/tool/gen';
 import type { GenTableQuery, GenTableVo } from '@/api/tool/model/genModel';
 
+const emit = defineEmits(['ok']);
+const queryRef = ref<FormInstanceFunctions>();
 const loading = ref(false);
 const visible = ref(false);
 const tables = ref([]);
@@ -124,8 +124,6 @@ const pagination = computed(() => {
     },
   };
 });
-const emit = defineEmits(['ok']);
-
 /** 查询参数列表 */
 function show(dataName: string) {
   getDataNames().then((res) => {
@@ -159,7 +157,7 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
 /** 处理打开弹窗事件 */
@@ -183,11 +181,6 @@ function handleImportTable() {
       }
     })
     .finally(() => (buttonLoading.value = false));
-}
-/** 查询多数据源名称 */
-async function getDataNameList() {
-  const res = await getDataNames();
-  dataNameList.value = res.data;
 }
 
 const exposed = {

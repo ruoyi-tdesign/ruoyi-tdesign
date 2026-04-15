@@ -41,6 +41,7 @@ declare module '@vue/runtime-core' {
      * i18n $t方法支持ts类型提示
      * @param key i18n key
      */
+    // eslint-disable-next-line ts/method-signature-style
     $t(key: ObjKeysToUnion<any>): string;
   }
 }

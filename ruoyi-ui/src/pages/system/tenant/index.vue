@@ -298,6 +298,7 @@ import { handleChangeStatus } from '@/utils/ruoyi';
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
+const queryRef = ref<FormInstanceFunctions>();
 const tenantList = ref<SysTenantVo[]>([]);
 const tenantRef = ref<FormInstanceFunctions>();
 const open = ref(false);
@@ -390,7 +391,7 @@ function reset() {
   form.value = {
     accountCount: -1,
   };
-  proxy.resetForm('tenantRef');
+  tenantRef.value.reset();
 }
 
 /** 查询所有租户套餐 */
@@ -415,7 +416,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -553,7 +554,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `tenant_${new Date().getTime()}.xlsx`,
+    `tenant_${Date.now()}.xlsx`,
   );
 }
 

@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error ignore
 import JSEncrypt from 'jsencrypt/bin/jsencrypt.min.js';
 
 // 密钥对生成 http://web.chacuo.net/netrsakeypair

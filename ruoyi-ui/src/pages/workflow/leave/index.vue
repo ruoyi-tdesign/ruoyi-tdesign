@@ -159,7 +159,7 @@ import {
   SearchIcon,
   SettingIcon,
 } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
 import { cancelProcessApply } from '@/api/workflow/instance';
@@ -170,6 +170,7 @@ import { ArrayOps } from '@/utils/array';
 const { proxy } = getCurrentInstance();
 const { wf_business_status } = proxy.useDict('wf_business_status');
 
+const queryRef = ref<FormInstanceFunctions>();
 const router = useRouter();
 const openView = ref(false);
 const openViewLoading = ref(false);
@@ -257,7 +258,6 @@ function getList() {
 // 表单重置
 function reset() {
   form.value = {};
-  proxy.resetForm('leaveRef');
 }
 
 /** 搜索按钮操作 */
@@ -269,7 +269,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   rangeLeaveDays.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
 
@@ -364,7 +364,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `leave_${new Date().getTime()}.xlsx`,
+    `leave_${Date.now()}.xlsx`,
   );
 }
 

@@ -1,6 +1,6 @@
 // axios配置  可自行根据项目进行更改，只需更改该文件即可，其他文件可以不动
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
-// @ts-ignore
+// @ts-expect-error ignore
 import { saveAs } from 'file-saver';
 import isString from 'lodash/isString';
 import merge from 'lodash/merge';
@@ -12,7 +12,6 @@ import cache from '@/plugins/cache';
 import { messageOptionMerge } from '@/plugins/modal';
 import { useUserStore } from '@/store/modules/user';
 import { decryptBase64, decryptWithAes, encryptBase64, encryptWithAes, generateAesKey } from '@/utils/crypto';
-// @ts-ignore
 import errorCode from '@/utils/errorCode';
 import { decrypt, encrypt } from '@/utils/jsencrypt';
 import { blobValidate, tansParams } from '@/utils/ruoyi';
@@ -81,7 +80,7 @@ const transform: AxiosTransform = {
     // 未设置状态码则默认成功状态
     const code = res.data.code || 200;
     // 获取错误信息
-    // @ts-ignore
+    // @ts-expect-error ignore
     let msg = errorCode[code] || res.data.msg || errorCode.default;
 
     // 二进制数据则直接返回
@@ -214,7 +213,7 @@ const transform: AxiosTransform = {
       const requestObj = {
         url: config.url,
         data: typeof config.data === 'object' ? JSON.stringify(config.data) : config.data,
-        time: new Date().getTime(),
+        time: Date.now(),
       };
       const sessionObj = cache.session.getJSON('sessionObj');
       if (sessionObj === undefined || sessionObj === null || sessionObj === '') {
@@ -384,7 +383,7 @@ export function download(url: string, data: any, filename: string, config?: Axio
         const blob = new Blob([data]);
         const resText = await blob.text();
         const rspObj = JSON.parse(resText);
-        // @ts-ignore
+        // @ts-expect-error ignore
         const errMsg = errorCode[rspObj.code] || rspObj.msg || errorCode.default;
         MessagePlugin.error(messageOptionMerge(errMsg));
       }

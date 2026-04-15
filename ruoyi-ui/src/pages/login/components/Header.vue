@@ -15,7 +15,6 @@
     </div>
   </header>
 </template>
-
 <script lang="ts" setup>
 import { HelpCircleIcon, LogoGithubIcon, SettingIcon } from 'tdesign-icons-vue-next';
 
@@ -38,7 +37,6 @@ const navToHelper = () => {
   window.open('http://tdesign.tencent.com/starter/docs/get-started');
 };
 </script>
-
 <style lang="less" scoped>
 .login-header {
   padding: 0 var(--td-comp-paddingLR-xl);

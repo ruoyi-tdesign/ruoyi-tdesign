@@ -20,6 +20,7 @@ export function useLocale() {
   }
 
   const getComponentsLocale = computed(() => {
+    // @ts-expect-error 应该有值
     return i18n.global.getLocaleMessage(locale.value).componentsLocale;
   });
 

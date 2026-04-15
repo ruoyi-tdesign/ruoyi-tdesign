@@ -6,7 +6,7 @@ import { createI18n } from 'vue-i18n';
 // 导入语言文件
 const langModules = import.meta.glob('./lang/*/index.ts', { eager: true });
 
-const langModuleMap = new Map<string, Object>();
+const langModuleMap = new Map<string, object>();
 
 export const langCode: Array<string> = [];
 
@@ -24,6 +24,7 @@ const generateLangModuleMap = () => {
     const lastIndex = k.lastIndexOf('/');
     const code = k.substring(startIndex, lastIndex);
     langCode.push(code);
+    // @ts-expect-error object
     langModuleMap.set(code, langModules[fullPath]);
   });
 };
@@ -61,7 +62,6 @@ export const langList = computed(() => {
   return list;
 });
 
-// @ts-ignore
 export const { t } = i18n.global;
 
 export default i18n;

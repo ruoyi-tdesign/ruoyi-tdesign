@@ -1,11 +1,11 @@
 <template>
   <t-card>
     <t-row :gutter="20">
-      <!--模型分类-->
+      <!-- 模型分类 -->
       <t-col :sm="2" :xs="12">
         <category-tree v-model="treeActived" @active="handleQuery" />
       </t-col>
-      <!--模型数据-->
+      <!-- 模型数据 -->
       <t-col :sm="10" :xs="12">
         <t-space direction="vertical" style="width: 100%">
           <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline" label-width="calc(6em + 12px)">
@@ -93,8 +93,8 @@
               />
             </template>
             <template #isPublish="{ row }">
-              <t-tag v-if="row.isPublish == 0" theme="danger" variant="light">未发布</t-tag>
-              <t-tag v-else-if="row.isPublish == 1" theme="success" variant="light">已发布</t-tag>
+              <t-tag v-if="row.isPublish === 0" theme="danger" variant="light">未发布</t-tag>
+              <t-tag v-else-if="row.isPublish === 1" theme="success" variant="light">已发布</t-tag>
               <t-tag v-else theme="danger" variant="light">失效</t-tag>
             </template>
             <template #operation="{ row }">
@@ -210,7 +210,6 @@
     </t-dialog>
   </t-card>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'ProcessDefinition',
@@ -279,6 +278,7 @@ const processDefinitionList = ref<FlowDefinitionVo[]>([]);
 const categoryOptions = ref<TreeModel<number | string>[]>([]);
 /** 部署文件分类选择 */
 const selectCategory = ref();
+const queryRef = ref<FormInstanceFunctions>();
 const defFormRef = ref<FormInstanceFunctions>();
 const activeName = ref<number | string>('0');
 if (route.query.activeName) {
@@ -374,7 +374,7 @@ const handleQuery = () => {
 };
 /** 重置按钮操作 */
 const resetQuery = () => {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   treeActived.value = [];
   handleQuery();
 };
@@ -415,7 +415,7 @@ const getUnPublishList = async () => {
 /** 删除按钮操作 */
 const handleDelete = (row?: FlowDefinitionVo) => {
   const id = row?.id || ids.value;
-  const defList = processDefinitionList.value.filter((x) => id.indexOf(x.id) !== -1).map((x) => x.flowCode);
+  const defList = processDefinitionList.value.filter((x) => id.includes(x.id)).map((x) => x.flowCode);
   proxy?.$modal.confirm(`是否确认删除流程定义编码为【${defList}】的数据项？`, async () => {
     loading.value = true;
     await deleteDefinition(id).finally(() => (loading.value = false));
@@ -551,7 +551,7 @@ const reset = () => {
     category: '',
     formPath: '',
   };
-  proxy.resetForm('defFormRef');
+  defFormRef.value.reset();
 };
 /**
  * 新增

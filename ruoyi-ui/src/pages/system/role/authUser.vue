@@ -100,13 +100,14 @@ defineOptions({
   name: 'AuthUser',
 });
 import { AddIcon, CloseCircleIcon, CloseIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 import type { SysUserQuery, SysUserVo } from '@/api/system/model/userModel';
 import { allocatedUserList, authUserCancel, authUserCancelAll } from '@/api/system/role';
-import SelectUser, { type SelectUserInstance } from '@/pages/system/role/selectUser.vue';
+import type { SelectUserInstance } from '@/pages/system/role/selectUser.vue';
+import SelectUser from '@/pages/system/role/selectUser.vue';
 import { useTabsRouterStore } from '@/store';
 import { ArrayOps } from '@/utils/array';
 
@@ -115,6 +116,7 @@ const route = useRoute();
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
+const queryRef = ref<FormInstanceFunctions>();
 const userList = ref<SysUserVo[]>([]);
 const loading = ref(true);
 const showSearch = ref(true);
@@ -177,7 +179,7 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
 // 多选框选中数据

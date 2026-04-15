@@ -132,7 +132,7 @@
       <t-table :loading="loading" :columns="definitionColumns" :data="processDefinitionHistoryList">
         <template #version="{ row }"> v{{ row.version }}.0 </template>
         <template #suspensionState="{ row }">
-          <t-tag v-if="row.suspensionState == 1" variant="outline" theme="success">激活</t-tag>
+          <t-tag v-if="row.suspensionState === 1" variant="outline" theme="success">激活</t-tag>
           <t-tag v-else variant="outline" theme="danger">挂起</t-tag>
         </template>
       </t-table>
@@ -165,7 +165,6 @@
     ></user-select>
   </t-card>
 </template>
-
 <script lang="ts" setup>
 import 'vue-json-pretty/lib/styles.css';
 
@@ -178,7 +177,7 @@ import {
   SearchIcon,
   SettingIcon,
 } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol, TableProps, TabsProps } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol, TableProps, TabsProps } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 import VueJsonPretty from 'vue-json-pretty';
 
@@ -195,6 +194,7 @@ const { proxy } = getCurrentInstance();
 const { wf_business_status } = proxy.useDict('wf_business_status');
 const routerJump = useRouterJump();
 
+const queryRef = ref<FormInstanceFunctions>();
 const treeActived = ref<string[]>([]);
 const columnControllerVisible = ref(false);
 // 遮罩层
@@ -308,7 +308,7 @@ const handleQuery = () => {
 };
 /** 重置按钮操作 */
 const resetQuery = () => {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   queryParams.value.createByIds = [];
   userSelectCount.value = 0;
@@ -423,7 +423,7 @@ const handleInstanceVariable = async (row: FlowInstanceVo) => {
 function formatToJsonObject(data: string) {
   try {
     return JSON.parse(data);
-  } catch (error) {
+  } catch {
     return data;
   }
 }

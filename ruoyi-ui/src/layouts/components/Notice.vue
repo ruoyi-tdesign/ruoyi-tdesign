@@ -47,7 +47,6 @@
     </t-badge>
   </t-popup>
 </template>
-
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { MailIcon } from 'tdesign-icons-vue-next';
@@ -91,9 +90,10 @@ const setRead = (type: string, item?: NoticeItem) => {
   }
 };
 
+const typeMatcher = /^\[(\S+)\].*/;
 function getType(content: string) {
   if (content) {
-    const array = content.match(/^\[(\S+)].*/);
+    const array = content.match(typeMatcher);
     return array.at(1);
   }
   return '';
@@ -103,7 +103,6 @@ const goDetail = () => {
   router.push('/system/notice');
 };
 </script>
-
 <style lang="less" scoped>
 .header-msg {
   width: 400px;

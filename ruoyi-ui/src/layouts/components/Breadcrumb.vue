@@ -1,5 +1,5 @@
 <template>
-  <t-breadcrumb :max-item-width="'150'" class="tdesign-breadcrumb" separator="&nbsp;/&nbsp;">
+  <t-breadcrumb max-item-width="150" class="tdesign-breadcrumb" separator="&nbsp;/&nbsp;">
     <t-breadcrumbItem
       v-for="(item, index) in crumbs"
       :key="item.to + index"
@@ -11,7 +11,6 @@
     </t-breadcrumbItem>
   </t-breadcrumb>
 </template>
-
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -44,7 +43,7 @@ const crumbs = computed(() => {
       return breadcrumbArray;
     }
     breadcrumbArray.push({
-      // @ts-ignore 设置子路由的参数
+      // @ts-expect-error 设置子路由的参数
       query: routeLocationMatched.children?.at(0)?.query,
       to,
       title,

@@ -88,7 +88,6 @@
     <modify-password v-model:visible="openModifyPassword" />
   </div>
 </template>
-
 <script lang="ts" setup>
 import {
   ChevronDownIcon,
@@ -118,8 +117,6 @@ import MenuContent from './MenuContent.vue';
 import Notice from './Notice.vue';
 import Search from './Search.vue';
 
-const userStore = useUserStore();
-
 const props = defineProps({
   theme: {
     type: String,
@@ -135,7 +132,7 @@ const props = defineProps({
   },
   menu: {
     type: Array as PropType<ComplexRoute[]>,
-    default: () => [],
+    default: () => [] as ComplexRoute[],
   },
   isFixed: {
     type: Boolean,
@@ -150,6 +147,8 @@ const props = defineProps({
     default: 3,
   },
 });
+
+const userStore = useUserStore();
 
 const openModifyPassword = ref(false);
 const router = useRouter();
@@ -398,7 +397,6 @@ const navToHelper = () => {
   }
 }
 </style>
-
 <!-- eslint-disable-next-line vue-scoped-css/enforce-style-type -->
 <style lang="less">
 .operations-dropdown-container-item {

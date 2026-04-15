@@ -1,9 +1,8 @@
 <template>
-  <div :style="'height:' + height">
+  <div :style="`height:${height}`">
     <iframe :id="iframeId" style="width: 100%; height: 100%" :src="src" frameborder="no"></iframe>
   </div>
 </template>
-
 <script lang="ts" setup>
 import { ref } from 'vue';
 

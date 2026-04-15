@@ -10,7 +10,6 @@
     <slot />
   </div>
 </template>
-
 <script lang="ts" setup>
 import { useMutationObserver } from '@vueuse/core';
 import debounce from 'lodash/debounce';

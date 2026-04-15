@@ -35,11 +35,19 @@
 </template>
 <script setup lang="ts">
 import type { FormInstanceFunctions, FormRule, SubmitContext } from 'tdesign-vue-next';
-import { defineModel, getCurrentInstance, onMounted, type PropType, ref } from 'vue';
+import type { PropType } from 'vue';
+import { defineModel, getCurrentInstance, onMounted, ref } from 'vue';
 
 import { getDataNames, updateGenTableName } from '@/api/tool/gen';
 import type { GenTableVo, GenUpdateTableNameForm } from '@/api/tool/model/genModel';
 
+const props = defineProps({
+  tableVo: {
+    type: Object as PropType<GenTableVo>,
+    required: true,
+  },
+});
+const emit = defineEmits(['submit']);
 const updateTableRef = ref<FormInstanceFunctions>();
 const dataNameList = ref<Array<string>>([]);
 const { proxy } = getCurrentInstance();
@@ -51,15 +59,6 @@ const visible = defineModel('visible', {
 const loading = defineModel('loading', {
   type: Boolean,
   default: false,
-});
-
-const emit = defineEmits(['submit']);
-
-const props = defineProps({
-  tableVo: {
-    type: Object as PropType<GenTableVo>,
-    required: true,
-  },
 });
 
 const updateTableNameForm = ref<GenUpdateTableNameForm>({});

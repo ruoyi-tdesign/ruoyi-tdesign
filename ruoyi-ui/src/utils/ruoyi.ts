@@ -10,6 +10,14 @@ import type { StringKeys } from '@/utils/types';
 import { isHttp } from '@/utils/validate';
 
 // 日期格式化
+const numberReg = /^\d+$/;
+
+const subReg = /-/g;
+
+const dianReg = /\.\d{3}/g;
+
+const formatReg = /\{([ymdhisa])+\}/g;
+
 export function parseTime(time: Date | string | number, pattern?: string) {
   if (arguments.length === 0 || !time) {
     return null;
@@ -19,13 +27,10 @@ export function parseTime(time: Date | string | number, pattern?: string) {
   if (typeof time === 'object') {
     date = time;
   } else {
-    if (typeof time === 'string' && /^[0-9]+$/.test(time)) {
-      time = parseInt(time, 10);
+    if (typeof time === 'string' && numberReg.test(time)) {
+      time = Number.parseInt(time, 10);
     } else if (typeof time === 'string') {
-      time = time
-        .replace(/-/gm, '/')
-        .replace('T', ' ')
-        .replace(/\.[\d]{3}/gm, '');
+      time = time.replace(subReg, '/').replace('T', ' ').replace(dianReg, '');
     }
     if (typeof time === 'number' && time.toString().length === 10) {
       time *= 1000;
@@ -41,7 +46,7 @@ export function parseTime(time: Date | string | number, pattern?: string) {
     s: date.getSeconds(),
     a: date.getDay(),
   };
-  return format.replace(/{([ymdhisa])+}/g, (result: string, key: string) => {
+  return format.replace(formatReg, (result: string, key: string) => {
     let value: string | number = formatObj[key];
     // Note: getDay() returns 0 on Sunday
     if (key === 'a') {
@@ -148,12 +153,14 @@ export function selectDictLabels(datas: DictModel[], value?: string | string[], 
 }
 
 // 字符串格式化(%s )
+const searchValue = /%s/g;
+
 export function sprintf(str: string) {
   // eslint-disable-next-line prefer-rest-params
   const args = arguments;
   let flag = true;
   let i = 1;
-  str = str.replace(/%s/g, () => {
+  str = str.replace(searchValue, () => {
     const arg = args[i++];
     if (typeof arg === 'undefined') {
       flag = false;
@@ -181,7 +188,7 @@ export function mergeRecursive(source: { [x: string]: any }, target: { [x: strin
       } else {
         source[p] = target[p];
       }
-    } catch (e) {
+    } catch {
       source[p] = target[p];
     }
   }
@@ -261,7 +268,7 @@ export function getNormalPath(p: string) {
     return p;
   }
   const res = p.replace('//', '/');
-  if (res[res.length - 1] === '/') {
+  if (res.at(-1) === '/') {
     return res.slice(0, res.length - 1);
   }
   return res;
@@ -282,7 +289,7 @@ export function treeFilter<S extends { children: S[]; label: string }>(data: S[]
         if (item.children && item.children.length > 0) {
           item.children = treeFilter(item.children, searchValue);
         }
-        return (item.children && item.children.length > 0) || item.label.indexOf(searchValue) !== -1;
+        return (item.children && item.children.length > 0) || item.label.includes(searchValue);
       });
   }
   return data;
@@ -344,12 +351,12 @@ export function handleChangeStatus<T>(
           modal.msgSuccess(`${text}成功`);
         })
         .catch(() => {
-          // @ts-ignore
+          // @ts-expect-error 动态类型
           rowObj[status] = rowObj[status] === noValue ? yesValue : noValue;
         });
     },
     () => {
-      // @ts-ignore
+      // @ts-expect-error 动态类型
       rowObj[status] = rowObj[status] === noValue ? yesValue : noValue;
     },
   );
@@ -363,7 +370,7 @@ export function isJson(json: string) {
   try {
     const obj = JSON.parse(json);
     return typeof obj === 'object' && obj;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -447,16 +454,17 @@ export function getVisitUrl(rawUrl: string, query?: Record<string, any> | string
   return urlObj.toString();
 }
 
+// eslint-disable-next-line regexp/no-super-linear-backtracking,regexp/optimal-quantifier-concatenation
+const regExp = /(src=")([^"]*sid=(\d+)[^"]*)(")/g;
 /**
  * 渲染富文本中的链接
  * @param obj
  * @param arr
  */
-export function editorRender<T extends Object, K extends StringKeys<T>>(obj: T | string, ...arr: K[]) {
+export function editorRender<T extends object, K extends StringKeys<T>>(obj: T | string, ...arr: K[]) {
   if (!obj) {
     return obj;
   }
-  const regExp = /(src=")([^"]*sid=(\d+)[^"]*?)(")/g;
   if (isString(obj)) {
     return obj.replaceAll(regExp, (match, p1, p2, p3, p4) => {
       return p1 + getVisitUrl(p2) + p4;

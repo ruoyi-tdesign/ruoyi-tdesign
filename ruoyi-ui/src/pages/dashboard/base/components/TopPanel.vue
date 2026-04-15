@@ -4,7 +4,8 @@
       <t-card
         :title="t(item.title)"
         :bordered="false"
-        :class="{ 'dashboard-item': true, 'dashboard-item--main-color': index == 0 }"
+        class="dashboard-item"
+        :class="{ 'dashboard-item--main-color': index == 0 }"
       >
         <div class="dashboard-item-top">
           <span :style="{ fontSize: `${resizeTime * 28}px` }">{{ item.number }}</span>
@@ -47,7 +48,6 @@
     </t-col>
   </t-row>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'DashboardBase',
@@ -176,7 +176,6 @@ watch(
   },
 );
 </script>
-
 <style lang="less" scoped>
 .dashboard-item {
   padding: var(--td-comp-paddingTB-xl) var(--td-comp-paddingLR-xxl);

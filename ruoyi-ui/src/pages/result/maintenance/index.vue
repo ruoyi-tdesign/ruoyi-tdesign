@@ -3,7 +3,6 @@
     <t-button theme="primary" @click="() => $router.push('/')">{{ t('pages.result.maintenance.back') }}</t-button>
   </result>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'ResultMaintenance',

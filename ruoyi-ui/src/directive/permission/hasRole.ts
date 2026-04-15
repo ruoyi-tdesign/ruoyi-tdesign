@@ -10,7 +10,7 @@ export default {
     const { value } = binding;
     const { roles } = useUserStore();
 
-    if (value && value instanceof Array && value.length > 0) {
+    if (value && Array.isArray(value) && value.length > 0) {
       const roleFlag = value;
 
       const hasRole = roles.some((role) => {
@@ -18,7 +18,6 @@ export default {
       });
 
       if (!hasRole) {
-        // eslint-disable-next-line no-unused-expressions
         el.parentNode && el.parentNode.removeChild(el);
       }
     } else {

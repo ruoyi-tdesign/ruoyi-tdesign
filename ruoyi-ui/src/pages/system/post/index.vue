@@ -1,11 +1,11 @@
 <template>
   <t-card>
     <t-row :gutter="20">
-      <!--部门数据-->
+      <!-- 部门数据 -->
       <t-col :sm="2" :xs="12">
         <dept-tree v-model="deptActived" @active="handleQuery" />
       </t-col>
-      <!--用户数据-->
+      <!-- 用户数据 -->
       <t-col :sm="10" :xs="12">
         <t-space direction="vertical" style="width: 100%">
           <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline" label-width="calc(4em + 12px)">
@@ -276,6 +276,7 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref('');
+const queryRef = ref<FormInstanceFunctions>();
 const postRef = ref<FormInstanceFunctions>();
 const columnControllerVisible = ref(false);
 const sort = ref<TableSort>();
@@ -359,7 +360,7 @@ function reset() {
     remark: undefined,
   };
   deptActived.value = [];
-  proxy.resetForm('postRef');
+  postRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -371,7 +372,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRangeCreateTime.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -485,7 +486,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `post_${new Date().getTime()}.xlsx`,
+    `post_${Date.now()}.xlsx`,
   );
 }
 

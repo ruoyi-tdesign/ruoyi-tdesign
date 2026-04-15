@@ -105,17 +105,6 @@ defineOptions({
   name: 'RoleSelect',
 });
 
-import { RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol, TableProps, TableSort } from 'tdesign-vue-next';
-import { computed, getCurrentInstance, type PropType, ref } from 'vue';
-
-import type { SysRoleQuery, SysRoleVo } from '@/api/system/model/roleModel';
-import { listRole, roleOptionSelect } from '@/api/system/role';
-import useDialog from '@/hooks/useDialog';
-
-const { proxy } = getCurrentInstance();
-const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
-
 const props = defineProps({
   multiple: {
     type: Boolean,
@@ -123,17 +112,28 @@ const props = defineProps({
   },
   data: [String, Number, Array] as PropType<string | number | Array<string | number>>,
 });
+const emit = defineEmits<{
+  (e: 'confirm-callback', value: SysRoleVo[]): void;
+}>();
+import { RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol, TableProps, TableSort } from 'tdesign-vue-next';
+import type { PropType } from 'vue';
+import { computed, getCurrentInstance, ref } from 'vue';
+
+import type { SysRoleQuery, SysRoleVo } from '@/api/system/model/roleModel';
+import { listRole, roleOptionSelect } from '@/api/system/role';
+import useDialog from '@/hooks/useDialog';
+
+const { proxy } = getCurrentInstance();
+const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
+const queryRef = ref<FormInstanceFunctions>();
 
 const modelValue = defineModel<SysRoleVo[]>({
   default: () => [] as SysRoleVo[],
 });
 
-const emit = defineEmits<{
-  (e: 'confirmCallBack', value: SysRoleVo[]): void;
-}>();
-
 const computedIds = (data: string | number | Array<string | number>) => {
-  if (data instanceof Array) {
+  if (Array.isArray(data)) {
     return [...data];
   }
   if (typeof data === 'string') {
@@ -211,7 +211,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -257,7 +257,7 @@ const handleSelectionChange: TableProps['onSelectChange'] = (selection, options)
 function onSubmit() {
   const value = [...selectRoleList.value];
   modelValue.value = value;
-  emit('confirmCallBack', value);
+  emit('confirm-callback', value);
   roleDialog.closeDialog();
 }
 

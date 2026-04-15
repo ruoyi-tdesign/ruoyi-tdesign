@@ -187,7 +187,7 @@ export function constructInitDataset({
  *  线性图表数据源
  *
  * @export
- * @param {Array<string>} [dateTime=[]]
+ * @param {Array<string>} [dateTime]
  * @returns {*}
  */
 export function getLineChartDataSet({
@@ -302,7 +302,7 @@ export function getLineChartDataSet({
  * 获取饼图数据
  *
  * @export
- * @param {number} [radius=1]
+ * @param {number} [radius]
  * @returns {*}
  */
 export function getPieChartDataSet({

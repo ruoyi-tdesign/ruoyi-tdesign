@@ -20,7 +20,6 @@
       <div class="head-container h70vh">
         <t-loading :loading="loadingTree" size="small">
           <t-tree
-            ref="deptTreeRef"
             v-model:actived="treeActived"
             v-model:expanded="expandedTree"
             class="t-tree--block-node"
@@ -40,7 +39,6 @@
     </my-scrollbar>
   </div>
 </template>
-
 <script setup lang="ts">
 import { RefreshIcon, SearchIcon } from 'tdesign-icons-vue-next';
 import type { TreeNodeModel } from 'tdesign-vue-next';
@@ -49,6 +47,7 @@ import { computed, ref } from 'vue';
 import type { TreeModel } from '@/api/model/resultModel';
 import { flowCategoryTree } from '@/api/workflow/category';
 
+const emit = defineEmits(['active']);
 const loadingTree = ref(false);
 const categoryOptions = ref<TreeModel<string>[]>([]);
 const categoryName = ref('');
@@ -56,8 +55,6 @@ const expandedTree = ref<string[]>([]);
 const treeActived = defineModel<string[]>({
   default: () => [] as string[],
 });
-const emit = defineEmits(['active']);
-
 function triggerExpandedTree() {
   expandedTree.value = categoryOptions.value
     .flatMap((value) => value.children?.concat([value]) ?? [value])
@@ -68,7 +65,7 @@ const filterNode = computed(() => {
   const value = categoryName.value;
   return (node: TreeNodeModel) => {
     if (!node.value || !value || node.data.id === '0') return true;
-    return node.label.indexOf(value) >= 0;
+    return node.label.includes(value);
   };
 });
 
@@ -83,5 +80,4 @@ onMounted(() => {
   getTreeselect().then(() => triggerExpandedTree());
 });
 </script>
-
 <style scoped lang="less"></style>

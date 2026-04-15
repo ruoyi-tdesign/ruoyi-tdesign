@@ -1,7 +1,6 @@
 <template>
   <div class="upload-file">
     <t-upload
-      ref="fileUpload"
       v-model="fileList"
       multiple
       :abridge-name="abridgeName"
@@ -52,15 +51,14 @@
       :multiple="limit > 1"
       :image-upload="false"
       :file-upload-props="{
-        accept: accept,
-        fileSize: fileSize,
-        fileType: fileType,
+        accept,
+        fileSize,
+        fileType,
       }"
       :on-submit="handleSelectSubmit"
     />
   </div>
 </template>
-
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { CloudUploadIcon } from 'tdesign-icons-vue-next';
@@ -133,6 +131,8 @@ const props = withDefaults(defineProps<FileUploadProps>(), {
   supportUrl: true,
 });
 
+const emit = defineEmits(['update:modelValue', 'change']);
+
 const queryParam = computed<MyOssProps['queryParam']>(() => {
   const maxSize = props.fileSize * 1024 * 1024;
   if (props.accept) {
@@ -149,7 +149,6 @@ const queryParam = computed<MyOssProps['queryParam']>(() => {
 
 const { token } = storeToRefs(useUserStore());
 const { proxy } = getCurrentInstance();
-const emit = defineEmits(['update:modelValue', 'change']);
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
 const uploadFileUrl = ref(`${baseUrl}/resource/oss/upload`); // 上传文件服务器地址
 const headers = ref({ Authorization: `Bearer ${token.value}` });
@@ -162,6 +161,7 @@ const effectiveSupportUrl = computed(() => {
 });
 const open = ref(false);
 
+const splitHttp = /,(?=http)/;
 watch(
   () => props.modelValue,
   async (val) => {
@@ -184,7 +184,7 @@ watch(
               ossId: oss.ossId,
             });
           });
-          list = val.split(/,(?=http)/).map((url: string) => {
+          list = val.split(splitHttp).map((url: string) => {
             return (
               tempMap.get(url) || {
                 name: getHttpFileName(url),
@@ -223,7 +223,7 @@ watch(
             ossId: item.ossId,
           };
         }
-        item.uid = item.uid || new Date().getTime() + temp++;
+        item.uid = item.uid || Date.now() + temp++;
         return item;
       });
     } else {
@@ -322,7 +322,7 @@ function handleBeforeUpload(file: UploadFile) {
   // 校检文件类型
   if (props.fileType?.length) {
     const fileExt = getHttpFileSuffix(file.name);
-    const isTypeOk = props.fileType.indexOf(fileExt) >= 0;
+    const isTypeOk = props.fileType.includes(fileExt);
     if (!isTypeOk) {
       proxy.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}格式文件!`);
       return false;

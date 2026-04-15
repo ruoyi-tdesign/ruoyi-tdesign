@@ -72,7 +72,7 @@ router.beforeEach(async (to, from, next) => {
     }
   } else {
     /* white list router */
-    if (whiteListRouters.indexOf(to.path) !== -1) {
+    if (whiteListRouters.includes(to.path)) {
       next();
     } else {
       next({

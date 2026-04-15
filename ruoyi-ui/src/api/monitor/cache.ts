@@ -18,7 +18,7 @@ export function listCacheName() {
 
 // 查询缓存键名列表
 export function listCacheKey(cacheName: string) {
-  return request.get<R<Array<String>>>({
+  return request.get<R<Array<string>>>({
     url: `/monitor/cache/getKeys/${cacheName}`,
   });
 }

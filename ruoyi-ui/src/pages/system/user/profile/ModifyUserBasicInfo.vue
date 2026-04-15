@@ -23,7 +23,6 @@
     </t-form>
   </t-dialog>
 </template>
-
 <script lang="ts" setup>
 import type { FormInstanceFunctions, FormRule, SubmitContext } from 'tdesign-vue-next';
 import { getCurrentInstance, ref } from 'vue';
@@ -31,17 +30,19 @@ import { getCurrentInstance, ref } from 'vue';
 import type { SysUserProfileBo } from '@/api/system/model/userModel';
 import { updateUserProfile } from '@/api/system/profile';
 
-const visible = defineModel('visible', {
-  type: Boolean,
-  default: false,
-});
-
 const props = defineProps({
   user: {
     type: Object,
   },
 });
+
 const emit = defineEmits(['submit']);
+
+const visible = defineModel('visible', {
+  type: Boolean,
+  default: false,
+});
+
 const { proxy } = getCurrentInstance();
 const userRef = ref<FormInstanceFunctions>();
 

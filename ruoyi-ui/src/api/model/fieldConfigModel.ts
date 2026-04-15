@@ -12,7 +12,7 @@ export interface FieldOption {
   /** 值 */
   value: string | number;
 }
-export type FieldOptionGroup = {
+export interface FieldOptionGroup {
   /** 是否显示分隔线，默认为true */
   divider?: boolean;
   /** 分组别名 */
@@ -21,7 +21,7 @@ export type FieldOptionGroup = {
   group: string;
   /** 子选项 */
   children?: FieldOption[];
-};
+}
 /** 字段基本配置对象 */
 export interface FieldConfig<T extends string | number | boolean | Array<string | number> = string> {
   /** 字段默认值 */
@@ -66,7 +66,8 @@ export function evalFieldConfig(config: FieldConfig<any>) {
       rule.pattern = new RegExp(rule.pattern);
     }
     if (rule.validator) {
-      // @ts-ignore
+      // eslint-disable-next-line ts/ban-ts-comment
+      // @ts-expect-error
       // eslint-disable-next-line no-new-func
       rule.validator = new Function(rule.validator);
     }

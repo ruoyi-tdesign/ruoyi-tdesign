@@ -35,22 +35,20 @@
     </t-loading>
   </div>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'SystemGlobalConfig',
 });
-import type { FormRule, SubmitContext } from 'tdesign-vue-next';
-import { getCurrentInstance, ref } from 'vue';
-
-import { getConfigByKeys, refreshCache, updateConfigMaps } from '@/api/system/config';
-
 defineProps({
   disabled: {
     type: Boolean,
     required: true,
   },
 });
+import type { FormRule, SubmitContext } from 'tdesign-vue-next';
+import { getCurrentInstance, ref } from 'vue';
+
+import { getConfigByKeys, refreshCache, updateConfigMaps } from '@/api/system/config';
 
 const loading = ref(false);
 const buttonLoading = ref(false);
@@ -113,5 +111,4 @@ function handleRefreshCache() {
 
 init();
 </script>
-
 <style scoped></style>

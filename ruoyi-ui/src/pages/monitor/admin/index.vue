@@ -3,7 +3,6 @@
     <i-frame v-model:src="url"></i-frame>
   </div>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'Admin',

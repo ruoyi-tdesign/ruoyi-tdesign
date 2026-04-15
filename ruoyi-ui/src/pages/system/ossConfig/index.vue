@@ -247,6 +247,7 @@ const { sys_yes_no, sys_normal_disable } = proxy.useDict('sys_yes_no', 'sys_norm
 const openView = ref(false);
 const openViewLoading = ref(false);
 const ossConfigList = ref<SysOssConfigVo[]>([]);
+const queryRef = ref<FormInstanceFunctions>();
 const ossConfigRef = ref<FormInstanceFunctions>();
 const open = ref(false);
 const buttonLoading = ref(false);
@@ -362,7 +363,7 @@ function reset() {
     accessPolicy: '1',
     status: '1',
   };
-  proxy.resetForm('ossConfigRef');
+  ossConfigRef.value.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -371,7 +372,7 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
 

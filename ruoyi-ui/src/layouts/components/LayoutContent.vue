@@ -69,7 +69,6 @@
     </t-footer>
   </t-layout>
 </template>
-
 <script lang="ts" setup>
 import { ArrowLeftIcon, ArrowRightIcon, CloseCircleIcon, HomeIcon, RefreshIcon } from 'tdesign-icons-vue-next';
 import type { PopupVisibleChangeContext } from 'tdesign-vue-next';

@@ -2,7 +2,6 @@ import { ref, toRefs } from 'vue';
 
 import { getDicts } from '@/api/system/dict/data';
 import type { SysDictDataVo } from '@/api/system/model/dictModel';
-// @ts-ignore
 import useDictStore from '@/store/modules/dict';
 
 export interface DictModel {

@@ -40,14 +40,6 @@
 defineOptions({
   name: 'GenPreview',
 });
-import { FileCopyIcon } from 'tdesign-icons-vue-next';
-import type { PropType } from 'vue';
-import { computed, getCurrentInstance, ref, watch } from 'vue';
-
-const { proxy } = getCurrentInstance();
-const title = ref('代码预览');
-const activeName = ref('domain.java');
-
 const props = defineProps({
   visible: {
     type: Boolean,
@@ -60,6 +52,14 @@ const props = defineProps({
   data: [Object] as PropType<Record<string, string>>,
 });
 const emit = defineEmits(['update:visible']);
+import { FileCopyIcon } from 'tdesign-icons-vue-next';
+import type { PropType } from 'vue';
+import { computed, getCurrentInstance, ref, watch } from 'vue';
+
+const { proxy } = getCurrentInstance();
+const title = ref('代码预览');
+const activeName = ref('domain.java');
+
 const modelVisible = computed({
   get() {
     return props.visible;

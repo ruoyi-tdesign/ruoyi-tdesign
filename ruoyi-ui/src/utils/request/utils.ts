@@ -10,7 +10,7 @@ export function joinTimestamp(join: boolean, restful = false): string | object {
   if (!join) {
     return restful ? '' : {};
   }
-  const now = new Date().getTime();
+  const now = Date.now();
   if (restful) {
     return `?_t=${now}`;
   }
@@ -24,7 +24,6 @@ export function formatRequestDate(params: Recordable) {
   }
 
   for (const key in params) {
-    // eslint-disable-next-line no-underscore-dangle
     if (params[key] && params[key]._isAMomentObject) {
       params[key] = params[key].format(DATE_TIME_FORMAT);
     }
@@ -45,11 +44,17 @@ export function formatRequestDate(params: Recordable) {
 }
 
 // 将对象转为Url参数
+const searchValue = /&$/;
+
+const regExp = /\?$/;
+
+const regExp1 = /\/?$/;
+
 export function setObjToUrlParams(baseUrl: string, obj: { [index: string]: any }): string {
   let parameters = '';
   for (const key in obj) {
     parameters += `${key}=${encodeURIComponent(obj[key])}&`;
   }
-  parameters = parameters.replace(/&$/, '');
-  return /\?$/.test(baseUrl) ? baseUrl + parameters : baseUrl.replace(/\/?$/, '?') + parameters;
+  parameters = parameters.replace(searchValue, '');
+  return regExp.test(baseUrl) ? baseUrl + parameters : baseUrl.replace(regExp1, '?') + parameters;
 }

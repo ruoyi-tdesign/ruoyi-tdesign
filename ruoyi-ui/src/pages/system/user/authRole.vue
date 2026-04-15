@@ -83,7 +83,7 @@ const columns = ref<Array<PrimaryTableCol>>([
     width: 55,
     align: 'center',
     disabled: (options: { row: TableRowData; rowIndex: number }) =>
-      options.row.status === '0' && !roleIds.value.some((roleId) => roleId === options.row.roleId),
+      options.row.status === '0' && !roleIds.value.includes(options.row.roleId),
   },
   { title: `角色编号`, colKey: 'roleId', align: 'center' },
   { title: `角色名称`, colKey: 'roleName', align: 'center' },

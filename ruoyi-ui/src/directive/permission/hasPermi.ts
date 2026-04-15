@@ -11,7 +11,7 @@ export default {
     const allPermission = '*:*:*';
     const { permissions } = useUserStore();
 
-    if (value && value instanceof Array && value.length > 0) {
+    if (value && Array.isArray(value) && value.length > 0) {
       const permissionFlag = value;
 
       const hasPermissions = permissions.some((permission) => {
@@ -19,7 +19,6 @@ export default {
       });
 
       if (!hasPermissions) {
-        // eslint-disable-next-line no-unused-expressions
         el.parentNode && el.parentNode.removeChild(el);
       }
     } else {

@@ -22,6 +22,15 @@ defineOptions({
   name: 'BindingEmail',
 });
 
+const props = defineProps({
+  email: {
+    type: String,
+    required: true,
+  },
+});
+const emit = defineEmits<{
+  (e: 'submit', email: string): void;
+}>();
 import type { FormInstanceFunctions, FormRule, SubmitContext } from 'tdesign-vue-next';
 import { getCurrentInstance, ref } from 'vue';
 
@@ -32,15 +41,6 @@ const visible = defineModel('visible', {
   default: false,
 });
 
-const props = defineProps({
-  email: {
-    type: String,
-    required: true,
-  },
-});
-const emit = defineEmits<{
-  (e: 'submit', email: string): void;
-}>();
 const { proxy } = getCurrentInstance();
 const formRef = ref<FormInstanceFunctions>();
 

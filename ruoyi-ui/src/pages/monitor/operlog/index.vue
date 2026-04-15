@@ -190,7 +190,7 @@ defineOptions({
 });
 
 import { BrowseIcon, DeleteIcon, DownloadIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol, TableSort } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol, TableSort } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
 import type { SysOperLogQuery, SysOperLogVo } from '@/api/monitor/model/operlogModel';
@@ -202,6 +202,7 @@ import { isJson } from '@/utils/ruoyi';
 const { proxy } = getCurrentInstance();
 const { sys_oper_type, sys_common_status } = proxy.useDict('sys_oper_type', 'sys_common_status');
 
+const queryRef = ref<FormInstanceFunctions>();
 const operLogList = ref<SysOperLogVo[]>([]);
 const open = ref(false);
 const loading = ref(false);
@@ -284,7 +285,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRangeOperTime.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -339,7 +340,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `operlog_${new Date().getTime()}.xlsx`,
+    `operlog_${Date.now()}.xlsx`,
   );
 }
 

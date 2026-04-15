@@ -10,52 +10,52 @@
             <t-row>
               <t-col :span="3">
                 <t-form-item label="Redis版本">
-                  <div v-if="cache.info">{{ cache.info['redis_version'] }}</div>
+                  <div v-if="cache.info">{{ cache.info.redis_version }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
                 <t-form-item label="运行模式">
-                  <div v-if="cache.info">{{ cache.info['redis_mode'] === 'standalone' ? '单机' : '集群' }}</div>
+                  <div v-if="cache.info">{{ cache.info.redis_mode === 'standalone' ? '单机' : '集群' }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
                 <t-form-item label="端口">
-                  <div v-if="cache.info">{{ cache.info['tcp_port'] }}</div>
+                  <div v-if="cache.info">{{ cache.info.tcp_port }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
                 <t-form-item label="客户端数">
-                  <div v-if="cache.info">{{ cache.info['connected_clients'] }}</div>
+                  <div v-if="cache.info">{{ cache.info.connected_clients }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
                 <t-form-item label="运行时间(天)">
-                  <div v-if="cache.info">{{ cache.info['uptime_in_days'] }}</div>
+                  <div v-if="cache.info">{{ cache.info.uptime_in_days }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
                 <t-form-item label="使用内存">
-                  <div v-if="cache.info">{{ cache.info['used_memory_human'] }}</div>
+                  <div v-if="cache.info">{{ cache.info.used_memory_human }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
                 <t-form-item label="使用CPU">
-                  <div v-if="cache.info">{{ parseFloat(cache.info['used_cpu_user_children']).toFixed(2) }}</div>
+                  <div v-if="cache.info">{{ parseFloat(cache.info.used_cpu_user_children).toFixed(2) }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
                 <t-form-item label="内存配置">
-                  <div v-if="cache.info">{{ cache.info['maxmemory_human'] }}</div>
+                  <div v-if="cache.info">{{ cache.info.maxmemory_human }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
                 <t-form-item label="AOF是否开启">
-                  <div v-if="cache.info">{{ cache.info['aof_enabled'] === '0' ? '否' : '是' }}</div>
+                  <div v-if="cache.info">{{ cache.info.aof_enabled === '0' ? '否' : '是' }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
                 <t-form-item label="RDB是否成功">
-                  <div v-if="cache.info">{{ cache.info['rdb_last_bgsave_status'] }}</div>
+                  <div v-if="cache.info">{{ cache.info.rdb_last_bgsave_status }}</div>
                 </t-form-item>
               </t-col>
               <t-col :span="3">
@@ -66,7 +66,7 @@
               <t-col :span="3">
                 <t-form-item label="网络入口/出口">
                   <div v-if="cache.info">
-                    {{ cache.info['instantaneous_input_kbps'] }}kps/{{ cache.info['instantaneous_output_kbps'] }}kps
+                    {{ cache.info.instantaneous_input_kbps }}kps/{{ cache.info.instantaneous_output_kbps }}kps
                   </div>
                 </t-form-item>
               </t-col>
@@ -160,7 +160,7 @@ function getList() {
           },
           data: [
             {
-              value: parseFloat(cache.value.info.used_memory_human),
+              value: Number.parseFloat(cache.value.info.used_memory_human),
               name: '内存消耗',
             },
           ],

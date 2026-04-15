@@ -8,7 +8,6 @@
   </router-view>
   <frame-page />
 </template>
-
 <script lang="ts" setup>
 import isBoolean from 'lodash/isBoolean';
 import isUndefined from 'lodash/isUndefined';

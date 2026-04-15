@@ -253,6 +253,7 @@ const title = ref('');
 const defaultDictType = ref('');
 const typeOptions = ref<SysDictTypeVo[]>([]);
 const columnControllerVisible = ref(false);
+const queryRef = ref<FormInstanceFunctions>();
 const dataRef = ref<FormInstanceFunctions>();
 const removeCurrentTab = useTabsRouterStore().useRemoveCurrentTab();
 const route = useRoute();
@@ -358,7 +359,7 @@ function reset() {
     dictSort: 0,
     remark: undefined,
   };
-  proxy.resetForm('dataRef');
+  dataRef.value.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -371,7 +372,7 @@ function handleClose() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.dictType = defaultDictType.value;
   queryParams.value.pageNum = 1;
   handleSortChange(null);
@@ -481,7 +482,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `dict_data_${new Date().getTime()}.xlsx`,
+    `dict_data_${Date.now()}.xlsx`,
   );
 }
 

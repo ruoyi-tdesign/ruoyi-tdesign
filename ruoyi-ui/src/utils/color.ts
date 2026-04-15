@@ -59,7 +59,6 @@ export function generateColorMap(theme: string, colorPalette: Array<string>, mod
   const isDarkMode = mode === 'dark';
 
   if (isDarkMode) {
-    // eslint-disable-next-line no-use-before-define
     colorPalette.reverse().map((color) => {
       const [h, s, l] = Color.colorTransform(color, 'hex', 'hsl');
       return Color.colorTransform([h, Number(s) - 4, l], 'hsl', 'hex');
@@ -93,7 +92,7 @@ export function insertThemeStylesheet(theme: string, colorMap: TColorToken, mode
 
   const styleSheet = document.createElement('style');
   styleSheet.type = 'text/css';
-  styleSheet.innerText = `${root}{
+  styleSheet.textContent = `${root}{
     --td-brand-color: ${colorMap['--td-brand-color']};
     --td-brand-color-1: ${colorMap['--td-brand-color-1']};
     --td-brand-color-2: ${colorMap['--td-brand-color-2']};

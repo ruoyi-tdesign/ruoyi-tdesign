@@ -20,7 +20,6 @@
       <div class="head-container h70vh">
         <t-loading :loading="loadingDept" size="small">
           <t-tree
-            ref="deptTreeRef"
             v-model:actived="deptActived"
             v-model:expanded="expandedDept"
             class="t-tree--block-node"
@@ -40,7 +39,6 @@
     </my-scrollbar>
   </div>
 </template>
-
 <script setup lang="ts">
 import { RefreshIcon, SearchIcon } from 'tdesign-icons-vue-next';
 import type { TreeNodeModel } from 'tdesign-vue-next';
@@ -49,6 +47,7 @@ import { ref } from 'vue';
 import type { TreeModel } from '@/api/model/resultModel';
 import { deptTreeSelect } from '@/api/system/user';
 
+const emit = defineEmits(['active']);
 const loadingDept = ref(false);
 const deptName = ref('');
 // const deptActived = ref<number[]>([]);
@@ -57,8 +56,6 @@ const deptOptions = ref<Array<TreeModel<number>>>([]);
 const deptActived = defineModel<number[]>({
   default: () => [],
 });
-const emit = defineEmits(['active']);
-
 /** 查询部门下拉树结构 */
 async function getDeptTree() {
   loadingDept.value = true;
@@ -74,7 +71,7 @@ const filterNode = computed(() => {
   const value = deptName.value;
   return (node: TreeNodeModel) => {
     if (!node.value || !value) return true;
-    return node.label.indexOf(value) >= 0;
+    return node.label.includes(value);
   };
 });
 
@@ -88,5 +85,4 @@ onMounted(() => {
   getDeptTree().then(() => triggerExpandedDept());
 });
 </script>
-
 <style scoped lang="less"></style>

@@ -62,7 +62,8 @@ function copyTextToClipboard(input: string, { target = document.body } = {}) {
 
   // Get the focus back on the previously focused element, if any
   if (previouslyFocusedElement) {
-    // @ts-ignore
+    // eslint-disable-next-line ts/ban-ts-comment
+    // @ts-expect-error
     previouslyFocusedElement?.focus();
   }
 

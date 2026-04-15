@@ -16,7 +16,6 @@
     <t-option v-for="item in tenantList" :key="item.tenantId" :label="item.companyName" :value="item.tenantId" />
   </t-select>
 </template>
-
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { ref, toRefs } from 'vue';
@@ -27,13 +26,12 @@ import Company from '@/assets/icons/svg/company.svg?component';
 import { useTabsRouterStore, useUserStore } from '@/store';
 import { useTenantStore } from '@/store/modules/tenant';
 
+const emit = defineEmits(['dynamic-change']);
 const { userId } = toRefs(useUserStore());
 const tenantId = ref(undefined);
 const tabsRouterStore = useTabsRouterStore();
 const router = useRouter();
 const { tenantEnabled, tenantList } = storeToRefs(useTenantStore());
-
-const emit = defineEmits(['dynamicChange']);
 
 /**
  * 动态切换租户
@@ -41,7 +39,7 @@ const emit = defineEmits(['dynamicChange']);
 function dynamicTenantEvent() {
   if (tenantId.value != null && tenantId.value !== '') {
     dynamicTenant(tenantId.value).then(() => {
-      emit('dynamicChange', true);
+      emit('dynamic-change', true);
       tabsRouterStore.removeTabRouterList();
       router.push('/');
     });
@@ -53,11 +51,10 @@ function dynamicTenantEvent() {
  */
 function dynamicClearEvent() {
   dynamicClear().then(() => {
-    emit('dynamicChange', false);
+    emit('dynamic-change', false);
     tabsRouterStore.removeTabRouterList();
     router.push('/');
   });
 }
 </script>
-
 <style scoped></style>

@@ -16,7 +16,7 @@
         :limit="1"
         accept=".xlsx, .xls"
         :headers="upload.headers"
-        :action="upload.url + '?updateSupport=' + upload.updateSupport"
+        :action="`${upload.url}?updateSupport=${upload.updateSupport}`"
         :disabled="upload.isUploading"
         :on-progress="handleFileUploadProgress"
         :on-success="handleFileSuccess"
@@ -33,7 +33,6 @@
     </t-space>
   </t-dialog>
 </template>
-
 <script setup lang="tsx">
 import { storeToRefs } from 'pinia';
 import type { SuccessContext, UploadInstanceFunctions, UploadProps } from 'tdesign-vue-next';
@@ -42,8 +41,6 @@ import { getCurrentInstance, reactive, ref } from 'vue';
 import MyScrollbar from '@/components/my-scrollbar/index.vue';
 import { useUserStore } from '@/store';
 
-const { token } = storeToRefs(useUserStore());
-const { proxy } = getCurrentInstance();
 const props = defineProps({
   title: {
     type: String,
@@ -64,16 +61,16 @@ const props = defineProps({
     default: 'template',
   },
 });
-
+const emit = defineEmits<{
+  (e: 'refresh'): void;
+}>();
+const { token } = storeToRefs(useUserStore());
+const { proxy } = getCurrentInstance();
 const visible = defineModel('visible', {
   type: Boolean,
   default: false,
 });
 const files = ref<UploadProps['value']>([]);
-
-const emit = defineEmits<{
-  (e: 'refresh'): void;
-}>();
 
 const uploadRef = ref<UploadInstanceFunctions>();
 
@@ -95,7 +92,7 @@ const handleClose = () => {
 
 /** 下载模板操作 */
 function importTemplate() {
-  proxy.download(props.downloadTemplateApi, {}, `${props.templateFilename}_${new Date().getTime()}.xlsx`);
+  proxy.download(props.downloadTemplateApi, {}, `${props.templateFilename}_${Date.now()}.xlsx`);
 }
 /** 文件上传中处理 */
 const handleFileUploadProgress = () => {
@@ -119,7 +116,6 @@ const handleFileSuccess = (context: SuccessContext) => {
   emit('refresh');
 };
 </script>
-
 <style lang="less" scoped>
 :global(.upload-excel .t-upload__dragger) {
   width: 100%;

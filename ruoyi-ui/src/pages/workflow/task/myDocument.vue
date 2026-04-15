@@ -93,7 +93,6 @@
     <submit-verify @submit-callback="getList" />
   </t-card>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'MyDocument',
@@ -107,7 +106,7 @@ import {
   SearchIcon,
   SettingIcon,
 } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol, TableProps } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol, TableProps } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 
 import { cancelProcessApply, deleteByInstanceIds, pageByCurrent } from '@/api/workflow/instance';
@@ -121,6 +120,7 @@ const routerJump = useRouterJump();
 const { proxy } = getCurrentInstance();
 const { wf_business_status } = proxy.useDict('wf_business_status');
 
+const queryRef = ref<FormInstanceFunctions>();
 const treeActived = ref<string[]>([]);
 const columnControllerVisible = ref(false);
 // 遮罩层
@@ -199,7 +199,7 @@ const handleQuery = () => {
 };
 /** 重置按钮操作 */
 const resetQuery = () => {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   treeActived.value = [];
   handleQuery();

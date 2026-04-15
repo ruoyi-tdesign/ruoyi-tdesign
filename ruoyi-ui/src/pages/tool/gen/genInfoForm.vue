@@ -187,7 +187,7 @@
               <t-option
                 v-for="(column, index) in info.columns"
                 :key="index"
-                :label="column.columnName + '：' + column.columnComment"
+                :label="`${column.columnName}：${column.columnComment}`"
                 :value="column.columnName"
               ></t-option>
             </t-select>
@@ -205,7 +205,7 @@
               <t-option
                 v-for="(column, index) in info.columns"
                 :key="index"
-                :label="column.columnName + '：' + column.columnComment"
+                :label="`${column.columnName}：${column.columnComment}`"
                 :value="column.columnName"
               ></t-option>
             </t-select>
@@ -223,7 +223,7 @@
               <t-option
                 v-for="(column, index) in info.columns"
                 :key="index"
-                :label="column.columnName + '：' + column.columnComment"
+                :label="`${column.columnName}：${column.columnComment}`"
                 :value="column.columnName"
               ></t-option>
             </t-select>
@@ -233,7 +233,6 @@
     </template>
   </t-loading>
 </template>
-
 <script lang="ts" setup>
 import { ChevronDownIcon, HelpCircleFilledIcon } from 'tdesign-icons-vue-next';
 import type { PropType } from 'vue';
@@ -242,9 +241,6 @@ import { getCurrentInstance, ref, toRefs } from 'vue';
 import { listMenu } from '@/api/system/menu';
 import type { SysMenuVo } from '@/api/system/model/menuModel';
 import type { GenTableVo } from '@/api/tool/model/genModel';
-
-const menuOptions = ref<SysMenuVo[]>([]);
-const { proxy } = getCurrentInstance();
 
 const props = defineProps({
   info: {
@@ -256,6 +252,9 @@ const props = defineProps({
     default: false,
   },
 });
+const menuOptions = ref<SysMenuVo[]>([]);
+const { proxy } = getCurrentInstance();
+
 const { info } = toRefs(props);
 
 /** 查询菜单下拉树结构 */

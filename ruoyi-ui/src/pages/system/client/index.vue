@@ -248,6 +248,7 @@ const { sys_device_type, sys_grant_type, sys_normal_disable } = proxy.useDict(
 );
 
 const clientList = ref<SysClientVo[]>([]);
+const queryRef = ref<FormInstanceFunctions>();
 const clientRef = ref<FormInstanceFunctions>();
 const open = ref(false);
 const openView = ref(false);
@@ -337,7 +338,7 @@ function reset() {
     grantTypeList: [],
     status: '1',
   };
-  proxy.resetForm('clientRef');
+  clientRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -348,7 +349,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -475,7 +476,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `client_${new Date().getTime()}.xlsx`,
+    `client_${Date.now()}.xlsx`,
   );
 }
 

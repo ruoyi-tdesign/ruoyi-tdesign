@@ -95,7 +95,7 @@ defineOptions({
   name: 'Online',
 });
 import { BrowseIcon, DeleteIcon, RefreshIcon, SearchIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
 import type { SysUserOnline, SysUserOnlineQuery } from '@/api/monitor/model/userOnlineModel';
@@ -104,6 +104,7 @@ import { forceLogout, list as initData } from '@/api/monitor/online';
 const { proxy } = getCurrentInstance();
 const { sys_device_type } = proxy.useDict('sys_device_type');
 
+const queryRef = ref<FormInstanceFunctions>();
 const onlineList = ref<SysUserOnline[]>([]);
 const loading = ref(false);
 const total = ref(0);
@@ -165,7 +166,7 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
 /** 详情按钮操作 */

@@ -8,13 +8,16 @@ import { getVisitUrl } from '@/utils/ruoyi';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
+    // @ts-expect-error ignore
     tenantId: undefined,
+    // @ts-expect-error ignore
     userId: undefined,
+    // @ts-expect-error ignore
     token: undefined,
     name: '',
     avatar: '',
-    roles: [],
-    permissions: [],
+    roles: [] as string[],
+    permissions: [] as string[],
   }),
   actions: {
     isLogin() {

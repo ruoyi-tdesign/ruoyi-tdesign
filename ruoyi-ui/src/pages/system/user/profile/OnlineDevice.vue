@@ -13,7 +13,6 @@
     </t-table>
   </div>
 </template>
-
 <script lang="ts" setup>
 import type { PrimaryTableCol } from 'tdesign-vue-next';
 

@@ -18,7 +18,7 @@
             @enter="handleQuery"
           />
         </t-form-item>
-        <t-form-item label="部门类别编码" name="deptCategory">
+        <t-form-item label="类别编码" name="deptCategory">
           <t-input v-model="queryParams.deptCategory" placeholder="请输入部门类别编码" clearable @enter="handleQuery" />
         </t-form-item>
         <t-form-item label="状态" name="status">
@@ -51,7 +51,7 @@
       <t-enhanced-table
         ref="tableRef"
         v-model:column-controller-visible="columnControllerVisible"
-        v-model:expandedTreeNodes="expandedTreeNodes"
+        v-model:expanded-tree-nodes="expandedTreeNodes"
         hover
         :loading="loading"
         :data="deptList"
@@ -264,6 +264,7 @@ import { listUserByDeptId } from '@/api/system/user';
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
+const queryRef = ref<FormInstanceFunctions>();
 const openView = ref(false);
 const openViewLoading = ref(false);
 const deptList = ref<SysDeptVo[]>([]);
@@ -288,7 +289,7 @@ const rules = ref<Record<string, Array<FormRule>>>({
   deptCategory: [{ max: 100, message: '部门类别编码不能超过100个字符' }],
   orderNum: [{ required: true, message: '显示排序不能为空' }],
   email: [{ email: true, message: '请输入正确的邮箱地址' }],
-  phone: [{ pattern: /^1[3456789][0-9]\d{8}$/, message: '请输入正确的手机号码' }],
+  phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码' }],
 });
 
 // 列显隐信息
@@ -337,7 +338,7 @@ function reset() {
     orderNum: 0,
     status: '1',
   };
-  proxy.resetForm('deptRef');
+  deptRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -348,7 +349,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRangeCreateTime.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleSortChange(null);
 }
 
@@ -469,7 +470,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `dept_${new Date().getTime()}.xlsx`,
+    `dept_${Date.now()}.xlsx`,
   );
 }
 

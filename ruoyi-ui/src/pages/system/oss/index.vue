@@ -176,7 +176,7 @@ import {
   SearchIcon,
   SettingIcon,
 } from 'tdesign-icons-vue-next';
-import type { FormRule, PageInfo, PrimaryTableCol, TableSort } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, FormRule, PageInfo, PrimaryTableCol, TableSort } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref, toRefs } from 'vue';
 
 import { getPreviewListResourceConfig } from '@/api/system/config';
@@ -189,6 +189,8 @@ import { DEFAULT_TENANT_ID } from '@/constants';
 import { useUserStore } from '@/store';
 import { ArrayOps } from '@/utils/array';
 
+const queryRef = ref<FormInstanceFunctions>();
+const ossRef = ref<FormInstanceFunctions>();
 const { proxy } = getCurrentInstance();
 const { tenantId } = toRefs(useUserStore());
 const isSystem = computed(() => tenantId.value === DEFAULT_TENANT_ID);
@@ -274,7 +276,7 @@ function getList() {
 function checkFileSuffix(fileSuffix: string | string[]) {
   const arr = ['png', 'jpg', 'jpeg', 'ico', 'bmp', 'webp', 'gif', 'svg'];
   return arr.some((type) => {
-    return fileSuffix.indexOf(type) > -1;
+    return fileSuffix.includes(type);
   });
 }
 /** 表单重置 */
@@ -282,7 +284,7 @@ function reset() {
   form.value = {
     file: undefined,
   };
-  proxy.resetForm('ossRef');
+  ossRef.value.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -292,7 +294,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   daterangeCreateTime.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

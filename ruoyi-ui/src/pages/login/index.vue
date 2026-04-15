@@ -46,7 +46,6 @@ const switchType = (val: string) => {
   type.value = val;
 };
 </script>
-
 <style lang="less" scoped>
 @import './index.less';
 </style>

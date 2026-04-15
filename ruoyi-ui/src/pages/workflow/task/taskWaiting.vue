@@ -84,13 +84,12 @@
     <user-select ref="userSelectRef" :multiple="true" :data="selectUserIds" @confirm-call-back="userSelectCallBack" />
   </t-card>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'TaskWaiting',
 });
 import { EditIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 
 import type { SysUserVo } from '@/api/system/model/userModel';
@@ -103,6 +102,7 @@ import UserSelect from '@/components/user-select/index.vue';
 const { proxy } = getCurrentInstance();
 const { wf_business_status } = proxy.useDict('wf_business_status');
 
+const queryRef = ref<FormInstanceFunctions>();
 const userSelectRef = ref<InstanceType<typeof UserSelect>>();
 const routerJump = useRouterJump();
 // 遮罩层
@@ -175,7 +175,7 @@ const handleQuery = () => {
 };
 /** 重置按钮操作 */
 const resetQuery = () => {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   queryParams.value.createByIds = [];
   userSelectCount.value = 0;

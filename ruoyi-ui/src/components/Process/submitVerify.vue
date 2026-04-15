@@ -191,7 +191,6 @@
     </t-dialog>
   </t-dialog>
 </template>
-
 <script lang="ts" setup>
 import { AddIcon, DeleteIcon, SearchIcon } from 'tdesign-icons-vue-next';
 import type { TableProps } from 'tdesign-vue-next';
@@ -212,6 +211,15 @@ import {
 } from '@/api/workflow/task';
 import UserSelect from '@/components/user-select/index.vue';
 
+const props = defineProps({
+  taskVariables: {
+    type: Object,
+    default: () => {},
+  },
+});
+
+const emits = defineEmits(['submit-callback', 'cancel-callback']);
+
 const { proxy } = getCurrentInstance();
 
 const userSelectCopyRef = ref<InstanceType<typeof UserSelect>>();
@@ -228,12 +236,6 @@ const deleteSignatureColumns: TableProps['columns'] = [
   { title: `操作`, colKey: 'operation', align: 'center', width: 160 },
 ];
 
-const props = defineProps({
-  taskVariables: {
-    type: Object,
-    default: () => {},
-  },
-});
 // 遮罩层
 const loading = ref(true);
 // 按钮
@@ -322,8 +324,6 @@ const openDialog = async (id?: string | number) => {
 };
 
 onMounted(() => {});
-const emits = defineEmits(['submitCallback', 'cancelCallback']);
-
 /** 办理流程 */
 const handleCompleteTask = async () => {
   form.value.taskId = taskId.value;
@@ -364,7 +364,7 @@ const handleCompleteTask = async () => {
     try {
       await completeTask(form.value);
       dialog.visible = false;
-      emits('submitCallback');
+      emits('submit-callback');
       proxy?.$modal.msgSuccess('操作成功');
     } finally {
       loading.value = false;
@@ -400,7 +400,7 @@ const handleBackProcess = async () => {
     dialog.visible = false;
     backLoading.value = false;
     backButtonDisabled.value = false;
-    emits('submitCallback');
+    emits('submit-callback');
     await proxy?.$modal.msgSuccess('操作成功');
   });
 };
@@ -410,7 +410,7 @@ const cancel = async () => {
   buttonDisabled.value = false;
   nickName.value = {};
   form.value.assigneeMap = {};
-  emits('cancelCallback');
+  emits('cancel-callback');
 };
 // 打开抄送人员
 const openUserSelectCopy = () => {
@@ -451,7 +451,7 @@ const addMultiInstanceUser = async (data: SysUserVo[]) => {
         buttonDisabled.value = false;
       });
       dialog.visible = false;
-      emits('submitCallback');
+      emits('submit-callback');
       await proxy?.$modal.msgSuccess('操作成功');
     });
   } else {
@@ -473,7 +473,7 @@ const deleteMultiInstanceUser = async (row: UserDTO) => {
       buttonDisabled.value = false;
     });
     dialog.visible = false;
-    emits('submitCallback');
+    emits('submit-callback');
     await proxy?.$modal.msgSuccess('操作成功');
   });
 };
@@ -497,7 +497,7 @@ const handleTransferTask = async (data: SysUserVo[]) => {
         buttonDisabled.value = false;
       });
       dialog.visible = false;
-      emits('submitCallback');
+      emits('submit-callback');
       await proxy?.$modal.msgSuccess('操作成功');
     });
   } else {
@@ -525,7 +525,7 @@ const handleDelegateTask = async (data: SysUserVo[]) => {
         buttonDisabled.value = false;
       });
       dialog.visible = false;
-      emits('submitCallback');
+      emits('submit-callback');
       await proxy?.$modal.msgSuccess('操作成功');
     });
   } else {
@@ -547,7 +547,7 @@ const handleTerminationTask = async () => {
       buttonDisabled.value = false;
     });
     dialog.visible = false;
-    emits('submitCallback');
+    emits('submit-callback');
     await proxy?.$modal.msgSuccess('操作成功');
   });
 };
@@ -556,7 +556,8 @@ const handleTaskUser = async () => {
   deleteUserList.value = data.data;
   if (deleteUserList.value && deleteUserList.value.length > 0) {
     deleteUserList.value.forEach((e) => {
-      // @ts-ignore
+      // eslint-disable-next-line ts/ban-ts-comment
+      // @ts-expect-error
       e.nodeName = task.value.nodeName;
     });
   }

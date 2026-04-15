@@ -53,15 +53,14 @@
       :multiple="limit > 1"
       :file-upload="false"
       :image-upload-props="{
-        accept: accept,
-        fileSize: fileSize,
-        fileType: fileType,
+        accept,
+        fileSize,
+        fileType,
       }"
       :on-submit="handleSelectSubmit"
     />
   </div>
 </template>
-
 <script lang="ts" setup>
 import { compressAccurately } from 'image-conversion';
 import { storeToRefs } from 'pinia';
@@ -139,6 +138,8 @@ const props = withDefaults(defineProps<ImageUploadProps>(), {
   compressTargetSize: 300,
 });
 
+const emit = defineEmits(['update:modelValue', 'change']);
+
 const queryParam = computed<MyOssProps['queryParam']>(() => {
   const maxSize = props.fileSize * 1024 * 1024;
   if (props.accept) {
@@ -155,7 +156,6 @@ const queryParam = computed<MyOssProps['queryParam']>(() => {
 
 const { token } = storeToRefs(useUserStore());
 const { proxy } = getCurrentInstance();
-const emit = defineEmits(['update:modelValue', 'change']);
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
 const uploadImgUrl = ref(`${baseUrl}/resource/oss/upload`); // 上传的图片服务器地址
 const headers = ref({ Authorization: `Bearer ${token.value}` });
@@ -168,6 +168,7 @@ const effectiveSupportUrl = computed(() => {
 });
 const open = ref(false);
 
+const splitHttp = /,(?=http)/;
 watch(
   () => props.modelValue,
   async (val) => {
@@ -189,7 +190,7 @@ watch(
               ossId: oss.ossId,
             });
           });
-          list = val.split(/,(?=http)/).map((url: string) => {
+          list = val.split(splitHttp).map((url: string) => {
             return (
               tempMap.get(url) || {
                 name: getHttpFileName(url),
@@ -342,15 +343,15 @@ async function handleBeforeUpload(file: UploadFile) {
   let isImg: boolean;
   if (props.fileType?.length) {
     let fileExtension = '';
-    if (file.name.lastIndexOf('.') > -1) {
+    if (file.name.includes('.')) {
       fileExtension = getHttpFileSuffix(file.name);
     }
     isImg = props.fileType.some((type) => {
-      if (file.type.indexOf(type) > -1) return true;
-      return fileExtension && fileExtension.indexOf(type) > -1;
+      if (file.type.includes(type)) return true;
+      return fileExtension && fileExtension.includes(type);
     });
   } else {
-    isImg = file.type.indexOf('image') > -1;
+    isImg = file.type.includes('image');
   }
   if (!isImg) {
     proxy.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}图片格式文件!`);

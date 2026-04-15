@@ -322,6 +322,7 @@ const { sys_storage_request_mode, sys_normal_disable } = proxy.useDict(
 
 const openView = ref(false);
 const openViewLoading = ref(false);
+const queryRef = ref<FormInstanceFunctions>();
 const storageConfigRef = ref<FormInstanceFunctions>();
 const open = ref(false);
 const buttonLoading = ref(false);
@@ -438,7 +439,7 @@ function reset() {
     status: 1,
     configObject: {},
   };
-  proxy.resetForm('storageConfigRef');
+  storageConfigRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -449,7 +450,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
 
@@ -565,7 +566,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `storageConfig_${new Date().getTime()}.xlsx`,
+    `storageConfig_${Date.now()}.xlsx`,
   );
 }
 

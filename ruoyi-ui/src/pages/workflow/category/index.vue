@@ -27,7 +27,7 @@
       <t-enhanced-table
         ref="tableRef"
         v-model:column-controller-visible="columnControllerVisible"
-        v-model:expandedTreeNodes="expandedTreeNodes"
+        v-model:expanded-tree-nodes="expandedTreeNodes"
         hover
         :loading="loading"
         :data="categoryList"
@@ -208,6 +208,7 @@ const categoryOptions = ref<CategoryVO[]>([]);
 const open = ref(false);
 const buttonLoading = ref(false);
 const title = ref('');
+const queryRef = ref<FormInstanceFunctions>();
 const categoryRef = ref<FormInstanceFunctions>();
 const expandedTreeNodes = ref([]);
 
@@ -254,7 +255,7 @@ function reset() {
   form.value = {
     orderNum: 0,
   };
-  proxy.resetForm('categoryRef');
+  categoryRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -264,7 +265,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
 
@@ -379,7 +380,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `category_${new Date().getTime()}.xlsx`,
+    `category_${Date.now()}.xlsx`,
   );
 }
 

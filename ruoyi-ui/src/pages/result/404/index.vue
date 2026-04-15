@@ -3,7 +3,6 @@
     <t-button @click="() => $router.push('/')">{{ t('pages.result.404.back') }}</t-button>
   </result>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'Result404',

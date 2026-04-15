@@ -337,6 +337,7 @@ const { sys_normal_disable, sensitive_words_category } = proxy.useDict(
   'sensitive_words_category',
 );
 
+const queryRef = ref<FormInstanceFunctions>();
 const openView = ref(false);
 const openViewLoading = ref(false);
 const sensitiveWordRef = ref<FormInstanceFunctions>();
@@ -428,7 +429,7 @@ function reset() {
   form.value = {
     status: 1,
   };
-  proxy.resetForm('sensitiveWordRef');
+  sensitiveWordRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -439,7 +440,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
 
@@ -557,7 +558,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `sensitiveWord_${new Date().getTime()}.xlsx`,
+    `sensitiveWord_${Date.now()}.xlsx`,
   );
 }
 

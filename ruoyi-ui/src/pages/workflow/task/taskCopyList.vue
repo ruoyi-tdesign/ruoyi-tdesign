@@ -68,13 +68,12 @@
     </t-space>
   </t-card>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'TaskCopyList',
 });
 import { BrowseIcon, RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 
 import type { FlowTaskVo, TaskQuery } from '@/api/workflow/model/taskModel';
@@ -83,6 +82,7 @@ import { pageByTaskCopy } from '@/api/workflow/task';
 import { useRouterJump } from '@/api/workflow/workflowCommon';
 
 const routerJump = useRouterJump();
+const queryRef = ref<FormInstanceFunctions>();
 const { proxy } = getCurrentInstance();
 const { wf_business_status } = proxy.useDict('wf_business_status');
 // 遮罩层
@@ -144,7 +144,7 @@ const handleQuery = () => {
 };
 /** 重置按钮操作 */
 const resetQuery = () => {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleQuery();
 };

@@ -3,7 +3,6 @@
     <template #prefix-icon><slot name="prefix-icon" /></template><slot />
   </t-link>
 </template>
-
 <script lang="ts" setup>
 import type { LinkProps } from 'tdesign-vue-next';
 

@@ -1,7 +1,6 @@
 <template>
   <div class="upload-file">
     <t-upload
-      ref="fileUpload"
       v-model="fileList"
       multiple
       :abridge-name="abridgeName"
@@ -53,15 +52,14 @@
       :multiple="limit > 1"
       :image-upload="false"
       :file-upload-props="{
-        accept: accept,
-        fileSize: fileSize,
-        fileType: fileType,
+        accept,
+        fileSize,
+        fileType,
       }"
       :on-submit="handleSelectSubmit"
     />
   </div>
 </template>
-
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import { CloudUploadIcon } from 'tdesign-icons-vue-next';
@@ -128,6 +126,8 @@ const props = withDefaults(defineProps<FileUploadProps>(), {
   supportSelectFile: true,
 });
 
+const emit = defineEmits(['update:modelValue', 'change']);
+
 const queryParam = computed<FileListProps['queryParam']>(() => {
   const maxSize = props.fileSize * 1024 * 1024;
   if (props.accept) {
@@ -144,7 +144,6 @@ const queryParam = computed<FileListProps['queryParam']>(() => {
 
 const { token } = storeToRefs(useUserStore());
 const { proxy } = getCurrentInstance();
-const emit = defineEmits(['update:modelValue', 'change']);
 const baseUrl = import.meta.env.VITE_APP_BASE_API;
 const uploadFileUrl = ref(`${baseUrl}/system/file/upload`); // 上传文件服务器地址
 const headers = ref({ Authorization: `Bearer ${token.value}` });
@@ -245,7 +244,7 @@ function handleSelectSubmit(values: SelectFile[]) {
   if (props.accept?.length) {
     const arr1: SelectFile[] = [];
     const arr2: SelectFile[] = [];
-    // eslint-disable-next-line consistent-return
+
     rowValues.forEach((value) => {
       if (props.accept.some((item) => isMimeTypeIncluded(item, value.contentType))) {
         arr1.push(value);
@@ -313,14 +312,13 @@ function handleSelectSubmit(values: SelectFile[]) {
 function handleBeforeUpload(file: UploadFile) {
   // 校检文件类型
   if (props.accept?.length) {
-    // eslint-disable-next-line array-callback-return
     if (!props.accept.some((value) => isMimeTypeIncluded(value, file.type))) {
       proxy.$modal.msgError(`文件格式不正确, 请上传${props.accept.join(',')}格式文件!`);
       return false;
     }
   } else if (props.fileType?.length) {
     const fileExt = getHttpFileSuffix(file.name);
-    const isTypeOk = props.fileType.indexOf(fileExt) >= 0;
+    const isTypeOk = props.fileType.includes(fileExt);
     if (!isTypeOk) {
       proxy.$modal.msgError(`文件格式不正确, 请上传${props.fileType.join('/')}格式文件!`);
       return false;

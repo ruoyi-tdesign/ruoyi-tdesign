@@ -46,7 +46,6 @@ const containerCls = computed(() => {
 
 const iconCls = computed(() => ['trend-icon-container']);
 </script>
-
 <style lang="less" scoped>
 .trend {
   &-container {

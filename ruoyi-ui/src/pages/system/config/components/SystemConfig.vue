@@ -12,7 +12,7 @@
         :disabled="disabled"
         @submit="submitForm"
       >
-        <!--<t-form-item label="主框架页-默认皮肤样式名称" name="sys.index.skinName">
+        <!-- <t-form-item label="主框架页-默认皮肤样式名称" name="sys.index.skinName">
           <t-select v-model="form['sys.index.skinName']" auto-width>
             <t-option label="蓝色" value="skin-blue" />
             <t-option label="绿色" value="skin-green" />
@@ -20,7 +20,7 @@
             <t-option label="红色" value="skin-red" />
             <t-option label="黄色" value="skin-yellow" />
           </t-select>
-        </t-form-item>-->
+        </t-form-item> -->
         <t-form-item label="用户管理-账号初始密码" name="sys.user.initPassword">
           <t-input
             v-model="form['sys.user.initPassword']"
@@ -29,12 +29,12 @@
             show-limit-number
           />
         </t-form-item>
-        <!--<t-form-item label="主框架页-侧边栏主题" name="sys.index.sideTheme">
+        <!-- <t-form-item label="主框架页-侧边栏主题" name="sys.index.sideTheme">
           <t-select v-model="form['sys.index.sideTheme']" auto-width>
             <t-option label="深色主题" value="theme-dark" />
             <t-option label="浅色主题" value="theme-light" />
           </t-select>
-        </t-form-item>-->
+        </t-form-item> -->
         <t-form-item v-hasPermi="['system:config:edit']">
           <t-button theme="default" variant="outline" @click="init()">还原</t-button>
           <t-button theme="primary" type="submit" :loading="buttonLoading">保存</t-button>
@@ -46,22 +46,20 @@
     </t-loading>
   </div>
 </template>
-
 <script lang="ts" setup>
 defineOptions({
   name: 'SystemConfig',
 });
-import type { FormRule, SubmitContext } from 'tdesign-vue-next';
-import { getCurrentInstance, ref } from 'vue';
-
-import { getConfigByKeys, refreshCache, updateConfigMaps } from '@/api/system/config';
-
 defineProps({
   disabled: {
     type: Boolean,
     required: true,
   },
 });
+import type { FormRule, SubmitContext } from 'tdesign-vue-next';
+import { getCurrentInstance, ref } from 'vue';
+
+import { getConfigByKeys, refreshCache, updateConfigMaps } from '@/api/system/config';
 
 const loading = ref(false);
 const buttonLoading = ref(false);
@@ -125,5 +123,4 @@ function handleRefreshCache() {
 
 init();
 </script>
-
 <style scoped></style>

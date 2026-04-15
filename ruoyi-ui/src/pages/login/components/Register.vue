@@ -1,7 +1,8 @@
 <template>
   <t-form
     ref="form"
-    :class="['item-container', `register-${type}`]"
+    class="item-container"
+    :class="[`register-${type}`]"
     :data="formData"
     :rules="FORM_RULES"
     label-width="0"
@@ -91,7 +92,6 @@
     </div>
   </t-form>
 </template>
-
 <script lang="ts" setup>
 import { BrowseIcon, BrowseOffIcon, LockOnIcon, MailIcon, SecuredIcon, UserIcon } from 'tdesign-icons-vue-next';
 import type { FormRule, SubmitContext } from 'tdesign-vue-next';
@@ -102,6 +102,8 @@ import { getCodeImg, getTenantList, register } from '@/api/login';
 import type { RegisterBody, TenantListVo } from '@/api/model/loginModel';
 import Company from '@/assets/icons/svg/company.svg?component';
 import { useCounter } from '@/hooks';
+
+const emit = defineEmits(['register-success']);
 
 const equalToPassword = (value: string) => {
   return formData.value.password === value;
@@ -148,8 +150,6 @@ const showPsw = ref(false);
 
 const [countDown, handleCounter] = useCounter();
 
-const emit = defineEmits(['registerSuccess']);
-
 const { proxy } = getCurrentInstance();
 
 const onSubmit = (ctx: SubmitContext) => {
@@ -174,7 +174,7 @@ const onSubmit = (ctx: SubmitContext) => {
     register(registerForm)
       .then(() => {
         MessagePlugin.success('注册成功');
-        emit('registerSuccess');
+        emit('register-success');
         const username = registerForm.username;
         proxy.$modal.alert({
           header: `系统提示`,
@@ -225,7 +225,6 @@ function initTenantList() {
 getCode();
 initTenantList();
 </script>
-
 <style lang="less" scoped>
 @import '../index.less';
 </style>

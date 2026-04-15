@@ -1,5 +1,5 @@
 import axios from 'axios';
-// @ts-ignore
+// @ts-expect-error ignore
 import { saveAs } from 'file-saver';
 import { LoadingPlugin, MessagePlugin } from 'tdesign-vue-next';
 
@@ -9,6 +9,8 @@ import { blobValidate, getVisitUrl } from '@/utils/ruoyi';
 
 const baseURL = import.meta.env.VITE_APP_BASE_API;
 
+const filenameMatcher = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+const rep = /['"]/g;
 export default {
   file(downloadUrl: string, filename?: string) {
     const { token } = useUserStore();
@@ -37,9 +39,9 @@ export default {
             // 尝试从content-disposition头获取
             else if (res.headers['content-disposition']) {
               const disposition = decodeURIComponent(res.headers['content-disposition']);
-              const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+              const match = disposition.match(filenameMatcher);
               if (match && match[1]) {
-                filename = match[1].replace(/['"]/g, '');
+                filename = match[1].replace(rep, '');
               }
             }
           }
@@ -131,7 +133,7 @@ export default {
   async printErrMsg(data: { text: () => any }) {
     const resText = await data.text();
     const rspObj = JSON.parse(resText);
-    // @ts-ignore
+    // @ts-expect-error ignore
     const errMsg = errorCode[rspObj.code] || rspObj.msg || errorCode.default;
     await MessagePlugin.error(errMsg);
   },

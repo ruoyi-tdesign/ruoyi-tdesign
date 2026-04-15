@@ -182,6 +182,7 @@ import { ArrayOps } from '@/utils/array';
 
 const { proxy } = getCurrentInstance();
 
+const queryRef = ref<FormInstanceFunctions>();
 const messageKeyList = ref<SysMessageKeyVo[]>([]);
 const messageKeyRef = ref<FormInstanceFunctions>();
 const open = ref(false);
@@ -252,7 +253,7 @@ function getList() {
 // 表单重置
 function reset() {
   form.value = {};
-  proxy.resetForm('messageKeyRef');
+  messageKeyRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -263,7 +264,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -382,7 +383,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `messageKey_${new Date().getTime()}.xlsx`,
+    `messageKey_${Date.now()}.xlsx`,
   );
 }
 

@@ -15,7 +15,7 @@
         </template>
         <!--        <template v-if="['select', 'radio', 'checkbox', 'tree-select'].includes(fieldConfig.component)">
           <dict-tag :options="fieldConfig.options" :value="configValue[key]" />
-        </template>-->
+        </template> -->
         <template v-else-if="['image-upload'].includes(fieldConfig.component)">
           <x-image-preview :src="getValue(fieldConfig, key)" width="60px" height="60px" />
         </template>
@@ -27,7 +27,6 @@
     <slot name="suffix" />
   </my-descriptions>
 </template>
-
 <script setup lang="ts">
 import isString from 'lodash/isString';
 
@@ -70,9 +69,11 @@ function getValue(fieldConfig: FieldConfig<any>, key: string) {
  */
 function getOptions(options: Array<FieldOption | FieldOptionGroup>): FieldOption[] {
   return options.flatMap((option) => {
-    // @ts-ignore
+    // eslint-disable-next-line ts/ban-ts-comment
+    // @ts-expect-error
     if (option.children) {
-      // @ts-ignore
+      // eslint-disable-next-line ts/ban-ts-comment
+      // @ts-expect-error
       return option.children.map((child) => {
         return child;
       });

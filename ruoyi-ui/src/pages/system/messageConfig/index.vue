@@ -308,12 +308,12 @@ import type {
 import FormFieldRenders from '@/components/field-config/FormFieldRenders';
 import { ArrayOps } from '@/utils/array';
 import type { DictModel } from '@/utils/dict';
-import { isJson } from '@/utils/ruoyi';
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
 const messageConfigList = ref<SysMessageConfigVo[]>([]);
+const queryRef = ref<FormInstanceFunctions>();
 const messageConfigRef = ref<FormInstanceFunctions>();
 const open = ref(false);
 const openView = ref(false);
@@ -442,7 +442,7 @@ function reset() {
     status: 1,
     configObject: {},
   };
-  proxy.resetForm('messageConfigRef');
+  messageConfigRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -453,7 +453,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -583,7 +583,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `messageConfig_${new Date().getTime()}.xlsx`,
+    `messageConfig_${Date.now()}.xlsx`,
   );
 }
 

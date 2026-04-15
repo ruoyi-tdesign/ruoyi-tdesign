@@ -22,6 +22,15 @@ defineOptions({
   name: 'BindingPhone',
 });
 
+const props = defineProps({
+  phone: {
+    type: String,
+    required: true,
+  },
+});
+const emit = defineEmits<{
+  (e: 'submit', phonenumber: string): void;
+}>();
 import type { FormInstanceFunctions, FormRule, SubmitContext } from 'tdesign-vue-next';
 import { getCurrentInstance, ref } from 'vue';
 
@@ -32,20 +41,11 @@ const visible = defineModel('visible', {
   default: false,
 });
 
-const props = defineProps({
-  phone: {
-    type: String,
-    required: true,
-  },
-});
-const emit = defineEmits<{
-  (e: 'submit', phonenumber: string): void;
-}>();
 const { proxy } = getCurrentInstance();
 const formRef = ref<FormInstanceFunctions>();
 
 const rules = ref<Record<string, Array<FormRule>>>({
-  phonenumber: [{ pattern: /^1[3456789][0-9]\d{8}$/, message: '请输入正确的手机号码' }],
+  phonenumber: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码' }],
 });
 
 const form = ref({

@@ -11,7 +11,7 @@ const modules = import.meta.glob('./modules/**/*.ts', { eager: true });
 const routeModuleList: Array<RouteRecordRaw> = [];
 
 Object.keys(modules).forEach((key) => {
-  // @ts-ignore
+  // @ts-expect-error ignore
   const mod = modules[key].default || {};
   const modList = Array.isArray(mod) ? [...mod] : [mod];
   routeModuleList.push(...modList);

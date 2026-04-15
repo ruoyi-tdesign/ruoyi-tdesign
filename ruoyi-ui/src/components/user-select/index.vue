@@ -10,7 +10,7 @@
     @confirm="onSubmit"
   >
     <t-row :gutter="20">
-      <!--部门数据-->
+      <!-- 部门数据 -->
       <t-col :sm="2" :xs="12">
         <t-card hover-shadow>
           <div class="head-container">
@@ -21,7 +21,6 @@
           <div class="head-container">
             <t-loading :loading="loadingDept" size="small">
               <t-tree
-                ref="deptTreeRef"
                 v-model:actived="actived"
                 v-model:expanded="expandedDept"
                 class="t-tree--block-node"
@@ -40,17 +39,11 @@
           </div>
         </t-card>
       </t-col>
-      <!--用户数据-->
+      <!-- 用户数据 -->
       <t-col :sm="10" :xs="12">
         <t-space direction="vertical" style="width: 100%">
           <t-card hover-shadow>
-            <t-form
-              v-show="showSearch"
-              ref="queryRef"
-              :data="queryParams"
-              layout="inline"
-              label-width="calc(4em + 12px)"
-            >
+            <t-form v-show="showSearch" :data="queryParams" layout="inline" label-width="calc(4em + 12px)">
               <t-form-item label="用户名称" name="userName">
                 <t-input v-model="queryParams.userName" placeholder="请输入用户名称" clearable @enter="handleQuery" />
               </t-form-item>
@@ -144,8 +137,26 @@ defineOptions({
   name: 'UserSelect',
 });
 
+const props = defineProps({
+  multiple: {
+    type: Boolean,
+    default: true,
+  },
+  data: [String, Number, Array] as PropType<string | number | Array<string | number>>,
+  userIds: [String, Number, Array] as PropType<string | number | Array<string | number>>,
+});
+const emit = defineEmits<{
+  (e: 'confirm-callback', value: SysUserVo[]): void;
+}>();
 import { RefreshIcon, SearchIcon, SettingIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol, TableProps, TableSort, TreeNodeModel } from 'tdesign-vue-next';
+import type {
+  FormInstanceFunctions,
+  PageInfo,
+  PrimaryTableCol,
+  TableProps,
+  TableSort,
+  TreeNodeModel,
+} from 'tdesign-vue-next';
 import type { PropType } from 'vue';
 import { computed, getCurrentInstance, ref } from 'vue';
 
@@ -157,25 +168,12 @@ import useDialog from '@/hooks/useDialog';
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
-const props = defineProps({
-  multiple: {
-    type: Boolean,
-    default: true,
-  },
-  data: [String, Number, Array] as PropType<string | number | Array<string | number>>,
-  userIds: [String, Number, Array] as PropType<string | number | Array<string | number>>,
-});
-
 const modelValue = defineModel<SysUserVo[]>({
   default: () => [] as SysUserVo[],
 });
 
-const emit = defineEmits<{
-  (e: 'confirmCallBack', value: SysUserVo[]): void;
-}>();
-
 const computedIds = (data: string | number | Array<string | number>) => {
-  if (data instanceof Array) {
+  if (Array.isArray(data)) {
     return [...data];
   }
   if (typeof data === 'string') {
@@ -189,6 +187,7 @@ const computedIds = (data: string | number | Array<string | number>) => {
 };
 const defaultSelectUserIds = computed(() => computedIds(props.data).filter((item) => item));
 
+const queryRef = ref<FormInstanceFunctions>();
 const selectUserList = ref<SysUserVo[]>([]);
 const userList = ref<SysUserVo[]>([]);
 const loading = ref(true);
@@ -253,7 +252,7 @@ const filterNode = computed(() => {
   const value = deptName.value;
   return (node: TreeNodeModel) => {
     if (!node.value || !value) return true;
-    return node.label.indexOf(value) >= 0;
+    return node.label.includes(value);
   };
 });
 /** 查询部门下拉树结构 */
@@ -274,7 +273,7 @@ function triggerExpandedDept() {
 function getList() {
   loading.value = true;
   queryParams.value.deptId = actived.value.at(0);
-  queryParams.value.userIds = props.userIds?.split(',');
+  queryParams.value.userIds = (props.userIds as string)?.split(',');
   listUser(queryParams.value).then((res) => {
     loading.value = false;
     userList.value = res.rows;
@@ -288,7 +287,7 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   actived.value = [];
   queryParams.value.deptId = undefined;
   queryParams.value.pageNum = 1;
@@ -337,7 +336,7 @@ const handleSelectionChange: TableProps['onSelectChange'] = (selection, options)
 const onSubmit = () => {
   const value = [...selectUserList.value];
   modelValue.value = value;
-  emit('confirmCallBack', value);
+  emit('confirm-callback', value);
   userDialog.closeDialog();
 };
 

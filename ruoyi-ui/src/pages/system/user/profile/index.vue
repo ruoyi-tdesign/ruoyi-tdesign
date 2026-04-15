@@ -11,7 +11,7 @@
           </span>
         </div>
         <!--    腾讯logo，自定义logo放开注释    -->
-        <!--        <img src="@/assets/assets-tencent-logo.png" class="logo" />-->
+        <!--        <img src="@/assets/assets-tencent-logo.png" class="logo" /> -->
       </div>
 
       <!--   个人信息   -->
@@ -156,7 +156,6 @@ onMounted(() => {
   getUser();
 });
 </script>
-
 <style lang="less" scoped>
 @import './index.less';
 

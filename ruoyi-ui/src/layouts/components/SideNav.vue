@@ -21,7 +21,6 @@
     <div :class="`${prefix}-side-nav-placeholder${collapsed ? '-hidden' : ''}`"></div>
   </div>
 </template>
-
 <script lang="ts" setup>
 import { union } from 'lodash';
 import type { MenuValue } from 'tdesign-vue-next';
@@ -39,12 +38,10 @@ import type { MenuRoute, ModeType } from '@/types/interface';
 import pgk from '../../../package.json';
 import MenuContent from './MenuContent.vue';
 
-const MIN_POINT = 992 - 1;
-
 const props = defineProps({
   menu: {
     type: Array as PropType<MenuRoute[]>,
-    default: () => [],
+    default: () => [] as MenuRoute[],
   },
   showLogo: {
     type: Boolean as PropType<boolean>,
@@ -71,6 +68,8 @@ const props = defineProps({
     default: false,
   },
 });
+
+const MIN_POINT = 992 - 1;
 
 const route = useRoute();
 
@@ -172,5 +171,4 @@ const getLogo = () => {
   return AssetLogoFull;
 };
 </script>
-
 <style lang="less" scoped></style>

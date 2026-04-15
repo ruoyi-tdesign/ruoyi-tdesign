@@ -80,7 +80,6 @@
     </t-dialog>
   </div>
 </template>
-
 <script setup lang="ts">
 defineOptions({
   name: 'LeaveEdit',
@@ -190,7 +189,7 @@ const reset = () => {
     flowCode: '',
     variables: {},
   };
-  proxy.resetForm('leaveFormRef');
+  leaveFormRef.value.reset();
 };
 
 const changeLeaveTime = () => {

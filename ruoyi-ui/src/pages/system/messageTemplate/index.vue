@@ -472,6 +472,7 @@ const openTest = ref(false);
 const formTest = ref<SysMessageTemplateTest>({});
 const messageFieldConfigs = ref<Record<string, MessageFieldConfig>>({});
 const supplierTypeList = ref<MessageTypeVo[]>([]);
+const queryRef = ref<FormInstanceFunctions>();
 
 // 校验规则
 const rules = ref<Record<string, Array<FormRule>>>({
@@ -552,6 +553,8 @@ const maxVarsTestLabelWidth = computed(() => {
   return 0;
 });
 
+const varRegExp = /\$\{([^}]+)\}/g;
+
 /**
  * 提取变量
  * @param contents
@@ -560,7 +563,7 @@ function getVars(...contents: string[]) {
   let vars: string[] = [];
   if (contents) {
     contents.forEach((content) => {
-      const rex = /\$\{([^}]+)}/g;
+      const rex = varRegExp;
       let temp;
       do {
         temp = rex.exec(content);
@@ -644,7 +647,7 @@ function reset() {
   formTest.value = {
     vars: {},
   };
-  proxy.resetForm('messageTemplateRef');
+  messageTemplateRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -655,7 +658,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -846,7 +849,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `messageTemplate_${new Date().getTime()}.xlsx`,
+    `messageTemplate_${Date.now()}.xlsx`,
   );
 }
 

@@ -35,7 +35,7 @@
           <template #icon> <swap-icon /> </template>
           移动到
         </t-button>
-        <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline">
+        <t-form v-show="showSearch" :data="queryParams" layout="inline">
           <t-form-item label-width="0px" name="originalName">
             <t-input v-model="queryParams.originalName" placeholder="搜索文件名" @enter="handleQuery">
               <template #suffix-icon>
@@ -81,7 +81,7 @@
                     v-if="getMediaType(oss) !== 'image'"
                     :class="`gallery-doc-icon gallery-doc-icon--${getMediaType(oss)}`"
                   >
-                    <component :is="getMediaType(oss) + '-svg'" class="gallery-doc-icon__icon" />
+                    <component :is="`${getMediaType(oss)}-svg`" class="gallery-doc-icon__icon" />
                   </div>
                   <picture v-else class="list-card-gallery-responsive-image list-card-gallery-responsive-image--fit">
                     <img
@@ -298,7 +298,6 @@
     </t-dialog>
   </div>
 </template>
-
 <script lang="ts" setup>
 import { useClipboard } from '@vueuse/core';
 import {
@@ -340,6 +339,18 @@ defineOptions({
   components: { ArchiveSvg, ExcelSvg, PdfSvg, PptSvg, AudioSvg, TextSvg, UnknownSvg, VideoSvg, WordSvg },
 });
 
+const props = withDefaults(defineProps<MyOssProps>(), {
+  imageUpload: true,
+  fileUpload: true,
+  multiple: true,
+  thumbnailSize: 120,
+});
+
+const emit = defineEmits<{
+  (e: 'change', selectValues: SysOssVo[]): void;
+  (e: 'update'): void;
+}>();
+
 export interface MyOssProps {
   /** 分类id */
   categoryId?: number;
@@ -361,12 +372,6 @@ export interface MyOssProps {
   rectMaxHeight?: string;
 }
 
-const props = withDefaults(defineProps<MyOssProps>(), {
-  imageUpload: true,
-  fileUpload: true,
-  multiple: true,
-  thumbnailSize: 120,
-});
 const fileUploadProps = computed(() => props.fileUploadProps);
 const imageUploadProps = computed(() => props.imageUploadProps);
 watch(
@@ -382,11 +387,6 @@ watch(
     }
   },
 );
-const emit = defineEmits<{
-  (e: 'change', selectValues: SysOssVo[]): void;
-  (e: 'update'): void;
-}>();
-
 const { proxy } = getCurrentInstance();
 
 const ossRef = ref<FormInstanceFunctions>();
@@ -548,7 +548,7 @@ function reset() {
     isLock: 0,
     ossCategoryId: 0,
   };
-  proxy.resetForm('ossRef');
+  ossRef.value.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {

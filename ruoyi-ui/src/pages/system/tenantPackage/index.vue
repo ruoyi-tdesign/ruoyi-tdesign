@@ -241,6 +241,7 @@ const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
 const tenantPackageList = ref<SysTenantPackageVo[]>([]);
+const queryRef = ref<FormInstanceFunctions>();
 const tenantPackageRef = ref<FormInstanceFunctions>();
 const open = ref(false);
 const openView = ref(false);
@@ -344,7 +345,7 @@ function reset() {
     status: '1',
     menuIds: [],
   };
-  proxy.resetForm('tenantPackageRef');
+  tenantPackageRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -355,7 +356,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -515,7 +516,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `tenantPackage_${new Date().getTime()}.xlsx`,
+    `tenantPackage_${Date.now()}.xlsx`,
   );
 }
 

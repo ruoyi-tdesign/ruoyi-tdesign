@@ -159,7 +159,7 @@ import {
   SettingIcon,
   UploadIcon,
 } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol, TableSort } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol, TableSort } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, onActivated, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -175,6 +175,7 @@ import ImportTable from './importTable.vue';
 const route = useRoute();
 const { proxy } = getCurrentInstance();
 
+const queryRef = ref<FormInstanceFunctions>();
 const tableList = ref<GenTableVo[]>([]);
 const loading = ref(false);
 const columnControllerVisible = ref(false);
@@ -236,7 +237,7 @@ onActivated(() => {
     uniqueId.value = time.toString();
     queryParams.value.pageNum = route.query.pageNum as any;
     dateRange.value = [];
-    proxy.resetForm('queryForm');
+    queryRef.value.reset();
     getList();
   }
 });
@@ -302,7 +303,7 @@ function openImportTable() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

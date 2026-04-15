@@ -59,7 +59,6 @@
     </template>
   </t-image-viewer>
 </template>
-
 <script lang="tsx" setup>
 import { BrowseIcon, ImageErrorIcon } from 'tdesign-icons-vue-next';
 import type { TdImageProps, TdImageViewerProps } from 'tdesign-vue-next';
@@ -153,11 +152,15 @@ const realPreviewSrcList = ref<string[]>([]);
 const hover = ref(false);
 const scale = computed(() => (hover.value ? 1.1 : 1));
 
+const numbersRegExp = /^(?:\d,?)+$/;
+const searchHttps = /http(s)?:\/\//;
+const splitDou = /,(?=\/)/;
+const splitHttp = /,(?=http)/;
 watchEffect(() => {
   const src = props.src;
   const previewSrc = props.previewSrc || props.src;
-  const srcIdMode = src && /^([0-9],?)+$/.test(src);
-  const previewSrcIdMode = previewSrc && /^([0-9],?)+$/.test(previewSrc);
+  const srcIdMode = src && numbersRegExp.test(src);
+  const previewSrcIdMode = previewSrc && numbersRegExp.test(previewSrc);
   let ids: string[] = [];
   let srcFirst: string = '';
   let previewSrcArr: string[] = [];
@@ -165,12 +168,12 @@ watchEffect(() => {
     srcFirst = src.split(',')[0];
     ids.push(srcFirst);
   } else if (src) {
-    if (src.search(/http(s)?:\/\//) === -1) {
+    if (src.search(searchHttps) === -1) {
       // 相对路径
-      realSrc.value = src.split(/,(?=\/)/).map((value) => getVisitUrl(value))[0];
+      realSrc.value = src.split(splitDou).map((value) => getVisitUrl(value))[0];
     } else {
       // http模式
-      realSrc.value = src.split(/,(?=http)/)[0];
+      realSrc.value = src.split(splitHttp)[0];
     }
   } else {
     realSrc.value = '';
@@ -179,12 +182,12 @@ watchEffect(() => {
     previewSrcArr = previewSrc.split(',');
     ids = ids.concat(previewSrcArr);
   } else if (previewSrc) {
-    if (previewSrc.search(/http(s)?:\/\//) === -1) {
+    if (previewSrc.search(searchHttps) === -1) {
       // 相对路径
-      realPreviewSrcList.value = previewSrc.split(/,(?=\/)/).map((value) => getVisitUrl(value));
+      realPreviewSrcList.value = previewSrc.split(splitDou).map((value) => getVisitUrl(value));
     } else {
       // http模式
-      realPreviewSrcList.value = previewSrc.split(/,(?=http)/);
+      realPreviewSrcList.value = previewSrc.split(splitHttp);
     }
   } else {
     realPreviewSrcList.value = [];
@@ -255,7 +258,7 @@ const realHeight = computed(() => (typeof props.height === 'string' ? props.heig
   }
 }
 
-:deep .t-image__overlay-content {
+:deep(.t-image__overlay-content) {
   border-radius: inherit;
 }
 </style>

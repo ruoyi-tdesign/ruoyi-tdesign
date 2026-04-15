@@ -39,10 +39,11 @@ const props = defineProps({
 
 const html = ref<HTMLElement>();
 
+const searchImg = /<img [^>]*>/g;
 const htmlText = computed(() => {
   if (props.imageLazy && props.htmlText) {
     // 使用正则，兼容非客户端环境
-    return props.htmlText?.replaceAll(/<img [^>]*>/g, (substring) => {
+    return props.htmlText?.replaceAll(searchImg, (substring) => {
       if (substring.search('loading=') === -1) {
         return `${substring.slice(0, 5)} loading="lazy" ${substring.slice(5)}`;
       }
@@ -97,7 +98,6 @@ onUpdated(() => {
   renderHtml();
 });
 </script>
-
 <style scoped lang="less">
 .editor_preview {
   :deep(ul),
@@ -124,8 +124,9 @@ onUpdated(() => {
   color: var(--td-text-color-primary);
 
   > :deep(div) {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
-      'Helvetica Neue', sans-serif;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
+      sans-serif;
     line-height: 1.4;
     margin: 1rem;
 

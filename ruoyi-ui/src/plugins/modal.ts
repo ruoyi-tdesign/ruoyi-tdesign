@@ -10,7 +10,8 @@ import type {
 } from 'tdesign-vue-next';
 import { DialogPlugin, Form, FormItem, Input, LoadingPlugin, MessagePlugin, NotifyPlugin } from 'tdesign-vue-next';
 import type { TNode } from 'tdesign-vue-next/es/common';
-import { h, reactive, ref, type VNode } from 'vue';
+import type { VNode } from 'vue';
+import { h, reactive, ref } from 'vue';
 
 let loadingInstance: LoadingInstance;
 
@@ -188,7 +189,9 @@ export default {
   // 确认窗体
   confirm(
     content: string | VNode,
+    // eslint-disable-next-line ts/no-unsafe-function-type
     onConfirm: Function,
+    // eslint-disable-next-line ts/no-unsafe-function-type
     onClose?: Function,
     options?: Omit<DialogOptions, 'onClose' | 'body' | 'confirmBtn'>,
   ) {
@@ -260,7 +263,7 @@ export default {
     });
     const formRef = ref<FormInstanceFunctions>();
     const instance = DialogPlugin.confirm({
-      // @ts-ignore
+      // @ts-expect-error ignore
       theme: props.theme || 'warning',
       header: title || '系统提示',
       confirmBtn: btn,
@@ -270,7 +273,6 @@ export default {
       zIndex: 99999,
       body: () =>
         h(
-          // @ts-ignore
           Form,
           {
             data: form,

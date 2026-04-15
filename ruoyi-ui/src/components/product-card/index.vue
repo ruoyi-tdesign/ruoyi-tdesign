@@ -12,9 +12,9 @@
       </t-avatar>
     </template>
     <template #status>
-      <t-tag :theme="product.isSetup ? 'success' : 'default'" :disabled="!product.isSetup">{{
-        product.isSetup ? '已启用' : '已停用'
-      }}</t-tag>
+      <t-tag :theme="product.isSetup ? 'success' : 'default'" :disabled="!product.isSetup">
+        {{ product.isSetup ? '已启用' : '已停用' }}
+      </t-tag>
     </template>
     <template #content>
       <p class="list-card-item_detail--name">{{ product.name }}</p>
@@ -73,8 +73,7 @@ export interface CardProductType {
   name: string;
 }
 
-// eslint-disable-next-line
-const props = defineProps({
+defineProps({
   product: {
     type: Object as PropType<CardProductType>,
   },
@@ -92,7 +91,6 @@ const handleClickDelete = (product: CardProductType) => {
   emit('delete-item', product);
 };
 </script>
-
 <style lang="less" scoped>
 .list-card-item {
   display: flex;

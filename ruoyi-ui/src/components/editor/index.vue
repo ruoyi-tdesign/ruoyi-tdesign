@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!--  文档:https://www.tiny.cloud/docs/tinymce/6/-->
+    <!--  文档:https://www.tiny.cloud/docs/tinymce/6/ -->
     <editor ref="editorRef" :model-value="modelValue" :init="conf" :disabled="disabled" v-bind="$attrs" />
     <x-upload-select
       v-if="selectFile"
@@ -23,9 +23,8 @@
     />
   </div>
 </template>
-
 <script lang="ts" setup>
-// eslint-disable-next-line
+// eslint-disable-next-line simple-import-sort/imports
 import tinymce from 'tinymce/tinymce';
 import 'tinymce/models/dom';
 import 'tinymce/icons/default/icons.min.js'; // 引入编辑器图标icon，不引入则不显示对应图标

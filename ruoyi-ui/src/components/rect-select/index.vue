@@ -27,8 +27,6 @@
 defineOptions({
   name: 'RectSelect',
 });
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
-
 const props = defineProps({
   borderAnimate: {
     type: Boolean,
@@ -43,6 +41,13 @@ const props = defineProps({
     default: '',
   },
 });
+
+const emit = defineEmits<{
+  (e: 'change', checkedIndexes: number[]): void;
+}>();
+
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue';
+
 // 矩形选取的相对距离
 const rect = computed(() => {
   return {
@@ -62,9 +67,6 @@ const distance = ref(5);
 const scrollPadding = ref(40);
 // 盒子的绝对距离
 const boxRect = ref({ left: 0, top: 0, right: 0, bottom: 0 });
-const emit = defineEmits<{
-  (e: 'change', checkedIndexes: number[]): void;
-}>();
 const effectiveActive = computed(() => {
   return active.value && !props.disabled;
 });
@@ -275,7 +277,6 @@ onUnmounted(() => {
   window.removeEventListener('mousemove', handleMouseMove);
 });
 </script>
-
 <style scoped lang="less">
 .rect-box {
   max-height: calc(100vh - 316px);

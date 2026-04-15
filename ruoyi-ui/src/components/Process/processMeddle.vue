@@ -82,11 +82,6 @@ import type { TableProps } from 'tdesign-vue-next';
 import type { FlowTaskVo, TaskOperationBo } from '@/api/workflow/model/taskModel';
 import UserSelect from '@/components/user-select/index.vue';
 
-const { proxy } = getCurrentInstance();
-
-import type { SysUserVo, UserDTO } from '@/api/system/model/userModel';
-import { currentTaskAllUser, getTask, taskOperation, terminationTask } from '@/api/workflow/task';
-
 const props = defineProps({
   width: {
     type: String,
@@ -97,12 +92,19 @@ const props = defineProps({
     default: '100%',
   },
 });
+
+const emits = defineEmits(['submit-callback']);
+
+const { proxy } = getCurrentInstance();
+
+import type { SysUserVo, UserDTO } from '@/api/system/model/userModel';
+import { currentTaskAllUser, getTask, taskOperation, terminationTask } from '@/api/workflow/task';
+
 const deleteSignatureColumns: TableProps['columns'] = [
   { title: `任务名称`, colKey: 'nodeName', align: 'center' },
   { title: `办理人`, colKey: 'nickName', align: 'center' },
   { title: `操作`, colKey: 'operation', align: 'center', width: 160 },
 ];
-const emits = defineEmits(['submitCallback']);
 const transferTaskRef = ref<InstanceType<typeof UserSelect>>();
 const multiInstanceUserRef = ref<InstanceType<typeof UserSelect>>();
 // 遮罩层
@@ -166,7 +168,7 @@ const handleTransferTask = async (data: SysUserVo[]) => {
         buttonDisabled.value = false;
       });
       visible.value = false;
-      emits('submitCallback');
+      emits('submit-callback');
       await proxy?.$modal.msgSuccess('操作成功');
     });
   } else {
@@ -193,7 +195,7 @@ const addMultiInstanceUser = async (data: SysUserVo[]) => {
         buttonDisabled.value = false;
       });
       visible.value = false;
-      emits('submitCallback');
+      emits('submit-callback');
       await proxy?.$modal.msgSuccess('操作成功');
     });
   } else {
@@ -215,7 +217,7 @@ const deleteMultiInstanceUser = async (row: UserDTO) => {
       buttonDisabled.value = false;
     });
     visible.value = false;
-    emits('submitCallback');
+    emits('submit-callback');
     await proxy?.$modal.msgSuccess('操作成功');
   });
 };
@@ -225,7 +227,8 @@ const handleTaskUser = async () => {
   deleteUserList.value = data.data;
   if (deleteUserList.value && deleteUserList.value.length > 0) {
     deleteUserList.value.forEach((e) => {
-      // @ts-ignore
+      // eslint-disable-next-line ts/ban-ts-comment
+      // @ts-expect-error
       e.nodeName = task.value.nodeName;
     });
   }
@@ -246,7 +249,7 @@ const handleTerminationTask = async () => {
       buttonDisabled.value = false;
     });
     visible.value = false;
-    emits('submitCallback');
+    emits('submit-callback');
     await proxy?.$modal.msgSuccess('操作成功');
   });
 };

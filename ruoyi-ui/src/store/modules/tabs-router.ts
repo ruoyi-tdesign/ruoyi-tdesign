@@ -39,7 +39,7 @@ export const useTabsRouterStore = defineStore('tabsRouter', {
     // 处理新增
     appendTabRouterList(newRoute: TRouterInfo) {
       const needAlive = !ignoreCacheRoutes.includes(newRoute.name as string);
-      if (!this.tabRouters.find((route: TRouterInfo) => route.path === newRoute.path)) {
+      if (!this.tabRouters.some((route: TRouterInfo) => route.path === newRoute.path)) {
         this.tabRouterList = this.tabRouterList.concat({ ...newRoute, isAlive: needAlive });
       }
     },

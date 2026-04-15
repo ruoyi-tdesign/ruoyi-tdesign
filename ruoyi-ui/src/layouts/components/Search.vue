@@ -2,7 +2,8 @@
   <div v-if="layout === 'side'" class="header-menu-search">
     <t-auto-complete
       v-model="searchData"
-      :class="['header-search', { 'hover-active': isSearchFocus }]"
+      class="header-search"
+      :class="[{ 'hover-active': isSearchFocus }]"
       :placeholder="t('layout.searchPlaceholder')"
       :options="options"
       :filterable="false"
@@ -34,7 +35,8 @@
     </t-button>
     <t-auto-complete
       v-model="searchData"
-      :class="['header-search', { 'width-zero': !isSearchFocus }]"
+      class="header-search"
+      :class="[{ 'width-zero': !isSearchFocus }]"
       :placeholder="t('layout.searchPlaceholder')"
       :autofocus="isSearchFocus"
       :options="options"
@@ -54,7 +56,6 @@
     </t-auto-complete>
   </div>
 </template>
-
 <script lang="ts" setup>
 import Fuse from 'fuse.js';
 import { storeToRefs } from 'pinia';

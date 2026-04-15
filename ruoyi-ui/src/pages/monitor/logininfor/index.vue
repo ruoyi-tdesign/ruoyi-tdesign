@@ -187,7 +187,7 @@ import {
   SearchIcon,
   SettingIcon,
 } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol, TableProps, TableSort } from 'tdesign-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol, TableProps, TableSort } from 'tdesign-vue-next';
 import { computed, getCurrentInstance, ref } from 'vue';
 
 import {
@@ -203,6 +203,7 @@ import { ArrayOps } from '@/utils/array';
 const { proxy } = getCurrentInstance();
 const { sys_common_status, sys_device_type } = proxy.useDict('sys_common_status', 'sys_device_type');
 
+const queryRef = ref<FormInstanceFunctions>();
 const openView = ref(false);
 const openViewLoading = ref(false);
 const logininforList = ref<SysLogininforVo[]>([]);
@@ -286,7 +287,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -371,7 +372,7 @@ function handleExport() {
     {
       ...proxy.addDateRange(queryParams.value, dateRange.value),
     },
-    `logininfor_${new Date().getTime()}.xlsx`,
+    `logininfor_${Date.now()}.xlsx`,
   );
 }
 

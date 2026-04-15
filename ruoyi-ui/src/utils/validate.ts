@@ -4,6 +4,7 @@
  * @param path
  */
 export function isPathMatch(pattern: string, path: string) {
+  // eslint-disable-next-line e18e/prefer-static-regex
   const regexPattern = pattern.replace(/\//g, '\\/').replace(/\*\*/g, '.*').replace(/\*/g, '[^\\/]*');
   const regex = new RegExp(`^${regexPattern}$`);
   return regex.test(path);
@@ -22,7 +23,8 @@ export function isHttp(url: string) {
  * @param path
  */
 export function isExternal(path: string) {
-  return /^(https?:|mailto:|tel:)/.test(path);
+  // eslint-disable-next-line e18e/prefer-static-regex
+  return /^(?:https?:|mailto:|tel:)/.test(path);
 }
 
 /**
@@ -30,7 +32,7 @@ export function isExternal(path: string) {
  */
 export function validUsername(str: string) {
   const validMap = ['admin', 'editor'];
-  return validMap.indexOf(str.trim()) >= 0;
+  return validMap.includes(str.trim());
 }
 
 /**
@@ -38,7 +40,8 @@ export function validUsername(str: string) {
  */
 export function validURL(url: string) {
   const reg =
-    /^(https?|ftp):\/\/([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/;
+    // eslint-disable-next-line e18e/prefer-static-regex
+    /^(?:https?|ftp):\/\/(?:[a-zA-Z0-9.-]+(?::[a-zA-Z0-9.&%$-]+)*@)*(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d?)(?:\.(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}|(?:[a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(?:com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(?::\d+)*(?:\/(?:$|[\w.,?'\\+&%$#=~-]+))*$/;
   return reg.test(url);
 }
 
@@ -46,6 +49,7 @@ export function validURL(url: string) {
  * @param str
  */
 export function validLowerCase(str: string) {
+  // eslint-disable-next-line e18e/prefer-static-regex
   const reg = /^[a-z]+$/;
   return reg.test(str);
 }
@@ -54,6 +58,7 @@ export function validLowerCase(str: string) {
  * @param str
  */
 export function validUpperCase(str: string) {
+  // eslint-disable-next-line e18e/prefer-static-regex
   const reg = /^[A-Z]+$/;
   return reg.test(str);
 }
@@ -62,7 +67,8 @@ export function validUpperCase(str: string) {
  * @param str
  */
 export function validAlphabets(str: string) {
-  const reg = /^[A-Za-z]+$/;
+  // eslint-disable-next-line e18e/prefer-static-regex
+  const reg = /^[A-Z]+$/i;
   return reg.test(str);
 }
 
@@ -71,7 +77,8 @@ export function validAlphabets(str: string) {
  */
 export function validEmail(email: string) {
   const reg =
-    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    // eslint-disable-next-line e18e/prefer-static-regex
+    /^(?:[^<>()[\]\\.,;:\s@"]+(?:\.[^<>()[\]\\.,;:\s@"]+)*|".+")@(?:\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\]|(?:[a-z\-0-9]+\.)+[a-z]{2,})$/i;
   return reg.test(email);
 }
 
@@ -79,6 +86,7 @@ export function validEmail(email: string) {
  * @param str
  */
 export function isString(str: any) {
+  // eslint-disable-next-line unicorn/no-instanceof-builtins
   return typeof str === 'string' || str instanceof String;
 }
 

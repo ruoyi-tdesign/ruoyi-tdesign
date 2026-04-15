@@ -77,8 +77,6 @@ import { ref } from 'vue';
 import { listByIds } from '@/api/system/oss';
 import { flowImage } from '@/api/workflow/instance';
 
-const { proxy } = getCurrentInstance();
-const { wf_task_status } = proxy.useDict('wf_task_status');
 const props = defineProps({
   width: {
     type: String,
@@ -89,6 +87,8 @@ const props = defineProps({
     default: '100%',
   },
 });
+const { proxy } = getCurrentInstance();
+const { wf_task_status } = proxy.useDict('wf_task_status');
 const loading = ref(false);
 const visible = ref(false);
 const historyList = ref<Array<any>>([]);

@@ -32,7 +32,6 @@
     </div>
   </t-watermark>
 </template>
-
 <script lang="ts" setup>
 import '@/style/layout.less';
 
@@ -94,5 +93,4 @@ watch(
   },
 );
 </script>
-
 <style lang="less" scoped></style>

@@ -295,6 +295,7 @@ import { ArrayOps } from '@/utils/array';
 const { proxy } = getCurrentInstance();
 const { sys_yes_no, sys_normal_disable } = proxy.useDict('sys_yes_no', 'sys_normal_disable');
 
+const queryRef = ref<FormInstanceFunctions>();
 const ossRuleList = ref<SysOssRuleVo[]>([]);
 const ossRuleRef = ref<FormInstanceFunctions>();
 const open = ref(false);
@@ -417,7 +418,7 @@ function reset() {
     status: '1',
     ruleSort: 0,
   };
-  proxy.resetForm('ossRuleRef');
+  ossRuleRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -428,7 +429,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -580,7 +581,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `ossRule_${new Date().getTime()}.xlsx`,
+    `ossRule_${Date.now()}.xlsx`,
   );
 }
 

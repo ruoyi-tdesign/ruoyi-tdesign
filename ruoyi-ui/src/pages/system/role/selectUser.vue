@@ -41,7 +41,6 @@
         </t-form-item>
       </t-form>
       <t-table
-        ref="refTable"
         hover
         :loading="loading"
         row-key="userId"
@@ -63,22 +62,23 @@
 defineOptions({
   name: 'SelectUser',
 });
-import { RefreshIcon, SearchIcon } from 'tdesign-icons-vue-next';
-import type { PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
-import { computed, getCurrentInstance, reactive, ref } from 'vue';
-
-import type { SysUserQuery, SysUserVo } from '@/api/system/model/userModel';
-import { authUserSelectAll, unallocatedUserList } from '@/api/system/role';
-
 const props = defineProps({
   roleId: {
     type: [Number, String],
   },
 });
+const emit = defineEmits(['ok']);
+import { RefreshIcon, SearchIcon } from 'tdesign-icons-vue-next';
+import type { FormInstanceFunctions, PageInfo, PrimaryTableCol } from 'tdesign-vue-next';
+import { computed, getCurrentInstance, reactive, ref } from 'vue';
+
+import type { SysUserQuery, SysUserVo } from '@/api/system/model/userModel';
+import { authUserSelectAll, unallocatedUserList } from '@/api/system/role';
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
+const queryRef = ref<FormInstanceFunctions>();
 const userList = ref<SysUserVo[]>([]);
 const visible = ref(false);
 const loading = ref(false);
@@ -142,10 +142,9 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleQuery();
 }
-const emit = defineEmits(['ok']);
 /** 选择授权用户操作 */
 function handleSelectUser() {
   const { roleId } = queryParams;

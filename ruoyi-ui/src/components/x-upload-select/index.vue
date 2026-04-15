@@ -74,6 +74,15 @@ defineOptions({
   name: 'XUploadSelect',
 });
 
+const props = withDefaults(defineProps<UploadSelectProps>(), {
+  imageUpload: true,
+  fileUpload: true,
+  supportSelectFile: true,
+  supportUrl: false,
+  multiple: true,
+  thumbnailSize: 120,
+  rectMaxHeight: 'calc(100vh - 444px)',
+});
 export interface UploadSelectProps extends FileCategoryProps {
   /** 标题 */
   title?: string;
@@ -84,16 +93,6 @@ export interface UploadSelectProps extends FileCategoryProps {
   /** 提交时调用，返回false可以阻止关闭窗口 */
   onSubmit?: (values: SelectFile[]) => boolean;
 }
-const props = withDefaults(defineProps<UploadSelectProps>(), {
-  imageUpload: true,
-  fileUpload: true,
-  supportSelectFile: true,
-  supportUrl: false,
-  multiple: true,
-  thumbnailSize: 120,
-  rectMaxHeight: 'calc(100vh - 444px)',
-});
-
 const formatQueryParam = computed(() => {
   const query = { ...props.queryParam };
   query.contentTypes = props.queryParam?.contentTypes?.map((value) => value.replaceAll('*', '%'));
@@ -130,7 +129,7 @@ watch(
 const rules = ref<Record<string, Array<FormRule>>>({
   url: [
     { required: true, message: '外链地址不能为空' },
-    { pattern: /^(http(s)?:\/\/[^.\\/]+\.[^\n]+\/[^\n]+\n?)+$/, message: '地址格式错误' },
+    { pattern: /^(http(s)?:\/\/[^.\\/]+\.[^\n][^\n/]*\/[^\n]+\n?)+$/, message: '地址格式错误' },
     { validator: UrlValidator },
   ],
 });

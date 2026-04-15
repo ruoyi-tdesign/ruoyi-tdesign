@@ -99,7 +99,7 @@ export class VAxios {
     // 请求拦截器
     this.instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       // 如果忽略取消令牌，则不会取消重复的请求
-      // @ts-ignore
+      // @ts-expect-error ignore
       const { ignoreCancelToken } = config.requestOptions;
       const ignoreCancel = ignoreCancelToken ?? this.options.requestOptions?.ignoreCancelToken;
       if (!ignoreCancel) axiosCanceler.addPending(config);

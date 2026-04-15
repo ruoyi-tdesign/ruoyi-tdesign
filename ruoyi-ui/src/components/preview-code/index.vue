@@ -1,14 +1,11 @@
 <template>
-  <pre :class="'language-' + language + `${isShowLineNumbers ? ' line-numbers' : ''}`">
-<code ref="html" :class="'language-'+ language" v-text="code" />
+  <pre :class="`language-${language}${isShowLineNumbers ? ' line-numbers' : ''}`">
+<code ref="html" :class="`language-${ language}`" v-text="code" />
   </pre>
 </template>
-
 <script lang="ts" setup>
 import Prism from 'prismjs';
 import { onMounted, onUpdated, ref } from 'vue';
-
-const html = ref<HTMLElement>();
 
 defineProps({
   // 代码
@@ -27,6 +24,8 @@ defineProps({
     default: true,
   },
 });
+
+const html = ref<HTMLElement>();
 
 // 注册语言别名
 function register() {

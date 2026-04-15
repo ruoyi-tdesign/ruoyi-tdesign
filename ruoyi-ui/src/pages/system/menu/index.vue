@@ -28,7 +28,7 @@
       <t-enhanced-table
         ref="tableRef"
         v-model:column-controller-visible="columnControllerVisible"
-        v-model:expandedTreeNodes="expandedTreeNodes"
+        v-model:expanded-tree-nodes="expandedTreeNodes"
         hover
         :loading="loading"
         :data="menuList"
@@ -417,6 +417,7 @@ const title = ref('');
 const menuOptions = ref<SysMenuVo[]>([]);
 const sort = ref<TableSort>();
 const tableRef = ref<EnhancedTableInstanceFunctions>();
+const queryRef = ref<FormInstanceFunctions>();
 const menuRef = ref<FormInstanceFunctions>();
 const expandedTreeNodes = ref([]);
 /** 是否 */
@@ -507,7 +508,7 @@ function reset() {
     visible: '1',
     status: '1',
   };
-  proxy.resetForm('menuRef');
+  menuRef.value.reset();
 }
 
 /** 搜索按钮操作 */
@@ -517,7 +518,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   handleSortChange(null);
 }
 
@@ -642,7 +643,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `menu_${new Date().getTime()}.xlsx`,
+    `menu_${Date.now()}.xlsx`,
   );
 }
 

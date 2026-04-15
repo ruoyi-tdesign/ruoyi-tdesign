@@ -29,7 +29,6 @@
     </t-form>
   </t-dialog>
 </template>
-
 <script lang="ts" setup>
 import type { FormInstanceFunctions, FormRule, SubmitContext } from 'tdesign-vue-next';
 import { getCurrentInstance, ref } from 'vue';
@@ -52,7 +51,7 @@ const form = ref({
 /** 重置操作表单 */
 function reset() {
   form.value = { confirmPassword: undefined, newPassword: undefined, oldPassword: undefined };
-  proxy.resetForm('pwdRef');
+  pwdRef.value.reset();
 }
 
 const equalToPassword = (value: string) => {

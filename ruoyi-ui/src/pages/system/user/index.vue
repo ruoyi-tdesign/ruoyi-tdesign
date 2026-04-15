@@ -1,11 +1,11 @@
 <template>
   <t-card>
     <t-row :gutter="20">
-      <!--部门数据-->
+      <!-- 部门数据 -->
       <t-col :sm="2" :xs="12">
         <dept-tree v-model="deptActived" @active="handleQuery" />
       </t-col>
-      <!--用户数据-->
+      <!-- 用户数据 -->
       <t-col :sm="10" :xs="12">
         <t-space direction="vertical" style="width: 100%">
           <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline" label-width="calc(4em + 12px)">
@@ -315,7 +315,7 @@
           :limit="1"
           accept=".xlsx, .xls"
           :headers="upload.headers"
-          :action="upload.url + '?updateSupport=' + upload.updateSupport"
+          :action="`${upload.url}?updateSupport=${upload.updateSupport}`"
           :disabled="upload.isUploading"
           :on-progress="handleFileUploadProgress"
           :on-success="handleFileSuccess"
@@ -424,6 +424,7 @@ const { proxy } = getCurrentInstance();
 const { sys_normal_disable, sys_user_sex } = proxy.useDict('sys_normal_disable', 'sys_user_sex');
 
 const uploadRef = ref<UploadInstanceFunctions>();
+const queryRef = ref<FormInstanceFunctions>();
 const userRef = ref<FormInstanceFunctions>();
 const userList = ref<SysUserVo[]>([]);
 const open = ref(false);
@@ -561,7 +562,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
   deptActived.value = [];
   queryParams.value.deptId = undefined;
   queryParams.value.pageNum = 1;
@@ -598,7 +599,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `user_${new Date().getTime()}.xlsx`,
+    `user_${Date.now()}.xlsx`,
   );
 }
 /** 用户状态修改  */
@@ -612,13 +613,16 @@ function handleAuthRole(row: SysUserVo) {
   const { userId } = row;
   router.push(`/system/user-auth/role/${userId}`);
 }
+
+const inputPattern = /^.{5,20}$/;
+
 /** 重置密码按钮操作 */
 function handleResetPwd(row: SysUserVo) {
   proxy.$modal.prompt(`请输入"${row.userName}"的新密码`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     closeOnClickModal: false,
-    inputPattern: /^.{5,20}$/,
+    inputPattern,
     inputErrorMessage: '用户密码长度必须介于 5 和 20 之间',
     onConfirm: (value) => {
       const msgLoading = proxy.$modal.msgLoading('提交中...');
@@ -643,7 +647,7 @@ function handleImport() {
 }
 /** 下载模板操作 */
 function importTemplate() {
-  proxy.download('system/user/importTemplate', {}, `user_template_${new Date().getTime()}.xlsx`);
+  proxy.download('system/user/importTemplate', {}, `user_template_${Date.now()}.xlsx`);
 }
 /** 文件上传中处理 */
 const handleFileUploadProgress = () => {
@@ -655,7 +659,7 @@ const handleFileSuccess = (context: SuccessContext) => {
   upload.isUploading = false;
   uploadRef.value.uploadFiles([]);
   proxy.$modal.alert({
-    // @ts-ignore
+    // @ts-expect-error 动态类型
     body: createVNode(
       'div',
       { style: 'overflow: auto;overflow-x: hidden;max-height: 70vh;padding: 10px 20px 0;' },
@@ -681,7 +685,7 @@ function reset() {
     postIds: [],
     roleIds: [],
   };
-  proxy.resetForm('userRef');
+  userRef.value.reset();
 }
 /** 取消按钮 */
 function cancel() {

@@ -38,7 +38,7 @@
           <template #icon> <lock-on-icon /> </template>
           加锁
         </t-button>
-        <t-form v-show="showSearch" ref="queryRef" :data="queryParams" layout="inline">
+        <t-form v-show="showSearch" :data="queryParams" layout="inline">
           <t-form-item label-width="0px" name="originalFilename">
             <t-input v-model="queryParams.originalFilename" placeholder="搜索文件名" @enter="handleQuery">
               <template #suffix-icon>
@@ -87,7 +87,7 @@
                     v-if="getMediaType(file) !== 'image'"
                     :class="`gallery-doc-icon gallery-doc-icon--${getMediaType(file)}`"
                   >
-                    <component :is="getMediaType(file) + '-svg'" class="gallery-doc-icon__icon" />
+                    <component :is="`${getMediaType(file)}-svg`" class="gallery-doc-icon__icon" />
                   </div>
                   <picture v-else class="list-card-gallery-responsive-image list-card-gallery-responsive-image--fit">
                     <img
@@ -310,7 +310,6 @@
     </t-dialog>
   </div>
 </template>
-
 <script lang="ts" setup>
 import { useClipboard } from '@vueuse/core';
 import {
@@ -352,6 +351,18 @@ defineOptions({
   components: { ArchiveSvg, ExcelSvg, PdfSvg, PptSvg, AudioSvg, TextSvg, UnknownSvg, VideoSvg, WordSvg },
 });
 
+const props = withDefaults(defineProps<FileListProps>(), {
+  imageUpload: true,
+  fileUpload: true,
+  multiple: true,
+  thumbnailSize: 120,
+});
+
+const emit = defineEmits<{
+  (e: 'change', selectValues: SysFileVo[]): void;
+  (e: 'update'): void;
+}>();
+
 export interface FileListProps {
   /** 分类id */
   categoryId?: number;
@@ -373,12 +384,6 @@ export interface FileListProps {
   rectMaxHeight?: string;
 }
 
-const props = withDefaults(defineProps<FileListProps>(), {
-  imageUpload: true,
-  fileUpload: true,
-  multiple: true,
-  thumbnailSize: 120,
-});
 // const fileUploadProps = computed(() => props.fileUploadProps);
 const imageUploadProps = computed(() => props.imageUploadProps);
 watch(
@@ -394,11 +399,6 @@ watch(
     }
   },
 );
-const emit = defineEmits<{
-  (e: 'change', selectValues: SysFileVo[]): void;
-  (e: 'update'): void;
-}>();
-
 const { proxy } = getCurrentInstance();
 
 const fileRef = ref<FormInstanceFunctions>();
@@ -559,7 +559,7 @@ function reset() {
     isLock: 0,
     fileCategoryId: 0,
   };
-  proxy.resetForm('fileRef');
+  fileRef.value.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {

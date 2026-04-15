@@ -44,6 +44,7 @@
                 #{item}
             </foreach>
             <if test="userName != null and userName != ''"> and su.user_name like concat(concat('%', #{userName}), '%')</if>
+            <if test="nickName != null and nickName != ''"> and su.nick_name like concat(concat('%', #{nickName}), '%')</if>
             <if test="email != null and email != ''"> and su.email like concat(concat('%', #{email}), '%')</if>
             <if test="phonenumber != null and phonenumber != ''"> and su.phonenumber like concat(concat('%', #{phonenumber}), '%')</if>
             <if test="status != null and status != ''"> and su.status = #{status}</if>
