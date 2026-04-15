@@ -431,8 +431,10 @@ import type {
 #if($isUseQueryMethod)
   EnhancedTableInstanceFunctions,
 #end
-#if($addOrUpdate)
+#if($addOrUpdate || $isUseQueryMethod)
   FormInstanceFunctions,
+#end
+#if($addOrUpdate)
   FormRule,
 #end
 #if($isUseQueryMethod)
@@ -503,6 +505,7 @@ const loading = ref(false);
 const columnControllerVisible = ref(false);
 const showSearch = ref(true);
 const tableRef = ref<EnhancedTableInstanceFunctions>();
+const queryRef = ref<FormInstanceFunctions>();
 #end
 #if($hasSorting && $isUseQueryMethod)
 const sort = ref<TableSort>();
@@ -617,7 +620,7 @@ function getList() {
 function reset() {
   form.value = {};
 #if($addOrUpdate)
-  proxy.resetForm('${businessName}Ref');
+  ${businessName}Ref.value.reset();
 #end
 }
 #end
@@ -636,7 +639,7 @@ function resetQuery() {
   dateRange${AttrName}.value = [];
 #end
 #end
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
 #if($hasSorting)
   handleSortChange(null);
 #else
@@ -819,7 +822,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `${businessName}_#[[${new Date().getTime()}]]#.xlsx`,
+    `${businessName}_#[[${Date.now()}]]#.xlsx`,
   );
 }
 #end

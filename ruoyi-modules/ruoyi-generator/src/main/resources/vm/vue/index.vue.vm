@@ -437,7 +437,7 @@ import {
 #end
 } from 'tdesign-icons-vue-next';
 #end
-import type { #if($addOrUpdate)FormInstanceFunctions, FormRule, #end#if($isUseQueryMethod)PageInfo, PrimaryTableCol, #{end}#if($addOrUpdate)SubmitContext, #end#if($hasSorting && $isUseQueryMethod)TableSort, #end } from 'tdesign-vue-next';
+import type { #if($addOrUpdate || $isUseQueryMethod)FormInstanceFunctions, #end#if($addOrUpdate)FormRule, #end#if($isUseQueryMethod)PageInfo, PrimaryTableCol, #{end}#if($addOrUpdate)SubmitContext, #end#if($hasSorting && $isUseQueryMethod)TableSort, #end } from 'tdesign-vue-next';
 import { #if($isUseQueryMethod)computed, #{end}getCurrentInstance, ref } from 'vue';
 #if($isUseRemoveMethod)
 import { ArrayOps } from '@/utils/array';
@@ -501,6 +501,7 @@ const buttonLoading = ref(false);
 const title = ref('');
 #end
 #if($isUseQueryMethod)
+const queryRef = ref<FormInstanceFunctions>();
 const ${businessName}List = ref<${vo}[]>([]);
 const loading = ref(false);
 const columnControllerVisible = ref(false);
@@ -630,7 +631,7 @@ function getList() {
 function reset() {
   form.value = {};
 #if($addOrUpdate)
-  proxy.resetForm('${businessName}Ref');
+  ${businessName}Ref.value.reset();
 #end
 }
 #end
@@ -650,7 +651,7 @@ function resetQuery() {
   dateRange${AttrName}.value = [];
 #end
 #end
-  proxy.resetForm('queryRef');
+  queryRef.value.reset();
 #if($hasSorting)
   queryParams.value.pageNum = 1;
   handleSortChange(null);
@@ -824,7 +825,7 @@ function handleExport() {
     {
       ...queryParams.value,
     },
-    `${businessName}_#[[${new Date().getTime()}]]#.xlsx`,
+    `${businessName}_#[[${Date.now()}]]#.xlsx`,
   );
 }
 #end

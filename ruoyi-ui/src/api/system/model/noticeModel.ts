@@ -11,7 +11,7 @@ export interface SysNoticeQuery extends BaseEntity {
   /** 公告状态（0正常 1关闭） */
   status?: string;
   /** 创建人名称 */
-  createByName: string;
+  createByName?: string;
 }
 
 /**
