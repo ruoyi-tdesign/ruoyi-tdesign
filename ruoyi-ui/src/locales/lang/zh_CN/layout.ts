@@ -29,7 +29,7 @@ export default {
       color: '主题色',
       options: {
         light: '明亮',
-        dark: '暗黑',
+        dark: '深色',
         system: '跟随系统',
         auto: '自动',
       },

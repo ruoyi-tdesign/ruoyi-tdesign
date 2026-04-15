@@ -80,9 +80,9 @@ spring:
 #          password: root
       hikari:
         # 最大连接池数量
-        maximum-pool-size: 20
+        maximum-pool-size: 10
         # 最小空闲链接数量
-        #minimum-idle: 10
+        minimum-idle: 0
         # 配置获取连接等待超时的时间
         connectionTimeout: 30000
         # 校验超时时间
