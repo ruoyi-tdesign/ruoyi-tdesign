@@ -1,7 +1,7 @@
 {
   "private": "true",
   "name": "@tencent/tdesign-vue-next-starter",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Ruoyi-Tdesign多租户管理系统",
   "type": "module",
   "scripts": {
@@ -38,7 +38,6 @@
     "pinia": "~3.0.4",
     "pinia-plugin-persistedstate": "~4.7.1",
     "prismjs": "^1.30.0",
-    "qrcode.vue": "^3.8.1",
     "qs": "^6.15.1",
     "tdesign-icons-vue-next": "0.4.4",
     "tdesign-vue-next": "1.19.1",

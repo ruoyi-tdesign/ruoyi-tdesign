@@ -61,7 +61,7 @@
         <span class="tip">{{ t('pages.login.wechatLogin') }}</span>
         <span class="refresh">{{ t('pages.login.refresh') }} <refresh-icon /> </span>
       </div>
-      <qrcode-vue value="" :size="160" level="H" />
+      <t-qrcode value="tdesign" :size="160" level="H" />
     </template>
 
     <!-- 手机号登录 -->
@@ -92,14 +92,14 @@
       <span v-if="type !== 'password'" class="tip" @click="switchType('password')">
         {{ t('pages.login.accountLogin') }}
       </span>
-      <span v-show="false" v-if="type !== 'qrcode'" class="tip" @click="switchType('qrcode')">
+      <span v-if="type !== 'qrcode'" class="tip" @click="switchType('qrcode')">
         {{ t('pages.login.wechatLogin') }}
       </span>
-      <span v-show="false" v-if="type !== 'phone'" class="tip" @click="switchType('phone')">
+      <span v-if="type !== 'phone'" class="tip" @click="switchType('phone')">
         {{ t('pages.login.phoneLogin') }}
       </span>
     </div>
-    <div style="display: flex; justify-content: flex-end; flex-direction: row">
+    <div style="margin-top: var(--td-comp-margin-xxl); display: flex; justify-content: flex-end; flex-direction: row">
       <t-button shape="circle" variant="outline" title="微信登录" @click="doSocialLogin('wechat_open')">
         <logo-wechat-stroke-filled-icon style="color: #1aad19" />
       </t-button>
@@ -122,7 +122,6 @@
   </t-form>
 </template>
 <script lang="ts" setup>
-import QrcodeVue from 'qrcode.vue';
 import {
   BrowseIcon,
   BrowseOffIcon,
