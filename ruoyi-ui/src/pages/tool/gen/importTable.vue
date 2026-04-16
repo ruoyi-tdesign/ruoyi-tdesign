@@ -157,7 +157,7 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   handleQuery();
 }
 /** 处理打开弹窗事件 */

@@ -360,7 +360,7 @@ function reset() {
     remark: undefined,
   };
   deptActived.value = [];
-  postRef.value.reset();
+  postRef.value?.reset();
 }
 
 /** 搜索按钮操作 */
@@ -372,7 +372,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRangeCreateTime.value = [];
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

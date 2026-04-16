@@ -479,7 +479,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }
@@ -569,7 +569,7 @@ function reset() {
     menuCheckStrictly: true,
     deptCheckStrictly: true,
   };
-  roleRef.value.reset();
+  roleRef.value?.reset();
 }
 /** 详情按钮操作 */
 function handleDetail(row: SysRoleVo) {

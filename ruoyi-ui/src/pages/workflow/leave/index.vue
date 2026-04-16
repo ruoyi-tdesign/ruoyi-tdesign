@@ -269,7 +269,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   rangeLeaveDays.value = [];
-  queryRef.value.reset();
+  queryRef.value?.reset();
   handleQuery();
 }
 

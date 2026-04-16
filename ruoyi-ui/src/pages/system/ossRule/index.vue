@@ -418,7 +418,7 @@ function reset() {
     status: '1',
     ruleSort: 0,
   };
-  ossRuleRef.value.reset();
+  ossRuleRef.value?.reset();
 }
 
 /** 搜索按钮操作 */
@@ -429,7 +429,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

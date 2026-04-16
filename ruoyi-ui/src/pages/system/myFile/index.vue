@@ -275,7 +275,7 @@ function reset() {
   form.value = {
     orderNum: 0,
   };
-  fileCategoryRef.value.reset();
+  fileCategoryRef.value?.reset();
 }
 
 /** 新增分类按钮操作 */

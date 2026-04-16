@@ -51,7 +51,7 @@ const form = ref({
 /** 重置操作表单 */
 function reset() {
   form.value = { confirmPassword: undefined, newPassword: undefined, oldPassword: undefined };
-  pwdRef.value.reset();
+  pwdRef.value?.reset();
 }
 
 const equalToPassword = (value: string) => {

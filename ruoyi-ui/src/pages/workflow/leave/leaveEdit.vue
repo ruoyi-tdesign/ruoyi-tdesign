@@ -189,7 +189,7 @@ const reset = () => {
     flowCode: '',
     variables: {},
   };
-  leaveFormRef.value.reset();
+  leaveFormRef.value?.reset();
 };
 
 const changeLeaveTime = () => {

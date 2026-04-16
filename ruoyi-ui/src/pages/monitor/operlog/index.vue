@@ -285,7 +285,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRangeOperTime.value = [];
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

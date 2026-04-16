@@ -363,7 +363,7 @@ function reset() {
     accessPolicy: '1',
     status: '1',
   };
-  ossConfigRef.value.reset();
+  ossConfigRef.value?.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -372,7 +372,7 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   handleQuery();
 }
 

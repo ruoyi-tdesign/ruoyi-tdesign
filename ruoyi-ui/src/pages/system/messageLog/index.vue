@@ -318,7 +318,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRangeLogTime.value = [];
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

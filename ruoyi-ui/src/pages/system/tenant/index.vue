@@ -391,7 +391,7 @@ function reset() {
   form.value = {
     accountCount: -1,
   };
-  tenantRef.value.reset();
+  tenantRef.value?.reset();
 }
 
 /** 查询所有租户套餐 */
@@ -416,7 +416,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

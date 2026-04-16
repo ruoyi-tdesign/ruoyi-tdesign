@@ -292,7 +292,7 @@ function reset() {
     dictType: undefined,
     remark: undefined,
   };
-  dictRef.value.reset();
+  dictRef.value?.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -302,7 +302,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

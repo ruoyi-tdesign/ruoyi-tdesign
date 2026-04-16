@@ -284,7 +284,7 @@ function reset() {
   form.value = {
     file: undefined,
   };
-  ossRef.value.reset();
+  ossRef.value?.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -294,7 +294,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   daterangeCreateTime.value = [];
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

@@ -287,7 +287,7 @@ function handleQuery() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   actived.value = [];
   queryParams.value.deptId = undefined;
   queryParams.value.pageNum = 1;

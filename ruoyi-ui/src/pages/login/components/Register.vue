@@ -192,7 +192,7 @@ const onSubmit = (ctx: SubmitContext) => {
 };
 
 const switchType = (val: string) => {
-  form.value.reset();
+  form.value?.reset();
   type.value = val;
 };
 

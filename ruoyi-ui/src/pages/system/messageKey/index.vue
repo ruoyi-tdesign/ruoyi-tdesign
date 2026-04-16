@@ -253,7 +253,7 @@ function getList() {
 // 表单重置
 function reset() {
   form.value = {};
-  messageKeyRef.value.reset();
+  messageKeyRef.value?.reset();
 }
 
 /** 搜索按钮操作 */
@@ -264,7 +264,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.pageNum = 1;
   handleSortChange(null);
 }

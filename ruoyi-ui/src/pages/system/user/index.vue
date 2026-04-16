@@ -562,7 +562,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRange.value = [];
-  queryRef.value.reset();
+  queryRef.value?.reset();
   deptActived.value = [];
   queryParams.value.deptId = undefined;
   queryParams.value.pageNum = 1;
@@ -685,7 +685,7 @@ function reset() {
     postIds: [],
     roleIds: [],
   };
-  userRef.value.reset();
+  userRef.value?.reset();
 }
 /** 取消按钮 */
 function cancel() {

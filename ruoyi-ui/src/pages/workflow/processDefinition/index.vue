@@ -374,7 +374,7 @@ const handleQuery = () => {
 };
 /** 重置按钮操作 */
 const resetQuery = () => {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   treeActived.value = [];
   handleQuery();
 };
@@ -551,7 +551,7 @@ const reset = () => {
     category: '',
     formPath: '',
   };
-  defFormRef.value.reset();
+  defFormRef.value?.reset();
 };
 /**
  * 新增

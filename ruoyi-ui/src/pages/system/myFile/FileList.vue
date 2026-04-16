@@ -559,7 +559,7 @@ function reset() {
     isLock: 0,
     fileCategoryId: 0,
   };
-  fileRef.value.reset();
+  fileRef.value?.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {

@@ -268,7 +268,7 @@ function reset() {
   form.value = {
     orderNum: 0,
   };
-  ossCategoryRef.value.reset();
+  ossCategoryRef.value?.reset();
 }
 
 /** 新增分类按钮操作 */

@@ -338,7 +338,7 @@ function reset() {
     orderNum: 0,
     status: '1',
   };
-  deptRef.value.reset();
+  deptRef.value?.reset();
 }
 
 /** 搜索按钮操作 */
@@ -349,7 +349,7 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   dateRangeCreateTime.value = [];
-  queryRef.value.reset();
+  queryRef.value?.reset();
   handleSortChange(null);
 }
 

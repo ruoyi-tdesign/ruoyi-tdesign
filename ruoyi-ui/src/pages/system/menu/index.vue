@@ -508,7 +508,7 @@ function reset() {
     visible: '1',
     status: '1',
   };
-  menuRef.value.reset();
+  menuRef.value?.reset();
 }
 
 /** 搜索按钮操作 */
@@ -518,7 +518,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   handleSortChange(null);
 }
 

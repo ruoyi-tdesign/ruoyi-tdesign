@@ -548,7 +548,7 @@ function reset() {
     isLock: 0,
     ossCategoryId: 0,
   };
-  ossRef.value.reset();
+  ossRef.value?.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {

@@ -359,7 +359,7 @@ function reset() {
     dictSort: 0,
     remark: undefined,
   };
-  dataRef.value.reset();
+  dataRef.value?.reset();
 }
 /** 搜索按钮操作 */
 function handleQuery() {
@@ -372,7 +372,7 @@ function handleClose() {
 }
 /** 重置按钮操作 */
 function resetQuery() {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   queryParams.value.dictType = defaultDictType.value;
   queryParams.value.pageNum = 1;
   handleSortChange(null);

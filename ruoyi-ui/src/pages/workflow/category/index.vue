@@ -255,7 +255,7 @@ function reset() {
   form.value = {
     orderNum: 0,
   };
-  categoryRef.value.reset();
+  categoryRef.value?.reset();
 }
 
 /** 搜索按钮操作 */
@@ -265,7 +265,7 @@ function handleQuery() {
 
 /** 重置按钮操作 */
 function resetQuery() {
-  queryRef.value.reset();
+  queryRef.value?.reset();
   handleQuery();
 }
 
