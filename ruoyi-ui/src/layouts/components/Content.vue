@@ -1,12 +1,16 @@
 <template>
-  <router-view v-if="!isRefreshing" v-slot="{ Component }">
-    <transition name="fade" mode="out-in">
-      <keep-alive :include="aliveViews">
-        <component :is="Component" :key="getComponentKey(Component)" />
-      </keep-alive>
-    </transition>
-  </router-view>
-  <frame-page />
+  <div v-if="!isRefreshing">
+    <router-view v-if="!isFramePage" v-slot="{ Component }">
+      <transition name="fade" mode="out-in">
+        <keep-alive :include="aliveViews">
+          <component :is="Component" :key="getComponentKey(Component)" />
+        </keep-alive>
+      </transition>
+    </router-view>
+    <frame-page v-else />
+  </div>
+
+  <t-loading v-else />
 </template>
 <script lang="ts" setup>
 import isBoolean from 'lodash/isBoolean';
@@ -58,6 +62,10 @@ const isRefreshing = computed(() => {
   const tabsRouterStore = useTabsRouterStore();
   const { refreshing } = tabsRouterStore;
   return refreshing;
+});
+
+const isFramePage = computed(() => {
+  return !!route.meta?.frameSrc;
 });
 </script>
 <style lang="less" scoped>

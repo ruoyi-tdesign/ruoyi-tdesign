@@ -620,7 +620,7 @@ function getList() {
 function reset() {
   form.value = {};
 #if($addOrUpdate)
-  ${businessName}Ref.value.reset();
+  ${businessName}Ref.value?.reset();
 #end
 }
 #end
@@ -639,7 +639,7 @@ function resetQuery() {
   dateRange${AttrName}.value = [];
 #end
 #end
-  queryRef.value.reset();
+  queryRef.value?.reset();
 #if($hasSorting)
   handleSortChange(null);
 #else
