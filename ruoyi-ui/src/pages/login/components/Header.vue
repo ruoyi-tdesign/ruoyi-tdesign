@@ -8,7 +8,7 @@
       <t-button v-show="false" theme="default" shape="square" variant="text" @click="navToHelper">
         <help-circle-icon class="icon" />
       </t-button>
-      <translate-select />
+      <language-switcher />
       <t-button theme="default" shape="square" variant="text" @click="toggleSettingPanel">
         <setting-icon class="icon" />
       </t-button>
@@ -19,10 +19,11 @@
 import { HelpCircleIcon, LogoGithubIcon, SettingIcon } from 'tdesign-icons-vue-next';
 
 import LogoFullIcon from '@/assets/icons/assets-logo-full.svg?component';
-import TranslateSelect from '@/components/translate-select/index.vue';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import { useSettingStore } from '@/store';
 
 const settingStore = useSettingStore();
+
 const toggleSettingPanel = () => {
   settingStore.updateConfig({
     showSettingPanel: true,

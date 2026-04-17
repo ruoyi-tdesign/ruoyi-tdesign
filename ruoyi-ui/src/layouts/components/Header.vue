@@ -39,7 +39,7 @@
             </t-button>
           </t-tooltip>
           <!-- 多语言 -->
-          <translate-select />
+          <language-switcher />
           <!-- 用户头像、下拉选项 -->
           <t-dropdown :min-column-width="120" :max-column-width="180" trigger="click">
             <template #dropdown>
@@ -104,7 +104,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import LogoFull from '@/assets/icons/assets-logo-full.svg?component';
-import TranslateSelect from '@/components/translate-select/index.vue';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 import { prefix } from '@/config/global';
 import ModifyPassword from '@/layouts/components/ModifyPassword.vue';
 import { t } from '@/locales';

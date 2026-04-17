@@ -258,7 +258,7 @@ const onSubmit = async (ctx: SubmitContext) => {
         localStorage.removeItem('rememberMe');
       }
 
-      await MessagePlugin.success('登录成功');
+      await MessagePlugin.success(t('pages.login.loginSuccess'));
       // 登录时删除保留的菜单项
       tabsRouterStore.removeTabRouterList();
       // 重定向到保留的菜单

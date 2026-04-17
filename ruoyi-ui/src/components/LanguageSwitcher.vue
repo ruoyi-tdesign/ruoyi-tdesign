@@ -23,6 +23,7 @@ import { useLocale } from '@/locales/useLocale';
 
 // 切换语言
 const { changeLocale } = useLocale();
+
 const changeLang = (lang: string) => {
   changeLocale(lang);
 };
