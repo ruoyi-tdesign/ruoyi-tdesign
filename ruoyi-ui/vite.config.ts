@@ -139,6 +139,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
     server: {
       port: 3002,
       host: '0.0.0.0',
+      allowedHosts: true,
       proxy: {
         '/api': 'http://127.0.0.1:3000/',
         // https://cn.vitejs.dev/config/#server-proxy

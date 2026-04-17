@@ -1,3 +1,4 @@
+import isObject from 'lodash/isObject';
 import uniq from 'lodash/uniq';
 import type { RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
@@ -11,10 +12,12 @@ const modules = import.meta.glob('./modules/**/*.ts', { eager: true });
 const routeModuleList: Array<RouteRecordRaw> = [];
 
 Object.keys(modules).forEach((key) => {
-  // @ts-expect-error ignore
-  const mod = modules[key].default || {};
-  const modList = Array.isArray(mod) ? [...mod] : [mod];
-  routeModuleList.push(...modList);
+  const routeModule = modules[key];
+  if (isObject(routeModule) && 'default' in routeModule) {
+    const route = routeModule.default;
+    const routes = Array.isArray(route) ? [...route] : [route];
+    routeModuleList.push(...routes);
+  }
 });
 
 // 关于单层路由，meta 中设置 { single: true } 即可为单层路由，{ hidden: true } 即可在侧边栏隐藏该路由

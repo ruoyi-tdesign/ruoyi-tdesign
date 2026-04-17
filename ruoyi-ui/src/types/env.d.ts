@@ -1,4 +1,4 @@
-export interface ImportMetaEnv {
+interface ImportMetaEnv {
   /** 打包路径 根据项目不同按需配置 */
   readonly VITE_BASE_URL: string;
   /** 页面标题 */
@@ -30,4 +30,8 @@ export interface ImportMetaEnv {
   readonly VITE_APP_PASSWORD: string;
   /** SSE开关 */
   readonly VITE_APP_SSE: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
 }

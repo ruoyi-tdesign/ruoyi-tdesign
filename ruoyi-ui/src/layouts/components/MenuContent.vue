@@ -29,7 +29,7 @@ import { computed } from 'vue';
 import RIcon from '@/components/r-icon/index.vue';
 import type { ComplexRoute, MenuRoute } from '@/types/interface';
 
-type ListItemType = MenuRoute & { icon?: string };
+type ListItemType = MenuRoute;
 
 const props = defineProps({
   navData: {

@@ -3,15 +3,14 @@
 </p>
 <p align="center">
   <a href="https://tdesign.tencent.com/starter/vue-next/#/dashboard/base" target="_blank">
-    <img alt="TDesign Logo" width="200" src="https://tdesign.gtimg.com/starter/brand-logo.svg">
+    <img alt="TDesign Logo" width="300" src="https://tdesign.gtimg.com/starter/brand-logo.svg">
   </a>
 </p>
 
 <p align="center">
   <a href="https://nodejs.org/en/about/releases/"><img src="https://img.shields.io/node/v/vite.svg" alt="node compatibility"></a>
-  <a href="https://github.com/Tencent/tdesign-vue-next/blob/develop/LICENSE">
-    <img src="https://img.shields.io/npm/l/tdesign-vue-next.svg?sanitize=true" alt="License">
-  </a>
+  <a href="https://github.com/Tencent/tdesign-vue-next-starter/releases"><img src="https://img.shields.io/github/v/release/Tencent/tdesign-vue-next-starter" alt="Version"></a>
+  <a href="https://github.com/Tencent/tdesign-vue-next/blob/develop/LICENSE"><img src="https://img.shields.io/npm/l/tdesign-vue-next.svg?sanitize=true" alt="License"></a>
 </p>
 
 ### Introduction
