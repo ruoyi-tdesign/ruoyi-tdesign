@@ -31,9 +31,9 @@ public class JacksonConfig {
         return builder -> {
             // 全局配置序列化返回 JSON 处理
             JavaTimeModule javaTimeModule = new JavaTimeModule();
-            javaTimeModule.addSerializer(Long.class, BigNumberSerializer.INSTANCE);
-            javaTimeModule.addSerializer(Long.TYPE, BigNumberSerializer.INSTANCE);
-            javaTimeModule.addSerializer(BigInteger.class, BigNumberSerializer.INSTANCE);
+            javaTimeModule.addSerializer(Long.class, ToStringSerializer.instance);
+            javaTimeModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
+            javaTimeModule.addSerializer(BigInteger.class, ToStringSerializer.instance);
             javaTimeModule.addSerializer(BigDecimal.class, ToStringSerializer.instance);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
