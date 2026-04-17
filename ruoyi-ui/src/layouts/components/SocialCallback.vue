@@ -1,7 +1,7 @@
 <template>
   <div>
     <result v-if="hasError" title="授权失败" type="401" :tip="errorMessage || '未知原因'">
-      <t-button @click="() => $router.push('/login')">返回登录</t-button>
+      <t-button @click="() => router.push('/login')">返回登录</t-button>
     </result>
     <t-loading :loading="loading" :text="loadingText" :fullscreen="true"> </t-loading>
   </div>
@@ -10,7 +10,7 @@
 import { storeToRefs } from 'pinia';
 import { MessagePlugin } from 'tdesign-vue-next';
 import { nextTick, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import { callback, login } from '@/api/login';
 import type { LoginData } from '@/api/model/loginModel';
@@ -18,6 +18,7 @@ import Result from '@/components/result/index.vue';
 import { useUserStore } from '@/store';
 
 const route = useRoute();
+const router = useRouter();
 const loading = ref(true);
 const { token, tenantId } = storeToRefs(useUserStore());
 const hasError = ref(false);

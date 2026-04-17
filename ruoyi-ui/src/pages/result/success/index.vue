@@ -4,15 +4,16 @@
     <div class="result-success-title">{{ t('pages.result.success.title') }}</div>
     <div class="result-success-describe">{{ t('pages.result.success.subtitle') }}</div>
     <div>
-      <t-button theme="default" @click="() => $router.push('/detail/advanced')">
+      <t-button theme="default" @click="() => router.push('/detail/advanced')">
         {{ t('pages.result.success.progress') }}
       </t-button>
-      <t-button @click="() => $router.push('/')"> {{ t('pages.result.success.back') }} </t-button>
+      <t-button @click="() => router.push('/')"> {{ t('pages.result.success.back') }} </t-button>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { CheckCircleIcon } from 'tdesign-icons-vue-next';
+import { useRouter } from 'vue-router';
 
 import { t } from '@/locales';
 
@@ -20,6 +21,8 @@ defineOptions({
   name: 'ResultSuccess',
   components: { CheckCircleIcon },
 });
+
+const router = useRouter();
 </script>
 <style lang="less" scoped>
 .result-success {

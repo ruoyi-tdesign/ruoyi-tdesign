@@ -5,7 +5,7 @@
     :tip="t('pages.result.browserIncompatible.subtitle')"
   >
     <div class="result-slot-container">
-      <t-button class="result-button" @click="() => $router.push('/')">{{
+      <t-button class="result-button" @click="() => router.push('/')">{{
         t('pages.result.browserIncompatible.back')
       }}</t-button>
       <div class="recommend-container">
@@ -25,14 +25,19 @@
   </result>
 </template>
 <script lang="ts" setup>
-defineOptions({
-  name: 'ResultBrowserIncompatible',
-});
+import { useRouter } from 'vue-router';
+
 import Chorme from '@/assets/images/chorme.png';
 import QQBrowser from '@/assets/images/qq-browser.png';
 import Result from '@/components/result/index.vue';
 import Thumbnail from '@/components/thumbnail/index.vue';
 import { t } from '@/locales';
+
+defineOptions({
+  name: 'ResultBrowserIncompatible',
+});
+
+const router = useRouter();
 </script>
 <style lang="less" scoped>
 .result-slot-container {

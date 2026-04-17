@@ -4,6 +4,7 @@ import { getInfo, isLogin, login, logout } from '@/api/login';
 import type { LoginParam, UserInfo } from '@/api/model/loginModel';
 import type { R } from '@/api/model/resultModel';
 import defAva from '@/assets/images/profile.jpg';
+import { usePermissionStore } from '@/store';
 import { getVisitUrl } from '@/utils/ruoyi';
 
 export const useUserStore = defineStore('user', {
@@ -99,10 +100,10 @@ export const useUserStore = defineStore('user', {
     storage: localStorage,
     key: 'Admin-Token',
     pick: ['token'],
-    // afterRestore: (ctx) => {
+    // afterHydrate: (ctx) => {
     //   if (ctx.store.roles && ctx.store.roles.length > 0) {
     //     const permissionStore = usePermissionStore();
-    //     // @ts-ignore
+    //     // @ts-expect-error ignore
     //     permissionStore.initRoutes(ctx.store.roles);
     //   }
     // },
