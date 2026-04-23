@@ -62,7 +62,7 @@ const props = defineProps({
     default: true,
   },
 });
-import { isNumber } from 'lodash';
+import isNumber from 'lodash/isNumber';
 import type { SizeEnum } from 'tdesign-vue-next';
 import type { PropType } from 'vue';
 import { computed } from 'vue';

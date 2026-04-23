@@ -22,7 +22,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { union } from 'lodash';
+import union from 'lodash/union';
 import type { MenuValue } from 'tdesign-vue-next';
 import type { PropType } from 'vue';
 import { computed, onMounted } from 'vue';
