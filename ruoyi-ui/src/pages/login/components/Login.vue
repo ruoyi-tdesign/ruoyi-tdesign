@@ -77,7 +77,7 @@
       <t-form-item class="verification-code" name="code">
         <t-input v-model="formData.code" size="large" :placeholder="t('pages.login.input.verification')" />
         <t-button size="large" variant="outline" :disabled="countDown > 0" @click="sendCode">
-          {{ countDown === 0 ? t('pages.login.sendVerification') : `${countDown}秒后可重发` }}
+          {{ countDown === 0 ? t('pages.login.sendVerification') : t('pages.login.countdown', { count: countDown }) }}
         </t-button>
       </t-form-item>
     </template>
@@ -136,7 +136,7 @@ import {
 } from 'tdesign-icons-vue-next';
 import type { FormInstanceFunctions, FormRule, SubmitContext } from 'tdesign-vue-next';
 import { MessagePlugin } from 'tdesign-vue-next';
-import { getCurrentInstance, ref } from 'vue';
+import { getCurrentInstance, computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { getCodeImg } from '@/api/login';
@@ -151,12 +151,12 @@ import { useTabsRouterStore, useUserStore } from '@/store';
 
 const userStore = useUserStore();
 
-const FORM_RULES: Record<string, FormRule[]> = {
+const FORM_RULES = computed<Record<string, FormRule[]>>(() => ({
   phone: [{ required: true, message: t('pages.login.required.phone'), type: 'error' }],
   account: [{ required: true, message: t('pages.login.required.account'), type: 'error' }],
   password: [{ required: true, message: t('pages.login.required.password'), type: 'error' }],
   code: [{ required: true, message: t('pages.login.required.verification'), type: 'error' }],
-};
+}));
 
 const type = ref('password');
 const form = ref<FormInstanceFunctions>();

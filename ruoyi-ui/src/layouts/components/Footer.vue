@@ -1,14 +1,9 @@
 <template>
-  <div :class="`${prefix}-footer`">
-    Copyright © 2021-{{ new Date().getFullYear() }} {{ companyName }} All Rights Reserved
-  </div>
+  <div :class="`${prefix}-footer`">{{ t('common.copyright') }}</div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
-
 import { prefix } from '@/config/global';
-
-const companyName = ref(import.meta.env.VITE_APP_COMPANY_NAME);
+import { t } from '@/locales';
 </script>
 <style lang="less" scoped>
 .@{starter-prefix}-footer {

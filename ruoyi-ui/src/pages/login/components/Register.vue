@@ -18,7 +18,12 @@
     </t-form-item>
     <template v-if="type === 'phone'">
       <t-form-item name="phone">
-        <t-input v-model="formData.phone" :maxlength="11" size="large" placeholder="请输入您的手机号">
+        <t-input
+          v-model="formData.phone"
+          :maxlength="11"
+          size="large"
+          :placeholder="t('pages.login.register.phonePlaceholder')"
+        >
           <template #prefix-icon>
             <user-icon />
           </template>
@@ -28,7 +33,12 @@
 
     <template v-if="type === 'email'">
       <t-form-item name="email">
-        <t-input v-model="formData.email" type="text" size="large" placeholder="请输入您的邮箱">
+        <t-input
+          v-model="formData.email"
+          type="text"
+          size="large"
+          :placeholder="t('pages.login.register.emailPlaceholder')"
+        >
           <template #prefix-icon>
             <mail-icon />
           </template>
@@ -42,7 +52,7 @@
         size="large"
         :type="showPsw ? 'text' : 'password'"
         clearable
-        placeholder="请输入登录密码"
+        :placeholder="t('pages.login.register.passwordPlaceholder')"
       >
         <template #prefix-icon>
           <lock-on-icon />
@@ -56,9 +66,13 @@
 
     <template v-if="type === 'phone' || type === 'email'">
       <t-form-item class="verification-code" name="code">
-        <t-input v-model="formData.code" size="large" placeholder="请输入验证码" />
+        <t-input v-model="formData.code" size="large" :placeholder="t('pages.login.register.verifyCodePlaceholder')" />
         <t-button variant="outline" :disabled="countDown > 0" @click="handleCounter">
-          {{ countDown === 0 ? '发送验证码' : `${countDown}秒后可重发` }}
+          {{
+            countDown === 0
+              ? t('pages.login.register.sendVerifyCode')
+              : t('pages.login.register.resendCountdown', { count: countDown })
+          }}
         </t-button>
       </t-form-item>
     </template>
@@ -77,18 +91,22 @@
     </template>
 
     <t-form-item class="check-container" name="checked">
-      <t-checkbox v-model="formData.checked">我已阅读并同意 </t-checkbox> <span>TDesign服务协议</span> 和
-      <span>TDesign 隐私声明</span>
+      <t-checkbox v-model="formData.checked">{{ t('pages.login.register.agreeTerms') }} </t-checkbox>
+      <span>{{ t('pages.login.register.serviceTerms') }}</span>
+      {{ t('common.conjunction') }}
+      <span>{{ t('pages.login.register.privacyStatement') }}</span>
     </t-form-item>
 
     <t-form-item>
-      <t-button :loading="loading" block size="large" type="submit"> {{ loading ? '注册中...' : '注册' }} </t-button>
+      <t-button :loading="loading" block size="large" type="submit">
+        {{ loading ? '注册中...' : t('pages.login.register.registerBtn') }}
+      </t-button>
     </t-form-item>
 
     <div class="switch-container">
-      <span class="tip" @click="switchType(type === 'phone' ? 'email' : 'phone')">{{
-        type === 'phone' ? '使用邮箱注册' : '使用手机号注册'
-      }}</span>
+      <span class="tip" @click="switchType(type === 'phone' ? 'email' : 'phone')">
+        {{ type === 'phone' ? t('pages.login.register.useEmailRegister') : t('pages.login.register.usePhoneRegister') }}
+      </span>
     </div>
   </t-form>
 </template>
@@ -96,12 +114,13 @@
 import { BrowseIcon, BrowseOffIcon, LockOnIcon, MailIcon, SecuredIcon, UserIcon } from 'tdesign-icons-vue-next';
 import type { FormRule, SubmitContext } from 'tdesign-vue-next';
 import { MessagePlugin } from 'tdesign-vue-next';
-import { getCurrentInstance, ref } from 'vue';
+import { computed, getCurrentInstance, ref } from 'vue';
 
 import { getCodeImg, getTenantList, register } from '@/api/login';
 import type { RegisterBody, TenantListVo } from '@/api/model/loginModel';
 import Company from '@/assets/icons/svg/company.svg?component';
 import { useCounter } from '@/hooks';
+import { t } from '@/locales';
 
 const emit = defineEmits(['register-success']);
 
@@ -109,20 +128,20 @@ const equalToPassword = (value: string) => {
   return formData.value.password === value;
 };
 
-const FORM_RULES: Record<string, FormRule[]> = {
+const FORM_RULES = computed<Record<string, FormRule[]>>(() => ({
   tenantId: [{ required: true, message: '请输入您的租户编号', type: 'error' }],
-  phone: [{ required: true, message: '手机号必填', type: 'error' }],
+  phone: [{ required: true, message: t('pages.login.register.validation.phone'), type: 'error' }],
   email: [
-    { required: true, message: '邮箱必填', type: 'error' },
-    { email: true, message: '请输入正确的邮箱', type: 'warning' },
+    { required: true, message: t('pages.login.register.validation.email'), type: 'error' },
+    { email: true, message: t('pages.login.register.validation.emailFormat'), type: 'warning' },
   ],
-  password: [{ required: true, message: '密码必填', type: 'error' }],
+  password: [{ required: true, message: t('pages.login.register.validation.password'), type: 'error' }],
   confirmPassword: [
     { required: true, message: '请再次输入您的密码' },
     { validator: equalToPassword, message: '两次输入的密码不一致' },
   ],
-  code: [{ required: true, message: '请输入验证码' }],
-};
+  code: [{ required: true, message: t('pages.login.register.validation.verifyCode') }],
+}));
 
 const loading = ref(false);
 const type = ref('phone');
@@ -159,7 +178,7 @@ const onSubmit = (ctx: SubmitContext) => {
       return;
     }
     if (!formData.value.checked) {
-      MessagePlugin.error('请同意TDesign服务协议和TDesign 隐私声明');
+      MessagePlugin.error(t('pages.login.register.validation.agreeTerms'));
       return;
     }
 
@@ -173,7 +192,7 @@ const onSubmit = (ctx: SubmitContext) => {
     };
     register(registerForm)
       .then(() => {
-        MessagePlugin.success('注册成功');
+        MessagePlugin.success(t('pages.login.register.messages.registerSuccess'));
         emit('register-success');
         const username = registerForm.username;
         proxy.$modal.alert({

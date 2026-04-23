@@ -1,27 +1,31 @@
 import { useLocalStorage } from '@vueuse/core';
+import type { GlobalConfigProvider } from 'tdesign-vue-next';
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
 
-import { t } from '@/locales';
-import { i18n, langCode, localeConfigKey } from '@/locales/index';
-import message from '@/plugins/modal';
+import type { SupportedLocale } from '@/locales/index';
+import { i18n, localeConfigKey, supportedLocales } from '@/locales/index';
+import { useNotificationStore } from '@/store/modules/notification';
 
 export function useLocale() {
-  const { locale } = useI18n({ useScope: 'global' });
-  function changeLocale(lang: string) {
-    // 如果切换的语言不在对应语言文件里则默认为简体中文
-    if (!langCode.includes(lang)) {
-      lang = 'zh_CN';
-    }
+  const locale = computed({
+    get: () => i18n.global.locale.value,
+    set: (val: string) => {
+      i18n.global.locale.value = val;
+    },
+  });
+  const storedLocale = useLocalStorage<SupportedLocale>(localeConfigKey, 'zh_CN');
 
-    locale.value = lang;
-    useLocalStorage(localeConfigKey, 'zh_CN').value = lang;
-    message.msgSuccess(t('constants.switchLanguage'));
-  }
+  const changeLocale = (lang: string) => {
+    const validLang = supportedLocales.includes(lang as SupportedLocale) ? (lang as SupportedLocale) : 'zh_CN';
+    locale.value = validLang;
+    storedLocale.value = validLang;
+    // 刷新持久化的翻译数据
+    useNotificationStore().refreshMsgData();
+  };
 
   const getComponentsLocale = computed(() => {
-    // @ts-expect-error 应该有值
-    return i18n.global.getLocaleMessage(locale.value).componentsLocale;
+    // @ts-expect-error ignore
+    return i18n.global.getLocaleMessage(locale.value).componentsLocale as GlobalConfigProvider;
   });
 
   return {

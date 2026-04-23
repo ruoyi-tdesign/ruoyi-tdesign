@@ -4,7 +4,7 @@
       v-model="searchData"
       class="header-search"
       :class="[{ 'hover-active': isSearchFocus }]"
-      :placeholder="t('layout.searchPlaceholder')"
+      :placeholder="t('layout.search.placeholder')"
       :options="options"
       :filterable="false"
       :popup-props="{
@@ -37,7 +37,7 @@
       v-model="searchData"
       class="header-search"
       :class="[{ 'width-zero': !isSearchFocus }]"
-      :placeholder="t('layout.searchPlaceholder')"
+      :placeholder="t('layout.search.placeholder')"
       :autofocus="isSearchFocus"
       :options="options"
       :filterable="false"

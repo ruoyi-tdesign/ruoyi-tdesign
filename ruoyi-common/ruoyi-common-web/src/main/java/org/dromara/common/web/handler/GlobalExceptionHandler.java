@@ -16,6 +16,9 @@ import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
+import org.springframework.web.bind.MissingRequestCookieException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -160,6 +163,33 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
         String message = StreamUtils.join(e.getConstraintViolations(), ConstraintViolation::getMessage, ", ");
         return R.fail(message);
+    }
+
+    /**
+     * 请求头中缺少必需的请求头
+     */
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public R<Void> handleMissingRequestHeaderException(MissingRequestHeaderException e) {
+        log.error(e.getMessage());
+        return R.fail(e.getMessage());
+    }
+
+    /**
+     * 请求中缺少必需的请求Cookie
+     */
+    @ExceptionHandler(MissingRequestCookieException.class)
+    public R<Void> handleMissingRequestCookieException(MissingRequestCookieException e) {
+        log.error(e.getMessage());
+        return R.fail(e.getMessage());
+    }
+
+    /**
+     * 请求中缺少必需的请求参数
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public R<Void> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        log.error(e.getMessage());
+        return R.fail(e.getMessage());
     }
 
     /**

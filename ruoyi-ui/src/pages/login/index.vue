@@ -19,9 +19,7 @@
       <tdesign-setting />
     </div>
 
-    <footer class="copyright">
-      Copyright @ 2021-{{ new Date().getFullYear() }} {{ companyName }} All Rights Reserved
-    </footer>
+    <footer class="copyright">{{ t('common.copyright') }}</footer>
   </div>
 </template>
 <script lang="ts" setup>
@@ -38,7 +36,6 @@ import Login from './components/Login.vue';
 import Register from './components/Register.vue';
 
 const title = ref(import.meta.env.VITE_APP_TITLE);
-const companyName = ref(import.meta.env.VITE_APP_COMPANY_NAME);
 // 注册开关
 const registerOpen = ref(false);
 const type = ref('login');

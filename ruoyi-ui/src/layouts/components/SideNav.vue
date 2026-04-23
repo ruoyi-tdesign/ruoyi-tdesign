@@ -15,7 +15,7 @@
       </template>
       <menu-content :nav-data="menu" />
       <template #operations>
-        <span :class="versionCls"> {{ !collapsed ? 'TDesign Starter' : '' }} {{ pgk.version }} </span>
+        <span :class="versionCls"> {{ !collapsed ? t('common.appName') : '' }} {{ pgk.version }} </span>
       </template>
     </t-menu>
     <div :class="`${prefix}-side-nav-placeholder${collapsed ? '-hidden' : ''}`"></div>
@@ -31,6 +31,7 @@ import { useRoute, useRouter } from 'vue-router';
 import AssetLogoFull from '@/assets/icons/assets-logo-full.svg?component'; // 全
 import AssetLogo from '@/assets/icons/assets-t-logo.svg?component'; // 简
 import { prefix } from '@/config/global';
+import { t } from '@/locales';
 import { getRoutesExpanded } from '@/router';
 import { useSettingStore } from '@/store';
 import type { MenuRoute, ModeType } from '@/types/interface';

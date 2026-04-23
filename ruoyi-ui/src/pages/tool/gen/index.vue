@@ -287,6 +287,7 @@ function handleSyncDb(row: GenTableVo) {
     const msgLoading = proxy.$modal.msgLoading('正在同步中...');
     return synchDb(tableId)
       .then(() => {
+        getList();
         proxy.$modal.msgSuccess('同步成功');
       })
       .finally(() => {
