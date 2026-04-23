@@ -75,7 +75,7 @@ const getMenuList = (list: ComplexRoute[], basePath?: string): ListItemType[] =>
     .filter((item) => item.meta && item.meta.hidden !== true);
 };
 
-const regExp = /(http|https):\/\/([\w.]+\/?)\S*/;
+const regExp = /(https?):\/\/([\w.-]+)(?:\/\S*)?/;
 const getHref = (item: MenuRoute) => {
   const { path } = item;
   const { frameSrc, frameBlank } = item.meta;
