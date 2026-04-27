@@ -35,12 +35,19 @@ public class PlusTenantLineHandler implements TenantLineHandler {
     public boolean ignoreTable(String tableName) {
         // 不需要过滤租户的表
         Set<String> excludes = tenantProperties.getExcludes();
+        if (excludes != null && !excludes.isEmpty()) {
+            for (String exclude : excludes) {
+                if (StringUtils.containsIgnoreCase(tableName, exclude)) {
+                    return true;
+                }
+            }
+        }
         // 非业务表
-        excludes.addAll(Set.of(
+        Set<String> genTable = Set.of(
             "gen_table",
             "gen_table_column"
-        ));
-        return excludes.contains(tableName);
+        );
+        return genTable.contains(tableName.toLowerCase());
     }
 
 }
