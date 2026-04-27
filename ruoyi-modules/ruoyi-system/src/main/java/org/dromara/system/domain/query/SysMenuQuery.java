@@ -39,4 +39,14 @@ public class SysMenuQuery extends BaseEntity {
      */
     private String status;
 
+    /**
+     * 菜单类型（M目录 C菜单 F按钮）
+     */
+    private String menuType;
+
+    /**
+     * 父菜单ID
+     */
+    private Long parentId;
+
 }

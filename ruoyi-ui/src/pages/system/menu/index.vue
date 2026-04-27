@@ -8,6 +8,11 @@
         <t-form-item label="组件名称" name="componentName">
           <t-input v-model="queryParams.componentName" placeholder="请输入组件名称" clearable @enter="handleQuery" />
         </t-form-item>
+        <t-form-item label="菜单类型" name="menuType">
+          <t-select v-model="queryParams.menuType" placeholder="请选择菜单类型" clearable>
+            <t-option v-for="dict in menuTypeOptions" :key="dict.value" :label="dict.label" :value="dict.value" />
+          </t-select>
+        </t-form-item>
         <t-form-item label="状态" name="status">
           <t-select v-model="queryParams.status" placeholder="菜单状态" clearable>
             <t-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label" :value="dict.value" />
@@ -472,7 +477,11 @@ const form = ref<SysMenuForm & SysMenuVo>({
 // 查询对象
 const queryParams = ref<SysMenuQuery>({
   menuName: undefined,
+  parentId: undefined,
+  componentName: undefined,
+  menuType: undefined,
   visible: undefined,
+  status: undefined,
 });
 const isExpand = computed(() => {
   return expandedTreeNodes.value.length !== 0;
