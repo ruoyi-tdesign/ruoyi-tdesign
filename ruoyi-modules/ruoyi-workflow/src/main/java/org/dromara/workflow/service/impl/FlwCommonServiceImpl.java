@@ -12,20 +12,13 @@ import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.sse.dto.SseMessageDto;
 import org.dromara.common.sse.utils.SseMessageUtils;
 import org.dromara.system.helper.MessageSendHelper;
-import org.dromara.warm.flow.core.FlowEngine;
-import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Node;
 import org.dromara.warm.flow.core.entity.Task;
-import org.dromara.warm.flow.core.entity.User;
 import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.warm.flow.core.service.NodeService;
-import org.dromara.warm.flow.core.service.UserService;
-import org.dromara.warm.flow.core.utils.MapUtil;
 import org.dromara.warm.flow.orm.entity.FlowTask;
-import org.dromara.warm.flow.orm.entity.FlowUser;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.enums.MessageTypeEnum;
-import org.dromara.workflow.common.enums.TaskAssigneeType;
 import org.dromara.workflow.service.IFlwCommonService;
 import org.dromara.workflow.service.IFlwTaskAssigneeService;
 import org.dromara.workflow.service.IFlwTaskService;
@@ -33,10 +26,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -50,82 +41,27 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class FlwCommonServiceImpl implements IFlwCommonService {
-    private final UserService userService;
     private final NodeService nodeService;
 
     /**
-     * 获取工作流用户service
-     */
-    @Override
-    public UserService getFlowUserService() {
-        return userService;
-    }
-
-    /**
      * 构建工作流用户
      *
-     * @param userList 办理用户
-     * @param taskId   任务ID
+     * @param permissionList 办理用户
      * @return 用户
      */
     @Override
-    public Set<User> buildUser(List<User> userList, Long taskId) {
-        if (CollUtil.isEmpty(userList)) {
-            return Set.of();
+    public List<String> buildUser(List<String> permissionList) {
+        if (CollUtil.isEmpty(permissionList)) {
+            return List.of();
         }
-        Set<User> list = new HashSet<>();
-        Set<String> processedBySet = new HashSet<>();
         IFlwTaskAssigneeService taskAssigneeService = SpringUtils.getBean(IFlwTaskAssigneeService.class);
-        Map<String, List<User>> userListMap = StreamUtils.groupByKey(userList, User::getType);
-        for (Map.Entry<String, List<User>> entry : userListMap.entrySet()) {
-            List<User> entryValue = entry.getValue();
-            String processedBys = StreamUtils.join(entryValue, User::getProcessedBy);
-            // 根据 processedBy 前缀判断处理人类型，分别获取用户列表
-            List<UserDTO> users = taskAssigneeService.fetchUsersByStorageIds(processedBys);
-            // 转换为 FlowUser 并添加到结果集合
-            if (CollUtil.isNotEmpty(users)) {
-                users.forEach(dto -> {
-                    String processedBy = String.valueOf(dto.getUserId());
-                    if (!processedBySet.contains(processedBy)) {
-                        FlowUser flowUser = new FlowUser();
-                        flowUser.setType(entry.getKey());
-                        flowUser.setProcessedBy(processedBy);
-                        flowUser.setAssociated(taskId);
-                        list.add(flowUser);
-                        processedBySet.add(processedBy);
-                    }
-                });
-            }
-        }
-        return list;
+        String processedBys = CollUtil.join(permissionList,  StringUtils.SEPARATOR);
+        // 根据 processedBy 前缀判断处理人类型，分别获取用户列表
+        List<UserDTO> users = taskAssigneeService.fetchUsersByStorageIds(processedBys);
+
+        return StreamUtils.toList(users, userDTO -> String.valueOf(userDTO.getUserId()));
     }
 
-    /**
-     * 构建工作流用户
-     *
-     * @param userIdList 办理用户
-     * @param taskId     任务ID
-     * @return 用户
-     */
-    @Override
-    public Set<User> buildFlowUser(List<String> userIdList, Long taskId) {
-        if (CollUtil.isEmpty(userIdList)) {
-            return Set.of();
-        }
-        Set<User> list = new HashSet<>();
-        Set<String> processedBySet = new HashSet<>();
-        for (String userId : userIdList) {
-            if (!processedBySet.contains(userId)) {
-                FlowUser flowUser = new FlowUser();
-                flowUser.setType(TaskAssigneeType.APPROVER.getCode());
-                flowUser.setProcessedBy(String.valueOf(userId));
-                flowUser.setAssociated(taskId);
-                list.add(flowUser);
-                processedBySet.add(String.valueOf(userId));
-            }
-        }
-        return list;
-    }
 
     /**
      * 发送消息
@@ -188,15 +124,5 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
         Node startNode = nodeService.getStartNode(definitionId);
         Node nextNode = nodeService.getNextNode(definitionId, startNode.getNodeCode(), null, SkipType.PASS.getKey());
         return nextNode.getNodeCode();
-    }
-
-    @Override
-    public void mergeVariable(Instance instance, Map<String, Object> variable) {
-        if (MapUtil.isNotEmpty(variable)) {
-            String variableStr = instance.getVariable();
-            Map<String, Object> deserialize = FlowEngine.jsonConvert.strToMap(variableStr);
-            deserialize.putAll(variable);
-            instance.setVariable(FlowEngine.jsonConvert.objToStr(deserialize));
-        }
     }
 }
