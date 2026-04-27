@@ -1,3 +1,6 @@
+-- ----------------------------
+-- 0、warm-flow-all.sql，地址：https://gitee.com/dromara/warm-flow/blob/master/sql/oracle/oracle-wram-flow-all.sql
+-- ----------------------------
 create table FLOW_DEFINITION
 (
     ID              NUMBER(20)            not null,
@@ -18,7 +21,8 @@ create table FLOW_DEFINITION
     TENANT_ID       VARCHAR2(40)
 );
 
-alter table FLOW_DEFINITION add constraint PK_FLOW_DEFINITION primary key (ID);
+alter table FLOW_DEFINITION
+    add constraint PK_FLOW_DEFINITION primary key (ID);
 
 comment on table FLOW_DEFINITION is '流程定义表';
 comment on column FLOW_DEFINITION.ID is '主键id';
@@ -63,7 +67,8 @@ create table FLOW_NODE
     PERMISSION_FLAG VARCHAR2(200)
 );
 
-alter table FLOW_NODE add constraint PK_FLOW_NODE primary key (ID);
+alter table FLOW_NODE
+    add constraint PK_FLOW_NODE primary key (ID);
 
 comment on table FLOW_NODE is '流程节点表';
 comment on column FLOW_NODE.ID is '主键id';
@@ -106,7 +111,8 @@ create table FLOW_SKIP
     TENANT_ID      VARCHAR2(40)
 );
 
-alter table FLOW_SKIP add constraint PK_FLOW_SKIP primary key (ID);
+alter table FLOW_SKIP
+    add constraint PK_FLOW_SKIP primary key (ID);
 
 comment on table FLOW_SKIP is '节点跳转关联表';
 comment on column FLOW_SKIP.ID is '主键id';
@@ -144,7 +150,8 @@ create table FLOW_INSTANCE
     TENANT_ID       VARCHAR2(40)
 );
 
-alter table FLOW_INSTANCE add constraint PK_FLOW_INSTANCE primary key (ID);
+alter table FLOW_INSTANCE
+    add constraint PK_FLOW_INSTANCE primary key (ID);
 
 comment on table FLOW_INSTANCE is '流程实例表';
 comment on column FLOW_INSTANCE.ID is '主键id';
@@ -154,7 +161,7 @@ comment on column FLOW_INSTANCE.NODE_TYPE is '开始节点类型 (0开始节点 
 comment on column FLOW_INSTANCE.NODE_CODE is '开始节点编码';
 comment on column FLOW_INSTANCE.NODE_NAME is '开始节点名称';
 comment on column FLOW_INSTANCE.VARIABLE is '任务变量';
-comment on column FLOW_INSTANCE.FLOW_STATUS is '流程状态（0待提交 1审批中 2 审批通过 3自动通过 4终止 5作废 6撤销 7取回  8已完成 9已退回 10失效）';
+comment on column FLOW_INSTANCE.FLOW_STATUS is '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）';
 comment on column FLOW_INSTANCE.ACTIVITY_STATUS is '流程激活状态（0挂起 1激活）';
 comment on column FLOW_INSTANCE.DEF_JSON is '流程定义json';
 comment on column FLOW_INSTANCE.CREATE_BY is '创建者';
@@ -172,6 +179,7 @@ create table FLOW_TASK
     NODE_CODE     VARCHAR2(100),
     NODE_NAME     VARCHAR2(100),
     NODE_TYPE     NUMBER(1),
+    FLOW_STATUS      VARCHAR2(20),
     FORM_CUSTOM   VARCHAR2(1) default 'N',
     FORM_PATH     VARCHAR2(100),
     CREATE_TIME   DATE,
@@ -180,7 +188,8 @@ create table FLOW_TASK
     TENANT_ID     VARCHAR2(40)
 );
 
-alter table FLOW_TASK add constraint PK_FLOW_TASK primary key (ID);
+alter table FLOW_TASK
+    add constraint PK_FLOW_TASK primary key (ID);
 
 comment on table FLOW_TASK is '待办任务表';
 comment on column FLOW_TASK.ID is '主键id';
@@ -189,6 +198,7 @@ comment on column FLOW_TASK.INSTANCE_ID is '对应flow_instance表的id';
 comment on column FLOW_TASK.NODE_CODE is '节点编码';
 comment on column FLOW_TASK.NODE_NAME is '节点名称';
 comment on column FLOW_TASK.NODE_TYPE is '节点类型 (0开始节点 1中间节点 2结束节点 3互斥网关 4并行网关)';
+comment on column FLOW_TASK.FLOW_STATUS is '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）';
 comment on column FLOW_TASK.FORM_CUSTOM is '审批表单是否自定义 (Y是 N否)';
 comment on column FLOW_TASK.FORM_PATH is '审批表单路径';
 comment on column FLOW_TASK.CREATE_TIME is '创建时间';
@@ -224,7 +234,8 @@ create table FLOW_HIS_TASK
 
 );
 
-alter table FLOW_HIS_TASK add constraint PK_FLOW_HIS_TASK primary key (ID);
+alter table FLOW_HIS_TASK
+    add constraint PK_FLOW_HIS_TASK primary key (ID);
 
 comment on table FLOW_HIS_TASK is '历史任务记录表';
 comment on column FLOW_HIS_TASK.ID is '主键id';
@@ -237,7 +248,7 @@ comment on column FLOW_HIS_TASK.NODE_TYPE is '开始节点类型 (0开始节点 
 comment on column FLOW_HIS_TASK.TARGET_NODE_CODE is '目标节点编码';
 comment on column FLOW_HIS_TASK.TARGET_NODE_NAME is '目标节点名称';
 comment on column FLOW_HIS_TASK.SKIP_TYPE is '流转类型（PASS通过 REJECT退回 NONE无动作）';
-comment on column FLOW_HIS_TASK.FLOW_STATUS is '流程状态（1审批中 2 审批通过 9已退回 10失效）';
+comment on column FLOW_HIS_TASK.FLOW_STATUS is '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）';
 comment on column FLOW_HIS_TASK.FORM_CUSTOM is '审批表单是否自定义 (Y是 N否)';
 comment on column FLOW_HIS_TASK.FORM_PATH is '审批表单路径';
 comment on column FLOW_HIS_TASK.MESSAGE is '审批意见';
@@ -264,7 +275,8 @@ create table FLOW_USER
     TENANT_ID    VARCHAR2(40)
 );
 
-alter table FLOW_USER add constraint PK_FLOW_USER primary key (ID);
+alter table FLOW_USER
+    add constraint PK_FLOW_USER primary key (ID);
 
 comment on table FLOW_USER is '待办任务表';
 comment on column FLOW_USER.ID is '主键id';
