@@ -18,7 +18,7 @@ export function listTable(query: GenTableQuery) {
 
 // 查询db数据库列表
 export function listDbTable(query: GenTableQuery) {
-  return request.get<R<GenTableVo[]>>({
+  return request.get<TableDataInfo<GenTableVo>>({
     url: '/tool/gen/db/list',
     params: query,
   });

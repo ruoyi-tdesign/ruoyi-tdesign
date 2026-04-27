@@ -90,6 +90,7 @@ const dbTableList = ref<GenTableVo[]>([]);
 const dataNameList = ref<Array<string>>([]);
 const { proxy } = getCurrentInstance();
 const buttonLoading = ref(false);
+const total = ref(0);
 
 const queryParams = reactive<GenTableQuery>({
   pageNum: 1,
@@ -108,19 +109,16 @@ const columns = ref<Array<PrimaryTableCol>>([
 ]);
 
 // 分页
-// const pagination = ref({
-//   pageSize: 10,
-// });
 const pagination = computed(() => {
   return {
     current: queryParams.pageNum,
     pageSize: queryParams.pageSize,
-    total: dbTableList.value.length,
+    total: total.value,
     showJumper: true,
     onChange: (pageInfo: PageInfo) => {
       queryParams.pageNum = pageInfo.current;
       queryParams.pageSize = pageInfo.pageSize;
-      // getList();
+      getList();
     },
   };
 });
@@ -145,8 +143,8 @@ function handleSelectionChange(selection: Array<string | number>) {
 function getList() {
   loading.value = true;
   listDbTable(queryParams).then((res) => {
-    dbTableList.value = res.data;
-    // total.value = res.total;
+    dbTableList.value = res.rows;
+    total.value = res.total;
     loading.value = false;
   });
 }
