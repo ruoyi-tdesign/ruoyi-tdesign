@@ -1,11 +1,13 @@
 package org.dromara.common.json.config;
 
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.json.handler.BigNumberSerializer;
+import org.dromara.common.json.handler.CustomDateDeserializer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -15,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.TimeZone;
 
 /**
@@ -38,7 +41,10 @@ public class JacksonConfig {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
             javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
-            builder.modules(javaTimeModule);
+            // 自定义 java.util.Date 的反序列化（支持多格式字符串解析）
+            SimpleModule dateModule = new SimpleModule();
+            dateModule.addDeserializer(Date.class, new CustomDateDeserializer());
+            builder.modules(javaTimeModule, dateModule);
             builder.timeZone(TimeZone.getDefault());
             log.info("初始化 jackson 配置");
         };
