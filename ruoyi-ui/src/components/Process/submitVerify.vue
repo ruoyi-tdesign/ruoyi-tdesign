@@ -16,14 +16,14 @@
             <t-checkbox value="3" name="type">短信</t-checkbox>
           </t-checkbox-group>
         </t-form-item>
-        <t-form-item v-if="task.flowStatus === 'waiting'" label="附件">
+        <t-form-item label="附件">
           <fileUpload
             v-model="form.fileId"
             :file-type="['png', 'jpg', 'jpeg', 'doc', 'docx', 'xlsx', 'xls', 'ppt', 'txt', 'pdf']"
             :file-size="20"
           />
         </t-form-item>
-        <t-form-item v-if="task.flowStatus === 'waiting' && buttonObj.copy" label="抄送">
+        <t-form-item v-if="buttonObj.copy" label="抄送">
           <t-button theme="primary" shape="circle" @click="openUserSelectCopy">
             <template #icon><add-icon /></template>
           </t-button>
