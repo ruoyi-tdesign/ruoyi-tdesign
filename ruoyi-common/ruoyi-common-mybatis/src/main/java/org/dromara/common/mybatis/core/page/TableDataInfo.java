@@ -117,7 +117,7 @@ public class TableDataInfo<T> implements Serializable {
             return TableDataInfo.build();
         }
         List<T> pageList = CollUtil.page((int) page.getCurrent() - 1, (int) page.getSize(), list);
-        return new TableDataInfo(pageList, list.size());
+        return new TableDataInfo<>(pageList, list.size());
     }
 
 }

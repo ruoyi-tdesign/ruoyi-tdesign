@@ -613,7 +613,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             for (FlowNode flowNode : nextFlowNodes) {
                 buildNextTaskList.stream().filter(t -> t.getNodeCode().equals(flowNode.getNodeCode())).findFirst().ifPresent(t -> {
                     if (CollUtil.isNotEmpty(t.getPermissionList())) {
-                        List<UserDTO> users = flwTaskAssigneeService.fetchUsersByStorageId(String.join(StringUtils.SEPARATOR, t.getPermissionList()));
+                        List<UserDTO> users = flwTaskAssigneeService.fetchUsersByStorageIds(String.join(StringUtils.SEPARATOR, t.getPermissionList()));
                         if (CollUtil.isNotEmpty(users)) {
                             flowNode.setPermissionFlag(StreamUtils.join(users, e -> String.valueOf(e.getUserId())));
                         }
