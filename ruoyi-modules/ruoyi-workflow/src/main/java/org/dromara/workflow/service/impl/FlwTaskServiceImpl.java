@@ -125,7 +125,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (ObjectUtil.isNotNull(flowInstance)) {
             BusinessStatusEnum.checkStartStatus(flowInstance.getFlowStatus());
             List<Task> taskList = taskService.list(new FlowTask().setInstanceId(flowInstance.getId()));
-            taskService.mergeVariable(flowInstance, variables);
+            flwCommonService.mergeVariable(flowInstance, variables);
             insService.updateById(flowInstance);
             StartProcessReturnDTO dto = new StartProcessReturnDTO();
             dto.setProcessInstanceId(taskList.get(0).getInstanceId());
@@ -230,7 +230,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
                 variableMap.remove(task.getNodeCode());
             }
         }
-        taskService.mergeVariable(inst, variableMap);
+        flwCommonService.mergeVariable(inst, variableMap);
     }
 
     /**
@@ -607,7 +607,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         nextFlowNodes = StreamUtils.filter(nextFlowNodes, node -> NodeType.BETWEEN.getKey().equals(node.getNodeType()));
         if (CollUtil.isNotEmpty(nextNodeList)) {
             // 构建以下节点数据
-            List<Task> buildNextTaskList = StreamUtils.toList(nextNodeList, node -> taskService.addTask(node, instance, definition, null));
+            List<Task> buildNextTaskList = StreamUtils.toList(nextNodeList, node -> taskService.addTask(node, instance, definition, FlowParams.build()));
             // 办理人变量替换
             ExpressionUtil.evalVariable(buildNextTaskList, mergeVariable);
             for (FlowNode flowNode : nextFlowNodes) {
