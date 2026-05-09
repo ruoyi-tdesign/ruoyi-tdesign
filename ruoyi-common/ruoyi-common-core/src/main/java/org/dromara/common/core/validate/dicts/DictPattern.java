@@ -1,4 +1,4 @@
-package org.dromara.common.core.validate.dict;
+package org.dromara.common.core.validate.dicts;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
@@ -13,10 +13,10 @@ import java.lang.annotation.Target;
  *
  * @author AprilWind
  */
-@Constraint(validatedBy = DictValueValidator.class)
+@Constraint(validatedBy = DictPatternValidator.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DictValue {
+public @interface DictPattern {
 
     /**
      * 字典类型，如 "sys_user_sex"

@@ -1,4 +1,4 @@
-package org.dromara.common.core.validate.dict;
+package org.dromara.common.core.validate.dicts;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -10,7 +10,7 @@ import org.dromara.common.core.utils.spring.SpringUtils;
  *
  * @author AprilWind
  */
-public class DictValueValidator implements ConstraintValidator<DictValue, String> {
+public class DictPatternValidator implements ConstraintValidator<DictPattern, String> {
 
     /**
      * 字典类型
@@ -23,7 +23,7 @@ public class DictValueValidator implements ConstraintValidator<DictValue, String
      * @param annotation 注解实例
      */
     @Override
-    public void initialize(DictValue annotation) {
+    public void initialize(DictPattern annotation) {
         this.dictType = annotation.dictType();
     }
 
