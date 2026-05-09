@@ -24,6 +24,11 @@ public @interface DictPattern {
     String dictType();
 
     /**
+     * 分隔符
+     */
+    String separator();
+
+    /**
      * 默认校验失败提示信息
      */
     String message() default "字典值无效";

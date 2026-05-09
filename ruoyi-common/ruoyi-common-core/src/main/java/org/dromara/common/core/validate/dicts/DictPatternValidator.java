@@ -3,6 +3,7 @@ package org.dromara.common.core.validate.dicts;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.dromara.common.core.service.DictService;
+import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.spring.SpringUtils;
 
 /**
@@ -18,6 +19,11 @@ public class DictPatternValidator implements ConstraintValidator<DictPattern, St
     private String dictType;
 
     /**
+     * 分隔符
+     */
+    private String separator = ",";
+
+    /**
      * 初始化校验器，提取注解上的字典类型
      *
      * @param annotation 注解实例
@@ -25,6 +31,9 @@ public class DictPatternValidator implements ConstraintValidator<DictPattern, St
     @Override
     public void initialize(DictPattern annotation) {
         this.dictType = annotation.dictType();
+        if (StringUtils.isNotBlank(annotation.separator())) {
+            this.separator = annotation.separator();
+        }
     }
 
     /**
@@ -36,7 +45,11 @@ public class DictPatternValidator implements ConstraintValidator<DictPattern, St
      */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        return SpringUtils.getBean(DictService.class).isValidDictValue(dictType, value);
+        if (StringUtils.isBlank(dictType) || StringUtils.isBlank(value)) {
+            return false;
+        }
+        String dictLabel = SpringUtils.getBean(DictService.class).getDictLabel(dictType, value, separator);
+        return StringUtils.isNotBlank(dictLabel);
     }
 
 }
