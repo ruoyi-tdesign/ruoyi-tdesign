@@ -84,4 +84,13 @@ public interface DictService {
      */
     List<DictDataDTO> getDictData(String dictType);
 
+    /**
+     * 校验指定的字典类型下是否存在指定的字典值
+     *
+     * @param dictType  字典类型
+     * @param dictValue 字典值
+     * @return true 表示该字典值在指定字典类型中有效；false 表示无效
+     */
+    Boolean isValidDictValue(String dictType, String dictValue);
+
 }

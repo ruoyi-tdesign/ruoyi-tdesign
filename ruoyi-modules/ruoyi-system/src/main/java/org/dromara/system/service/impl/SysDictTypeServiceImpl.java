@@ -320,4 +320,24 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
         return BeanUtil.copyToList(list, DictDataDTO.class);
     }
 
+    /**
+     * 校验指定的字典类型下是否存在指定的字典值
+     *
+     * @param dictType  字典类型
+     * @param dictValue 字典值
+     * @return true 表示该字典值在指定字典类型中有效；false 表示无效
+     */
+    @Override
+    public Boolean isValidDictValue(String dictType, String dictValue) {
+        if (StringUtils.isBlank(dictType) || StringUtils.isBlank(dictValue)) {
+            return false;
+        }
+        List<SysDictDataVo> datas = SpringUtils.getAopProxy(this).selectDictDataByType(dictType);
+        if (CollUtil.isEmpty(datas)) {
+            return false;
+        }
+        Map<String, String> map = StreamUtils.toMap(datas, SysDictDataVo::getDictValue, SysDictDataVo::getDictLabel);
+        return map.containsKey(dictValue);
+    }
+
 }
