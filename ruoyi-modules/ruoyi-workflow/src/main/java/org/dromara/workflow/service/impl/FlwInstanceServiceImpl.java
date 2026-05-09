@@ -248,7 +248,6 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             BusinessStatusEnum.checkCancelStatus(instance.getFlowStatus());
             FlowParams flowParams = FlowParams.build()
                 .message(message)
-                .skipType(SkipType.PASS.getKey())
                 .flowStatus(BusinessStatusEnum.CANCEL.getStatus())
                 .hisStatus(BusinessStatusEnum.CANCEL.getStatus())
                 .handler(userIdStr)
