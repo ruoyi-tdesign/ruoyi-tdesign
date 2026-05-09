@@ -282,7 +282,6 @@ function handleSelectionChange(selection: Array<string | number>) {
 
 /** 新增按钮操作 */
 function handleAdd() {
-  // proxy.$tab.closePage(proxy.$route);
   router.push({
     path: `/workflow/leaveEdit/index`,
     query: {
