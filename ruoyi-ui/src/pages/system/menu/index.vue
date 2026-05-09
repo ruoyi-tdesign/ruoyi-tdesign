@@ -58,6 +58,10 @@
                 <template #icon> <unfold-less-icon v-if="isExpand" /> <unfold-more-icon v-else /> </template>
                 全部{{ isExpand ? '折叠' : '展开' }}
               </t-button>
+              <t-button theme="danger" variant="outline" @click="handleCascadeDelete">
+                <template #icon> <delete-icon /> </template>
+                级联删除
+              </t-button>
               <t-button v-hasPermi="['system:menu:export']" theme="default" variant="outline" @click="handleExport">
                 <template #icon> <download-icon /> </template>
                 导出
@@ -325,6 +329,8 @@
       </t-loading>
     </t-dialog>
 
+    <cascad-delete-menu-dialog v-model:visible="deleteMenuDialog" @submit="getList()" />
+
     <!-- 菜单权限详情 -->
     <t-dialog
       v-model:visible="openView"
@@ -407,6 +413,8 @@ import type { SysMenuForm, SysMenuQuery, SysMenuVo } from '@/api/system/model/me
 import IconfontSelect from '@/components/IconfontSelect.vue';
 import type { DictModel } from '@/utils/dict';
 
+import CascadDeleteMenuDialog from './CascadDeleteMenuDialog.vue';
+
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable, sys_show_hide } = proxy.useDict('sys_normal_disable', 'sys_show_hide');
 
@@ -425,6 +433,7 @@ const tableRef = ref<EnhancedTableInstanceFunctions>();
 const queryRef = ref<FormInstanceFunctions>();
 const menuRef = ref<FormInstanceFunctions>();
 const expandedTreeNodes = ref([]);
+const deleteMenuDialog = ref(false);
 /** 是否 */
 const yesNoOptions = ref([
   { value: 0, label: '否' },
@@ -551,6 +560,10 @@ function toggleExpandAll() {
     tableRef.value.expandAll();
   }
 }
+/** 级联删除按钮操作 */
+const handleCascadeDelete = () => {
+  deleteMenuDialog.value = true;
+};
 /** 详情按钮操作 */
 function handleDetail(row: SysMenuVo) {
   reset();

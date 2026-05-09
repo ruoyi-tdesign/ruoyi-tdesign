@@ -3,7 +3,6 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -41,6 +40,7 @@ import org.dromara.system.service.ISysMenuService;
 import org.dromara.system.service.ISysTenantPackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -318,6 +318,17 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     /**
+     * 是否存在菜单子节点
+     *
+     * @param menuIds 菜单ID串
+     * @return 结果
+     */
+    @Override
+    public boolean hasChildByMenuId(List<Long> menuIds) {
+        return baseMapper.exists(new LambdaQueryWrapper<SysMenu>().in(SysMenu::getParentId, menuIds).notIn(SysMenu::getMenuId, menuIds));
+    }
+
+    /**
      * 查询菜单使用数量
      *
      * @param menuId 菜单ID
@@ -410,6 +421,19 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 throw new ServiceException("保存菜单'" + bo.getMenuName() + "'失败，停用菜单表达式错误！");
             }
         }
+    }
+
+    /**
+     * 批量删除菜单管理信息
+     *
+     * @param menuIds 菜单ID串
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteMenuById(List<Long> menuIds) {
+        baseMapper.deleteByIds(menuIds);
+        roleMenuMapper.deleteByMenuIds(menuIds);
     }
 
     /**

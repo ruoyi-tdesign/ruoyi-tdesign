@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <t-dialog
-      v-model="visible"
+      v-model:visible="visible"
       header="审批记录"
       :width="props.width"
       :height="props.height"

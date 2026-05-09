@@ -108,6 +108,14 @@ public interface ISysMenuService extends IService<SysMenu> {
     boolean hasChildByMenuId(Long menuId);
 
     /**
+     * 是否存在菜单子节点
+     *
+     * @param menuIds 菜单ID串
+     * @return 结果 true 存在 false 不存在
+     */
+    boolean hasChildByMenuId(List<Long> menuIds);
+
+    /**
      * 查询菜单是否存在角色
      *
      * @param menuId 菜单ID
@@ -138,6 +146,14 @@ public interface ISysMenuService extends IService<SysMenu> {
      * @return 结果
      */
     int deleteMenuById(Long menuId);
+
+    /**
+     * 批量删除菜单管理信息
+     *
+     * @param menuIds 菜单ID串
+     * @return 结果
+     */
+    void deleteMenuById(List<Long> menuIds);
 
     /**
      * 校验菜单名称是否唯一
