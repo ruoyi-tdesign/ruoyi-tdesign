@@ -20,12 +20,12 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.constant.ExceptionCons;
+import org.dromara.warm.flow.core.dto.DefChart;
 import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
 import org.dromara.warm.flow.core.enums.NodeType;
-import org.dromara.warm.flow.core.enums.SkipType;
 import org.dromara.warm.flow.core.service.ChartService;
 import org.dromara.warm.flow.core.service.DefService;
 import org.dromara.warm.flow.core.service.InsService;
@@ -317,7 +317,8 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             list.addAll(BeanUtil.copyToList(flowHisTasks, FlowHisTaskVo.class));
         }
         String flowChart = chartService.chartIns(instanceId);
-        return Map.of("list", list, "image", flowChart);
+        DefChart defChart = chartService.chartInsObj(instanceId);
+        return Map.of("list", list, "image", flowChart,"defChart",defChart);
     }
 
     /**
