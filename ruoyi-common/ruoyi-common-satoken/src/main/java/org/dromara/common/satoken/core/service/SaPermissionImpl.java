@@ -10,9 +10,7 @@ import org.dromara.common.core.service.PermissionService;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.context.SaSecurityContext;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.common.satoken.utils.LoginUserHelper;
 import org.dromara.common.satoken.utils.MultipleStpUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +32,7 @@ public class SaPermissionImpl implements StpInterface {
     public List<String> getPermissionList(Object loginId, String loginType) {
         if (MultipleStpUtil.SYSTEM.isLogin()) {
             LoginUser loginUser = LoginHelper.getUser();
-            if (ObjectUtil.isNull(loginUser)) {
+            if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(loginId)) {
                 List<String> list = StringUtils.splitList(loginId.toString(), ":");
                 return new ArrayList<>(permissionService.getMenuPermission(Long.parseLong(list.get(1))));
             }
@@ -59,7 +57,7 @@ public class SaPermissionImpl implements StpInterface {
     public List<String> getRoleList(Object loginId, String loginType) {
         if (MultipleStpUtil.SYSTEM.isLogin()) {
             LoginUser loginUser = LoginHelper.getUser();
-            if (ObjectUtil.isNull(loginUser)) {
+            if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(loginId)) {
                 List<String> list = StringUtils.splitList(loginId.toString(), ":");
                 return new ArrayList<>(permissionService.getRolePermission(Long.parseLong(list.get(1))));
             }
