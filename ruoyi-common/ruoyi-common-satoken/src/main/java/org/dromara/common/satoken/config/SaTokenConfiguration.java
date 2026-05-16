@@ -7,6 +7,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.strategy.SaAnnotationStrategy;
 import cn.dev33.satoken.strategy.SaStrategy;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.service.PermissionService;
 import org.dromara.common.satoken.core.dao.PlusSaTokenDao;
 import org.dromara.common.satoken.core.service.SaPermissionImpl;
 import org.dromara.common.satoken.handler.SaTokenExceptionHandler;
@@ -41,8 +42,8 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
      * 权限接口实现(使用bean注入方便用户替换)
      */
     @Bean
-    public StpInterface stpInterface() {
-        return new SaPermissionImpl();
+    public StpInterface stpInterface(PermissionService permissionService) {
+        return new SaPermissionImpl(permissionService);
     }
 
     /**
