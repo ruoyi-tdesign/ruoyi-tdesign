@@ -107,8 +107,12 @@ public class R<T> implements Serializable {
         return r;
     }
 
+    public static <T> Boolean isWarning(R<T> ret) {
+        return HttpStatus.WARN == ret.getCode();
+    }
+
     public static <T> Boolean isError(R<T> ret) {
-        return !isSuccess(ret);
+        return !isSuccess(ret) && !isWarning(ret);
     }
 
     public static <T> Boolean isSuccess(R<T> ret) {

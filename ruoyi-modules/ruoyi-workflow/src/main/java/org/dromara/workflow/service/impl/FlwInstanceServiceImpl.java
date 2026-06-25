@@ -20,13 +20,11 @@ import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.warm.flow.core.constant.ExceptionCons;
-import org.dromara.warm.flow.core.dto.DefChart;
 import org.dromara.warm.flow.core.dto.FlowParams;
 import org.dromara.warm.flow.core.entity.Definition;
 import org.dromara.warm.flow.core.entity.Instance;
 import org.dromara.warm.flow.core.entity.Task;
 import org.dromara.warm.flow.core.enums.NodeType;
-import org.dromara.warm.flow.core.service.ChartService;
 import org.dromara.warm.flow.core.service.DefService;
 import org.dromara.warm.flow.core.service.InsService;
 import org.dromara.warm.flow.core.service.TaskService;
@@ -45,13 +43,18 @@ import org.dromara.workflow.domain.vo.FlowInstanceVo;
 import org.dromara.workflow.handler.FlowProcessEventHandler;
 import org.dromara.workflow.mapper.FlwCategoryMapper;
 import org.dromara.workflow.mapper.FlwInstanceMapper;
-import org.dromara.workflow.service.IFlwCommonService;
 import org.dromara.workflow.service.IFlwInstanceService;
 import org.dromara.workflow.service.IFlwTaskService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -67,7 +70,6 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
 
     private final InsService insService;
     private final DefService defService;
-    private final ChartService chartService;
     private final TaskService taskService;
     private final FlowHisTaskMapper flowHisTaskMapper;
     private final FlowInstanceMapper flowInstanceMapper;
@@ -75,7 +77,6 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     private final IFlwTaskService flwTaskService;
     private final FlwInstanceMapper flwInstanceMapper;
     private final FlwCategoryMapper flwCategoryMapper;
-    private final IFlwCommonService flwCommonService;
 
     /**
      * 分页查询正在运行的流程实例
@@ -280,7 +281,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      * @param businessId 业务id
      */
     @Override
-    public Map<String, Object> flowImage(String businessId) {
+    public Map<String, Object> flowHisTaskList(String businessId) {
         FlowInstance flowInstance = this.selectInstByBusinessId(businessId);
         if (ObjectUtil.isNull(flowInstance)) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
@@ -316,9 +317,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         if (CollUtil.isNotEmpty(flowHisTasks)) {
             list.addAll(BeanUtil.copyToList(flowHisTasks, FlowHisTaskVo.class));
         }
-        String flowChart = chartService.chartIns(instanceId);
-        DefChart defChart = chartService.chartInsObj(instanceId);
-        return Map.of("list", list, "image", flowChart,"defChart",defChart);
+        return Map.of("list", list,"instanceId",instanceId);
     }
 
     /**
@@ -422,15 +421,12 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
             if (instance != null) {
                 BusinessStatusEnum.checkInvalidStatus(instance.getFlowStatus());
             }
-            List<FlowTask> flowTaskList = flwTaskService.selectByInstId(bo.getId());
-            for (FlowTask flowTask : flowTaskList) {
-                FlowParams flowParams = FlowParams.build()
-                    .message(bo.getComment())
-                    .flowStatus(BusinessStatusEnum.INVALID.getStatus())
-                    .hisStatus(TaskStatusEnum.INVALID.getStatus())
-                    .ignore(true);
-                taskService.termination(flowTask.getId(), flowParams);
-            }
+            FlowParams flowParams = FlowParams.build()
+                .message(bo.getComment())
+                .flowStatus(BusinessStatusEnum.INVALID.getStatus())
+                .hisStatus(TaskStatusEnum.INVALID.getStatus())
+                .ignore(true);
+            taskService.terminationByInsId(bo.getId(), flowParams);
             return true;
         } catch (Exception e) {
             log.error(e.getMessage(), e);

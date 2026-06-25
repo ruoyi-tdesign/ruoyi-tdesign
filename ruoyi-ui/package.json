@@ -24,6 +24,7 @@
   "dependencies": {
     "@tinymce/tinymce-vue": "~5.1.1",
     "@vueuse/core": "^14.2.1",
+    "@logicflow/core": "^2.0.13",
     "axios": "~1.15.0",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
