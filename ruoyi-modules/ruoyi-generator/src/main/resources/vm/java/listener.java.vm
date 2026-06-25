@@ -40,8 +40,8 @@ public class ${ClassName}ImportListener extends AnalysisEventListener<${ClassNam
     private final StringBuilder successMsg = new StringBuilder();
     private final StringBuilder failureMsg = new StringBuilder();
 
-    public ${ClassName}ImportListener(I${ClassName}Service sysSensitiveWordService, boolean isUpdateSupport) {
-        this.sysSensitiveWordService = sysSensitiveWordService;
+    public ${ClassName}ImportListener(I${ClassName}Service ${className}Service, boolean isUpdateSupport) {
+        this.${className}Service = ${className}Service;
         this.isUpdateSupport = isUpdateSupport;
     }
 
@@ -51,12 +51,12 @@ public class ${ClassName}ImportListener extends AnalysisEventListener<${ClassNam
             $bo $boObjName = MapstructUtils.convert(importTemplate, ${bo}.class);
             if (!isUpdateSupport) {
                 ValidatorUtils.validate($boObjName, AddGroup.class);
-                sysSensitiveWordService.insertByBo($boObjName);
+                ${className}Service.insertByBo($boObjName);
                 successNum++;
                 successMsg.append("<br/>第").append(successNum).append("行 导入成功");
             } else {
                 ValidatorUtils.validate($boObjName, EditGroup.class);
-                sysSensitiveWordService.updateByBo($boObjName);
+                ${className}Service.updateByBo($boObjName);
                 successNum++;
                 successMsg.append("<br/>第").append(successNum).append("行 更新成功");
             }
