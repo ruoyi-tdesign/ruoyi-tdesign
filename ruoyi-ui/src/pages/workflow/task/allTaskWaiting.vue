@@ -294,6 +294,7 @@ const handleView = (row: FlowTaskVo | FlowHisTaskVo) => {
     type: 'view',
     formCustom: row.formCustom,
     formPath: row.formPath,
+    instanceId: row.instanceId,
   });
   routerJump(routerJumpVo);
 };

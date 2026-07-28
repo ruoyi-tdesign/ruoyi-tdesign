@@ -27,9 +27,9 @@ export function pageByFinish(query: FlowInstanceQuery) {
 /**
  * 通过业务id获取历史流程图
  */
-export function flowImage(businessId: string | number) {
+export function flowHisTaskList(businessId: string | number) {
   return request.get<R<Record<string, any>>>({
-    url: `/workflow/instance/flowImage/${businessId}?t${Math.random()}`,
+    url: `/workflow/instance/flowHisTaskList/${businessId}?t${Math.random()}`,
   });
 }
 

@@ -396,13 +396,13 @@ const cancelPopover = async (index: any) => {
 
 /** 查看按钮操作 */
 const handleView = (row: FlowInstanceVo) => {
-  const routerJumpVo = reactive<RouterJumpVo>({
+  const routerJumpVo: RouterJumpVo = {
     businessId: row.businessId,
     taskId: row.id,
     type: 'view',
     formCustom: row.formCustom,
     formPath: row.formPath,
-  });
+  };
   routerJump(routerJumpVo);
 };
 

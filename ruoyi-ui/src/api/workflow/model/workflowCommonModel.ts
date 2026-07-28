@@ -4,5 +4,5 @@ export interface RouterJumpVo {
   type: string;
   formCustom: string;
   formPath: string;
-  instanceId: string | number;
+  instanceId?: string | number;
 }
