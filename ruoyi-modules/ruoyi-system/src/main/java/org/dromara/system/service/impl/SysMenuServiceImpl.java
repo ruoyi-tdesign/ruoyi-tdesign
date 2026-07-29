@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.HttpStatus;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.enums.MenuTypeEnum;
@@ -143,7 +144,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         } else {
             menus = baseMapper.selectMenuTreeByUserId(userId);
         }
-        return getChildPerms(menus, 0L);
+        return getChildPerms(menus, Constants.TOP_PARENT_ID);
     }
 
     /**
@@ -246,7 +247,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 childrenList.add(children);
                 router.setChildren(childrenList);
                 router.setRedirect(router.getPath() + "/" + children.getPath());
-            } else if (Objects.equals(menu.getParentId(), 0L) && menu.isInnerLink()) {
+            } else if (Objects.equals(menu.getParentId(), Constants.TOP_PARENT_ID) && menu.isInnerLink()) {
                 router.setMeta(new MetaVo(menu.getMenuName(), menu.getIcon()));
                 router.setPath("/");
                 List<RouterVo> childrenList = new ArrayList<>();
@@ -474,7 +475,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      * @param parentId 传入的父节点ID
      * @return String
      */
-    private List<SysMenuVo> getChildPerms(List<SysMenuVo> list, long parentId) {
+    private List<SysMenuVo> getChildPerms(List<SysMenuVo> list, Long parentId) {
         List<SysMenuVo> returnList = new ArrayList<>();
         for (SysMenuVo t : list) {
             // 一、根据传入的某个父节点ID,遍历该父节点的所有子节点

@@ -335,13 +335,13 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
             List<GenTableColumn> tableColumns = new ArrayList<>();
             columns.forEach((columnName, column) -> {
                 GenTableColumn tableColumn = new GenTableColumn();
-                tableColumn.setIsPk(column.isPrimaryKey() == 1 ? "1" : "0");
+                tableColumn.setIsPk(column.isPrimaryKey() ? "1" : "0");
                 tableColumn.setColumnName(column.getName());
                 tableColumn.setColumnComment(column.getComment());
                 tableColumn.setColumnType(column.getOriginType().toLowerCase());
                 tableColumn.setSort(column.getPosition());
-                tableColumn.setIsRequired(column.isNullable() == 0 || column.isPrimaryKey() == 1 ? "1" : "0");
-                tableColumn.setIsIncrement(column.isAutoIncrement() == 1 ? "1" : "0");
+                tableColumn.setIsRequired(!column.isNullable() || column.isPrimaryKey() ? "1" : "0");
+                tableColumn.setIsIncrement(column.isAutoIncrement() ? "1" : "0");
                 tableColumns.add(tableColumn);
             });
             return tableColumns;

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -125,9 +126,14 @@ public class SysMenuController extends BaseController {
     @GetMapping(value = "/tenantPackageMenuTreeSelect/{packageId}")
     public R<MenuTreeSelectVo> tenantPackageMenuTreeSelect(@PathVariable("packageId") Long packageId) {
         List<SysMenuVo> menus = menuService.selectMenuList(LoginHelper.getUserId());
-        MenuTreeSelectVo selectVo = new MenuTreeSelectVo(
-            menuService.selectMenuListByPackageId(packageId),
-            menuService.buildMenuTreeSelect(menus));
+        List<Tree<Long>> list = menuService.buildMenuTreeSelect(menus);
+        // 删除租户管理菜单
+        list.removeIf(menu -> menu.getId() == 6L);
+        List<Long> ids = new ArrayList<>();
+        if (packageId > 0L) {
+            ids = menuService.selectMenuListByPackageId(packageId);
+        }
+        MenuTreeSelectVo selectVo = new MenuTreeSelectVo(ids, list);
         return R.ok(selectVo);
     }
 

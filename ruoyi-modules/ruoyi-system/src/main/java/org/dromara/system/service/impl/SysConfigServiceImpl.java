@@ -53,7 +53,6 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      * @return 参数配置信息
      */
     @Override
-    @DS("master")
     public SysConfigVo selectConfigById(Long configId) {
         return baseMapper.selectVoById(configId);
     }
@@ -149,16 +148,16 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteConfigByIds(Long[] configIds) {
+    public void deleteConfigByIds(List<Long> configIds) {
         for (Long configId : configIds) {
             SysConfig config = baseMapper.selectById(configId);
             if (StringUtils.equals(YesNoEnum.YES.getCodeStr(), config.getConfigType())) {
-                throw new ServiceException(String.format("内置参数【%1$s】不能删除 ", config.getConfigKey()));
+                throw new ServiceException(String.format("内置参数【%s】不能删除", config.getConfigKey()));
             }
             boolean isGlobal = YesNoEnum.YES.getCodeNum().equals(config.getIsGlobal());
             CacheUtils.evict(GlobalConstants.getGlobalKey(isGlobal, CacheNames.SYS_CONFIG), config.getConfigKey());
         }
-        baseMapper.deleteByIds(Arrays.asList(configIds));
+        baseMapper.deleteByIds(configIds);
     }
 
     /**

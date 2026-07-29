@@ -1,6 +1,5 @@
 package org.dromara.demo.controller.queue;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.redis.utils.QueueUtils;
@@ -22,8 +21,9 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Lion Li
  * @version 3.6.0
+ * @deprecated redisson 新版本已经将队列功能标记删除 一些技术问题无法解决 建议搭建MQ使用
  */
-@SaIgnore
+@Deprecated
 @Slf4j
 @RestController
 @RequestMapping("/demo/queue/delayed")

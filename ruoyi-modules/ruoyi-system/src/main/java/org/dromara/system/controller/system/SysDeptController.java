@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.convert.Convert;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
+import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.enums.NormalDisableEnum;
 import org.dromara.common.core.utils.StringUtils;
@@ -131,6 +132,9 @@ public class SysDeptController extends BaseController {
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
     public R<Void> remove(@NotNull(message = "部门id不能为空") @PathVariable Long deptId) {
+        if (SystemConstants.DEFAULT_DEPT_ID.equals(deptId)) {
+            return R.warn("默认部门,不允许删除");
+        }
         if (deptService.hasChildByDeptId(deptId)) {
             return R.warn("存在下级部门,不允许删除");
         }
