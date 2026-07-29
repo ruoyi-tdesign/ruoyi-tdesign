@@ -410,8 +410,8 @@ CREATE TABLE sj_distributed_lock
     update_dt  date         DEFAULT CURRENT_TIMESTAMP    NOT NULL
 );
 
--- ALTER TABLE sj_distributed_lock
---     ADD CONSTRAINT pk_sj_distributed_lock PRIMARY KEY (id);
+ALTER TABLE sj_distributed_lock
+    ADD CONSTRAINT pk_sj_distributed_lock PRIMARY KEY (name);
 
 COMMENT ON COLUMN sj_distributed_lock.name IS '锁名称';
 COMMENT ON COLUMN sj_distributed_lock.lock_until IS '锁定时长';

@@ -69,7 +69,7 @@ public interface ISysDictTypeService extends IService<SysDictType> {
      *
      * @param dictIds 需要删除的字典ID
      */
-    void deleteDictTypeByIds(Long[] dictIds);
+    void deleteDictTypeByIds(List<Long> dictIds);
 
     /**
      * 重置字典缓存数据

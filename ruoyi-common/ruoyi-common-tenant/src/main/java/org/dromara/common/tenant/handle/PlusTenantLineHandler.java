@@ -37,7 +37,7 @@ public class PlusTenantLineHandler implements TenantLineHandler {
         Set<String> excludes = tenantProperties.getExcludes();
         if (excludes != null && !excludes.isEmpty()) {
             for (String exclude : excludes) {
-                if (StringUtils.containsIgnoreCase(tableName, exclude)) {
+                if (StringUtils.equalsAnyIgnoreCase(tableName, exclude)) {
                     return true;
                 }
             }

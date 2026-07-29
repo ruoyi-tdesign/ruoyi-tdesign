@@ -15,6 +15,7 @@ import org.dromara.warm.flow.core.entity.Task;
 import org.dromara.warm.flow.core.listener.GlobalListener;
 import org.dromara.warm.flow.core.listener.ListenerVariable;
 import org.dromara.warm.flow.core.service.InsService;
+import org.dromara.warm.flow.orm.entity.FlowInstance;
 import org.dromara.warm.flow.orm.entity.FlowTask;
 import org.dromara.workflow.common.ConditionalOnEnable;
 import org.dromara.workflow.common.constant.FlowConstant;
@@ -106,6 +107,7 @@ public class WorkflowGlobalListener implements GlobalListener {
         Task task = listenerVariable.getTask();
         Map<String, Object> params = new HashMap<>();
         FlowParams flowParams = listenerVariable.getFlowParams();
+        Map<String, Object> variable = new HashMap<>();
         if (ObjectUtil.isNotNull(flowParams)) {
             // 历史任务扩展(通常为附件)
             params.put("hisTaskExt", flowParams.getHisTaskExt());
@@ -113,8 +115,8 @@ public class WorkflowGlobalListener implements GlobalListener {
             params.put("handler", flowParams.getHandler());
             // 办理意见
             params.put("message", flowParams.getMessage());
+            variable = flowParams.getVariable();
         }
-        Map<String, Object> variable = flowParams.getVariable();
         //申请人提交事件
         Boolean submit = MapUtil.getBool(variable, FlowConstant.SUBMIT);
         if (submit != null && submit) {
@@ -150,13 +152,15 @@ public class WorkflowGlobalListener implements GlobalListener {
                         flwCommonService.sendMessage(definition.getFlowName(), instance.getId(), messageType, notice);
                     }
                 }
+                FlowInstance ins = new FlowInstance();
                 Map<String, Object> variableMap = instance.getVariableMap();
                 variableMap.remove(FlowConstant.FLOW_COPY_LIST);
                 variableMap.remove(FlowConstant.MESSAGE_TYPE);
                 variableMap.remove(FlowConstant.MESSAGE_NOTICE);
                 variableMap.remove(FlowConstant.SUBMIT);
-                instance.setVariable(FlowEngine.jsonConvert.objToStr(variableMap));
-                insService.updateById(instance);
+                ins.setId(instance.getId());
+                ins.setVariable(FlowEngine.jsonConvert.objToStr(variableMap));
+                insService.updateById(ins);
             }
         }
     }

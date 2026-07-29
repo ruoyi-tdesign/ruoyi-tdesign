@@ -127,7 +127,7 @@ public class SysConfigController extends BaseController {
     @Log(title = "参数管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
     public R<Void> remove(@PathVariable Long[] configIds) {
-        configService.deleteConfigByIds(configIds);
+        configService.deleteConfigByIds(Arrays.asList(configIds));
         return R.ok();
     }
 

@@ -25,6 +25,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * sa-token 配置
@@ -42,8 +43,8 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
      * 权限接口实现(使用bean注入方便用户替换)
      */
     @Bean
-    public StpInterface stpInterface(PermissionService permissionService) {
-        return new SaPermissionImpl(permissionService);
+    public StpInterface stpInterface(Optional<PermissionService> permissionService) {
+        return new SaPermissionImpl(permissionService.orElse(null));
     }
 
     /**

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -103,7 +104,7 @@ public class SysDictTypeController extends BaseController {
     @Log(title = "字典类型", businessType = BusinessType.DELETE)
     @DeleteMapping("/{dictIds}")
     public R<Void> remove(@NotEmpty(message = "主键不能为空") @PathVariable Long[] dictIds) {
-        dictTypeService.deleteDictTypeByIds(dictIds);
+        dictTypeService.deleteDictTypeByIds(Arrays.asList(dictIds));
         return R.ok();
     }
 

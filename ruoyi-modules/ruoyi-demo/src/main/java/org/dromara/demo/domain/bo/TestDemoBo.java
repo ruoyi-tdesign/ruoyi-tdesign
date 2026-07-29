@@ -60,6 +60,10 @@ public class TestDemoBo extends BaseEntity {
     @NotBlank(message = "值不能为空", groups = {AddGroup.class, EditGroup.class})
     private String value;
 
+    /**
+     * 版本
+     */
+    private Long version;
 
     /**
      * 创建者

@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.model.BaseUser;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.PermissionService;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.satoken.context.SaSecurityContext;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.satoken.utils.MultipleStpUtil;
@@ -33,8 +35,12 @@ public class SaPermissionImpl implements StpInterface {
         if (MultipleStpUtil.SYSTEM.isLogin()) {
             LoginUser loginUser = LoginHelper.getUser();
             if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(loginId)) {
-                List<String> list = StringUtils.splitList(loginId.toString(), ":");
-                return new ArrayList<>(permissionService.getMenuPermission(Long.parseLong(list.get(1))));
+                if (ObjectUtil.isNotNull(permissionService)) {
+                    List<String> list = StringUtils.splitList(loginId.toString(), ":");
+                    return new ArrayList<>(permissionService.getMenuPermission(Long.parseLong(list.get(1))));
+                } else {
+                    throw new ServiceException("PermissionService 实现类不存在");
+                }
             }
             UserType userType = UserType.getUserType(loginUser.getUserType());
             if (userType == UserType.APP_USER) {
@@ -58,8 +64,12 @@ public class SaPermissionImpl implements StpInterface {
         if (MultipleStpUtil.SYSTEM.isLogin()) {
             LoginUser loginUser = LoginHelper.getUser();
             if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(loginId)) {
-                List<String> list = StringUtils.splitList(loginId.toString(), ":");
-                return new ArrayList<>(permissionService.getRolePermission(Long.parseLong(list.get(1))));
+                if (ObjectUtil.isNotNull(permissionService)) {
+                    List<String> list = StringUtils.splitList(loginId.toString(), ":");
+                    return new ArrayList<>(permissionService.getRolePermission(Long.parseLong(list.get(1))));
+                } else {
+                    throw new ServiceException("PermissionService 实现类不存在");
+                }
             }
             UserType userType = UserType.getUserType(loginUser.getUserType());
             if (userType == UserType.APP_USER) {
