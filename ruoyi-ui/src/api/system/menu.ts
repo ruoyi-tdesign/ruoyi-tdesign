@@ -66,3 +66,10 @@ export function delMenu(menuId: number) {
     url: `/system/menu/${menuId}`,
   });
 }
+
+// 级联删除菜单
+export function cascadeDelMenu(menuIds: Array<string | number>) {
+  return request.delete<R>({
+    url: `/system/menu/cascade/${menuIds}`,
+  });
+}

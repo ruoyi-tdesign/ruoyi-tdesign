@@ -6,11 +6,15 @@ import type { BaseEntity, TreeModel } from '@/api/model/resultModel';
 export interface SysMenuQuery extends BaseEntity {
   /** 菜单名称 */
   menuName?: string;
+  /** 父菜单ID */
+  parentId?: number;
   /** 组件名称 */
   componentName?: string;
-  /** 显示状态 */
+  /** 菜单类型（M目录 C菜单 F按钮） */
+  menuType?: string;
+  /** 显示状态（1显示 0隐藏） */
   visible?: string;
-  /** 菜单状态 */
+  /** 菜单状态（1正常 0停用） */
   status?: string;
 }
 /**
@@ -98,7 +102,7 @@ export interface SysMenuVo {
   updateTime?: any;
   /** 备注 */
   remark?: string;
-  /** 子菜单 */
+  /** 子菜单权限 */
   children?: SysMenuVo[];
 }
 

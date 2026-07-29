@@ -123,7 +123,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
      */
     @DS("#query.dataName")
     @Override
-    public List<GenTableVo> selectPageDbTableList(GenTableQuery query) {
+    public TableDataInfo<GenTableVo> selectPageDbTableList(GenTableQuery query) {
         // 清理数据库元数据缓存
         CacheProxy.clear();
         // 获取查询条件
@@ -131,7 +131,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         String tableComment = query.getTableComment();
         LinkedHashMap<String, Table<?>> tablesMap = ServiceProxy.metadata().tables();
         if (CollUtil.isEmpty(tablesMap)) {
-            return new ArrayList<>(0);
+            return TableDataInfo.build();
         }
         List<String> tableNames = baseMapper.selectTableNameList(query.getDataName());
         String[] tableArrays;
@@ -141,7 +141,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
             tableArrays = new String[0];
         }
         // 过滤并转换表格数据
-        return tablesMap.values().stream()
+        List<GenTableVo> tables = tablesMap.values().stream()
             .filter(x -> !StringUtils.startWithAnyIgnoreCase(x.getName(), TABLE_IGNORE))
             .filter(x -> {
                 if (CollUtil.isEmpty(tableNames)) {
@@ -172,6 +172,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
                 gen.setUpdateTime(x.getUpdateTime());
                 return gen;
             }).toList();
+        return TableDataInfo.build(tables, PageQuery.of().build());
     }
 
     /**

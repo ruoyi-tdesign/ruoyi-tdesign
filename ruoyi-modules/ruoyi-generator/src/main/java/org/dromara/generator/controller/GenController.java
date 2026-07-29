@@ -1,6 +1,7 @@
 package org.dromara.generator.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -69,8 +70,8 @@ public class GenController extends BaseController {
      */
     @SaCheckPermission("tool:gen:list")
     @GetMapping("/db/list")
-    public R<List<GenTableVo>> dataList(GenTableQuery query) {
-        return R.ok(genTableService.selectPageDbTableList(query));
+    public TableDataInfo<GenTableVo> dataList(GenTableQuery query) {
+        return genTableService.selectPageDbTableList(query);
     }
 
     /**
@@ -237,6 +238,6 @@ public class GenController extends BaseController {
     @SaCheckPermission("tool:gen:list")
     @GetMapping(value = "/getDataNames")
     public R<List<String>> getCurrentDataSourceNameList() {
-        return R.ok(DataBaseHelper.getDataSourceNameList());
+        return R.ok(CollUtil.reverse(DataBaseHelper.getDataSourceNameList()));
     }
 }

@@ -66,15 +66,17 @@ public class RedisReadWriteLockBuild {
      */
     public <T> T readWrite(Supplier<T> defaultSupplier, BiConsumer<String, T> after) {
         RReadWriteLock readWriteLock = RedisUtils.getClient().getReadWriteLock(getKey(key));
-        RLock lock = readWriteLock.readLock();
-        lock.lock();
+        RLock readLock = readWriteLock.readLock();
+        readLock.lock();
         boolean unlock = false;
         try {
             T data = RedisUtils.getObject(key);
             if (data == null && defaultSupplier != null) {
                 RLock writeLock = readWriteLock.writeLock();
                 // 此处读锁需要先释放才能获取写锁
-                lock.unlock();
+                if (readLock.isHeldByCurrentThread()) {
+                    readLock.unlock();
+                }
                 unlock = true;
                 writeLock.lock();
                 try {
@@ -85,7 +87,9 @@ public class RedisReadWriteLockBuild {
                         after.accept(key, data);
                     }
                 } finally {
-                    writeLock.unlock();
+                    if (writeLock.isHeldByCurrentThread()) {
+                        writeLock.unlock();
+                    }
                 }
             } else if (rewriteExpire && expire != null) {
                 setExpire();
@@ -94,7 +98,9 @@ public class RedisReadWriteLockBuild {
         } finally {
             // 判断是否已经提前释放锁，避免锁重入时被提前释放
             if (!unlock) {
-                lock.unlock();
+                if (readLock.isHeldByCurrentThread()) {
+                    readLock.unlock();
+                }
             }
         }
     }
@@ -109,8 +115,8 @@ public class RedisReadWriteLockBuild {
      */
     public <T> List<T> readWriteList(Supplier<List<T>> defaultSupplier, BiConsumer<String, List<T>> after) {
         RReadWriteLock readWriteLock = RedisUtils.getClient().getReadWriteLock(getKey(key));
-        RLock lock = readWriteLock.readLock();
-        lock.lock();
+        RLock readLock = readWriteLock.readLock();
+        readLock.lock();
         boolean unlock = false;
         try {
             Boolean hasKey = RedisUtils.hasKey(key);
@@ -124,7 +130,9 @@ public class RedisReadWriteLockBuild {
             if (defaultSupplier != null) {
                 RLock writeLock = readWriteLock.writeLock();
                 // 此处读锁需要先释放才能获取写锁
-                lock.unlock();
+                if (readLock.isHeldByCurrentThread()) {
+                    readLock.unlock();
+                }
                 unlock = true;
                 writeLock.lock();
                 try {
@@ -143,7 +151,9 @@ public class RedisReadWriteLockBuild {
         } finally {
             // 判断是否已经提前释放锁，避免锁重入时被提前释放
             if (!unlock) {
-                lock.unlock();
+                if (readLock.isHeldByCurrentThread()) {
+                    readLock.unlock();
+                }
             }
         }
     }
@@ -158,8 +168,8 @@ public class RedisReadWriteLockBuild {
      */
     public <T> Set<T> readWriteSet(Supplier<Set<T>> defaultSupplier, BiConsumer<String, Set<T>> after) {
         RReadWriteLock readWriteLock = RedisUtils.getClient().getReadWriteLock(getKey(key));
-        RLock lock = readWriteLock.readLock();
-        lock.lock();
+        RLock readLock = readWriteLock.readLock();
+        readLock.lock();
         boolean unlock = false;
         try {
             Boolean hasKey = RedisUtils.hasKey(key);
@@ -173,7 +183,9 @@ public class RedisReadWriteLockBuild {
             if (defaultSupplier != null) {
                 RLock writeLock = readWriteLock.writeLock();
                 // 此处读锁需要先释放才能获取写锁
-                lock.unlock();
+                if (readLock.isHeldByCurrentThread()) {
+                    readLock.unlock();
+                }
                 unlock = true;
                 writeLock.lock();
                 try {
@@ -192,7 +204,9 @@ public class RedisReadWriteLockBuild {
         } finally {
             // 判断是否已经提前释放锁，避免锁重入时被提前释放
             if (!unlock) {
-                lock.unlock();
+                if (readLock.isHeldByCurrentThread()) {
+                    readLock.unlock();
+                }
             }
         }
     }
@@ -207,8 +221,8 @@ public class RedisReadWriteLockBuild {
      */
     public <T> Map<String, T> readWriteMap(Supplier<Map<String, T>> defaultSupplier, BiConsumer<String, Map<String, T>> after) {
         RReadWriteLock readWriteLock = RedisUtils.getClient().getReadWriteLock(getKey(key));
-        RLock lock = readWriteLock.readLock();
-        lock.lock();
+        RLock readLock = readWriteLock.readLock();
+        readLock.lock();
         boolean unlock = false;
         try {
             Boolean hasKey = RedisUtils.hasKey(key);
@@ -222,7 +236,9 @@ public class RedisReadWriteLockBuild {
             if (defaultSupplier != null) {
                 RLock writeLock = readWriteLock.writeLock();
                 // 此处读锁需要先释放才能获取写锁
-                lock.unlock();
+                if (readLock.isHeldByCurrentThread()) {
+                    readLock.unlock();
+                }
                 unlock = true;
                 writeLock.lock();
                 try {
@@ -241,7 +257,9 @@ public class RedisReadWriteLockBuild {
         } finally {
             // 判断是否已经提前释放锁，避免锁重入时被提前释放
             if (!unlock) {
-                lock.unlock();
+                if (readLock.isHeldByCurrentThread()) {
+                    readLock.unlock();
+                }
             }
         }
     }
@@ -253,8 +271,8 @@ public class RedisReadWriteLockBuild {
      */
     public <T> T read(Function<String, T> after) {
         RReadWriteLock readWriteLock = RedisUtils.getClient().getReadWriteLock(getKey(key));
-        RLock lock = readWriteLock.readLock();
-        lock.lock();
+        RLock readLock = readWriteLock.readLock();
+        readLock.lock();
         try {
             T apply = after.apply(key);
             if (apply != null && rewriteExpire && expire != null) {
@@ -262,7 +280,9 @@ public class RedisReadWriteLockBuild {
             }
             return apply;
         } finally {
-            lock.unlock();
+            if (readLock.isHeldByCurrentThread()) {
+                readLock.unlock();
+            }
         }
     }
 
@@ -282,7 +302,9 @@ public class RedisReadWriteLockBuild {
             after.accept(key, data);
             return data;
         } finally {
-            writeLock.unlock();
+            if (writeLock.isHeldByCurrentThread()) {
+                writeLock.unlock();
+            }
         }
     }
 
@@ -298,7 +320,9 @@ public class RedisReadWriteLockBuild {
         try {
            RedisUtils.deleteObject(key);
         } finally {
-            writeLock.unlock();
+            if (writeLock.isHeldByCurrentThread()) {
+                writeLock.unlock();
+            }
         }
     }
 

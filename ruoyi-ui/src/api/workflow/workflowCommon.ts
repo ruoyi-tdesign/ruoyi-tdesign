@@ -11,6 +11,7 @@ export function useRouterJump() {
         id: routerJumpVo.businessId,
         type: routerJumpVo.type,
         taskId: routerJumpVo.taskId,
+        instanceId: routerJumpVo.instanceId,
       },
     });
   };

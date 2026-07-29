@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/demo/websocket")
 @Slf4j
-public class WeSocketController {
+public class WebSocketController {
 
     /**
      * 发布消息

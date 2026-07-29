@@ -175,7 +175,9 @@ public class RedisLockUtil {
                     after.accept(key, data);
                 }
             } finally {
-                lock.unlock();
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
             }
         }
         return data;
@@ -210,7 +212,9 @@ public class RedisLockUtil {
                     after.accept(key, data);
                 }
             } finally {
-                lock.unlock();
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
             }
             return data;
         }
@@ -245,7 +249,9 @@ public class RedisLockUtil {
                     after.accept(key, data);
                 }
             } finally {
-                lock.unlock();
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
             }
             return data;
         }
@@ -280,7 +286,9 @@ public class RedisLockUtil {
                     after.accept(key, data);
                 }
             } finally {
-                lock.unlock();
+                if (lock.isHeldByCurrentThread()) {
+                    lock.unlock();
+                }
             }
             return data;
         }
@@ -298,7 +306,9 @@ public class RedisLockUtil {
         try {
             runnable.run();
         } finally {
-            lock.unlock();
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 
@@ -314,7 +324,9 @@ public class RedisLockUtil {
         try {
             return runnable.get();
         } finally {
-            lock.unlock();
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 

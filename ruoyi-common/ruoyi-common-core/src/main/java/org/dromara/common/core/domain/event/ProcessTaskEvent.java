@@ -6,12 +6,12 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 流程创建任务监听
+ * 流程任务监听
  *
  * @author may
  */
 @Data
-public class ProcessCreateTaskEvent implements Serializable {
+public class ProcessTaskEvent implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -50,5 +50,10 @@ public class ProcessCreateTaskEvent implements Serializable {
      * 业务id
      */
     private String businessId;
+
+    /**
+     * 流程状态
+     */
+    private String status;
 
 }

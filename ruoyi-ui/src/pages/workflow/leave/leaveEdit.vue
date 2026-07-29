@@ -3,23 +3,16 @@
     <t-space direction="vertical" class="w100%">
       <t-card>
         <div style="display: flex; justify-content: space-between">
-          <div>
-            <t-button v-if="submitButtonShow" :loading="buttonLoading" theme="default" @click="submitForm('draft')">
-              暂存
-            </t-button>
-            <t-button v-if="submitButtonShow" :loading="buttonLoading" theme="primary" @click="submitForm('submit')">
-              提 交
-            </t-button>
-            <t-button v-if="approvalButtonShow" :loading="buttonLoading" theme="primary" @click="approvalVerifyOpen">
-              审批
-            </t-button>
-            <t-button v-if="form && form.id && form.status !== 'draft'" theme="primary" @click="handleApprovalRecord">
-              流程进度
-            </t-button>
-          </div>
-          <div>
-            <t-button style="float: right" @click="goBack()">返回</t-button>
-          </div>
+          <approval-button
+            :id="form.id"
+            ref="approvalButtonRef"
+            :button-loading="buttonLoading"
+            :status="form.status"
+            :page-type="routeParams.type"
+            @submit-form="submitForm"
+            @approval-verify-open="approvalVerifyOpen"
+            @handle-approval-record="handleApprovalRecord"
+          />
         </div>
       </t-card>
       <t-card style="height: 70vh; overflow-y: auto">
@@ -93,6 +86,7 @@ import { addLeave, getLeave, updateLeave } from '@/api/workflow/leave';
 import type { LeaveForm, LeaveVo } from '@/api/workflow/model/leaveModel';
 import type { StartProcessBo } from '@/api/workflow/model/taskModel';
 import { startWorkFlow } from '@/api/workflow/task';
+import ApprovalButton from '@/components/Process/approvalButton.vue';
 import ApprovalRecord from '@/components/Process/approvalRecord.vue';
 import SubmitVerify from '@/components/Process/submitVerify.vue';
 import { useTabsRouterStore } from '@/store';
@@ -155,6 +149,8 @@ const title = ref('流程定义');
 const submitVerifyRef = ref<InstanceType<typeof SubmitVerify>>();
 // 审批记录组件
 const approvalRecordRef = ref<InstanceType<typeof ApprovalRecord>>();
+// 按钮组件
+const approvalButtonRef = ref<InstanceType<typeof ApprovalButton>>();
 
 const leaveFormRef = ref<FormInstanceFunctions>();
 
@@ -295,29 +291,10 @@ const handleApprovalRecord = () => {
 const submitCallback = async () => {
   removeCurrentTab();
 };
-
-// 返回
-const goBack = () => {
-  removeCurrentTab();
-};
 // 审批
 const approvalVerifyOpen = async () => {
   submitVerifyRef.value.openDialog(routeParams.value.taskId);
 };
-// 校验提交按钮是否显示
-const submitButtonShow = computed(() => {
-  return (
-    routeParams.value.type === 'add' ||
-    (routeParams.value.type === 'update' &&
-      form.value.status &&
-      (form.value.status === 'draft' || form.value.status === 'cancel' || form.value.status === 'back'))
-  );
-});
-
-// 校验审批按钮是否显示
-const approvalButtonShow = computed(() => {
-  return routeParams.value.type === 'approval' && form.value.status && form.value.status === 'waiting';
-});
 
 onMounted(() => {
   nextTick(async () => {

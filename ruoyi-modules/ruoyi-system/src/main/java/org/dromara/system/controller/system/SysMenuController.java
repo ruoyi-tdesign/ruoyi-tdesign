@@ -169,4 +169,22 @@ public class SysMenuController extends BaseController {
     public record MenuTreeSelectVo(List<Long> checkedKeys, List<Tree<Long>> menus) {
     }
 
+    /**
+     * 批量级联删除菜单
+     *
+     * @param menuIds 菜单ID串
+     */
+    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @SaCheckPermission("system:menu:remove")
+    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/cascade/{menuIds}")
+    public R<Void> remove(@PathVariable Long[] menuIds) {
+        List<Long> menuIdList = List.of(menuIds);
+        if (menuService.hasChildByMenuId(menuIdList)) {
+            return R.warn("存在子菜单,不允许删除");
+        }
+        menuService.deleteMenuById(menuIdList);
+        return R.ok();
+    }
+
 }

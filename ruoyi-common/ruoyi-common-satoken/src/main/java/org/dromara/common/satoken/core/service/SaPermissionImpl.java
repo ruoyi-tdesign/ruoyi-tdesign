@@ -1,11 +1,15 @@
 package org.dromara.common.satoken.core.service;
 
 import cn.dev33.satoken.stp.StpInterface;
+import cn.hutool.core.util.ObjectUtil;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.model.BaseUser;
 import org.dromara.common.core.domain.model.LoginUser;
 import org.dromara.common.core.enums.UserType;
+import org.dromara.common.core.service.PermissionService;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.satoken.context.SaSecurityContext;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.common.satoken.utils.LoginUserHelper;
 import org.dromara.common.satoken.utils.MultipleStpUtil;
 
 import java.util.ArrayList;
@@ -16,7 +20,10 @@ import java.util.List;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 public class SaPermissionImpl implements StpInterface {
+
+    private final PermissionService permissionService;
 
     /**
      * 获取菜单权限列表
@@ -25,17 +32,20 @@ public class SaPermissionImpl implements StpInterface {
     public List<String> getPermissionList(Object loginId, String loginType) {
         if (MultipleStpUtil.SYSTEM.isLogin()) {
             LoginUser loginUser = LoginHelper.getUser();
+            if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(loginId)) {
+                List<String> list = StringUtils.splitList(loginId.toString(), ":");
+                return new ArrayList<>(permissionService.getMenuPermission(Long.parseLong(list.get(1))));
+            }
             UserType userType = UserType.getUserType(loginUser.getUserType());
-            if (userType == UserType.SYS_USER) {
-                return new ArrayList<>(loginUser.getMenuPermission());
-            } else if (userType == UserType.APP_USER) {
+            if (userType == UserType.APP_USER) {
                 // 其他端 自行根据业务编写
             }
-        } else if (MultipleStpUtil.USER.isLogin()) {
-            BaseUser tokenUser = LoginUserHelper.getUser();
-            if (tokenUser != null) {
-                return new ArrayList<>(tokenUser.getMenuPermission());
-            }
+            // SYS_USER 默认返回权限
+            return new ArrayList<>(loginUser.getMenuPermission());
+        }
+        BaseUser user = SaSecurityContext.getContext();
+        if (user != null) {
+            return new ArrayList<>(user.getMenuPermission());
         }
         return new ArrayList<>();
     }
@@ -47,17 +57,20 @@ public class SaPermissionImpl implements StpInterface {
     public List<String> getRoleList(Object loginId, String loginType) {
         if (MultipleStpUtil.SYSTEM.isLogin()) {
             LoginUser loginUser = LoginHelper.getUser();
+            if (ObjectUtil.isNull(loginUser) || !loginUser.getLoginId().equals(loginId)) {
+                List<String> list = StringUtils.splitList(loginId.toString(), ":");
+                return new ArrayList<>(permissionService.getRolePermission(Long.parseLong(list.get(1))));
+            }
             UserType userType = UserType.getUserType(loginUser.getUserType());
-            if (userType == UserType.SYS_USER) {
-                return new ArrayList<>(loginUser.getRolePermission());
-            } else if (userType == UserType.APP_USER) {
+            if (userType == UserType.APP_USER) {
                 // 其他端 自行根据业务编写
             }
-        } else if (MultipleStpUtil.USER.isLogin()) {
-            BaseUser tokenUser = LoginUserHelper.getUser();
-            if (tokenUser != null) {
-                return new ArrayList<>(tokenUser.getRolePermission());
-            }
+            // SYS_USER 默认返回权限
+            return new ArrayList<>(loginUser.getRolePermission());
+        }
+        BaseUser user = SaSecurityContext.getContext();
+        if (user != null) {
+            return new ArrayList<>(user.getRolePermission());
         }
         return new ArrayList<>();
     }

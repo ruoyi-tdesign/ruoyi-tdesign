@@ -2,7 +2,7 @@
  SnailJob Database Transfer Tool
  Source Server Type    : MySQL
  Target Server Type    : PostgreSQL
- Date: 2025-02-25 22:15:32
+ Date: 2025-04-26 09:56:45
 */
 
 
@@ -18,7 +18,7 @@ CREATE TABLE sj_namespace
     update_dt   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_namespace_name ON sj_namespace (name);
+CREATE INDEX idx_sj_namespace_01 ON sj_namespace (name);
 
 COMMENT ON COLUMN sj_namespace.id IS '主键';
 COMMENT ON COLUMN sj_namespace.name IS '名称';
@@ -49,7 +49,7 @@ CREATE TABLE sj_group_config
     update_dt         timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_sj_group_config_namespace_group ON sj_group_config (namespace_id, group_name);
+CREATE UNIQUE INDEX uk_sj_group_config_01 ON sj_group_config (namespace_id, group_name);
 
 COMMENT ON COLUMN sj_group_config.id IS '主键';
 COMMENT ON COLUMN sj_group_config.namespace_id IS '命名空间id';
@@ -87,7 +87,7 @@ CREATE TABLE sj_notify_config
     update_dt              timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_notify_config_namespace_group ON sj_notify_config (namespace_id, group_name);
+CREATE INDEX idx_sj_notify_config_01 ON sj_notify_config (namespace_id, group_name);
 
 COMMENT ON COLUMN sj_notify_config.id IS '主键';
 COMMENT ON COLUMN sj_notify_config.namespace_id IS '命名空间id';
@@ -118,7 +118,7 @@ CREATE TABLE sj_notify_recipient
     update_dt        timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_notify_recipient_namespace ON sj_notify_recipient (namespace_id);
+CREATE INDEX idx_sj_notify_recipient_01 ON sj_notify_recipient (namespace_id);
 
 COMMENT ON COLUMN sj_notify_recipient.id IS '主键';
 COMMENT ON COLUMN sj_notify_recipient.namespace_id IS '命名空间id';
@@ -136,7 +136,9 @@ CREATE TABLE sj_retry_dead_letter
     id            bigserial PRIMARY KEY,
     namespace_id  varchar(64)  NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a',
     group_name    varchar(64)  NOT NULL,
+    group_id      bigint       NOT NULL,
     scene_name    varchar(64)  NOT NULL,
+    scene_id      bigint       NOT NULL,
     idempotent_id varchar(64)  NOT NULL,
     biz_no        varchar(64)  NOT NULL DEFAULT '',
     executor_name varchar(512) NOT NULL DEFAULT '',
@@ -145,15 +147,17 @@ CREATE TABLE sj_retry_dead_letter
     create_dt     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_retry_dead_letter_namespace_group_scene ON sj_retry_dead_letter (namespace_id, group_name, scene_name);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_dead_letter_idempotent_id ON sj_retry_dead_letter (idempotent_id);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_dead_letter_biz_no ON sj_retry_dead_letter (biz_no);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_dead_letter_create_dt ON sj_retry_dead_letter (create_dt);
+CREATE INDEX idx_sj_retry_dead_letter_01 ON sj_retry_dead_letter (namespace_id, group_name, scene_name);
+CREATE INDEX idx_sj_retry_dead_letter_02 ON sj_retry_dead_letter (idempotent_id);
+CREATE INDEX idx_sj_retry_dead_letter_03 ON sj_retry_dead_letter (biz_no);
+CREATE INDEX idx_sj_retry_dead_letter_04 ON sj_retry_dead_letter (create_dt);
 
 COMMENT ON COLUMN sj_retry_dead_letter.id IS '主键';
 COMMENT ON COLUMN sj_retry_dead_letter.namespace_id IS '命名空间id';
 COMMENT ON COLUMN sj_retry_dead_letter.group_name IS '组名称';
+COMMENT ON COLUMN sj_retry_dead_letter.group_id IS '组Id';
 COMMENT ON COLUMN sj_retry_dead_letter.scene_name IS '场景名称';
+COMMENT ON COLUMN sj_retry_dead_letter.scene_id IS '场景ID';
 COMMENT ON COLUMN sj_retry_dead_letter.idempotent_id IS '幂等id';
 COMMENT ON COLUMN sj_retry_dead_letter.biz_no IS '业务编号';
 COMMENT ON COLUMN sj_retry_dead_letter.executor_name IS '执行器名称';
@@ -168,7 +172,9 @@ CREATE TABLE sj_retry
     id              bigserial PRIMARY KEY,
     namespace_id    varchar(64)  NOT NULL DEFAULT '764d604ec6fc45f68cd92514c40e9e1a',
     group_name      varchar(64)  NOT NULL,
+    group_id        bigint       NOT NULL,
     scene_name      varchar(64)  NOT NULL,
+    scene_id        bigint       NOT NULL,
     idempotent_id   varchar(64)  NOT NULL,
     biz_no          varchar(64)  NOT NULL DEFAULT '',
     executor_name   varchar(512) NOT NULL DEFAULT '',
@@ -185,19 +191,21 @@ CREATE TABLE sj_retry
     update_dt       timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_sj_retry_namespace_group_type_idempotent_deleted ON sj_retry (namespace_id, group_name, task_type, idempotent_id, deleted);
+CREATE UNIQUE INDEX uk_sj_retry_01 ON sj_retry (scene_id, task_type, idempotent_id, deleted);
 
-CREATE INDEX IF NOT EXISTS idx_sj_retry_namespace_group_scene ON sj_retry (namespace_id, group_name, scene_name);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_namespace_group_status ON sj_retry (namespace_id, group_name, retry_status);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_idempotent_id ON sj_retry (idempotent_id);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_biz_no ON sj_retry (biz_no);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_parent_id ON sj_retry (parent_id);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_create_dt ON sj_retry (create_dt);
+CREATE INDEX idx_sj_retry_01 ON sj_retry (biz_no);
+CREATE INDEX idx_sj_retry_02 ON sj_retry (retry_status, bucket_index);
+CREATE INDEX idx_sj_retry_03 ON sj_retry (parent_id);
+CREATE INDEX idx_sj_retry_04 ON sj_retry (create_dt);
+CREATE INDEX idx_sj_retry_05 ON sj_retry (idempotent_id);
+
 
 COMMENT ON COLUMN sj_retry.id IS '主键';
 COMMENT ON COLUMN sj_retry.namespace_id IS '命名空间id';
 COMMENT ON COLUMN sj_retry.group_name IS '组名称';
+COMMENT ON COLUMN sj_retry.group_id IS '组Id';
 COMMENT ON COLUMN sj_retry.scene_name IS '场景名称';
+COMMENT ON COLUMN sj_retry.scene_id IS '场景ID';
 COMMENT ON COLUMN sj_retry.idempotent_id IS '幂等id';
 COMMENT ON COLUMN sj_retry.biz_no IS '业务编号';
 COMMENT ON COLUMN sj_retry.executor_name IS '执行器名称';
@@ -231,10 +239,10 @@ CREATE TABLE sj_retry_task
     update_dt        timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_retry_task_namespace_group_scene ON sj_retry_task (namespace_id, group_name, scene_name);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_task_status ON sj_retry_task (task_status);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_task_create_dt ON sj_retry_task (create_dt);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_task_retry_id ON sj_retry_task (retry_id);
+CREATE INDEX idx_sj_retry_task_01 ON sj_retry_task (namespace_id, group_name, scene_name);
+CREATE INDEX idx_sj_retry_task_02 ON sj_retry_task (task_status);
+CREATE INDEX idx_sj_retry_task_03 ON sj_retry_task (create_dt);
+CREATE INDEX idx_sj_retry_task_04 ON sj_retry_task (retry_id);
 
 COMMENT ON COLUMN sj_retry_task.id IS '主键';
 COMMENT ON COLUMN sj_retry_task.namespace_id IS '命名空间id';
@@ -264,8 +272,8 @@ CREATE TABLE sj_retry_task_log_message
     create_dt     timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_retry_task_log_message_namespace_group_task_id ON sj_retry_task_log_message (namespace_id, group_name, retry_task_id);
-CREATE INDEX IF NOT EXISTS idx_sj_retry_task_log_message_create_dt ON sj_retry_task_log_message (create_dt);
+CREATE INDEX idx_sj_retry_task_log_message_01 ON sj_retry_task_log_message (namespace_id, group_name, retry_task_id);
+CREATE INDEX idx_sj_retry_task_log_message_02 ON sj_retry_task_log_message (create_dt);
 
 COMMENT ON COLUMN sj_retry_task_log_message.id IS '主键';
 COMMENT ON COLUMN sj_retry_task_log_message.namespace_id IS '命名空间id';
@@ -303,7 +311,7 @@ CREATE TABLE sj_retry_scene_config
     update_dt           timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_sj_retry_scene_config_namespace_group_scene ON sj_retry_scene_config (namespace_id, group_name, scene_name);
+CREATE UNIQUE INDEX uk_sj_retry_scene_config_01 ON sj_retry_scene_config (namespace_id, group_name, scene_name);
 
 COMMENT ON COLUMN sj_retry_scene_config.id IS '主键';
 COMMENT ON COLUMN sj_retry_scene_config.namespace_id IS '命名空间id';
@@ -343,10 +351,10 @@ CREATE TABLE sj_server_node
     update_dt    timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_sj_server_node_host_id_ip ON sj_server_node (host_id, host_ip);
+CREATE UNIQUE INDEX uk_sj_server_node_01 ON sj_server_node (host_id, host_ip);
 
-CREATE INDEX IF NOT EXISTS idx_sj_server_node_namespace_group ON sj_server_node (namespace_id, group_name);
-CREATE INDEX IF NOT EXISTS idx_sj_server_node_expire_type ON sj_server_node (expire_at, node_type);
+CREATE INDEX idx_sj_server_node_01 ON sj_server_node (namespace_id, group_name);
+CREATE INDEX idx_sj_server_node_02 ON sj_server_node (expire_at, node_type);
 
 COMMENT ON COLUMN sj_server_node.id IS '主键';
 COMMENT ON COLUMN sj_server_node.namespace_id IS '命名空间id';
@@ -413,7 +421,7 @@ CREATE TABLE sj_system_user_permission
     update_dt      timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_sj_system_user_permission_namespace_group_user ON sj_system_user_permission (namespace_id, group_name, system_user_id);
+CREATE UNIQUE INDEX uk_sj_system_user_permission_01 ON sj_system_user_permission (namespace_id, group_name, system_user_id);
 
 COMMENT ON COLUMN sj_system_user_permission.id IS '主键';
 COMMENT ON COLUMN sj_system_user_permission.group_name IS '组名称';
@@ -434,7 +442,7 @@ CREATE TABLE sj_sequence_alloc
     update_dt    timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_sj_sequence_alloc_namespace_group ON sj_sequence_alloc (namespace_id, group_name);
+CREATE UNIQUE INDEX uk_sj_sequence_alloc_01 ON sj_sequence_alloc (namespace_id, group_name);
 
 COMMENT ON COLUMN sj_sequence_alloc.id IS '主键';
 COMMENT ON COLUMN sj_sequence_alloc.namespace_id IS '命名空间id';
@@ -477,9 +485,9 @@ CREATE TABLE sj_job
     update_dt        timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_job_namespace_group ON sj_job (namespace_id, group_name);
-CREATE INDEX IF NOT EXISTS idx_sj_job_status_bucket ON sj_job (job_status, bucket_index);
-CREATE INDEX IF NOT EXISTS idx_sj_job_create_dt ON sj_job (create_dt);
+CREATE INDEX idx_sj_job_01 ON sj_job (namespace_id, group_name);
+CREATE INDEX idx_sj_job_02 ON sj_job (job_status, bucket_index);
+CREATE INDEX idx_sj_job_03 ON sj_job (create_dt);
 
 COMMENT ON COLUMN sj_job.id IS '主键';
 COMMENT ON COLUMN sj_job.namespace_id IS '命名空间id';
@@ -529,9 +537,9 @@ CREATE TABLE sj_job_log_message
     create_dt     timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_job_log_message_batch_task ON sj_job_log_message (task_batch_id, task_id);
-CREATE INDEX IF NOT EXISTS idx_sj_job_log_message_create_dt ON sj_job_log_message (create_dt);
-CREATE INDEX IF NOT EXISTS idx_sj_job_log_message_namespace_group ON sj_job_log_message (namespace_id, group_name);
+CREATE INDEX idx_sj_job_log_message_01 ON sj_job_log_message (task_batch_id, task_id);
+CREATE INDEX idx_sj_job_log_message_02 ON sj_job_log_message (create_dt);
+CREATE INDEX idx_sj_job_log_message_03 ON sj_job_log_message (namespace_id, group_name);
 
 COMMENT ON COLUMN sj_job_log_message.id IS '主键';
 COMMENT ON COLUMN sj_job_log_message.namespace_id IS '命名空间id';
@@ -570,9 +578,9 @@ CREATE TABLE sj_job_task
     update_dt      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_job_task_batch_status ON sj_job_task (task_batch_id, task_status);
-CREATE INDEX IF NOT EXISTS idx_sj_job_task_create_dt ON sj_job_task (create_dt);
-CREATE INDEX IF NOT EXISTS idx_sj_job_task_namespace_group ON sj_job_task (namespace_id, group_name);
+CREATE INDEX idx_sj_job_task_01 ON sj_job_task (task_batch_id, task_status);
+CREATE INDEX idx_sj_job_task_02 ON sj_job_task (create_dt);
+CREATE INDEX idx_sj_job_task_03 ON sj_job_task (namespace_id, group_name);
 
 COMMENT ON COLUMN sj_job_task.id IS '主键';
 COMMENT ON COLUMN sj_job_task.namespace_id IS '命名空间id';
@@ -616,10 +624,10 @@ CREATE TABLE sj_job_task_batch
     update_dt               timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_job_task_batch_job_status ON sj_job_task_batch (job_id, task_batch_status);
-CREATE INDEX IF NOT EXISTS idx_sj_job_task_batch_create_dt ON sj_job_task_batch (create_dt);
-CREATE INDEX IF NOT EXISTS idx_sj_job_task_batch_namespace_group ON sj_job_task_batch (namespace_id, group_name);
-CREATE INDEX IF NOT EXISTS idx_sj_job_task_batch_workflow_batch_node ON sj_job_task_batch (workflow_task_batch_id, workflow_node_id);
+CREATE INDEX idx_sj_job_task_batch_01 ON sj_job_task_batch (job_id, task_batch_status);
+CREATE INDEX idx_sj_job_task_batch_02 ON sj_job_task_batch (create_dt);
+CREATE INDEX idx_sj_job_task_batch_03 ON sj_job_task_batch (namespace_id, group_name);
+CREATE INDEX idx_sj_job_task_batch_04 ON sj_job_task_batch (workflow_task_batch_id, workflow_node_id);
 
 COMMENT ON COLUMN sj_job_task_batch.id IS '主键';
 COMMENT ON COLUMN sj_job_task_batch.namespace_id IS '命名空间id';
@@ -659,9 +667,9 @@ CREATE TABLE sj_job_summary
     update_dt        timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_sj_job_summary_trigger_task_business ON sj_job_summary (trigger_at, system_task_type, business_id);
+CREATE UNIQUE INDEX uk_sj_job_summary_01 ON sj_job_summary (trigger_at, system_task_type, business_id);
 
-CREATE INDEX IF NOT EXISTS idx_sj_job_summary_namespace_group_business ON sj_job_summary (namespace_id, group_name, business_id);
+CREATE INDEX idx_sj_job_summary_01 ON sj_job_summary (namespace_id, group_name, business_id);
 
 COMMENT ON COLUMN sj_job_summary.id IS '主键';
 COMMENT ON COLUMN sj_job_summary.namespace_id IS '命名空间id';
@@ -696,9 +704,9 @@ CREATE TABLE sj_retry_summary
     update_dt     timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS uk_sj_retry_summary_namespace_group_scene_trigger ON sj_retry_summary (namespace_id, group_name, scene_name, trigger_at);
+CREATE UNIQUE INDEX uk_sj_retry_summary_01 ON sj_retry_summary (namespace_id, group_name, scene_name, trigger_at);
 
-CREATE INDEX IF NOT EXISTS idx_sj_retry_summary_trigger_at ON sj_retry_summary (trigger_at);
+CREATE INDEX idx_sj_retry_summary_01 ON sj_retry_summary (trigger_at);
 
 COMMENT ON COLUMN sj_retry_summary.id IS '主键';
 COMMENT ON COLUMN sj_retry_summary.namespace_id IS '命名空间id';
@@ -738,8 +746,8 @@ CREATE TABLE sj_workflow
     update_dt        timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_workflow_create_dt ON sj_workflow (create_dt);
-CREATE INDEX IF NOT EXISTS idx_sj_workflow_namespace_group ON sj_workflow (namespace_id, group_name);
+CREATE INDEX idx_sj_workflow_01 ON sj_workflow (create_dt);
+CREATE INDEX idx_sj_workflow_02 ON sj_workflow (namespace_id, group_name);
 
 COMMENT ON COLUMN sj_workflow.id IS '主键';
 COMMENT ON COLUMN sj_workflow.workflow_name IS '工作流名称';
@@ -785,8 +793,8 @@ CREATE TABLE sj_workflow_node
     update_dt            timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_workflow_node_create_dt ON sj_workflow_node (create_dt);
-CREATE INDEX IF NOT EXISTS idx_sj_workflow_node_namespace_group ON sj_workflow_node (namespace_id, group_name);
+CREATE INDEX idx_sj_workflow_node_01 ON sj_workflow_node (create_dt);
+CREATE INDEX idx_sj_workflow_node_02 ON sj_workflow_node (namespace_id, group_name);
 
 COMMENT ON COLUMN sj_workflow_node.id IS '主键';
 COMMENT ON COLUMN sj_workflow_node.namespace_id IS '命名空间id';
@@ -826,9 +834,9 @@ CREATE TABLE sj_workflow_task_batch
     update_dt         timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_sj_workflow_task_batch_workflow_status ON sj_workflow_task_batch (workflow_id, task_batch_status);
-CREATE INDEX IF NOT EXISTS idx_sj_workflow_task_batch_create_dt ON sj_workflow_task_batch (create_dt);
-CREATE INDEX IF NOT EXISTS idx_sj_workflow_task_batch_namespace_group ON sj_workflow_task_batch (namespace_id, group_name);
+CREATE INDEX idx_sj_workflow_task_batch_01 ON sj_workflow_task_batch (workflow_id, task_batch_status);
+CREATE INDEX idx_sj_workflow_task_batch_02 ON sj_workflow_task_batch (create_dt);
+CREATE INDEX idx_sj_workflow_task_batch_03 ON sj_workflow_task_batch (namespace_id, group_name);
 
 COMMENT ON COLUMN sj_workflow_task_batch.id IS '主键';
 COMMENT ON COLUMN sj_workflow_task_batch.namespace_id IS '命名空间id';

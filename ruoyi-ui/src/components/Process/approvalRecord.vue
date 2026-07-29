@@ -1,32 +1,19 @@
 <template>
   <div class="container">
     <t-dialog
-      v-model="visible"
+      v-model:visible="visible"
       header="审批记录"
       :width="props.width"
       :height="props.height"
+      placement="center"
       :close-on-overlay-click="false"
     >
       <t-tabs v-model="tabActiveName" class="demo-tabs">
-        <t-loading :loading="loading">
-          <t-tab-panel label="流程图" name="image" style="height: 68vh">
-            <div
-              ref="imageWrapperRef"
-              class="image-wrapper"
-              :style="transformStyle"
-              @wheel="handleMouseWheel"
-              @mousedown="handleMouseDown"
-              @mousemove="handleMouseMove"
-              @mouseup="handleMouseUp"
-              @mouseleave="handleMouseLeave"
-              @dblclick="resetTransform"
-            >
-              <t-card class="box-card">
-                <t-image :src="imgUrl" class="scalable-image" />
-              </t-card>
-            </div>
-          </t-tab-panel>
-        </t-loading>
+        <t-tab-panel label="流程图" value="image" style="height: 68vh">
+          <t-loading :loading="loading">
+            <flow-chart v-if="insId" :ins-id="insId" />
+          </t-loading>
+        </t-tab-panel>
         <t-tab-panel label="审批信息" value="info">
           <t-loading :loading="loading">
             <t-table :data="historyList" row-key="id" :columns="columns" style="width: 100%">
@@ -75,7 +62,8 @@ import type { PrimaryTableCol } from 'tdesign-vue-next';
 import { ref } from 'vue';
 
 import { listByIds } from '@/api/system/oss';
-import { flowImage } from '@/api/workflow/instance';
+import { flowHisTaskList } from '@/api/workflow/instance';
+import FlowChart from '@/components/Process/flowChart.vue';
 
 const props = defineProps({
   width: {
@@ -93,7 +81,7 @@ const loading = ref(false);
 const visible = ref(false);
 const historyList = ref<Array<any>>([]);
 const tabActiveName = ref('image');
-const imgUrl = ref('');
+const insId = ref(null);
 
 // 列显隐信息
 const columns = computed<Array<PrimaryTableCol>>(() => [
@@ -119,10 +107,10 @@ const init = async (businessId: string | number) => {
   loading.value = true;
   tabActiveName.value = 'image';
   historyList.value = [];
-  flowImage(businessId).then((resp) => {
+  flowHisTaskList(businessId).then((resp) => {
     if (resp.data) {
       historyList.value = resp.data.list;
-      imgUrl.value = `data:image/gif;base64,${resp.data.image}`;
+      insId.value = resp.data.instanceId;
       if (historyList.value.length > 0) {
         historyList.value.forEach((item) => {
           if (item.ext) {
@@ -147,109 +135,6 @@ const handleDownload = (ossId: string) => {
   proxy?.$download.oss(ossId);
 };
 
-const imageWrapperRef = ref<HTMLElement | null>(null);
-const scale = ref(1); // 初始缩放比例
-const maxScale = 3; // 最大缩放比例
-const minScale = 0.5; // 最小缩放比例
-
-let isDragging = false;
-let startX = 0;
-let startY = 0;
-let currentTranslateX = 0;
-let currentTranslateY = 0;
-
-const handleMouseWheel = (event: WheelEvent) => {
-  event.preventDefault();
-  let newScale = scale.value - event.deltaY / 1000;
-  newScale = Math.max(minScale, Math.min(newScale, maxScale));
-  if (newScale !== scale.value) {
-    scale.value = newScale;
-    resetDragPosition(); // 重置拖拽位置，使图片居中
-  }
-};
-
-const handleMouseDown = (event: MouseEvent) => {
-  if (scale.value > 1) {
-    event.preventDefault(); // 阻止默认行为，防止拖拽
-    isDragging = true;
-    startX = event.clientX;
-    startY = event.clientY;
-  }
-};
-
-const handleMouseMove = (event: MouseEvent) => {
-  if (!isDragging || !imageWrapperRef.value) return;
-
-  const deltaX = event.clientX - startX;
-  const deltaY = event.clientY - startY;
-  startX = event.clientX;
-  startY = event.clientY;
-
-  currentTranslateX += deltaX;
-  currentTranslateY += deltaY;
-
-  // 边界检测，防止图片被拖出容器
-  const bounds = getBounds();
-  if (currentTranslateX > bounds.maxTranslateX) {
-    currentTranslateX = bounds.maxTranslateX;
-  } else if (currentTranslateX < bounds.minTranslateX) {
-    currentTranslateX = bounds.minTranslateX;
-  }
-
-  if (currentTranslateY > bounds.maxTranslateY) {
-    currentTranslateY = bounds.maxTranslateY;
-  } else if (currentTranslateY < bounds.minTranslateY) {
-    currentTranslateY = bounds.minTranslateY;
-  }
-
-  applyTransform();
-};
-
-const handleMouseUp = () => {
-  isDragging = false;
-};
-
-const handleMouseLeave = () => {
-  isDragging = false;
-};
-
-const resetTransform = () => {
-  scale.value = 1;
-  currentTranslateX = 0;
-  currentTranslateY = 0;
-  applyTransform();
-};
-
-const resetDragPosition = () => {
-  currentTranslateX = 0;
-  currentTranslateY = 0;
-  applyTransform();
-};
-
-const applyTransform = () => {
-  if (imageWrapperRef.value) {
-    imageWrapperRef.value.style.transform = `translate(${currentTranslateX}px, ${currentTranslateY}px) scale(${scale.value})`;
-  }
-};
-
-const getBounds = () => {
-  if (!imageWrapperRef.value) return { minTranslateX: 0, maxTranslateX: 0, minTranslateY: 0, maxTranslateY: 0 };
-
-  const imgRect = imageWrapperRef.value.getBoundingClientRect();
-  const containerRect = imageWrapperRef.value.parentElement?.getBoundingClientRect() ?? imgRect;
-
-  const minTranslateX = (containerRect.width - imgRect.width * scale.value) / 2;
-  const maxTranslateX = -(containerRect.width - imgRect.width * scale.value) / 2;
-  const minTranslateY = (containerRect.height - imgRect.height * scale.value) / 2;
-  const maxTranslateY = -(containerRect.height - imgRect.height * scale.value) / 2;
-
-  return { minTranslateX, maxTranslateX, minTranslateY, maxTranslateY };
-};
-
-const transformStyle = computed(() => ({
-  transition: isDragging ? 'none' : 'transform 0.2s ease',
-}));
-
 /**
  * 对外暴露子组件方法
  */
@@ -258,46 +143,10 @@ defineExpose({
 });
 </script>
 <style lang="less" scoped>
-.triangle {
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  border-radius: 6px;
-}
-
-.triangle::after {
-  content: ' ';
-  position: absolute;
-  top: 8em;
-  right: 215px;
-  border: 15px solid;
-  border-color: transparent #fff transparent transparent;
-}
-
 .container {
   :deep(.t-dialog__ctx .t-dialog__body) {
     max-height: calc(100vh - 170px) !important;
     min-height: calc(100vh - 170px) !important;
   }
-}
-
-.image-wrapper {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  user-select: none; /* 禁用文本选择 */
-  cursor: grab; /* 设置初始鼠标指针为可拖动 */
-}
-
-.image-wrapper:active {
-  cursor: grabbing; /* 当正在拖动时改变鼠标指针 */
-}
-
-.scalable-image {
-  object-fit: contain;
-  width: 100%;
-  padding: 15px;
 }
 </style>
