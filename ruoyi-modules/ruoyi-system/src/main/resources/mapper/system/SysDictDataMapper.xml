@@ -18,7 +18,7 @@
             <if test="dictLabel != null and dictLabel != ''"> and sdd.dict_label like concat(concat('%', #{dictLabel}), '%')</if>
             <if test="dictType != null and dictType != ''"> and sdd.dict_type = #{dictType}</if>
         </where>
-        order by dict_sort
+        order by dict_sort, dict_code
     </select>
 
 </mapper>

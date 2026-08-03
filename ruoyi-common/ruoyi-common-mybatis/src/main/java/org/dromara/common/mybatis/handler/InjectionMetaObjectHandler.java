@@ -28,6 +28,11 @@ import java.util.Objects;
 public class InjectionMetaObjectHandler implements MetaObjectHandler {
 
     /**
+     * 如果用户不存在默认注入-1代表无用户
+     */
+    private static final Long DEFAULT_USER_ID = -1L;
+
+    /**
      * 插入填充方法，用于在插入数据时自动填充实体对象中的创建时间、更新时间、创建人、更新人等信息
      *
      * @param metaObject 元对象，用于获取原始对象并进行填充
@@ -110,7 +115,7 @@ public class InjectionMetaObjectHandler implements MetaObjectHandler {
      * @return
      */
     private Long getLoginId() {
-        return SaSecurityContext.getContextOptional().map(BaseUser::getUserId).orElse(null);
+        return SaSecurityContext.getContextOptional().map(BaseUser::getUserId).orElse(DEFAULT_USER_ID);
     }
 
     /**

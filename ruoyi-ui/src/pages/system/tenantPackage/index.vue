@@ -304,13 +304,6 @@ const pagination = computed(() => {
   };
 });
 
-/** 查询菜单树结构 */
-function getMenuTreeSelect() {
-  menuTreeSelect().then((response) => {
-    menuOptions.value = response.data;
-  });
-}
-
 /** 根据租户套餐ID查询菜单树结构 */
 function getPackageMenuTreeSelect(packageId: number) {
   return tenantPackageMenuTreeSelect(packageId).then((response) => {
@@ -389,11 +382,11 @@ function handleStatusChange(row: SysTenantPackageVo) {
 }
 
 /** 新增按钮操作 */
-function handleAdd() {
+async function handleAdd() {
   reset();
   open.value = true;
   title.value = '添加租户套餐';
-  getMenuTreeSelect();
+  await getPackageMenuTreeSelect(0);
 }
 
 /** 详情按钮操作 */
