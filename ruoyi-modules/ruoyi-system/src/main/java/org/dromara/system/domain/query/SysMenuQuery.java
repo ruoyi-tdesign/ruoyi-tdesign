@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.dromara.common.mybatis.core.domain.BaseEntity;
 
+import java.util.List;
+
 /**
  * 菜单权限查询对象 sys_menu
  *
@@ -43,6 +45,11 @@ public class SysMenuQuery extends BaseEntity {
      * 菜单类型（M目录 C菜单 F按钮）
      */
     private String menuType;
+
+    /**
+     * 菜单类型列表
+     */
+    private List<String> menuTypes;
 
     /**
      * 父菜单ID

@@ -6,6 +6,7 @@ CREATE TABLE `flow_definition`
     `id`              bigint          NOT NULL COMMENT '主键id',
     `flow_code`       varchar(40)     NOT NULL COMMENT '流程编码',
     `flow_name`       varchar(100)    NOT NULL COMMENT '流程名称',
+    `model_value`     varchar(40)     NOT NULL DEFAULT 'CLASSICS' COMMENT '设计器模型（CLASSICS经典模型 MIMIC仿钉钉模型）',
     `category`        varchar(100)             DEFAULT NULL COMMENT '流程类别',
     `version`         varchar(20)     NOT NULL COMMENT '流程版本',
     `is_publish`      tinyint(1)      NOT NULL DEFAULT '0' COMMENT '是否发布（0未发布 1已发布 9失效）',
@@ -119,7 +120,7 @@ CREATE TABLE `flow_his_task`
     `target_node_name` varchar(200)                 DEFAULT NULL COMMENT '结束节点名称',
     `approver`         varchar(40)                  DEFAULT NULL COMMENT '审批者',
     `cooperate_type`   tinyint(1)                   NOT NULL DEFAULT '0' COMMENT '协作方式(1审批 2转办 3委派 4会签 5票签 6加签 7减签)',
-    `collaborator`     varchar(40)                  DEFAULT NULL COMMENT '协作人',
+    `collaborator`     varchar(500)                 DEFAULT NULL COMMENT '协作人',
     `skip_type`        varchar(10)                  NOT NULL COMMENT '流转类型（PASS通过 REJECT退回 NONE无动作）',
     `flow_status`      varchar(20)                  NOT NULL COMMENT '流程状态（0待提交 1审批中 2审批通过 4终止 5作废 6撤销 8已完成 9已退回 10失效 11拿回）',
     `form_custom`      char(1)                      DEFAULT 'N' COMMENT '审批表单是否自定义（Y是 N否）',
@@ -183,12 +184,58 @@ INSERT INTO flow_category values (108, '000000', 102, '0,100,102', '转正', 1, 
 INSERT INTO flow_category values (109, '000000', 102, '0,100,102', '离职', 2, '0', 103, 1, sysdate(), null, null);
 
 -- ----------------------------
+-- 流程spel表达式定义表
+-- ----------------------------
+
+CREATE TABLE flow_spel (
+    id bigint(20) NOT NULL COMMENT '主键id',
+    component_name varchar(255) DEFAULT NULL COMMENT '组件名称',
+    method_name varchar(255) DEFAULT NULL COMMENT '方法名',
+    method_params varchar(255) DEFAULT NULL COMMENT '参数',
+    view_spel varchar(255) DEFAULT NULL COMMENT '预览spel表达式',
+    remark varchar(255) DEFAULT NULL COMMENT '备注',
+    status char(1) DEFAULT '0' COMMENT '状态（1正常 0停用）',
+    del_flag char(1) DEFAULT '0' COMMENT '删除标志',
+    create_dept bigint(20) DEFAULT NULL COMMENT '创建部门',
+    create_by bigint(20) DEFAULT NULL COMMENT '创建者',
+    create_time datetime DEFAULT NULL COMMENT '创建时间',
+    update_by bigint(20) DEFAULT NULL COMMENT '更新者',
+    update_time datetime DEFAULT NULL COMMENT '更新时间',
+    PRIMARY KEY (id)
+) ENGINE = InnoDB COMMENT='流程spel表达式定义表';
+
+INSERT INTO flow_spel VALUES (1, 'spelRuleComponent', 'selectDeptLeaderById', 'initiatorDeptId', '#{@spelRuleComponent.selectDeptLeaderById(#initiatorDeptId)}', '根据部门id获取部门负责人', '1', '0', 103, 1, sysdate(), 1, sysdate());
+INSERT INTO flow_spel VALUES (2, NULL, NULL, 'initiator', '${initiator}', '流程发起人', '1', '0', 103, 1, sysdate(), 1, sysdate());
+
+-- ----------------------------
+-- 流程实例业务扩展表
+-- ----------------------------
+
+create table flow_instance_biz_ext (
+    id             bigint                       not null comment '主键id',
+    tenant_id      varchar(20) default '000000' null comment '租户编号',
+    create_dept    bigint                       null comment '创建部门',
+    create_by      bigint                       null comment '创建者',
+    create_time    datetime                     null comment '创建时间',
+    update_by      bigint                       null comment '更新者',
+    update_time    datetime                     null comment '更新时间',
+    business_code  varchar(255)                 null comment '业务编码',
+    business_title varchar(1000)                null comment '业务标题',
+    del_flag       char        default '0'      null comment '删除标志（0代表存在 1代表删除）',
+    instance_id    bigint                       null comment '流程实例Id',
+    business_id    varchar(255)                 null comment '业务Id',
+    PRIMARY KEY (id)
+)  ENGINE = InnoDB COMMENT '流程实例业务扩展表';
+
+-- ----------------------------
 -- 请假单信息
 -- ----------------------------
+
 create table test_leave
 (
     id          bigint(20)   not null comment 'id',
-    tenant_id   varchar(20) default '000000' comment '租户编号',
+    tenant_id   varchar(20)  default '000000' comment '租户编号',
+    apply_code  varchar(50)  not null comment '申请编号',
     leave_type  varchar(255) not null comment '请假类型',
     start_date  datetime     not null comment '开始时间',
     end_date    datetime     not null comment '结束时间',
@@ -210,23 +257,32 @@ insert into sys_menu values ('11632', '我的已办', '11618', '3', 'taskFinish'
 insert into sys_menu values ('11633', '我的抄送', '11618', '4', 'taskCopyList', 'workflow/task/taskCopyList', '', '', '0', '0', 'C', '1', '1', '', 'user-arrow-left', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11620', '流程定义', '11616', '3', 'processDefinition', 'workflow/processDefinition/index', '', '', '0', '0', 'C', '1', '1', '', 'system-components', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11621', '流程实例', '11630', '1', 'processInstance', 'workflow/processInstance/index', '', '', '0', '0', 'C', '1', '1', '', 'tree-round-dot', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11801', '流程表达式', '11616', '2', 'spel',    'workflow/spel/index', '', '', '0', '1', 'C', '1', '1', 'workflow:spel:list', 'input', null, null, 103, 1, sysdate(), 1, sysdate(), '流程达式定义菜单');
 insert into sys_menu values ('11622', '流程分类', '11616', '1', 'category', 'workflow/category/index', '', '', '0', '1', 'C', '1', '1', 'workflow:category:list', 'app', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11629', '我发起的', '11618', '1', 'myDocument', 'workflow/task/myDocument', '', '', '0', '0', 'C', '1', '1', '', 'send', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11630', '流程监控', '11616', '4', 'monitor', '', '', '', '0', '1', 'M', '1', '1', '', 'chart-analytics', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11631', '待办任务', '11630', '2', 'allTaskWaiting', 'workflow/task/allTaskWaiting', '', '', '0', '0', 'C', '1', '1', '', 'task-visible', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu values ('11700', '流程设计', '11616', '5', 'design/index',   'workflow/processDefinition/design', '', '', '0', '1', 'C', '0', '1', 'workflow:leave:edit', '#', null, null, 103, 1, sysdate(), null, null, '/workflow/processDefinition');
+insert into sys_menu values ('11701', '请假申请', '11616', '6', 'leaveEdit/index', 'workflow/leave/leaveEdit', '', '', '0', '1', 'C', '0', '1', 'workflow:leave:edit', '#', null, null, 103, 1, sysdate(), null, null, '');
 -- 流程分类管理相关按钮
 insert into sys_menu values ('11623', '流程分类查询', '11622', '1', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:query', '#', null, null, 103, 1,sysdate(), null, null, '');
 insert into sys_menu values ('11624', '流程分类新增', '11622', '2', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:add', '#', null, null, 103, 1,sysdate(), null, null, '');
 insert into sys_menu values ('11625', '流程分类修改', '11622', '3', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:edit', '#', null, null, 103, 1,sysdate(), null, null, '');
 insert into sys_menu values ('11626', '流程分类删除', '11622', '4', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:remove', '#', null, null, 103,1, sysdate(), null, null, '');
 insert into sys_menu values ('11627', '流程分类导出', '11622', '5', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:export', '#', null, null, 103,1, sysdate(), null, null, '');
+-- 流程表达式管理相关按钮
+INSERT INTO sys_menu VALUES ('11802', '流程达式定义查询', '11801', 1, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11803', '流程达式定义新增', '11801', 2, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11804', '流程达式定义修改', '11801', 3, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11805', '流程达式定义删除', '11801', 4, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:remove', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11806', '流程达式定义导出', '11801', 5, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:export', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
 -- 请假测试相关按钮
-insert into sys_menu VALUES (11638, '请假申请',    11618,    1, 'leave', 'workflow/leave/index', '', '', '0', '1', 'C', '1', '1', 'workflow:leave:list', '#', null, null, 103, 1, sysdate(), NULL, NULL, '请假申请菜单');
-insert into sys_menu VALUES (11639, '请假申请查询', 11638, 1, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu VALUES (11640, '请假申请新增', 11638, 2, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu VALUES (11641, '请假申请修改', 11638, 3, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu VALUES (11642, '请假申请删除', 11638, 4, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:remove', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu VALUES (11643, '请假申请导出', 11638, 5, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:export', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES ('11638', '请假申请',    '11618',    1, 'leave', 'workflow/leave/index', '', '', '0', '1', 'C', '1', '1', 'workflow:leave:list', '#', null, null, 103, 1, sysdate(), NULL, NULL, '请假申请菜单');
+insert into sys_menu VALUES ('11639', '请假申请查询', '11638', 1, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES ('11640', '请假申请新增', '11638', 2, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES ('11641', '请假申请修改', '11638', 3, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES ('11642', '请假申请删除', '11638', 4, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:remove', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+insert into sys_menu VALUES ('11643', '请假申请导出', '11638', 5, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:export', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
 
 INSERT INTO sys_dict_type VALUES (18, '000000', '业务状态', 'wf_business_status', 103, 1, sysdate(), NULL, NULL, '业务状态列表');
 INSERT INTO sys_dict_type VALUES (19, '000000', '表单类型', 'wf_form_type', 103, 1, sysdate(), NULL, NULL, '表单类型列表');

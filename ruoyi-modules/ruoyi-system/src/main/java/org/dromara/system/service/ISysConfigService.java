@@ -17,7 +17,7 @@ import java.util.Map;
 public interface ISysConfigService extends IService<SysConfig> {
 
     /**
-     * 获取参数配置列表
+     * 分页查询参数配置列表
      *
      * @param config 参数配置
      * @return 参数配置结果

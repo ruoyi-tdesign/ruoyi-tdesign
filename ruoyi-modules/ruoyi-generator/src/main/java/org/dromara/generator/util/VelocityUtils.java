@@ -7,13 +7,19 @@ import lombok.NoArgsConstructor;
 import org.apache.velocity.VelocityContext;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.mybatis.enums.DataBaseType;
 import org.dromara.common.mybatis.helper.DataBaseHelper;
 import org.dromara.generator.constant.GenConstants;
 import org.dromara.generator.domain.GenTableColumn;
 import org.dromara.generator.domain.vo.GenTableOptions;
 import org.dromara.generator.domain.vo.GenTableVo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * 模板处理工具类
@@ -137,11 +143,12 @@ public class VelocityUtils {
             }
         }
         if (options.getIsUseSql()) {
-            if (DataBaseHelper.isOracle()) {
+            DataBaseType dataBaseType = DataBaseHelper.getDataBaseType();
+            if (dataBaseType.isOracle()) {
                 templates.add("vm/sql/oracle/sql.vm");
-            } else if (DataBaseHelper.isPostgerSql()) {
+            } else if (dataBaseType.isPostgreSql()) {
                 templates.add("vm/sql/postgres/sql.vm");
-            } else if (DataBaseHelper.isSqlServer()) {
+            } else if (dataBaseType.isSqlServer()) {
                 templates.add("vm/sql/sqlserver/sql.vm");
             } else {
                 templates.add("vm/sql/sql.vm");

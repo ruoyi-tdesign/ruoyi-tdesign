@@ -76,5 +76,10 @@ public interface Constants {
      * 根路径
      */
     String ROOT_PATH = "/";
+
+    /**
+     * 加密头
+     */
+    String ENCRYPT_HEADER = "ENC_";
 }
 

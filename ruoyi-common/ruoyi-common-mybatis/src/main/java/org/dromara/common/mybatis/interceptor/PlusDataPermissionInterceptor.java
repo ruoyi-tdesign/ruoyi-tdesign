@@ -35,17 +35,9 @@ import java.util.List;
 @Slf4j
 public class PlusDataPermissionInterceptor extends BaseMultiTableInnerInterceptor implements InnerInterceptor {
 
-    private final PlusDataPermissionHandler dataPermissionHandler;
     private static final String SUFFIX = "_COUNT";
 
-    /**
-     * 构造函数，初始化 PlusDataPermissionHandler 实例
-     *
-     * @param mapperPackage 扫描的映射器包
-     */
-    public PlusDataPermissionInterceptor(String mapperPackage) {
-        this.dataPermissionHandler = new PlusDataPermissionHandler(mapperPackage);
-    }
+    private final PlusDataPermissionHandler dataPermissionHandler = new PlusDataPermissionHandler();
 
     /**
      * 在执行查询之前，检查并处理数据权限相关逻辑
@@ -69,7 +61,7 @@ public class PlusDataPermissionInterceptor extends BaseMultiTableInnerIntercepto
             return;
         }
         // 检查是否缺少有效的数据权限注解
-        if (dataPermissionHandler.invalid(effectiveMsId)) {
+        if (dataPermissionHandler.invalid()) {
             return;
         }
         log.debug("[数据权限拦截器] - ID: {}", ms.getId());
@@ -98,7 +90,7 @@ public class PlusDataPermissionInterceptor extends BaseMultiTableInnerIntercepto
                 return;
             }
             // 检查是否缺少有效的数据权限注解
-            if (dataPermissionHandler.invalid(ms.getId())) {
+            if (dataPermissionHandler.invalid()) {
                 return;
             }
             PluginUtils.MPBoundSql mpBs = mpSh.mPBoundSql();
@@ -134,7 +126,7 @@ public class PlusDataPermissionInterceptor extends BaseMultiTableInnerIntercepto
      */
     @Override
     protected void processUpdate(Update update, int index, String sql, Object obj) {
-        Expression sqlSegment = dataPermissionHandler.getSqlSegment(update.getWhere(), (String) obj, false);
+        Expression sqlSegment = dataPermissionHandler.getSqlSegment(update.getWhere(), false);
         if (null != sqlSegment) {
             update.setWhere(sqlSegment);
         }
@@ -150,7 +142,7 @@ public class PlusDataPermissionInterceptor extends BaseMultiTableInnerIntercepto
      */
     @Override
     protected void processDelete(Delete delete, int index, String sql, Object obj) {
-        Expression sqlSegment = dataPermissionHandler.getSqlSegment(delete.getWhere(), (String) obj, false);
+        Expression sqlSegment = dataPermissionHandler.getSqlSegment(delete.getWhere(), false);
         if (null != sqlSegment) {
             delete.setWhere(sqlSegment);
         }
@@ -163,7 +155,7 @@ public class PlusDataPermissionInterceptor extends BaseMultiTableInnerIntercepto
      * @param mappedStatementId 映射语句的 ID
      */
     protected void setWhere(PlainSelect plainSelect, String mappedStatementId) {
-        Expression sqlSegment = dataPermissionHandler.getSqlSegment(plainSelect.getWhere(), mappedStatementId, true);
+        Expression sqlSegment = dataPermissionHandler.getSqlSegment(plainSelect.getWhere(), true);
         if (null != sqlSegment) {
             plainSelect.setWhere(sqlSegment);
         }

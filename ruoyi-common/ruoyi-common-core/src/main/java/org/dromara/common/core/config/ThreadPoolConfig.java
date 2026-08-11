@@ -7,11 +7,9 @@ import org.dromara.common.core.config.properties.ThreadPoolProperties;
 import org.dromara.common.core.utils.Threads;
 import org.dromara.common.core.utils.spring.SpringUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -33,18 +31,6 @@ public class ThreadPoolConfig {
     private final int core = Runtime.getRuntime().availableProcessors() + 1;
 
     private ScheduledExecutorService scheduledExecutorService;
-
-    @Bean(name = "threadPoolTaskExecutor")
-    @ConditionalOnProperty(prefix = "thread-pool", name = "enabled", havingValue = "true")
-    public ThreadPoolTaskExecutor threadPoolTaskExecutor(ThreadPoolProperties threadPoolProperties) {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(core);
-        executor.setMaxPoolSize(core * 2);
-        executor.setQueueCapacity(threadPoolProperties.getQueueCapacity());
-        executor.setKeepAliveSeconds(threadPoolProperties.getKeepAliveSeconds());
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        return executor;
-    }
 
     /**
      * 执行周期性或定时任务

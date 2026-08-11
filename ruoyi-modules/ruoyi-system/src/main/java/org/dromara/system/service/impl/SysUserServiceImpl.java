@@ -24,14 +24,10 @@ import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.system.domain.SysDept;
-import org.dromara.system.domain.SysPost;
-import org.dromara.system.domain.SysRole;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.SysUserRole;
 import org.dromara.system.domain.bo.SysUserBo;
-import org.dromara.system.domain.query.SysRoleQuery;
 import org.dromara.system.domain.query.SysUserQuery;
 import org.dromara.system.domain.vo.SysPostVo;
 import org.dromara.system.domain.vo.SysRoleVo;
@@ -43,7 +39,6 @@ import org.dromara.system.mapper.SysRoleMapper;
 import org.dromara.system.mapper.SysUserMapper;
 import org.dromara.system.mapper.SysUserPostMapper;
 import org.dromara.system.mapper.SysUserRoleMapper;
-import org.dromara.system.service.ISysDeptService;
 import org.dromara.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -57,7 +52,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 用户 业务层处理
@@ -68,8 +62,6 @@ import java.util.stream.Collectors;
 @Service
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService, UserService {
 
-    @Autowired
-    private ISysDeptService deptService;
     @Autowired
     private SysRoleMapper roleMapper;
     @Autowired
@@ -106,10 +98,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     private void setDeptIds(SysUserQuery user) {
         if (user.getDeptId() != null) {
-            List<SysDept> deptList = deptMapper.selectListByParentId(user.getDeptId());
-            List<Long> ids = StreamUtils.toList(deptList, SysDept::getDeptId);
-            ids.add(user.getDeptId());
-            user.setDeptIds(ids.toArray(Long[]::new));
+            List<Long> deptIds = deptMapper.selectDeptAndChildById(user.getDeptId());
+            user.setDeptIds(deptIds);
         }
     }
 
@@ -360,7 +350,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         // 防止错误更新后导致的数据误删除
         int flag = baseMapper.updateById(sysUser);
         if (flag < 1) {
-            throw new ServiceException("修改用户" + user.getUserName() + "信息失败");
+            throw new ServiceException("修改用户{}信息失败", user.getUserName());
         }
         return flag;
     }
@@ -457,14 +447,22 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @param clear 清除已存在的关联数据
      */
     private void insertUserPost(SysUserBo user, boolean clear) {
-        Long[] posts = user.getPostIds();
+        Long[] postIdArr = user.getPostIds();
+        List<Long> postIds = Arrays.asList(postIdArr);
+
+        // 校验是否有权限操作这些岗位（含数据权限控制）
+        if (postMapper.selectPostCount(postIds) != postIds.size()) {
+            throw new ServiceException("没有权限访问岗位的数据");
+        }
+
+        // 是否清除旧的用户岗位绑定
         if (clear) {
-            // 删除用户与岗位关联
             userPostMapper.delete(new LambdaQueryWrapper<SysUserPost>().eq(SysUserPost::getUserId, user.getUserId()));
         }
-        if (ArrayUtil.isNotEmpty(posts)) {
+        // 构建用户岗位关联列表并批量插入
+        if (ArrayUtil.isNotEmpty(postIdArr)) {
             // 新增用户与岗位管理
-            List<SysUserPost> list = StreamUtils.toList(List.of(posts), postId -> {
+            List<SysUserPost> list = StreamUtils.toList(List.of(postIdArr), postId -> {
                 SysUserPost up = new SysUserPost();
                 up.setUserId(user.getUserId());
                 up.setPostId(postId);
@@ -482,31 +480,35 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
      * @param clear   清除已存在的关联数据
      */
     private void insertUserRole(Long userId, Long[] roleIds, boolean clear) {
-        if (ArrayUtil.isNotEmpty(roleIds)) {
-            List<Long> roleList = new ArrayList<>(List.of(roleIds));
-            if (!LoginHelper.isSuperAdmin(userId)) {
-                roleList.remove(SystemConstants.SUPER_ADMIN_ID);
-            }
-            // 判断是否具有此角色的操作权限
-            SysRoleQuery query = new SysRoleQuery();
-            query.setRoleIds(roleList);
-            List<SysRoleVo> roles = roleMapper.queryList(query);
-            if (CollUtil.isEmpty(roles)) {
-                throw new ServiceException("没有权限访问角色的数据");
-            }
-            if (clear) {
-                // 删除用户与角色关联
-                userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
-            }
-            // 新增用户与角色管理
-            List<SysUserRole> list = StreamUtils.toList(roleList, roleId -> {
-                SysUserRole ur = new SysUserRole();
-                ur.setUserId(userId);
-                ur.setRoleId(roleId);
-                return ur;
-            });
-            userRoleMapper.insertBatch(list);
+        if (ArrayUtil.isEmpty(roleIds)) {
+            return;
         }
+
+        List<Long> roleList = new ArrayList<>(Arrays.asList(roleIds));
+
+        // 非超级管理员，禁止包含超级管理员角色
+        if (!LoginHelper.isSuperAdmin(userId)) {
+            roleList.remove(SystemConstants.SUPER_ADMIN_ID);
+        }
+
+        // 校验是否有权限访问这些角色（含数据权限控制）
+        if (roleMapper.selectRoleCount(roleList) != roleList.size()) {
+            throw new ServiceException("没有权限访问角色的数据");
+        }
+
+        // 是否清除原有绑定
+        if (clear) {
+            userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userId));
+        }
+
+        // 批量插入用户-角色关联
+        List<SysUserRole> list = StreamUtils.toList(roleList, roleId -> {
+            SysUserRole ur = new SysUserRole();
+            ur.setUserId(userId);
+            ur.setRoleId(roleId);
+            return ur;
+        });
+        userRoleMapper.insertBatch(list);
     }
 
     /**
@@ -621,7 +623,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 list.add(nickname);
             }
         }
-        return String.join(StringUtils.SEPARATOR, list);
+        return StringUtils.joinComma(list);
     }
 
     /**
@@ -760,69 +762,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyMap();
         }
-        return baseMapper.selectList(
-                new LambdaQueryWrapper<SysUser>()
-                    .select(SysUser::getUserId, SysUser::getNickName)
-                    .in(SysUser::getUserId, userIds)
-            ).stream()
-            .collect(Collectors.toMap(SysUser::getUserId, SysUser::getNickName));
-    }
-
-    /**
-     * 根据角色 ID 列表查询角色名称映射关系
-     *
-     * @param roleIds 角色 ID 列表
-     * @return Map，其中 key 为角色 ID，value 为对应的角色名称
-     */
-    @Override
-    public Map<Long, String> selectRoleNamesByIds(List<Long> roleIds) {
-        if (CollUtil.isEmpty(roleIds)) {
-            return Collections.emptyMap();
-        }
-        return roleMapper.selectList(
-                new LambdaQueryWrapper<SysRole>()
-                    .select(SysRole::getRoleId, SysRole::getRoleName)
-                    .in(SysRole::getRoleId, roleIds)
-            ).stream()
-            .collect(Collectors.toMap(SysRole::getRoleId, SysRole::getRoleName));
-    }
-
-    /**
-     * 根据部门 ID 列表查询部门名称映射关系
-     *
-     * @param deptIds 部门 ID 列表
-     * @return Map，其中 key 为部门 ID，value 为对应的部门名称
-     */
-    @Override
-    public Map<Long, String> selectDeptNamesByIds(List<Long> deptIds) {
-        if (CollUtil.isEmpty(deptIds)) {
-            return Collections.emptyMap();
-        }
-        return deptMapper.selectList(
-                new LambdaQueryWrapper<SysDept>()
-                    .select(SysDept::getDeptId, SysDept::getDeptName)
-                    .in(SysDept::getDeptId, deptIds)
-            ).stream()
-            .collect(Collectors.toMap(SysDept::getDeptId, SysDept::getDeptName));
-    }
-
-    /**
-     * 根据岗位 ID 列表查询岗位名称映射关系
-     *
-     * @param postIds 岗位 ID 列表
-     * @return Map，其中 key 为岗位 ID，value 为对应的岗位名称
-     */
-    @Override
-    public Map<Long, String> selectPostNamesByIds(List<Long> postIds) {
-        if (CollUtil.isEmpty(postIds)) {
-            return Collections.emptyMap();
-        }
-        return postMapper.selectList(
-                new LambdaQueryWrapper<SysPost>()
-                    .select(SysPost::getPostId, SysPost::getPostName)
-                    .in(SysPost::getPostId, postIds)
-            ).stream()
-            .collect(Collectors.toMap(SysPost::getPostId, SysPost::getPostName));
+        List<SysUser> list = baseMapper.selectList(
+            new LambdaQueryWrapper<SysUser>()
+                .select(SysUser::getUserId, SysUser::getNickName)
+                .in(SysUser::getUserId, userIds)
+        );
+        return StreamUtils.toMap(list, SysUser::getUserId, SysUser::getNickName);
     }
 
 }

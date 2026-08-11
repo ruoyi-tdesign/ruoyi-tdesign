@@ -13,7 +13,6 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.SortQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.system.domain.SysDept;
 import org.dromara.system.domain.SysPost;
 import org.dromara.system.domain.SysUserPost;
 import org.dromara.system.domain.bo.SysPostBo;
@@ -26,8 +25,9 @@ import org.dromara.system.service.ISysPostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 岗位信息 服务层处理
@@ -42,6 +42,12 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     @Autowired
     private SysUserPostMapper userPostMapper;
 
+    /**
+     * 分页查询岗位列表
+     *
+     * @param query 查询条件
+     * @return 岗位分页列表
+     */
     @Override
     public TableDataInfo<SysPostVo> selectPagePostList(SysPostQuery query) {
         buildQuery(query);
@@ -63,9 +69,7 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     private void buildQuery(SysPostQuery query) {
         if (ObjectUtil.isNull(query.getDeptId()) && ObjectUtil.isNotNull(query.getBelongDeptId())) {
             //部门树搜索
-            List<SysDept> deptList = deptMapper.selectListByParentId(query.getBelongDeptId());
-            List<Long> deptIds = StreamUtils.toList(deptList, SysDept::getDeptId);
-            deptIds.add(query.getBelongDeptId());
+            List<Long> deptIds = deptMapper.selectDeptAndChildById(query.getBelongDeptId());
             query.setDeptIds(deptIds);
         }
     }
@@ -197,14 +201,14 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
      * @return 结果
      */
     @Override
-    public int deletePostByIds(Long[] postIds) {
-        for (Long postId : postIds) {
-            SysPost post = baseMapper.selectById(postId);
-            if (countUserPostById(postId) > 0) {
-                throw new ServiceException(String.format("%1$s已分配，不能删除!", post.getPostName()));
+    public int deletePostByIds(List<Long> postIds) {
+        List<SysPost> list = baseMapper.selectByIds(postIds);
+        for (SysPost post : list) {
+            if (this.countUserPostById(post.getPostId()) > 0) {
+                throw new ServiceException("{}已分配，不能删除!", post.getPostName());
             }
         }
-        return baseMapper.deleteByIds(Arrays.asList(postIds));
+        return baseMapper.deleteByIds(postIds);
     }
 
     /**
@@ -229,6 +233,25 @@ public class SysPostServiceImpl extends ServiceImpl<SysPostMapper, SysPost> impl
     public int updatePost(SysPostBo bo) {
         SysPost post = MapstructUtils.convert(bo, SysPost.class);
         return baseMapper.updateById(post);
+    }
+
+    /**
+     * 根据岗位 ID 列表查询岗位名称映射关系
+     *
+     * @param postIds 岗位 ID 列表
+     * @return Map，其中 key 为岗位 ID，value 为对应的岗位名称
+     */
+    @Override
+    public Map<Long, String> selectPostNamesByIds(List<Long> postIds) {
+        if (CollUtil.isEmpty(postIds)) {
+            return Collections.emptyMap();
+        }
+        List<SysPost> list = baseMapper.selectList(
+            new LambdaQueryWrapper<SysPost>()
+                .select(SysPost::getPostId, SysPost::getPostName)
+                .in(SysPost::getPostId, postIds)
+        );
+        return StreamUtils.toMap(list, SysPost::getPostId, SysPost::getPostName);
     }
 
 }

@@ -57,6 +57,13 @@ spring:
     # 开启虚拟线程 仅jdk21可用
     virtual:
       enabled: false
+  task:
+    execution:
+      # 从 springboot 3.5 开始 spring自带线程池
+      # 不再需要 AsyncConfig与ThreadPoolConfig 可直接注入线程池使用
+      thread-name-prefix: async-
+      # 由spring自己初始化线程池
+      mode: force
   main:
     allow-circular-references: true
   # 资源信息
@@ -182,6 +189,7 @@ tenant:
     - sys_oss_category
     - sys_oss_config
     - sys_oss_rule
+    - flow_spel
     - sys_dict_data
     - sys_dict_type
     - sys_sensitive_word
@@ -205,6 +213,7 @@ mybatis-plus:
       # AUTO 自增 NONE 空 INPUT 用户输入 ASSIGN_ID 雪花 ASSIGN_UUID 唯一 UUID
       # 如需改为自增 需要将数据库表全部设置为自增
       idType: ASSIGN_ID
+      table-format:
 
 # 数据加密
 mybatis-encryptor:
@@ -251,13 +260,6 @@ springdoc:
       name: YiXia
       email: ruoyi_tdesign@163.com
       url: https://gitee.com/yixiacoco/ruoyi-tdesign
-  components:
-    # 鉴权方式配置
-    security-schemes:
-      apiKey:
-        type: APIKEY
-        in: HEADER
-        name: ${sa-token.multiple.login.token-name}
   #这里定义了两个分组，可定义多个，也可以不定义
   group-configs:
     - group: 1.演示模块
@@ -275,22 +277,12 @@ springdoc:
 xss:
   # 过滤开关
   enabled: true
-  # 排除链接（多个用逗号分隔）
+  # 排除链接
   excludeUrls:
     - /system/notice
     - /system/config/**
     - /system/messageTemplate
     - /system/messageConfig
-
-# 全局线程池相关配置
-# 如使用JDK21请直接使用虚拟线程 不要开启此配置
-thread-pool:
-  # 是否开启线程池
-  enabled: false
-  # 队列最大长度
-  queueCapacity: 128
-  # 线程池维护线程所允许的空闲时间
-  keepAliveSeconds: 300
 
 --- # 分布式锁 lock4j 全局配置
 lock4j:
@@ -337,13 +329,9 @@ warm-flow:
   enabled: true
   # 是否开启设计器ui
   ui: true
+  # 是否显示流程图顶部文字
+  top-text-show: true
+  # 是否渲染节点悬浮提示，默认true
+  node-tooltip: true
   # 默认Authorization，如果有多个token，用逗号分隔
   token-name: ${sa-token.multiple.login.token-name},clientid
-  # 流程状态对应的三元色
-  chart-status-color:
-    ## 未办理
-    - 62,62,62
-    ## 待办理
-    - 255,205,23
-    ## 已办理
-    - 157,255,0

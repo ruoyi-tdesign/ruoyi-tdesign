@@ -25,7 +25,7 @@ public interface ISysOperLogService extends IService<SysOperLog> {
     SysOperLogVo queryById(Long operId);
 
     /**
-     * 查询操作日志记录列表
+     * 分页查询操作日志列表
      *
      * @param query 查询对象
      * @return SysOperLogVo

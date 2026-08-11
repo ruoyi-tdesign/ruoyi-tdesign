@@ -10,6 +10,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -92,6 +93,7 @@ public class SysDictDataController extends BaseController {
      */
     @SaCheckPermission("system:dict:add")
     @Log(title = "字典数据", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysDictDataBo dict) {
         if (!dictDataService.checkDictDataUnique(dict)) {
@@ -106,6 +108,7 @@ public class SysDictDataController extends BaseController {
      */
     @SaCheckPermission("system:dict:edit")
     @Log(title = "字典数据", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysDictDataBo dict) {
         if (!dictDataService.checkDictDataUnique(dict)) {

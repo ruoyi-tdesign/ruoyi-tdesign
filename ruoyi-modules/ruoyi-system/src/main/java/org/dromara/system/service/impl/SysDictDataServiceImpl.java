@@ -30,20 +30,27 @@ import java.util.List;
 @Service
 public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDictData> implements ISysDictDataService {
 
+    /**
+     * 分页查询字典数据列表
+     *
+     * @param query  查询条件
+     * @param pageQuery 分页参数
+     * @return 字典数据分页列表
+     */
     @Override
-    public TableDataInfo<SysDictDataVo> selectPageDictDataList(SysDictDataQuery dictData) {
-        return PageQuery.of(() -> baseMapper.queryList(dictData));
+    public TableDataInfo<SysDictDataVo> selectPageDictDataList(SysDictDataQuery query) {
+        return PageQuery.of(() -> baseMapper.queryList(query));
     }
 
     /**
      * 根据条件分页查询字典数据
      *
-     * @param dictData 字典数据信息
+     * @param query 字典数据信息
      * @return 字典数据集合信息
      */
     @Override
-    public List<SysDictDataVo> selectDictDataList(SysDictDataQuery dictData) {
-        return baseMapper.queryList(dictData);
+    public List<SysDictDataVo> selectDictDataList(SysDictDataQuery query) {
+        return baseMapper.queryList(query);
     }
 
     /**
@@ -123,15 +130,15 @@ public class SysDictDataServiceImpl extends ServiceImpl<SysDictDataMapper, SysDi
     /**
      * 校验字典键值是否唯一
      *
-     * @param dict 字典数据
+     * @param bo 字典数据
      * @return 结果
      */
     @Override
-    public boolean checkDictDataUnique(SysDictDataBo dict) {
+    public boolean checkDictDataUnique(SysDictDataBo bo) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDictData>()
-            .eq(SysDictData::getDictType, dict.getDictType())
-            .eq(SysDictData::getDictValue, dict.getDictValue())
-            .ne(ObjectUtil.isNotNull(dict.getDictCode()), SysDictData::getDictCode, dict.getDictCode()));
+            .eq(SysDictData::getDictType, bo.getDictType())
+            .eq(SysDictData::getDictValue, bo.getDictValue())
+            .ne(ObjectUtil.isNotNull(bo.getDictCode()), SysDictData::getDictCode, bo.getDictCode()));
         return !exist;
     }
 

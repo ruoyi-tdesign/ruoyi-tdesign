@@ -17,20 +17,20 @@ import java.util.List;
 public interface ISysDictDataService extends IService<SysDictData> {
 
     /**
-     * 查询字典数据列表
+     * 分页查询字典数据列表
      *
-     * @param dictData 字典数据信息
+     * @param query 查询条件
      * @return 字典数据集合信息
      */
-    TableDataInfo<SysDictDataVo> selectPageDictDataList(SysDictDataQuery dictData);
+    TableDataInfo<SysDictDataVo> selectPageDictDataList(SysDictDataQuery query);
 
     /**
      * 根据条件查询字典数据
      *
-     * @param dictData 字典数据信息
+     * @param query 查询条件
      * @return 字典数据集合信息
      */
-    List<SysDictDataVo> selectDictDataList(SysDictDataQuery dictData);
+    List<SysDictDataVo> selectDictDataList(SysDictDataQuery query);
 
     /**
      * 根据字典类型和字典键值查询字典数据信息
@@ -75,9 +75,9 @@ public interface ISysDictDataService extends IService<SysDictData> {
     /**
      * 校验字典键值是否唯一
      *
-     * @param dict 字典数据
+     * @param bo 字典数据信息
      * @return 结果
      */
-    boolean checkDictDataUnique(SysDictDataBo dict);
+    boolean checkDictDataUnique(SysDictDataBo bo);
 
 }

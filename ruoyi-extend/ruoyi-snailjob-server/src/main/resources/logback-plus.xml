@@ -86,6 +86,7 @@
     <!-- 控制台输出日志级别 -->
     <root level="info">
         <appender-ref ref="console" />
+        <appender-ref ref="file_console" />
         <appender-ref ref="async_info" />
         <appender-ref ref="async_error" />
         <appender-ref ref="snail_log_server_appender" />

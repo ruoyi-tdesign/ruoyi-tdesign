@@ -95,4 +95,16 @@ public class MetaVo implements Serializable {
         }
     }
 
+    public MetaVo(String title, String icon, Boolean noCache, String link, String activeMenu) {
+        this.title = title;
+        this.icon = icon;
+        this.noCache = noCache;
+        if (StringUtils.ishttp(link)) {
+            this.link = link;
+        }
+        if (StringUtils.startWithAnyIgnoreCase(activeMenu, "/")) {
+            this.activeMenu = activeMenu;
+        }
+    }
+
 }

@@ -54,7 +54,7 @@ public class SysUserQuery extends BasePageQuery {
     /**
      * 部门组
      */
-    private Long[] deptIds;
+    private List<Long> deptIds;
 
     /**
      * 数据权限 当前角色ID

@@ -1,6 +1,7 @@
 package org.dromara.system.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.dromara.common.mybatis.annotation.DataColumn;
@@ -35,12 +36,43 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
     }
 
     /**
-     * 查询用户所属岗位组
+     * 查询岗位列表
+     *
+     * @param queryWrapper 查询条件
+     * @return 岗位信息列表
+     */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "create_by")
+    })
+    default List<SysPostVo> selectPostList(Wrapper<SysPost> queryWrapper) {
+        return this.selectVoList(queryWrapper);
+    }
+
+    /**
+     * 根据岗位ID集合查询岗位数量
+     *
+     * @param postIds 岗位ID列表
+     * @return 匹配的岗位数量
+     */
+    @DataPermission({
+        @DataColumn(key = "deptName", value = "dept_id"),
+        @DataColumn(key = "userName", value = "create_by")
+    })
+    default long selectPostCount(List<Long> postIds) {
+        return this.selectCount(new LambdaQueryWrapper<SysPost>().in(SysPost::getPostId, postIds));
+    }
+
+    /**
+     * 根据用户ID查询其关联的岗位列表
      *
      * @param userId 用户ID
-     * @return 结果
+     * @return 岗位信息列表
      */
-    List<SysPostVo> selectPostsByUserId(@Param("userId") Long userId);
+    default List<SysPostVo> selectPostsByUserId(Long userId) {
+        return this.selectVoList(new LambdaQueryWrapper<SysPost>()
+            .inSql(SysPost::getPostId, "select post_id from sys_user_post where user_id = " + userId));
+    }
 
     /**
      * 查询岗位信息列表

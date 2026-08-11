@@ -27,6 +27,7 @@ import org.dromara.common.oss.factory.OssFactory;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.system.domain.SysOss;
 import org.dromara.system.domain.SysOssCategory;
+import org.dromara.system.domain.SysOssExt;
 import org.dromara.system.domain.bo.SysOssBo;
 import org.dromara.system.domain.query.SysOssQuery;
 import org.dromara.system.domain.vo.SysOssVo;
@@ -211,8 +212,11 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
         } catch (IOException e) {
             throw new ServiceException(e.getMessage());
         }
+        SysOssExt ext1 = new SysOssExt();
+        ext1.setFileSize(file.getSize());
+        ext1.setContentType(file.getContentType());
         // 保存文件信息
-        return buildResultEntity(originalFilename, suffix, file.getContentType(), storage.getConfigKey(), uploadResult, file.getSize(), bo);
+        return buildResultEntity(originalFilename, suffix, storage.getConfigKey(), uploadResult, bo, ext1);
     }
 
     /**
@@ -232,20 +236,23 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
         OssClient storage = OssFactory.instance();
         UploadResult uploadResult = storage.uploadSuffix(file, suffix);
         String mimeType = FileUtil.getMimeType(file.getAbsolutePath());
+        SysOssExt ext1 = new SysOssExt();
+        ext1.setFileSize(file.length());
+        ext1.setContentType(mimeType);
         // 保存文件信息
-        return buildResultEntity(originalFileName, suffix, mimeType, storage.getConfigKey(), uploadResult, file.length(), bo);
+        return buildResultEntity(originalFileName, suffix, storage.getConfigKey(), uploadResult, bo, ext1);
     }
 
     @NotNull
-    private SysOssVo buildResultEntity(String originalFilename, String suffix, String contentType, String service, UploadResult uploadResult, Long size, SysOssBo bo) {
+    private SysOssVo buildResultEntity(String originalFilename, String suffix, String service, UploadResult uploadResult, SysOssBo bo, SysOssExt ext1) {
         SysOss oss = new SysOss();
         oss.setUrl(uploadResult.getUrl());
         oss.setFileSuffix(suffix);
         oss.setFileName(uploadResult.getFilename());
         oss.setOriginalName(originalFilename);
         oss.setService(service);
-        oss.setSize(size);
-        oss.setContentType(contentType);
+        oss.setSize(ext1.getFileSize());
+        oss.setContentType(ext1.getContentType());
         oss.setUserType(bo.getUserTypeEnum().getUserType());
         oss.setCreateBy(bo.getCreateBy());
         oss.setIsLock(bo.getIsLock());

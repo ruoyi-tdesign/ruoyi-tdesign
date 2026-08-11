@@ -84,6 +84,7 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:add")
     @Log(title = "参数管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysConfigBo config) {
         if (!configService.checkConfigKeyUnique(config)) {
@@ -98,6 +99,7 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysConfigBo config) {
         if (!configService.checkConfigKeyUnique(config)) {
@@ -112,6 +114,7 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:edit")
     @Log(title = "参数管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping("/updateByKey")
     public R<Void> updateByKey(@Validated(EditGroup.class) @RequestBody SysConfigBo config) {
         configService.updateConfigs(config);

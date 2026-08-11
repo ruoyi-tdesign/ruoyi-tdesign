@@ -82,6 +82,7 @@ public interface WorkflowService {
      * completeTask.getVariables().put("ignore", true);
      *
      * @param completeTask 参数
+     * @return 结果
      */
     boolean completeTask(CompleteTaskDTO completeTask);
 
@@ -90,6 +91,15 @@ public interface WorkflowService {
      *
      * @param taskId  任务ID
      * @param message 办理意见
+     * @return 结果
      */
     boolean completeTask(Long taskId, String message);
+
+    /**
+     * 启动流程并办理第一个任务
+     *
+     * @param startProcess 参数
+     * @return 结果
+     */
+    boolean startCompleteTask(StartProcessDTO startProcess);
 }

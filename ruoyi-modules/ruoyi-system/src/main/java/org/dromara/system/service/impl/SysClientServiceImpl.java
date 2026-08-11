@@ -113,7 +113,7 @@ public class SysClientServiceImpl extends ServiceImpl<SysClientMapper, SysClient
     public Boolean updateByBo(SysClientBo bo) {
         checkRepeat(bo);
         SysClient update = MapstructUtils.convert(bo, SysClient.class);
-        update.setGrantType(String.join(",", bo.getGrantTypeList()));
+        update.setGrantType(StringUtils.joinComma(bo.getGrantTypeList()));
         return updateById(update);
     }
 

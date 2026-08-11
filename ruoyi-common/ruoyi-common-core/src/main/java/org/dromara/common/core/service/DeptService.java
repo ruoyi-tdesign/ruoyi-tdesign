@@ -3,6 +3,7 @@ package org.dromara.common.core.service;
 import org.dromara.common.core.domain.dto.DeptDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 通用 部门服务
@@ -33,5 +34,13 @@ public interface DeptService {
      * @return 部门列表
      */
     List<DeptDTO> selectDeptsByList();
+
+    /**
+     * 根据部门 ID 列表查询部门名称映射关系
+     *
+     * @param deptIds 部门 ID 列表
+     * @return Map，其中 key 为部门 ID，value 为对应的部门名称
+     */
+    Map<Long, String> selectDeptNamesByIds(List<Long> deptIds);
 
 }

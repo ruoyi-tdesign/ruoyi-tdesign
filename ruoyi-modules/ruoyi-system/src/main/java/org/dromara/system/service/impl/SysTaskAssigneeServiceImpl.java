@@ -59,7 +59,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         TableDataInfo<SysRoleVo> page = roleService.selectPageRoleList(query);
         // 使用封装的字段映射方法进行转换
         List<TaskAssigneeDTO.TaskHandler> handlers = TaskAssigneeDTO.convertToHandlerList(page.getRows(),
-            SysRoleVo::getRoleId, SysRoleVo::getRoleKey, SysRoleVo::getRoleName, null, SysRoleVo::getCreateTime);
+            item -> Convert.toStr(item.getRoleId()), SysRoleVo::getRoleKey, SysRoleVo::getRoleName, item -> "", SysRoleVo::getCreateTime);
         return new TaskAssigneeDTO(page.getTotal(), handlers);
     }
 
@@ -84,7 +84,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         TableDataInfo<SysPostVo> page = postService.selectPagePostList(query);
         // 使用封装的字段映射方法进行转换
         List<TaskAssigneeDTO.TaskHandler> handlers = TaskAssigneeDTO.convertToHandlerList(page.getRows(),
-            SysPostVo::getPostId, SysPostVo::getPostCategory, SysPostVo::getPostName, SysPostVo::getDeptId, SysPostVo::getCreateTime);
+            item -> Convert.toStr(item.getPostId()), SysPostVo::getPostCategory, SysPostVo::getPostName, item -> Convert.toStr(item.getDeptId()), SysPostVo::getCreateTime);
         return new TaskAssigneeDTO(page.getTotal(), handlers);
     }
 
@@ -109,7 +109,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         TableDataInfo<SysDeptVo> page = deptService.selectPageDeptList(query);
         // 使用封装的字段映射方法进行转换
         List<TaskAssigneeDTO.TaskHandler> handlers = TaskAssigneeDTO.convertToHandlerList(page.getRows(),
-            SysDeptVo::getDeptId, SysDeptVo::getDeptCategory, SysDeptVo::getDeptName, SysDeptVo::getParentId, SysDeptVo::getCreateTime);
+            item -> Convert.toStr(item.getDeptId()), SysDeptVo::getDeptCategory, SysDeptVo::getDeptName, item -> Convert.toStr(item.getParentId()), SysDeptVo::getCreateTime);
         return new TaskAssigneeDTO(page.getTotal(), handlers);
     }
 
@@ -134,7 +134,7 @@ public class SysTaskAssigneeServiceImpl implements TaskAssigneeService {
         TableDataInfo<SysUserVo> page = userService.selectPageUserList(query);
         // 使用封装的字段映射方法进行转换
         List<TaskAssigneeDTO.TaskHandler> handlers = TaskAssigneeDTO.convertToHandlerList(page.getRows(),
-            SysUserVo::getUserId, SysUserVo::getUserName, SysUserVo::getNickName, SysUserVo::getDeptId, SysUserVo::getCreateTime);
+            item -> Convert.toStr(item.getUserId()), SysUserVo::getUserName, SysUserVo::getNickName, item -> Convert.toStr(item.getDeptId()), SysUserVo::getCreateTime);
         return new TaskAssigneeDTO(page.getTotal(), handlers);
     }
 
