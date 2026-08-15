@@ -12,10 +12,10 @@ export const initSSE = (url: string) => {
   url = `${url}?Authorization=Bearer ${useUserStore().token}&clientid=${import.meta.env.VITE_CLIENT_ID}`;
   const { data, error, close } = useEventSource(url, [], {
     autoReconnect: {
-      retries: 10,
-      delay: 3000,
+      retries: 5,
+      delay: 5000,
       onFailed() {
-        console.log('Failed to connect after 10 retries');
+        console.log('Failed to connect after 5 retries');
       },
     },
   });

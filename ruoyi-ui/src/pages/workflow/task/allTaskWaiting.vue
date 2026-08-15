@@ -52,10 +52,20 @@
                 theme="primary"
                 variant="outline"
                 :disabled="multiple"
-                @click="handleUpdate"
+                @click="handleUserOpen()"
               >
                 <template #icon> <edit-icon /> </template>
                 修改办理人
+              </t-button>
+              <t-button
+                v-if="tab === 'waiting'"
+                theme="primary"
+                variant="outline"
+                :disabled="multiple"
+                @click="handleUrgeTaskOpen()"
+              >
+                <template #icon> <notification-icon /> </template>
+                催办
               </t-button>
               <span class="selected-count">已选 {{ ids.length }} 项</span>
             </t-col>
@@ -108,7 +118,7 @@
       </t-table>
     </t-space>
     <!-- 选人组件 -->
-    <user-select ref="userSelectRef" :multiple="false" @confirm-call-back="submitCallback"></user-select>
+    <user-select ref="userSelectRef" :multiple="userMultiple" @confirm-call-back="submitCallback"></user-select>
     <!-- 流程干预组件 -->
     <process-meddle ref="processMeddleRef" @submit-callback="getWaitingList"></process-meddle>
     <!-- 申请人 -->
@@ -118,21 +128,32 @@
       :data="selectUserIds"
       @confirm-call-back="userSelectCallBack"
     ></user-select>
+    <!-- 消息组件 -->
+    <message-type ref="messageTypeRef" @submit-callback="handleUserTask"></message-type>
   </t-card>
 </template>
 <script lang="ts" setup>
 defineOptions({
   name: 'AllTaskWaiting',
 });
-import { BrowseIcon, EditIcon, RefreshIcon, SearchIcon, Setting1Icon, SettingIcon } from 'tdesign-icons-vue-next';
+import {
+  BrowseIcon,
+  EditIcon,
+  NotificationIcon,
+  RefreshIcon,
+  SearchIcon,
+  Setting1Icon,
+  SettingIcon,
+} from 'tdesign-icons-vue-next';
 import type { FormInstanceFunctions, PageInfo, PrimaryTableCol, TabsProps } from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 
 import type { SysUserVo } from '@/api/system/model/userModel';
-import type { FlowHisTaskVo, FlowTaskVo, TaskQuery } from '@/api/workflow/model/taskModel';
+import type { FlowHisTaskVo, FlowTaskVo, FlowUrgeTaskBo, TaskQuery } from '@/api/workflow/model/taskModel';
 import type { RouterJumpVo } from '@/api/workflow/model/workflowCommonModel';
-import { pageByAllTaskFinish, pageByAllTaskWait, updateAssignee } from '@/api/workflow/task';
+import { pageByAllTaskFinish, pageByAllTaskWait, updateAssignee, urgeTask } from '@/api/workflow/task';
 import { useRouterJump } from '@/api/workflow/workflowCommon';
+import MessageType from '@/components/Process/MessageType.vue';
 import ProcessMeddle from '@/components/Process/processMeddle.vue';
 import UserSelect from '@/components/user-select/index.vue';
 // 选人组件
@@ -141,6 +162,8 @@ const userSelectRef = ref<InstanceType<typeof UserSelect>>();
 const processMeddleRef = ref<InstanceType<typeof ProcessMeddle>>();
 // 选人组件
 const applyUserSelectRef = ref<InstanceType<typeof UserSelect>>();
+// 消息组件
+const messageTypeRef = ref<InstanceType<typeof MessageType>>();
 const columnControllerVisible = ref(false);
 const queryRef = ref<FormInstanceFunctions>();
 
@@ -156,6 +179,7 @@ const ids = ref<Array<any>>([]);
 const single = ref(true);
 // 非多个禁用
 const multiple = ref(true);
+const userMultiple = ref(false);
 // 显示搜索条件
 const showSearch = ref(true);
 // 总条数
@@ -183,12 +207,14 @@ const columns = computed<Array<PrimaryTableCol>>(
     [
       { colKey: 'row-select', type: 'multiple', width: 30, align: 'center' },
       { title: `序号`, colKey: 'serial-number', width: 70 },
-      { title: `流程定义名称`, colKey: 'flowName', ellipsis: true, align: 'center' },
-      { title: `流程定义编码`, colKey: 'flowCode', align: 'center' },
+      { title: `业务编码`, colKey: 'businessCode', ellipsis: true, align: 'center' },
+      { title: `业务标题`, colKey: 'businessTitle', ellipsis: true, align: 'center' },
+      { title: `流程定义名称`, colKey: 'flowName', ellipsis: true, width: 120, align: 'center' },
+      { title: `流程定义编码`, colKey: 'flowCode', width: 120, align: 'center' },
       { title: `流程分类`, colKey: 'categoryName', align: 'center' },
       { title: `版本号`, colKey: 'version', align: 'center' },
-      { title: `任务名称`, colKey: 'nodeName', align: 'center' },
-      { title: `申请人`, colKey: 'createByName', align: 'center' },
+      { title: `任务名称`, colKey: 'nodeName', ellipsis: true, align: 'center' },
+      { title: `申请人`, colKey: 'createByName', ellipsis: true, align: 'center' },
       { title: `办理人`, colKey: 'assigneeNames', align: 'center' },
       { title: `流程状态`, colKey: 'flowStatus', align: 'center' },
       { title: `任务状态`, colKey: 'flowTaskStatus', align: 'center' },
@@ -268,9 +294,23 @@ const getFinishList = () => {
     loading.value = false;
   });
 };
+// 打开催办
+const handleUrgeTaskOpen = () => {
+  messageTypeRef.value.open();
+};
 // 打开修改选人
-const handleUpdate = () => {
+const handleUserOpen = () => {
   userSelectRef.value.open();
+};
+// 催办任务
+const handleUserTask = async (data: Record<string, any>) => {
+  proxy?.$modal.confirm('是否确认提交？', async () => {
+    data.taskIdList = ids.value;
+    await urgeTask(data as FlowUrgeTaskBo);
+    messageTypeRef.value.close();
+    proxy?.$modal.msgSuccess('操作成功');
+    handleQuery();
+  });
 };
 // 修改办理人
 const submitCallback = async (data: SysUserVo[]) => {
@@ -294,7 +334,6 @@ const handleView = (row: FlowTaskVo | FlowHisTaskVo) => {
     type: 'view',
     formCustom: row.formCustom,
     formPath: row.formPath,
-    instanceId: row.instanceId,
   });
   routerJump(routerJumpVo);
 };

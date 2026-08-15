@@ -203,6 +203,21 @@
         <t-form-item label="流程名称" name="flowName">
           <t-input v-model="form.flowName" placeholder="请输入流程名称" maxlength="100" show-limit-number />
         </t-form-item>
+        <t-form-item label="设计器模式" name="modelValue">
+          <t-radio-group v-model="form.modelValue" :disabled="!!form.id">
+            <t-radio value="CLASSICS" variant="outline">经典模式</t-radio>
+            <t-radio value="MIMIC" variant="outline">仿钉钉模式</t-radio>
+          </t-radio-group>
+        </t-form-item>
+        <t-form-item label="流程配置">
+          <t-checkbox v-model="autoPass" label="下一节点执行人是当前任务处理人自动审批" />
+        </t-form-item>
+        <t-form-item label="是否动态表单" name="formCustom">
+          <t-radio-group v-model="form.formCustom">
+            <t-radio value="Y" variant="outline">是</t-radio>
+            <t-radio value="N" variant="outline">否</t-radio>
+          </t-radio-group>
+        </t-form-item>
         <t-form-item label="表单路径" name="formPath">
           <t-input v-model="form.formPath" placeholder="请输入表单路径" maxlength="100" show-limit-number />
         </t-form-item>
@@ -283,6 +298,8 @@ const defFormRef = ref<FormInstanceFunctions>();
 const activeName = ref<number | string>('0');
 if (route.query.activeName) {
   activeName.value = route.query.activeName as string;
+  // 清除路由参数缓存，避免分页错误
+  route.query.activeName = '';
 }
 const uploadDialog = reactive({
   visible: false,
@@ -299,11 +316,16 @@ const modelDialog = reactive({
   title: '',
 });
 
+// 下一节点执行人是当前任务处理人自动审批
+const autoPass = ref(false);
+
 // 校验规则
 const rules = ref<Record<string, Array<FormRule>>>({
   category: [{ required: true, message: '分类名称不能为空' }],
   flowName: [{ required: true, message: '流程定义名称不能为空' }],
   flowCode: [{ required: true, message: '流程定义编码不能为空' }],
+  formCustom: [{ required: true, message: '请选择是否动态表单' }],
+  modelValue: [{ required: true, message: '设计器模式不能为空' }],
 });
 
 // 列显隐信息
@@ -324,7 +346,10 @@ const form = ref<FlowDefinitionVo & FlowDefinitionForm>({
   flowName: '',
   flowCode: '',
   category: '',
+  ext: '',
   formPath: '',
+  formCustom: '',
+  modelValue: '',
 });
 
 // 查询参数
@@ -544,12 +569,16 @@ const designView = async (row: FlowDefinitionVo) => {
 };
 /** 表单重置 */
 const reset = () => {
+  autoPass.value = false;
   form.value = {
     id: '',
     flowName: '',
     flowCode: '',
     category: '',
+    ext: '',
     formPath: '',
+    formCustom: '',
+    modelValue: '',
   };
   defFormRef.value?.reset();
 };
@@ -561,6 +590,8 @@ const handleAdd = async () => {
   if (queryParams.value.category) {
     form.value.category = `${queryParams.value.category}`;
   }
+  form.value.formCustom = 'N';
+  form.value.modelValue = 'CLASSICS';
   buttonLoading.value = true;
   modelDialog.visible = true;
   modelDialog.title = '新增流程';
@@ -578,6 +609,18 @@ const handleUpdate = async (row?: FlowDefinitionVo) => {
   await getTreeselect();
   buttonLoading.value = false;
   Object.assign(form.value, res.data);
+  // 回显自动审批配置
+  autoPass.value = false;
+  if (form.value.ext != null && form.value.ext !== '') {
+    try {
+      const extJson = JSON.parse(form.value.ext);
+      if (extJson.autoPass != null && extJson.autoPass !== '') {
+        autoPass.value = extJson.autoPass;
+      }
+    } catch {
+      // 忽略解析异常
+    }
+  }
 };
 const handleImportDefinition = async () => {
   uploadDialog.visible = true;
@@ -590,6 +633,10 @@ const handleSubmit: FormProps['onSubmit'] = ({ validateResult, firstError }) => 
   if (validateResult === true) {
     buttonLoading.value = true;
     const msgLoading = proxy.$modal.msgLoading('提交中...');
+    // 将自动审批配置写入扩展字段
+    const ext: Record<string, any> = {};
+    ext.autoPass = autoPass.value;
+    form.value.ext = JSON.stringify(ext);
     if (form.value.id) {
       edit(form.value)
         .then(() => {
@@ -612,6 +659,7 @@ const handleSubmit: FormProps['onSubmit'] = ({ validateResult, firstError }) => 
           buttonLoading.value = false;
           proxy.$modal.msgClose(msgLoading);
         });
+      activeName.value = '1';
     }
   } else {
     proxy.$modal.msgError(firstError);

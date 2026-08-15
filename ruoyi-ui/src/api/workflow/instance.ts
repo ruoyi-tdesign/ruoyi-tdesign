@@ -77,6 +77,18 @@ export function deleteByInstanceIds(instanceIds: Array<string | number> | string
     url: `/workflow/instance/deleteByInstanceIds/${instanceIds}`,
   });
 }
+
+/**
+ * 删除历史流程实例
+ * @param instanceIds 流程实例id
+ * @returns
+ */
+export function deleteHisByInstanceIds(instanceIds: Array<string | number> | string | number) {
+  return request.delete<R>({
+    url: `/workflow/instance/deleteHisByInstanceIds/${instanceIds}`,
+  });
+}
+
 /**
  * 作废流程
  * @param data 参数
@@ -85,6 +97,18 @@ export function deleteByInstanceIds(instanceIds: Array<string | number> | string
 export function invalid(data: any) {
   return request.post<R<boolean>>({
     url: `/workflow/instance/invalid`,
+    data,
+  });
+}
+
+/**
+ * 修改流程变量
+ * @param data 参数
+ * @returns
+ */
+export function updateVariable(data: { instanceId?: string | number; key?: string; value?: string }) {
+  return request.put<R>({
+    url: `/workflow/instance/updateVariable`,
     data,
   });
 }

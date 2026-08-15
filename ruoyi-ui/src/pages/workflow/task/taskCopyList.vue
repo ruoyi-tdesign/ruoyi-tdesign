@@ -114,6 +114,8 @@ const columns = computed<Array<PrimaryTableCol>>(() => {
   return [
     { colKey: 'row-select', type: 'multiple', width: 30, align: 'center' },
     { title: `序号`, colKey: 'serial-number', width: 70 },
+    { title: `业务编码`, colKey: 'businessCode', ellipsis: true, align: 'center' },
+    { title: `业务标题`, colKey: 'businessTitle', ellipsis: true, align: 'center' },
     { title: `流程定义名称`, colKey: 'flowName', ellipsis: true, align: 'center' },
     { title: `流程定义编码`, colKey: 'flowCode', align: 'center' },
     { title: `流程分类`, colKey: 'categoryName', align: 'center' },

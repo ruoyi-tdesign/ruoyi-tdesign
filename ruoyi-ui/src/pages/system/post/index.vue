@@ -257,8 +257,7 @@ import { computed, getCurrentInstance, ref } from 'vue';
 
 import type { TreeModel } from '@/api/model/resultModel';
 import type { SysPostForm, SysPostQuery, SysPostVo } from '@/api/system/model/postModel';
-import { addPost, delPost, getPost, listPost, updatePost } from '@/api/system/post';
-import { deptTreeSelect } from '@/api/system/user';
+import { addPost, delPost, deptTreeSelect, getPost, listPost, updatePost } from '@/api/system/post';
 import { ArrayOps } from '@/utils/array';
 
 const { proxy } = getCurrentInstance();
@@ -310,6 +309,8 @@ const form = ref<SysPostForm & SysPostVo>({});
 const queryParams = ref<SysPostQuery>({
   pageNum: 1,
   pageSize: 10,
+  deptId: undefined,
+  belongDeptId: undefined,
   postCode: undefined,
   postName: undefined,
   status: undefined,

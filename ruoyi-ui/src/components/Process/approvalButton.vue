@@ -38,12 +38,16 @@ const props = defineProps({
     type: [String, Number],
     default: '',
   },
+  mode: {
+    type: Boolean,
+    default: false,
+  },
 });
 const emits = defineEmits(['submit-form', 'approval-verify-open', 'handle-approval-record']);
 const removeCurrentTab = useTabsRouterStore().useRemoveCurrentTab();
 // 暂存，提交
 const submitForm = async (type: 'draft' | 'submit') => {
-  emits('submit-form', type);
+  emits('submit-form', type, props.mode);
 };
 // 审批
 const approvalVerifyOpen = async () => {

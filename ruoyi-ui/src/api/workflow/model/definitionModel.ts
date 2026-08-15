@@ -12,6 +12,12 @@ export interface FlowDefinitionVo {
   flowName?: string;
   flowCode?: string;
   formPath?: string;
+  /** 扩展字段，预留给业务系统使用 */
+  ext?: string;
+  /** 审批表单是否自定义（Y是 N否） */
+  formCustom?: string;
+  /** 设计器模型（CLASSICS经典模型 MIMIC仿钉钉模型） */
+  modelValue?: string;
   version?: string;
   isPublish?: number;
   activityStatus?: number;
@@ -24,6 +30,12 @@ export interface FlowDefinitionForm {
   flowName?: string;
   flowCode?: string;
   category?: string;
+  /** 扩展字段，预留给业务系统使用 */
+  ext?: string;
+  /** 审批表单是否自定义（Y是 N否） */
+  formCustom?: string;
+  /** 设计器模型（CLASSICS经典模型 MIMIC仿钉钉模型） */
+  modelValue?: string;
   formPath?: string;
 }
 
@@ -56,6 +68,8 @@ export interface Definition {
   formCustom?: string;
   /** 审批表单是否自定义（Y是 2否） */
   formPath?: string;
+  /** 设计器模型（CLASSICS经典模型 MIMIC仿钉钉模型） */
+  modelValue?: string;
   /** 流程激活状态（0挂起 1激活） */
   activityStatus?: number;
   /** 监听器类型 */

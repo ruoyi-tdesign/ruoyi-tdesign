@@ -1,5 +1,5 @@
 <template>
-  <pre :class="`language-${language}${isShowLineNumbers ? ' line-numbers' : ''}`">
+  <pre :class="`language-${language}${isShowLineNumbers ? ' line-numbers' : ''}`" class="pre">
 <code ref="html" :class="`language-${ language}`" v-text="code" />
   </pre>
 </template>
@@ -42,3 +42,8 @@ onUpdated(() => {
   Prism.highlightElement(html.value); // 切换菜单重新渲染
 });
 </script>
+<style scoped>
+.pre {
+  border-radius: 8px;
+}
+</style>

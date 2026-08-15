@@ -8,6 +8,7 @@ import type {
   FlowNextNodeBo,
   FlowTaskVo,
   FlowTerminationBo,
+  FlowUrgeTaskBo,
   StartProcessBo,
   StartProcessReturnDTO,
   TaskOperationBo,
@@ -140,12 +141,24 @@ export function terminationTask(data: FlowTerminationBo) {
 
 /**
  * 获取可驳回得任务节点
- * @param definitionId 流程定义id
- * @param nodeCode     当前节点
+ * @param taskId    任务id
+ * @param nodeCode  当前节点
  */
-export function getBackTaskNode(definitionId: string | number, nodeCode: string) {
+export function getBackTaskNode(taskId: string | number, nodeCode: string) {
   return request.get<R<FlowNode[]>>({
-    url: `/workflow/task/getBackTaskNode/${definitionId}/${nodeCode}`,
+    url: `/workflow/task/getBackTaskNode/${taskId}/${nodeCode}`,
+  });
+}
+
+/**
+ * 催办任务
+ * @param data 参数
+ * @returns
+ */
+export function urgeTask(data: FlowUrgeTaskBo) {
+  return request.post<R>({
+    url: '/workflow/task/urgeTask',
+    data,
   });
 }
 

@@ -137,16 +137,18 @@ const columns = computed<Array<PrimaryTableCol>>(() => {
   return [
     { colKey: 'row-select', type: 'multiple', width: 30, align: 'center' },
     { title: `序号`, colKey: 'serial-number', width: 70 },
-    { title: `流程定义名称`, colKey: 'flowName', ellipsis: true, align: 'center' },
-    { title: `流程定义编码`, colKey: 'flowCode', align: 'center' },
+    { title: `业务编码`, colKey: 'businessCode', ellipsis: true, align: 'center' },
+    { title: `业务标题`, colKey: 'businessTitle', ellipsis: true, align: 'center' },
+    { title: `流程定义名称`, colKey: 'flowName', width: 120, align: 'center' },
+    { title: `流程定义编码`, colKey: 'flowCode', width: 120, align: 'center' },
     { title: `流程分类`, colKey: 'categoryName', align: 'center' },
     { title: `版本号`, colKey: 'version', align: 'center' },
-    { title: `任务名称`, colKey: 'nodeName', align: 'center' },
-    { title: `申请人`, colKey: 'createByName', align: 'center' },
+    { title: `任务名称`, colKey: 'nodeName', ellipsis: true, align: 'center' },
+    { title: `申请人`, colKey: 'createByName', ellipsis: true, align: 'center' },
     { title: `办理人`, colKey: 'approverName', align: 'center' },
     { title: `流程状态`, colKey: 'flowStatus', align: 'center' },
     { title: `任务状态`, colKey: 'flowTaskStatus', align: 'center' },
-    { title: `创建时间`, colKey: 'createTime', align: 'center', width: '10%', minWidth: 112 },
+    { title: `创建时间`, colKey: 'createTime', ellipsis: true, align: 'center', width: '10%', minWidth: 112 },
     { title: `操作`, colKey: 'operation', align: 'center', fixed: 'right' },
   ] as PrimaryTableCol[];
 });

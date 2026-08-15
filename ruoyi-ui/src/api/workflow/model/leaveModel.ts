@@ -15,6 +15,8 @@ export interface LeaveQuery extends BaseEntity {
 export interface LeaveForm {
   /** 主键 */
   id?: number;
+  /** 申请编码 */
+  applyCode?: string;
   /** 请假类型 */
   leaveType?: string;
   /** 开始时间 */
@@ -34,6 +36,8 @@ export interface LeaveForm {
 export interface LeaveVo {
   /** 主键 */
   id?: number;
+  /** 申请编码 */
+  applyCode?: string;
   /** 请假类型 */
   leaveType?: string;
   /** 开始时间 */

@@ -23,7 +23,7 @@ export interface SysUserQuery extends BaseEntity {
   /** 数据权限 当前角色ID */
   roleId?: number;
   /** 用户id */
-  userIds?: string[];
+  userIds?: string | number | (string | number)[] | undefined;
   /** 排除不查询的用户(工作流用) */
   excludeUserIds?: string[];
 }

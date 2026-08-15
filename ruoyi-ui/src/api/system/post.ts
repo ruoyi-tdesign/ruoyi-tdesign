@@ -1,4 +1,4 @@
-import type { R, TableDataInfo } from '@/api/model/resultModel';
+import type { R, TableDataInfo, TreeModel } from '@/api/model/resultModel';
 import type { SysPostForm, SysPostQuery, SysPostVo } from '@/api/system/model/postModel';
 import { request } from '@/utils/request';
 
@@ -48,5 +48,15 @@ export function updatePost(data: SysPostForm) {
 export function delPost(postId: number | number[]) {
   return request.delete<R>({
     url: `/system/post/${postId}`,
+  });
+}
+
+/**
+ * 查询部门下拉树结构
+ */
+export function deptTreeSelect() {
+  return request.get<R<Array<TreeModel<number>>>>({
+    url: '/system/post/deptTree',
+    method: 'get',
   });
 }

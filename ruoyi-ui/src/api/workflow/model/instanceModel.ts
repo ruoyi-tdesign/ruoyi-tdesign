@@ -71,5 +71,9 @@ export interface FlowInstanceVo {
   category?: string;
   /** 流程分类名称 */
   categoryName?: string;
+  /** 业务编码 */
+  businessCode?: string;
+  /** 业务标题 */
+  businessTitle?: string;
   flowTaskList: FlowTaskVo[];
 }
