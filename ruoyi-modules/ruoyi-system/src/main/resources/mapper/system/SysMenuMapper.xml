@@ -15,91 +15,31 @@
     <select id="queryList" parameterType="org.dromara.system.domain.query.SysMenuQuery" resultMap="SysMenuResultVo">
         <include refid="selectSysMenuVo"/>
         <where>
+            <if test="userId != null">
+                EXISTS (SELECT 1 FROM sys_role_menu rm
+                    JOIN sys_role sr ON rm.role_id = sr.role_id
+                    JOIN sys_user_role sur ON sr.role_id = sur.role_id
+                WHERE
+                    sur.user_id = #{userId}
+                    AND sr.status = '1'
+                    AND sr.del_flag = '0'
+                    AND sm.menu_id = rm.menu_id
+                )
+            </if>
             <if test="menuName != null and menuName != ''"> and sm.menu_name like concat(concat('%', #{menuName}), '%')</if>
             <if test="componentName != null and componentName != ''"> and sm.component_name like concat(concat('%', #{componentName}), '%')</if>
             <if test="visible != null and visible != ''"> and sm.visible = #{visible}</if>
             <if test="status != null and status != ''"> and sm.status = #{status}</if>
             <if test="menuType != null and menuType != ''"> and sm.menu_type = #{menuType}</if>
+            <if test="menuTypes != null and !menuTypes.isEmpty()">
+                and sm.menu_type in
+                <foreach collection="menuTypes" item="item" open="(" separator="," close=")" nullable="true">
+                    #{item}
+                </foreach>
+            </if>
             <if test="parentId != null"> and sm.parent_id = #{parentId}</if>
         </where>
         order by parent_id, order_num
-    </select>
-
-    <select id="selectMenuListByUserId" parameterType="org.dromara.system.domain.query.SysMenuQuery" resultMap="SysMenuResultVo">
-        select sm.menu_id, sm.parent_id, sm.menu_name, sm.path, sm.component, sm.query_param, sm.visible, sm.status,
-        sm.perms, sm.is_frame, sm.is_cache, sm.menu_type, sm.icon, sm.hidden_expression, sm.shop_expression, sm.order_num, sm.create_time
-        from sys_menu sm
-        <where>
-            EXISTS (SELECT 1 FROM sys_role_menu rm
-                JOIN sys_role ro ON rm.role_id = ro.role_id
-            WHERE
-                ro.role_id IN (SELECT role_id FROM sys_user_role WHERE user_id = #{userId})
-                AND ro.status = '1'
-                AND ro.del_flag = '0'
-                AND sm.menu_id = rm.menu_id
-            )
-            <if test="menuName != null and menuName != ''"> and sm.menu_name like concat(concat('%', #{menuName}), '%')</if>
-            <if test="componentName != null and componentName != ''"> and sm.component_name like concat(concat('%', #{componentName}), '%')</if>
-            <if test="visible != null and visible != ''"> and sm.visible = #{visible}</if>
-            <if test="status != null and status != ''"> and sm.status = #{status}</if>
-            <if test="menuType != null and menuType != ''"> and sm.menu_type = #{menuType}</if>
-            <if test="parentId != null"> and sm.parent_id = #{parentId}</if>
-        </where>
-        order by parent_id, order_num
-    </select>
-
-    <select id="selectMenuTreeByUserId" parameterType="Long" resultMap="SysMenuResultVo">
-        select distinct sm.menu_id,
-                        sm.parent_id,
-                        sm.menu_name,
-                        sm.path,
-                        sm.component,
-                        sm.query_param,
-                        sm.visible,
-                        sm.status,
-                        sm.perms,
-                        sm.is_frame,
-                        sm.is_cache,
-                        sm.menu_type,
-                        sm.icon,
-                        sm.hidden_expression,
-                        sm.shop_expression,
-                        sm.order_num,
-                        sm.create_time
-        from sys_menu sm
-                 left join sys_role_menu rm on sm.menu_id = rm.menu_id and sm.status = '1'
-                 left join sys_role ro on rm.role_id = ro.role_id and ro.status = '1'
-        where sm.menu_type in ('M', 'C')
-          and sm.status = '1'
-          and ro.role_id in (select role_id from sys_user_role where user_id = #{userId})
-        order by sm.order_num, sm.parent_id
-    </select>
-
-    <select id="selectMenuListByRoleId" resultType="Long">
-        select m.menu_id
-        from sys_menu m
-        left join sys_role_menu rm on m.menu_id = rm.menu_id
-        where rm.role_id = #{roleId}
-        <if test="menuCheckStrictly">
-            and m.menu_id not in (select m.parent_id from sys_menu m inner join sys_role_menu rm on m.menu_id =
-            rm.menu_id and rm.role_id = #{roleId})
-        </if>
-        order by m.parent_id, m.order_num
-    </select>
-
-    <select id="selectMenuPermsByUserId" parameterType="Long" resultType="String">
-        select distinct m.perms
-        from sys_menu m
-                 left join sys_role_menu rm on m.menu_id = rm.menu_id and m.status = '1'
-                 left join sys_role r on r.role_id = rm.role_id and r.status = '1'
-        where r.role_id in (select role_id from sys_user_role where user_id = #{userId})
-    </select>
-
-    <select id="selectMenuPermsByRoleId" parameterType="Long" resultType="String">
-        select distinct m.perms
-        from sys_menu m
-                 left join sys_role_menu rm on m.menu_id = rm.menu_id
-        where m.status = '1' and rm.role_id = #{roleId}
     </select>
 
 </mapper>

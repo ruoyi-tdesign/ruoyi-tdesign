@@ -189,7 +189,7 @@
                 <t-input v-model="form.nickName" placeholder="请输入用户昵称" :maxlength="30" />
               </t-form-item>
             </t-col>
-            <t-col :span="6">
+            <t-col v-if="form.userId == null || form.userId !== userId" :span="6">
               <t-form-item label="归属部门" name="deptId">
                 <t-tree-select
                   v-model="form.deptId"
@@ -250,7 +250,7 @@
                 </t-radio-group>
               </t-form-item>
             </t-col>
-            <t-col :span="6">
+            <t-col v-if="form.userId == null || form.userId !== userId" :span="6">
               <t-form-item label="岗位" name="postIds">
                 <t-select
                   v-model="form.postIds"
@@ -270,7 +270,7 @@
                 </t-select>
               </t-form-item>
             </t-col>
-            <t-col :span="6">
+            <t-col v-if="form.userId == null || form.userId !== userId" :span="6">
               <t-form-item label="角色" name="roleIds">
                 <t-select
                   v-model="form.roleIds"
@@ -447,7 +447,7 @@ const roleOptions = ref<SysRoleVo[]>([]);
 const deptActived = ref<number[]>([]);
 const sort = ref<TableSort>();
 const loadingPost = ref(false);
-const { token } = storeToRefs(useUserStore());
+const { token, userId } = storeToRefs(useUserStore());
 /** 用户导入参数 */
 const upload = reactive({
   // 是否显示弹出层（用户导入）
@@ -731,7 +731,12 @@ function handleUpdate(row?: SysUserVo) {
     .then((response) => {
       Object.assign(form.value, response.data.user);
       postOptions.value = response.data.posts;
-      roleOptions.value = response.data.roles;
+      // roleOptions 去重处理（合并可选角色与用户已有角色）
+      roleOptions.value = Array.from(
+        new Map(
+          [...(response.data.roles ?? []), ...(response.data.user?.roles ?? [])].map((role) => [role.roleId, role]),
+        ).values(),
+      );
       form.value.postIds = response.data.postIds;
       form.value.roleIds = response.data.roleIds;
       title.value = '修改用户';
@@ -751,6 +756,12 @@ const onSubmit = ({ validateResult, firstError }: SubmitContext) => {
     dLoading.value = true;
     const msgLoading = proxy.$modal.msgLoading('提交中...');
     if (form.value.userId) {
+      // 自己编辑自己的情况下 不允许编辑角色部门岗位
+      if (form.value.userId === userId.value) {
+        form.value.roleIds = null;
+        form.value.deptId = null;
+        form.value.postIds = null;
+      }
       updateUser(form.value)
         .then(() => {
           proxy.$modal.msgSuccess('修改成功');

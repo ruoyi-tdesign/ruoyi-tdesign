@@ -173,14 +173,17 @@ const modelValue = defineModel<SysUserVo[]>({
 });
 
 const computedIds = (data: string | number | Array<string | number>) => {
+  if (data === '' || data === null || data === undefined) {
+    return [];
+  }
   if (Array.isArray(data)) {
-    return [...data];
+    return data.map((item) => String(item));
   }
   if (typeof data === 'string') {
     return data.split(',');
   }
   if (typeof data === 'number') {
-    return [data];
+    return [String(data)];
   }
   console.warn('<user-select> The data type of data should be array or string or number, but I received other');
   return [];

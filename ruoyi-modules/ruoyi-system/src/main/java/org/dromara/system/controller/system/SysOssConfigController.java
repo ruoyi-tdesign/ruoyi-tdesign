@@ -97,6 +97,7 @@ public class SysOssConfigController extends BaseController {
      */
     @SaCheckPermission("system:ossConfig:edit")
     @Log(title = "对象存储状态修改", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysOssConfigBo bo) {
         return toAjax(ossConfigService.updateOssConfigStatus(bo));

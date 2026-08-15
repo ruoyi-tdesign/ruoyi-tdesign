@@ -71,6 +71,14 @@ public class PageQuery implements Serializable {
      */
     public static final int DEFAULT_PAGE_SIZE = 10;
 
+    public PageQuery() {
+    }
+
+    public PageQuery(Integer pageSize, Integer pageNum) {
+        this.pageSize = pageSize;
+        this.pageNum = pageNum;
+    }
+
     /**
      * 使用请求参数设置分页页码
      *

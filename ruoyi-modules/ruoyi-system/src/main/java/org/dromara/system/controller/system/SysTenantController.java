@@ -114,6 +114,7 @@ public class SysTenantController extends BaseController {
     @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenant:edit")
     @Log(title = "租户管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysTenantBo bo) {
         tenantService.checkTenantAllowed(bo.getTenantId());
@@ -164,6 +165,7 @@ public class SysTenantController extends BaseController {
     @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:tenant:edit")
     @Log(title = "租户管理", businessType = BusinessType.UPDATE)
+    @Lock4j
     @GetMapping("/syncTenantPackage")
     public R<Void> syncTenantPackage(@NotBlank(message = "租户ID不能为空") String tenantId,
                                      @NotNull(message = "套餐ID不能为空") Long packageId) {
@@ -175,6 +177,7 @@ public class SysTenantController extends BaseController {
      */
     @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
     @Log(title = "租户管理", businessType = BusinessType.INSERT)
+    @Lock4j
 //    @GetMapping("/syncTenantDict")
     public R<Void> syncTenantDict() {
         if (!TenantHelper.isEnable()) {

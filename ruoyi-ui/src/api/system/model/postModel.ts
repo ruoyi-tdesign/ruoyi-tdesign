@@ -6,6 +6,8 @@ import type { BaseEntity } from '@/api/model/resultModel';
 export interface SysPostQuery extends BaseEntity {
   /** 部门id */
   deptId?: number;
+  /** 归属部门id */
+  belongDeptId?: number;
   /** 岗位编码 */
   postCode?: string;
   /** 岗位类别编码 */

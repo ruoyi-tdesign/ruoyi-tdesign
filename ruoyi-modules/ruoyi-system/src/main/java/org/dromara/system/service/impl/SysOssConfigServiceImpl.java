@@ -106,7 +106,7 @@ public class SysOssConfigServiceImpl extends ServiceImpl<SysOssConfigMapper, Sys
     private void validEntityBeforeSave(SysOssConfig entity) {
         if (StringUtils.isNotEmpty(entity.getConfigKey())
             && !checkConfigKeyUnique(entity)) {
-            throw new ServiceException("操作配置'" + entity.getConfigKey() + "'失败, 配置key已存在!");
+            throw new ServiceException("操作配置'{}'失败, 配置key已存在!", entity.getConfigKey());
         }
     }
 

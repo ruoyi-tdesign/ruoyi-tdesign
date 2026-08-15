@@ -45,7 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 部门管理 服务实现
@@ -87,10 +89,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     private void buildQuery(SysDeptQuery query) {
         if (ObjectUtil.isNotNull(query.getBelongDeptId())) {
             //部门树搜索
-            Long parentId = query.getBelongDeptId();
-            List<SysDept> deptList = baseMapper.selectListByParentId(parentId);
-            List<Long> deptIds = StreamUtils.toList(deptList, SysDept::getDeptId);
-            deptIds.add(parentId);
+            List<Long> deptIds = baseMapper.selectDeptAndChildById(query.getBelongDeptId());
             query.setDeptIds(deptIds);
         }
     }
@@ -190,7 +189,7 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
                 list.add(vo.getDeptName());
             }
         }
-        return String.join(StringUtils.SEPARATOR, list);
+        return StringUtils.joinComma(list);
     }
 
     /**
@@ -398,6 +397,25 @@ public class SysDeptServiceImpl extends ServiceImpl<SysDeptMapper, SysDept> impl
     @Override
     public int deleteDeptById(Long deptId) {
         return baseMapper.deleteById(deptId);
+    }
+
+    /**
+     * 根据部门 ID 列表查询部门名称映射关系
+     *
+     * @param deptIds 部门 ID 列表
+     * @return Map，其中 key 为部门 ID，value 为对应的部门名称
+     */
+    @Override
+    public Map<Long, String> selectDeptNamesByIds(List<Long> deptIds) {
+        if (CollUtil.isEmpty(deptIds)) {
+            return Collections.emptyMap();
+        }
+        List<SysDept> list = baseMapper.selectList(
+            new LambdaQueryWrapper<SysDept>()
+                .select(SysDept::getDeptId, SysDept::getDeptName)
+                .in(SysDept::getDeptId, deptIds)
+        );
+        return StreamUtils.toMap(list, SysDept::getDeptId, SysDept::getDeptName);
     }
 
 }

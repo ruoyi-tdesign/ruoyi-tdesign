@@ -88,12 +88,13 @@
             <template #operation="{ row, rowIndex }">
               <t-space :size="8" break-line>
                 <t-popup
+                  v-if="tab === 'running'"
                   :ref="`popoverRef${rowIndex}`"
                   trigger="click"
                   placement="left"
                   :overlay-style="{ width: '300px' }"
                 >
-                  <my-link theme="danger" @click.stop="handleInvalid(row)">
+                  <my-link theme="danger">
                     <template #prefix-icon><close-circle-icon /></template>作废
                   </my-link>
                   <template #content>
@@ -138,9 +139,16 @@
       </t-table>
     </t-dialog>
     <!-- 流程变量开始 -->
-    <t-dialog v-model:visible="variableVisible" draggable header="流程变量" width="60%" :close-on-overlay-click="false">
+    <t-dialog
+      v-if="variableVisible"
+      v-model:visible="variableVisible"
+      draggable
+      header="流程变量"
+      width="60%"
+      :close-on-overlay-click="false"
+    >
       <t-loading :loading="variableLoading">
-        <t-card class="box-card">
+        <t-card>
           <template #header>
             <div class="clearfix">
               <span>
@@ -151,6 +159,26 @@
           <div class="max-h-500px overflow-y-auto">
             <vue-json-pretty :data="formatToJsonObject(variables)" />
           </div>
+        </t-card>
+        <t-card style="margin-top: 16px">
+          <t-form
+            ref="ruleFormRef"
+            :data="form"
+            :rules="rules"
+            layout="inline"
+            label-width="120px"
+            @submit="handleVariable"
+          >
+            <t-form-item label="变量KEY" name="key">
+              <t-input v-model="form.key" placeholder="请输入变量KEY" />
+            </t-form-item>
+            <t-form-item label="变量值" name="value">
+              <t-input v-model="form.value" placeholder="请输入变量值" />
+            </t-form-item>
+            <t-form-item>
+              <t-button theme="primary" @click="ruleFormRef.submit()">确认</t-button>
+            </t-form-item>
+          </t-form>
         </t-card>
       </t-loading>
     </t-dialog>
@@ -177,12 +205,28 @@ import {
   SearchIcon,
   SettingIcon,
 } from 'tdesign-icons-vue-next';
-import type { FormInstanceFunctions, PageInfo, PrimaryTableCol, TableProps, TabsProps } from 'tdesign-vue-next';
+import type {
+  FormInstanceFunctions,
+  FormRule,
+  PageInfo,
+  PrimaryTableCol,
+  SubmitContext,
+  TableProps,
+  TabsProps,
+} from 'tdesign-vue-next';
 import { computed, ref } from 'vue';
 import VueJsonPretty from 'vue-json-pretty';
 
 import type { SysUserVo } from '@/api/system/model/userModel';
-import { deleteByInstanceIds, instanceVariable, invalid, pageByFinish, pageByRunning } from '@/api/workflow/instance';
+import {
+  deleteByInstanceIds,
+  deleteHisByInstanceIds,
+  instanceVariable,
+  invalid,
+  pageByFinish,
+  pageByRunning,
+  updateVariable,
+} from '@/api/workflow/instance';
 import type { FlowInstanceQuery, FlowInstanceVo } from '@/api/workflow/model/instanceModel';
 import type { RouterJumpVo } from '@/api/workflow/model/workflowCommonModel';
 import { useRouterJump } from '@/api/workflow/workflowCommon';
@@ -195,6 +239,7 @@ const { wf_business_status } = proxy.useDict('wf_business_status');
 const routerJump = useRouterJump();
 
 const queryRef = ref<FormInstanceFunctions>();
+const ruleFormRef = ref<FormInstanceFunctions>();
 const treeActived = ref<string[]>([]);
 const columnControllerVisible = ref(false);
 // 遮罩层
@@ -211,6 +256,8 @@ const multiple = ref(true);
 const showSearch = ref(true);
 // 总条数
 const total = ref(0);
+// 实例id
+const instanceId = ref<string | number>(undefined);
 
 // 流程变量是否显示
 const variableVisible = ref(false);
@@ -218,6 +265,17 @@ const variableLoading = ref(true);
 const variables = ref<string>('');
 // 流程定义名称
 const processDefinitionName = ref<string>();
+// 流程变量表单
+const form = ref<{ instanceId?: string | number; key?: string; value?: string }>({
+  instanceId: undefined,
+  key: undefined,
+  value: undefined,
+});
+// 流程变量校验规则
+const rules = ref<Record<string, Array<FormRule>>>({
+  key: [{ required: true, message: '请输入KEY' }],
+  value: [{ required: true, message: '请输入变量值' }],
+});
 // 模型定义表格数据
 const processInstanceList = ref<FlowInstanceVo[]>([]);
 const processDefinitionHistoryList = ref<Array<any>>([]);
@@ -228,14 +286,16 @@ const columns = computed<Array<PrimaryTableCol>>(() => {
     [
       { colKey: 'row-select', type: 'multiple', width: 30, align: 'center' },
       { title: `序号`, colKey: 'serial-number', width: 70 },
-      { title: `流程定义名称`, colKey: 'flowName', ellipsis: true, align: 'center' },
+      { title: `业务编码`, colKey: 'businessCode', ellipsis: true, align: 'center' },
+      { title: `业务标题`, colKey: 'businessTitle', ellipsis: true, align: 'center' },
+      { title: `流程定义名称`, colKey: 'flowName', ellipsis: true, width: 120, align: 'center' },
       { title: `任务名称`, colKey: 'nodeName', align: 'center' },
-      { title: `流程定义编码`, colKey: 'flowCode', align: 'center' },
+      { title: `流程定义编码`, colKey: 'flowCode', width: 120, align: 'center' },
       { title: `流程分类`, colKey: 'categoryName', align: 'center' },
-      { title: `申请人`, colKey: 'createByName', align: 'center' },
+      { title: `申请人`, colKey: 'createByName', ellipsis: true, align: 'center' },
       { title: `版本号`, colKey: 'version', align: 'center' },
       { title: `状态`, colKey: 'isSuspended', align: 'center' },
-      { title: `流程状态`, colKey: 'flowStatus', align: 'center' },
+      { title: `流程状态`, colKey: 'flowStatus', align: 'center', minWidth: 80 },
       { title: `启动时间`, colKey: 'createTime', align: 'center', width: '10%', minWidth: 112 },
       { title: `结束时间`, colKey: 'createTime', align: 'center', width: '10%', minWidth: 112 },
       { title: `操作`, colKey: 'operation', align: 'center', fixed: 'right' },
@@ -360,7 +420,7 @@ const handleDelete = async (row?: FlowInstanceVo) => {
       await deleteByInstanceIds(instanceIdList).finally(() => (loading.value = false));
       getProcessInstanceRunningList();
     } else {
-      await deleteByInstanceIds(instanceIdList).finally(() => (loading.value = false));
+      await deleteHisByInstanceIds(instanceIdList).finally(() => (loading.value = false));
       getProcessInstanceFinishList();
     }
     await proxy?.$modal.msgSuccess('删除成功');
@@ -387,6 +447,8 @@ const handleInvalid = async (row: FlowInstanceVo) => {
       await invalid(param).finally(() => (loading.value = false));
       getProcessInstanceRunningList();
       await proxy?.$modal.msgSuccess('操作成功');
+    } else {
+      await proxy?.$modal.msgError('当前流程已结束，不能作废');
     }
   });
 };
@@ -408,13 +470,30 @@ const handleView = (row: FlowInstanceVo) => {
 
 // 查询流程变量
 const handleInstanceVariable = async (row: FlowInstanceVo) => {
+  instanceId.value = row.id;
   variableLoading.value = true;
   variableVisible.value = true;
   processDefinitionName.value = row.flowName;
   const data = await instanceVariable(row.id);
   variables.value = data.data.variable;
+  form.value.instanceId = undefined;
+  form.value.key = undefined;
+  form.value.value = undefined;
   variableLoading.value = false;
 };
+
+/** 修改流程变量 */
+function handleVariable({ validateResult }: SubmitContext) {
+  if (validateResult === true) {
+    form.value.instanceId = instanceId.value;
+    proxy?.$modal.confirm('是否确认提交？', async () => {
+      await updateVariable(form.value);
+      proxy?.$modal.msgSuccess('操作成功');
+      const data = await instanceVariable(instanceId.value);
+      variables.value = data.data.variable;
+    });
+  }
+}
 
 /**
  * json转为对象

@@ -4,17 +4,13 @@ import { getInfo, isLogin, login, logout } from '@/api/login';
 import type { LoginParam, UserInfo } from '@/api/model/loginModel';
 import type { R } from '@/api/model/resultModel';
 import defAva from '@/assets/images/profile.jpg';
-import { usePermissionStore } from '@/store';
 import { getVisitUrl } from '@/utils/ruoyi';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    // @ts-expect-error ignore
-    tenantId: undefined,
-    // @ts-expect-error ignore
-    userId: undefined,
-    // @ts-expect-error ignore
-    token: undefined,
+    tenantId: undefined as string | undefined,
+    userId: undefined as number | undefined,
+    token: undefined as string | undefined,
     name: '',
     avatar: '',
     roles: [] as string[],

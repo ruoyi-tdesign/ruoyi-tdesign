@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
+import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.mybatis.annotation.DataColumn;
 import org.dromara.common.mybatis.annotation.DataPermission;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
@@ -20,6 +21,42 @@ import java.util.List;
  * @author Lion Li
  */
 public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo> {
+
+    /**
+     * 构建角色对应的部门 SQL 查询语句
+     *
+     * <p>该 SQL 用于查询某个角色关联的所有部门 ID，常用于数据权限控制</p>
+     *
+     * @param roleId 角色ID
+     * @return 查询部门ID的 SQL 语句字符串
+     */
+    default String buildDeptByRoleSql(Long roleId) {
+        return """
+                select srd.dept_id from sys_role_dept srd
+                    left join sys_role sr on sr.role_id = srd.role_id
+                    where srd.role_id = %d and sr.status = '0'
+            """.formatted(roleId);
+    }
+
+    /**
+     * 构建 SQL 查询，用于获取当前角色拥有的部门中所有的父部门ID
+     *
+     * <p>
+     * 该 SQL 用于 deptCheckStrictly 场景下，排除非叶子节点（父节点）用。
+     * </p>
+     *
+     * @param roleId 角色ID
+     * @return SQL 语句字符串，查询角色下部门的所有父部门ID
+     */
+    default String buildParentDeptByRoleSql(Long roleId) {
+        return """
+                select parent_id from sys_dept where dept_id in (
+                    select srd.dept_id from sys_role_dept srd
+                        left join sys_role sr on sr.role_id = srd.role_id
+                        where srd.role_id = %d and sr.status = '0'
+                )
+            """.formatted(roleId);
+    }
 
     /**
      * 查询部门列表
@@ -85,13 +122,36 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo> {
     }
 
     /**
+     * 查询某个部门及其所有子部门ID（含自身）
+     *
+     * @param parentId 父部门ID
+     * @return 部门ID集合
+     */
+    default List<Long> selectDeptAndChildById(Long parentId) {
+        List<SysDept> deptList = this.selectListByParentId(parentId);
+        List<Long> deptIds = StreamUtils.toList(deptList, SysDept::getDeptId);
+        deptIds.add(parentId);
+        return deptIds;
+    }
+
+    /**
      * 根据角色ID查询部门树信息
      *
      * @param roleId            角色ID
      * @param deptCheckStrictly 部门树选择项是否关联显示
      * @return 选中部门列表
      */
-    List<Long> selectDeptListByRoleId(@Param("roleId") Long roleId, @Param("deptCheckStrictly") boolean deptCheckStrictly);
+    default List<Long> selectDeptListByRoleId(Long roleId, boolean deptCheckStrictly) {
+        LambdaQueryWrapper<SysDept> wrapper = new LambdaQueryWrapper<>();
+        wrapper.select(SysDept::getDeptId)
+            .inSql(SysDept::getDeptId, this.buildDeptByRoleSql(roleId))
+            .orderByAsc(SysDept::getParentId)
+            .orderByAsc(SysDept::getOrderNum);
+        if (deptCheckStrictly) {
+            wrapper.notInSql(SysDept::getDeptId, this.buildParentDeptByRoleSql(roleId));
+        }
+        return this.selectObjs(wrapper);
+    }
 
     /**
      * 查询部门信息

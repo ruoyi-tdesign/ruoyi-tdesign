@@ -83,6 +83,14 @@ export interface FlowTaskVo {
   applyNode?: boolean;
   /** 按钮权限 */
   buttonList?: ButtonList[];
+  /** 抄送对象 */
+  copyList?: FlowCopyVo[];
+  /** 自定义变量 */
+  varList?: Map<string, string>;
+  /** 业务编码 */
+  businessCode?: string;
+  /** 业务标题 */
+  businessTitle?: string;
 }
 export interface ButtonList {
   /** 枚举路径 */
@@ -91,6 +99,26 @@ export interface ButtonList {
   value?: string;
   /** 是否显示 */
   show?: boolean;
+}
+/**
+ * 抄送对象
+ */
+export interface FlowCopyVo {
+  /** 用户id */
+  userId: string | number;
+  /** 用户名称 */
+  userName: string;
+}
+/**
+ * 催办任务请求对象
+ */
+export interface FlowUrgeTaskBo {
+  /** 任务id */
+  taskIdList: Array<number | string>;
+  /** 消息类型 */
+  messageType?: Array<string>;
+  /** 催办内容 */
+  message?: string;
 }
 /**
  * 历史任务视图
@@ -169,11 +197,6 @@ export interface FlowHisTaskVo {
   runDuration?: string;
 }
 
-export interface VariableVo {
-  key: string;
-  value: string;
-}
-
 export interface TaskOperationBo {
   /** 委派/转办人的用户ID（必填，准对委派/转办人操作） */
   userId?: string | number;
@@ -204,6 +227,19 @@ export interface StartProcessBo {
   flowCode?: string;
   /** 流程变量，前端会提交一个元素{'entity': {业务详情数据对象}} */
   variables?: Record<string, any>;
+  /** 流程业务扩展信息 */
+  bizExt?: FlowInstanceBizExt;
+}
+/**
+ * 流程实例业务扩展对象
+ */
+export interface FlowInstanceBizExt {
+  /** 业务ID */
+  businessId?: string | number;
+  /** 业务编码 */
+  businessCode?: string;
+  /** 业务标题 */
+  businessTitle?: string;
 }
 /**
  * 驳回参数请求

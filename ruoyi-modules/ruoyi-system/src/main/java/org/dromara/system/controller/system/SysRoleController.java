@@ -8,6 +8,7 @@ import org.dromara.common.core.domain.R;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -82,6 +83,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:add")
     @Log(title = "角色管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
@@ -98,6 +100,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
@@ -120,6 +123,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping("/dataScope")
     public R<Void> dataScope(@RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
@@ -132,6 +136,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysRoleBo role) {
         roleService.checkRoleAllowed(role);
@@ -148,7 +153,7 @@ public class SysRoleController extends BaseController {
     @Log(title = "角色管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{roleIds}")
     public R<Void> remove(@NotEmpty(message = "角色id不能为空") @PathVariable Long[] roleIds) {
-        return toAjax(roleService.deleteRoleByIds(roleIds));
+        return toAjax(roleService.deleteRoleByIds(List.of(roleIds)));
     }
 
     /**
@@ -185,6 +190,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
+    @RepeatSubmit()
     @PutMapping("/authUser/cancel")
     public R<Void> cancelAuthUser(@RequestBody SysUserRole userRole) {
         return toAjax(roleService.deleteAuthUser(userRole));
@@ -198,6 +204,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
+    @RepeatSubmit()
     @PutMapping("/authUser/cancelAll")
     public R<Void> cancelAuthUserAll(Long roleId, Long[] userIds) {
         return toAjax(roleService.deleteAuthUsers(roleId, userIds));
@@ -211,6 +218,7 @@ public class SysRoleController extends BaseController {
      */
     @SaCheckPermission("system:role:edit")
     @Log(title = "角色管理", businessType = BusinessType.GRANT)
+    @RepeatSubmit()
     @PutMapping("/authUser/selectAll")
     public R<Void> selectAuthUserAll(Long roleId, Long[] userIds) {
         roleService.checkRoleDataScope(roleId);
@@ -231,6 +239,12 @@ public class SysRoleController extends BaseController {
         return R.ok(selectVo);
     }
 
+    /**
+     * 角色部门列表树信息
+     *
+     * @param checkedKeys 选中部门列表
+     * @param depts       下拉树结构列表
+     */
     public record DeptTreeSelectVo(List<Long> checkedKeys, List<Tree<Long>> depts) {}
 
 }

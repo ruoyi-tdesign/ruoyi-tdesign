@@ -18,20 +18,20 @@ import java.util.List;
 public interface ISysDictTypeService extends IService<SysDictType> {
 
     /**
-     * 查询字典类型列表
+     * 分页查询字典类型列表
      *
-     * @param dictType 字典类型信息
+     * @param query 查询条件
      * @return 字典类型集合信息
      */
-    TableDataInfo<SysDictTypeVo> selectPageDictTypeList(SysDictTypeQuery dictType);
+    TableDataInfo<SysDictTypeVo> selectPageDictTypeList(SysDictTypeQuery query);
 
     /**
      * 根据条件分页查询字典类型
      *
-     * @param dictType 字典类型信息
+     * @param query 查询条件
      * @return 字典类型集合信息
      */
-    List<SysDictTypeVo> selectDictTypeList(SysDictTypeQuery dictType);
+    List<SysDictTypeVo> selectDictTypeList(SysDictTypeQuery query);
 
     /**
      * 根据所有字典类型
@@ -95,8 +95,8 @@ public interface ISysDictTypeService extends IService<SysDictType> {
     /**
      * 校验字典类型称是否唯一
      *
-     * @param dictType 字典类型
+     * @param bo 字典类型信息
      * @return 结果
      */
-    boolean checkDictTypeUnique(SysDictTypeBo dictType);
+    boolean checkDictTypeUnique(SysDictTypeBo bo);
 }

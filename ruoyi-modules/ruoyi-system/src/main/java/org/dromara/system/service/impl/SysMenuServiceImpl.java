@@ -12,6 +12,7 @@ import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.HttpStatus;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.enums.MenuTypeEnum;
+import org.dromara.common.core.enums.NormalDisableEnum;
 import org.dromara.common.core.enums.ShowHiddenEnum;
 import org.dromara.common.core.enums.YesNoEnum;
 import org.dromara.common.core.enums.YesNoFrameEnum;
@@ -85,13 +86,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public List<SysMenuVo> selectMenuList(SysMenuQuery query, Long userId) {
-        query.setUserId(userId);
-        // 管理员显示所有菜单信息
-        if (LoginHelper.isSuperAdmin(userId)) {
-            return SortQuery.of(() -> baseMapper.queryList(query));
-        } else {
-            return SortQuery.of(() -> baseMapper.selectMenuListByUserId(query));
-        }
+        // 管理员显示所有菜单信息 不是管理员 按用户id过滤菜单
+        query.setUserId(LoginHelper.isSuperAdmin(userId) ? null : userId);
+        return SortQuery.of(() -> baseMapper.queryList(query));
     }
 
     /**
@@ -102,14 +99,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public Set<String> selectMenuPermsByUserId(Long userId) {
-        List<String> perms = baseMapper.selectMenuPermsByUserId(userId);
-        Set<String> permsSet = new HashSet<>();
-        for (String perm : perms) {
-            if (StringUtils.isNotEmpty(perm)) {
-                permsSet.addAll(StringUtils.splitList(perm.trim()));
-            }
-        }
-        return permsSet;
+        return baseMapper.selectMenuPermsByUserId(userId);
     }
 
     /**
@@ -120,14 +110,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public Set<String> selectMenuPermsByRoleId(Long roleId) {
-        List<String> perms = baseMapper.selectMenuPermsByRoleId(roleId);
-        Set<String> permsSet = new HashSet<>();
-        for (String perm : perms) {
-            if (StringUtils.isNotEmpty(perm)) {
-                permsSet.addAll(StringUtils.splitList(perm.trim()));
-            }
-        }
-        return permsSet;
+        return baseMapper.selectMenuPermsByRoleId(roleId);
     }
 
     /**
@@ -138,12 +121,13 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
      */
     @Override
     public List<SysMenuVo> selectMenuTreeByUserId(Long userId) {
-        List<SysMenuVo> menus;
-        if (LoginHelper.isSuperAdmin(userId)) {
-            menus = baseMapper.selectMenuTreeAll();
-        } else {
-            menus = baseMapper.selectMenuTreeByUserId(userId);
+        SysMenuQuery query = new SysMenuQuery();
+        query.setMenuTypes(List.of(MenuTypeEnum.DIRECTORY.getType(), MenuTypeEnum.MENU.getType()));
+        query.setStatus(NormalDisableEnum.NORMAL.getCode());
+        if (!LoginHelper.isSuperAdmin(userId)) {
+            query.setUserId(userId);
         }
+        List<SysMenuVo> menus = baseMapper.queryList(query);
         return getChildPerms(menus, Constants.TOP_PARENT_ID);
     }
 
@@ -181,6 +165,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             });
         }
         return baseMapper.selectObjs(new LambdaQueryWrapper<SysMenu>()
+            .select(SysMenu::getMenuId)
             .in(SysMenu::getMenuId, menuIds)
             .notIn(CollUtil.isNotEmpty(parentIds), SysMenu::getMenuId, parentIds), x -> {
             return Convert.toLong(x);

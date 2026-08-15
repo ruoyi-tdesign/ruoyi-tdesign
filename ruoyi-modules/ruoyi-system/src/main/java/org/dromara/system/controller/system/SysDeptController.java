@@ -11,6 +11,7 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.web.core.BaseController;
@@ -92,6 +93,7 @@ public class SysDeptController extends BaseController {
      */
     @SaCheckPermission("system:dept:add")
     @Log(title = "部门管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysDeptBo dept) {
         if (!deptService.checkDeptNameUnique(dept)) {
@@ -105,6 +107,7 @@ public class SysDeptController extends BaseController {
      */
     @SaCheckPermission("system:dept:edit")
     @Log(title = "部门管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysDeptBo dept) {
         Long deptId = dept.getDeptId();

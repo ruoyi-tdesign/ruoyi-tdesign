@@ -3,17 +3,20 @@ package org.dromara.system.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.github.pagehelper.Page;
+import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.utils.StreamUtils;
-import org.dromara.common.mybatis.helper.DataBaseHelper;
+import org.dromara.common.mybatis.helper.PageHelperSuspendUtil;
+import org.dromara.system.domain.SysRoleDept;
+import org.dromara.system.mapper.SysDeptMapper;
+import org.dromara.system.mapper.SysRoleDeptMapper;
 import org.dromara.system.service.ISysDataScopeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 数据权限 实现
@@ -23,11 +26,12 @@ import java.util.stream.Collectors;
  *
  * @author Lion Li
  */
+@RequiredArgsConstructor
 @Service("sdss")
 public class SysDataScopeServiceImpl implements ISysDataScopeService {
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final SysRoleDeptMapper roleDeptMapper;
+    private final SysDeptMapper deptMapper;
 
     /**
      * 获取角色自定义权限
@@ -41,10 +45,17 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
         if (ObjectUtil.isNull(roleId)) {
             return "-1";
         }
-        // 此处使用jdbc防止与pagehelper插件冲突
-        List<Long> deptIds = jdbcTemplate.queryForList("select dept_id from sys_role_dept srd where srd.role_id = ?", Long.class, roleId);
-        if (CollUtil.isNotEmpty(deptIds)) {
-            return deptIds.stream().map(Convert::toStr).collect(Collectors.joining(","));
+        Page<?> page = PageHelperSuspendUtil.suspend();
+        try {
+            List<SysRoleDept> list = roleDeptMapper.selectList(
+                new LambdaQueryWrapper<SysRoleDept>()
+                    .select(SysRoleDept::getDeptId)
+                    .eq(SysRoleDept::getRoleId, roleId));
+            if (CollUtil.isNotEmpty(list)) {
+                return StreamUtils.join(list, rd -> Convert.toStr(rd.getDeptId()));
+            }
+        } finally {
+            PageHelperSuspendUtil.resume(page);
         }
         return "-1";
     }
@@ -61,14 +72,13 @@ public class SysDataScopeServiceImpl implements ISysDataScopeService {
         if (ObjectUtil.isNull(deptId)) {
             return "-1";
         }
-        // 此处使用jdbc防止与pagehelper插件冲突
-        List<Long> ids = jdbcTemplate.queryForList("select dept_id from sys_dept sd where " + DataBaseHelper.findInSet(deptId, "ancestors"), Long.class);
-        ids.add(deptId);
-
-        if (CollUtil.isNotEmpty(ids)) {
-            return StreamUtils.join(ids, Convert::toStr);
+        Page<?> page = PageHelperSuspendUtil.suspend();
+        try {
+            List<Long> deptIds = deptMapper.selectDeptAndChildById(deptId);
+            return CollUtil.isNotEmpty(deptIds) ? StreamUtils.join(deptIds, Convert::toStr) : "-1";
+        } finally {
+            PageHelperSuspendUtil.resume(page);
         }
-        return "-1";
     }
 
 }

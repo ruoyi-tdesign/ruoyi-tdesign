@@ -10,6 +10,7 @@ import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -74,6 +75,7 @@ public class SysNoticeController extends BaseController {
      */
     @SaCheckPermission("system:notice:add")
     @Log(title = "通知公告", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping
     public R<Void> add(@Validated(AddGroup.class) @RequestBody SysNoticeBo notice) {
         Boolean b = noticeService.insertNotice(notice);
@@ -93,6 +95,7 @@ public class SysNoticeController extends BaseController {
      */
     @SaCheckPermission("system:notice:edit")
     @Log(title = "通知公告", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody SysNoticeBo notice) {
         return toAjax(noticeService.updateNotice(notice));

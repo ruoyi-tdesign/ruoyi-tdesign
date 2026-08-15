@@ -111,10 +111,10 @@ public class SysLogininforServiceImpl extends ServiceImpl<SysLogininforMapper, S
     }
 
     /**
-     * 查询系统访问记录列表
+     * 分页查询登录日志列表
      *
      * @param query 查询对象
-     * @return SysLogininforVo
+     * @return 登录日志分页列表
      */
     @Override
     public TableDataInfo<SysLogininforVo> queryPageList(SysLogininforQuery query) {

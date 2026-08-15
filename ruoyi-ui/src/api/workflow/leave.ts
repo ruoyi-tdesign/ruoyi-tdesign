@@ -35,6 +35,17 @@ export function addLeave(data: LeaveForm) {
 }
 
 /**
+ * 提交请假并发起流程
+ * @param data
+ */
+export function submitAndFlowStart(data: LeaveForm) {
+  return request.post<R<LeaveVo>>({
+    url: '/workflow/leave/submitAndFlowStart',
+    data,
+  });
+}
+
+/**
  * 修改请假
  * @param data
  */

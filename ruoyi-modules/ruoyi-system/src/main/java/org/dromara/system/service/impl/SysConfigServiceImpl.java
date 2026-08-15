@@ -41,6 +41,13 @@ import java.util.Set;
 @Service
 public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig> implements ISysConfigService, ConfigService {
 
+    /**
+     * 分页查询参数配置列表
+     *
+     * @param config    查询条件
+     * @param pageQuery 分页参数
+     * @return 参数配置分页列表
+     */
     @Override
     public TableDataInfo<SysConfigVo> selectPageConfigList(SysConfigBo config) {
         return PageQuery.of(() -> baseMapper.queryList(config));
@@ -152,7 +159,7 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
         for (Long configId : configIds) {
             SysConfig config = baseMapper.selectById(configId);
             if (StringUtils.equals(YesNoEnum.YES.getCodeStr(), config.getConfigType())) {
-                throw new ServiceException(String.format("内置参数【%s】不能删除", config.getConfigKey()));
+                throw new ServiceException("内置参数【{}】不能删除", config.getConfigKey());
             }
             boolean isGlobal = YesNoEnum.YES.getCodeNum().equals(config.getIsGlobal());
             CacheUtils.evict(GlobalConstants.getGlobalKey(isGlobal, CacheNames.SYS_CONFIG), config.getConfigKey());

@@ -34,7 +34,7 @@
             style="margin: 2px"
             @close="handleCopyCloseTag(user)"
           >
-            {{ user.nickName }}
+            {{ user.userName }}
           </t-tag>
         </t-form-item>
         <t-form-item
@@ -127,7 +127,13 @@
     <!-- 加签组件 -->
     <user-select ref="multiInstanceUserRef" :multiple="true" @confirm-call-back="addMultiInstanceUser" />
     <!-- 弹窗选人 -->
-    <user-select ref="porUserRef" :multiple="true" :user-ids="popUserIds" @confirm-call-back="handlePopUser" />
+    <user-select
+      ref="porUserRef"
+      :data="form.assigneeMap[nodeCode]"
+      :multiple="true"
+      :user-ids="popUserIds"
+      @confirm-call-back="handlePopUser"
+    />
 
     <!-- 驳回开始 -->
     <t-dialog v-model:visible="backVisible" header="驳回" width="40%" :close-on-overlay-click="false">
@@ -198,7 +204,7 @@ import { ref } from 'vue';
 
 import type { SysUserVo, UserDTO } from '@/api/system/model/userModel';
 import type { FlowNode } from '@/api/workflow/model/definitionModel';
-import type { FlowTaskVo, FlowTerminationBo, TaskOperationBo } from '@/api/workflow/model/taskModel';
+import type { FlowCopyVo, FlowTaskVo, FlowTerminationBo, TaskOperationBo } from '@/api/workflow/model/taskModel';
 import {
   backProcess,
   completeTask,
@@ -243,9 +249,11 @@ const buttonDisabled = ref(true);
 // 任务id
 const taskId = ref<string | number>('');
 // 抄送人
-const selectCopyUserList = ref<SysUserVo[]>([]);
+const selectCopyUserList = ref<FlowCopyVo[]>([]);
 // 抄送人id
 const selectCopyUserIds = ref<string>(undefined);
+// 自定义节点变量
+const varNodeList = ref<Map<string, string>>(undefined);
 // 可减签的人员
 const deleteUserList = ref<UserDTO[]>([]);
 // 弹窗可选择的人员id
@@ -274,6 +282,7 @@ const nestNodeList = ref<FlowNode[]>([]);
 const task = ref<FlowTaskVo>({
   applyNode: false,
   buttonList: [],
+  copyList: [],
 });
 const dialog = reactive({
   visible: false,
@@ -313,14 +322,20 @@ const openDialog = async (id?: string | number) => {
   task.value.buttonList.forEach((e) => {
     buttonObj.value[e.code] = e.show;
   });
+  selectCopyUserList.value = task.value.copyList ?? [];
+  selectCopyUserIds.value = (task.value.copyList ?? []).map((e) => e.userId).join(',');
+  varNodeList.value = task.value.varList;
   buttonDisabled.value = false;
-  const data = {
-    taskId: taskId.value,
-    variables: props.taskVariables,
-  };
-  const nextData = await getNextNodeList(data);
-  nestNodeList.value = nextData.data;
-  loading.value = false;
+  try {
+    const data = {
+      taskId: taskId.value,
+      variables: props.taskVariables,
+    };
+    const nextData = await getNextNodeList(data);
+    nestNodeList.value = nextData.data;
+  } finally {
+    loading.value = false;
+  }
 };
 
 onMounted(() => {});
@@ -348,11 +363,11 @@ const handleCompleteTask = async () => {
     form.value.assigneeMap = {};
   }
   if (selectCopyUserList.value && selectCopyUserList.value.length > 0) {
-    const flowCopyList: SysUserVo[] = [];
+    const flowCopyList: FlowCopyVo[] = [];
     selectCopyUserList.value.forEach((e) => {
       const copyUser = {
         userId: e.userId,
-        userName: e.nickName,
+        userName: e.userName,
       };
       flowCopyList.push(copyUser);
     });
@@ -380,7 +395,7 @@ const handleBackProcessOpen = async () => {
   backVisible.value = true;
   backLoading.value = true;
   backButtonDisabled.value = true;
-  const data = await getBackTaskNode(task.value.definitionId, task.value.nodeCode);
+  const data = await getBackTaskNode(task.value.id, task.value.nodeCode);
   taskNodeList.value = data.data;
   backLoading.value = false;
   backButtonDisabled.value = false;
@@ -419,12 +434,15 @@ const openUserSelectCopy = () => {
 // 确认抄送人员
 const userSelectCopyCallBack = (data: SysUserVo[]) => {
   if (data && data.length > 0) {
-    selectCopyUserList.value = data;
+    selectCopyUserList.value = data.map((item) => ({
+      userId: item.userId as string | number,
+      userName: item.userName ?? item.nickName ?? '',
+    }));
     selectCopyUserIds.value = selectCopyUserList.value.map((item) => item.userId).join(',');
   }
 };
 // 删除抄送人员
-const handleCopyCloseTag = (user: SysUserVo) => {
+const handleCopyCloseTag = (user: FlowCopyVo) => {
   const userId = user.userId;
   // 使用split删除用户
   const index = selectCopyUserList.value.findIndex((item) => item.userId === userId);

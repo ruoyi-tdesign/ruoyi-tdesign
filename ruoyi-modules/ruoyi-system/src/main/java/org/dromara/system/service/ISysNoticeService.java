@@ -18,7 +18,7 @@ public interface ISysNoticeService extends IService<SysNotice> {
 
 
     /**
-     * 查询通知公告列表
+     * 分页查询通知公告列表
      *
      * @param query 查询对象
      * @return SysNoticeVo

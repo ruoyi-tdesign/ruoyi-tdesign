@@ -1,6 +1,7 @@
 package org.dromara.system.domain.bo;
 
 import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMapping;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class SysTenantPackageBo extends BaseEntity {
     /**
      * 关联菜单id
      */
+//    @AutoMapping(target = "menuIds", expression = "java(org.dromara.common.core.utils.StringUtils.joinComma(source.getMenuIds()))")
     private List<Long> menuIds;
 
     /**

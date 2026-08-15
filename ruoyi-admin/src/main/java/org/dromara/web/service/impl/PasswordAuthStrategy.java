@@ -105,7 +105,7 @@ public class PasswordAuthStrategy implements IAuthStrategy<PasswordLoginBody> {
             loginService.recordLogininfor(tenantId, userId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
-        if (!code.equalsIgnoreCase(captcha)) {
+        if (!StringUtils.equalsIgnoreCase(code, captcha)) {
             loginService.recordLogininfor(tenantId, userId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
             throw new CaptchaException();
         }

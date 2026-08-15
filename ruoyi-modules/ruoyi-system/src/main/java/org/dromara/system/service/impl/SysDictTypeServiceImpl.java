@@ -50,20 +50,27 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     @Autowired
     private SysDictDataMapper dictDataMapper;
 
+    /**
+     * 分页查询字典类型列表
+     *
+     * @param query  查询条件
+     * @param pageQuery 分页参数
+     * @return 字典类型分页列表
+     */
     @Override
-    public TableDataInfo<SysDictTypeVo> selectPageDictTypeList(SysDictTypeQuery dictType) {
-        return PageQuery.of(() -> baseMapper.queryList(dictType));
+    public TableDataInfo<SysDictTypeVo> selectPageDictTypeList(SysDictTypeQuery query) {
+        return PageQuery.of(() -> baseMapper.queryList(query));
     }
 
     /**
      * 根据条件分页查询字典类型
      *
-     * @param dictType 字典类型信息
+     * @param query 字典类型信息
      * @return 字典类型集合信息
      */
     @Override
-    public List<SysDictTypeVo> selectDictTypeList(SysDictTypeQuery dictType) {
-        return baseMapper.queryList(dictType);
+    public List<SysDictTypeVo> selectDictTypeList(SysDictTypeQuery query) {
+        return baseMapper.queryList(query);
     }
 
     /**
@@ -130,7 +137,7 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
             boolean assigned = dictDataMapper.exists(new LambdaQueryWrapper<SysDictData>()
                 .eq(SysDictData::getDictType, x.getDictType()));
             if (assigned) {
-                throw new ServiceException(String.format("%1$s已分配,不能删除", x.getDictName()));
+                throw new ServiceException("{}已分配,不能删除", x.getDictName());
             }
         });
         baseMapper.deleteByIds(dictIds);
@@ -212,14 +219,14 @@ public class SysDictTypeServiceImpl extends ServiceImpl<SysDictTypeMapper, SysDi
     /**
      * 校验字典类型称是否唯一
      *
-     * @param dictType 字典类型
+     * @param bo 字典类型
      * @return 结果
      */
     @Override
-    public boolean checkDictTypeUnique(SysDictTypeBo dictType) {
+    public boolean checkDictTypeUnique(SysDictTypeBo bo) {
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysDictType>()
-            .eq(SysDictType::getDictType, dictType.getDictType())
-            .ne(ObjectUtil.isNotNull(dictType.getDictId()), SysDictType::getDictId, dictType.getDictId()));
+            .eq(SysDictType::getDictType, bo.getDictType())
+            .ne(ObjectUtil.isNotNull(bo.getDictId()), SysDictType::getDictId, bo.getDictId()));
         return !exist;
     }
 

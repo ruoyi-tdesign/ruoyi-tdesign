@@ -26,6 +26,7 @@ public class PasswordLoginBody extends LoginBody {
      */
     @NotBlank(message = "{user.password.not.blank}")
     @Length(min = 5, max = 20, message = "{user.password.length.valid}")
+//    @Pattern(regexp = RegexConstants.PASSWORD, message = "{user.password.format.valid}")
     private String password;
 
 }

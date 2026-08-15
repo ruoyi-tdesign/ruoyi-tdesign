@@ -43,30 +43,4 @@
         order by r.role_sort, r.create_time desc
     </select>
 
-    <select id="selectPageRoleList" resultMap="SysRoleResult">
-        <include refid="selectRoleVo"/>
-        ${ew.getCustomSqlSegment}
-    </select>
-
-    <select id="selectRolePermissionByUserId" parameterType="Long" resultMap="SysRoleResultVo">
-        <include refid="selectRoleVo"/>
-        WHERE r.del_flag = '0' and sur.user_id = #{userId}
-    </select>
-
-    <select id="selectRolesByUserId" parameterType="Long" resultMap="SysRoleResultVo">
-        select r.role_id,
-               r.role_name,
-               r.role_key,
-               r.role_sort,
-               r.data_scope,
-               r.status
-        from sys_role r
-        WHERE r.del_flag = '0' and r.role_id in (select role_id from sys_user_role where user_id = #{userId})
-    </select>
-
-    <select id="selectRoleById" resultMap="SysRoleResultVo">
-        <include refid="selectRoleVo"/>
-        WHERE r.del_flag = '0' and r.role_id = #{roleId}
-    </select>
-
 </mapper>

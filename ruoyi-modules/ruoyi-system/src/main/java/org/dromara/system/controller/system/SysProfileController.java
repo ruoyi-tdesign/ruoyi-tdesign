@@ -29,6 +29,7 @@ import org.dromara.system.domain.bo.SysUserBo;
 import org.dromara.system.domain.bo.SysUserPasswordBo;
 import org.dromara.system.domain.bo.SysUserProfileBo;
 import org.dromara.system.domain.query.SysLogininforQuery;
+import org.dromara.system.domain.vo.ProfileUserVo;
 import org.dromara.system.domain.vo.SysLogininforVo;
 import org.dromara.system.domain.vo.SysUserVo;
 import org.dromara.system.service.ISysFileService;
@@ -209,6 +210,11 @@ public class SysProfileController extends BaseController {
         return logininforService.queryPageList(query);
     }
 
+    /**
+     * 用户头像信息
+     *
+     * @param imgUrl 头像地址
+     */
     public record AvatarVo(String imgUrl) {}
 
     public record ProfileVo(@SensitiveIgnore SysUserVo user, String roleGroup, String postGroup) {}

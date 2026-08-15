@@ -6,17 +6,21 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.dto.CompleteTaskDTO;
 import org.dromara.common.core.domain.dto.StartProcessDTO;
 import org.dromara.common.core.domain.dto.StartProcessReturnDTO;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.WorkflowService;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
 import org.dromara.workflow.common.ConditionalOnEnable;
+import org.dromara.workflow.common.enums.MessageTypeEnum;
 import org.dromara.workflow.domain.bo.CompleteTaskBo;
 import org.dromara.workflow.domain.bo.StartProcessBo;
 import org.dromara.workflow.service.IFlwDefinitionService;
 import org.dromara.workflow.service.IFlwInstanceService;
 import org.dromara.workflow.service.IFlwTaskService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -148,4 +152,35 @@ public class WorkflowServiceImpl implements WorkflowService {
         return flwTaskService.completeTask(completeTask);
     }
 
+    /**
+     * 启动流程并办理第一个任务
+     *
+     * @param startProcess 参数
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean startCompleteTask(StartProcessDTO startProcess) {
+        try {
+            StartProcessBo processBo = new StartProcessBo();
+            processBo.setBusinessId(startProcess.getBusinessId());
+            processBo.setFlowCode(startProcess.getFlowCode());
+            processBo.setVariables(startProcess.getVariables());
+            processBo.setHandler(startProcess.getHandler());
+
+            StartProcessReturnDTO result = flwTaskService.startWorkFlow(processBo);
+            CompleteTaskBo taskBo = new CompleteTaskBo();
+            taskBo.setTaskId(result.getTaskId());
+            taskBo.setMessageType(Collections.singletonList(MessageTypeEnum.SYSTEM_MESSAGE.getCode()));
+            taskBo.setVariables(startProcess.getVariables());
+            taskBo.setHandler(startProcess.getHandler());
+
+            boolean flag = flwTaskService.completeTask(taskBo);
+            if (!flag) {
+                throw new ServiceException("流程发起异常");
+            }
+            return true;
+        } catch (Exception e) {
+            throw new ServiceException(e.getMessage());
+        }
+    }
 }

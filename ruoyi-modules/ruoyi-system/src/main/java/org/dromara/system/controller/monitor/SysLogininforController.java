@@ -1,6 +1,7 @@
 package org.dromara.system.controller.monitor;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import com.baomidou.lock.annotation.Lock4j;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
@@ -88,6 +90,7 @@ public class SysLogininforController extends BaseController {
      */
     @SaCheckPermission("monitor:logininfor:remove")
     @Log(title = "登录日志", businessType = BusinessType.CLEAN)
+    @Lock4j
     @DeleteMapping("/clean")
     public R<Void> clean() {
         logininforService.cleanLogininfor();
@@ -96,6 +99,7 @@ public class SysLogininforController extends BaseController {
 
     @SaCheckPermission("monitor:logininfor:unlock")
     @Log(title = "账户解锁", businessType = BusinessType.OTHER)
+    @RepeatSubmit()
     @GetMapping("/unlock/{userName}")
     public R<Void> unlock(@NotBlank(message = "用户名不能为空") @PathVariable("userName") String userName) {
         String loginName = GlobalConstants.PWD_ERR_CNT_KEY + userName;

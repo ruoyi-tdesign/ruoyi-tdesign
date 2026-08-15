@@ -17,9 +17,11 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.encrypt.annotation.ApiEncrypt;
 import org.dromara.common.excel.core.ExcelResult;
 import org.dromara.common.excel.utils.ExcelUtil;
+import org.dromara.common.idempotent.annotation.RepeatSubmit;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.mybatis.helper.DataPermissionHelper;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.web.core.BaseController;
@@ -126,8 +128,10 @@ public class SysUserController extends BaseController {
             // 超级管理员 如果重新加载用户信息需清除动态租户
             TenantHelper.clearUserDynamicTenant();
         }
-        SysUser sysUser = userService.getById(loginUser.getUserId());
-        SysUserVo user = MapstructUtils.convert(sysUser, SysUserVo.class);
+        SysUserVo user = DataPermissionHelper.ignore(() -> {
+            SysUser sysUser = userService.getById(loginUser.getUserId());
+            return MapstructUtils.convert(sysUser, SysUserVo.class);
+        });
         if (ObjectUtil.isNull(user)) {
             return R.fail("没有权限访问用户数据!");
         }
@@ -173,6 +177,7 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:add")
     @Log(title = "用户管理", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
     @PostMapping
     public R<Void> add(@Validated @RequestBody SysUserBo user) {
         deptService.checkDeptDataScope(user.getDeptId());
@@ -199,6 +204,7 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping
     public R<Void> edit(@Validated @RequestBody SysUserBo user) {
         userService.checkUserAllowed(user.getUserId());
@@ -250,6 +256,7 @@ public class SysUserController extends BaseController {
     @ApiEncrypt
     @SaCheckPermission("system:user:resetPwd")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping("/resetPwd")
     public R<Void> resetPwd(@RequestBody SysUserBo user) {
         userService.checkUserAllowed(user.getUserId());
@@ -263,6 +270,7 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
     @PutMapping("/changeStatus")
     public R<Void> changeStatus(@RequestBody SysUserBo user) {
         userService.checkUserAllowed(user.getUserId());
@@ -295,6 +303,7 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:edit")
     @Log(title = "用户管理", businessType = BusinessType.GRANT)
+    @RepeatSubmit()
     @PutMapping("/authRole")
     public R<Void> insertAuthRole(Long userId, Long[] roleIds) {
         userService.checkUserDataScope(userId);

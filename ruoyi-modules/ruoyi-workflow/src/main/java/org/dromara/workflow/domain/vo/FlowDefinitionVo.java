@@ -52,6 +52,11 @@ public class FlowDefinitionVo implements Serializable {
     private String flowName;
 
     /**
+     * 设计器模型（CLASSICS经典模型 MIMIC仿钉钉模型）
+     */
+    private String modelValue;
+
+    /**
      * 流程分类id
      */
     private String category;

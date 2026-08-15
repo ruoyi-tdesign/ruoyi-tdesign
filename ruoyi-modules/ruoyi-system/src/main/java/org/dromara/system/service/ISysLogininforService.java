@@ -25,7 +25,7 @@ public interface ISysLogininforService extends IService<SysLogininfor> {
     SysLogininforVo queryById(Long infoId);
 
     /**
-     * 获取系统访问记录列表
+     * 分页查询登录日志列表
      *
      * @param query 查询对象
      * @return

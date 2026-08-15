@@ -65,11 +65,7 @@ public class PlusSaTokenDao implements SaTokenDaoBySessionFollowObject {
         if (timeout == NEVER_EXPIRE) {
             RedisUtils.setObject(key, value);
         } else {
-            if (RedisUtils.hasKey(key)) {
-                RedisUtils.setObject(key, value, true);
-            } else {
-                RedisUtils.setObject(key, value, Duration.ofSeconds(timeout));
-            }
+            RedisUtils.setObject(key, value, Duration.ofSeconds(timeout));
         }
         CAFFEINE.invalidate(key);
         CAFFEINE_WRITE.put(key, Boolean.TRUE);
@@ -92,9 +88,10 @@ public class PlusSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void delete(String key) {
-        RedisUtils.deleteObject(key);
-        CAFFEINE.invalidate(key);
-        CAFFEINE_WRITE.invalidate(key);
+        if (RedisUtils.deleteObject(key)) {
+            CAFFEINE.invalidate(key);
+            CAFFEINE_WRITE.invalidate(key);
+        }
     }
 
     /**
@@ -150,11 +147,7 @@ public class PlusSaTokenDao implements SaTokenDaoBySessionFollowObject {
         if (timeout == NEVER_EXPIRE) {
             RedisUtils.setObject(key, object);
         } else {
-            if (RedisUtils.hasKey(key)) {
-                RedisUtils.setObject(key, object, true);
-            } else {
-                RedisUtils.setObject(key, object, Duration.ofSeconds(timeout));
-            }
+            RedisUtils.setObject(key, object, Duration.ofSeconds(timeout));
         }
         CAFFEINE.invalidate(key);
     }
@@ -176,9 +169,10 @@ public class PlusSaTokenDao implements SaTokenDaoBySessionFollowObject {
      */
     @Override
     public void deleteObject(String key) {
-        RedisUtils.deleteObject(key);
-        CAFFEINE.invalidate(key);
-        CAFFEINE_WRITE.invalidate(key);
+        if (RedisUtils.deleteObject(key)) {
+            CAFFEINE.invalidate(key);
+            CAFFEINE_WRITE.invalidate(key);
+        }
     }
 
     /**

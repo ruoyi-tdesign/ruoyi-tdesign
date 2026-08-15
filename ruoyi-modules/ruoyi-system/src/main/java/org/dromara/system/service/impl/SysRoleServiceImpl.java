@@ -41,9 +41,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -62,13 +63,19 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Autowired
     private SysRoleDeptMapper roleDeptMapper;
 
+    /**
+     * 分页查询角色列表
+     *
+     * @param query      查询条件
+     * @return 角色分页列表
+     */
     @Override
     public TableDataInfo<SysRoleVo> selectPageRoleList(SysRoleQuery query) {
         return PageQuery.of(query.getPageNum(), query.getPageSize()).execute(() -> baseMapper.queryList(query));
     }
 
     /**
-     * 根据条件分页查询角色数据
+     * 根据条件查询角色数据
      *
      * @param query 查询对象
      * @return 角色数据集合信息
@@ -242,14 +249,23 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         if (ObjectUtil.isNull(roleId)) {
             return;
         }
-        if (LoginHelper.isSuperAdmin()) {
+        this.checkRoleDataScope(Collections.singletonList(roleId));
+    }
+
+    /**
+     * 校验角色是否有数据权限
+     *
+     * @param roleIds 角色ID列表（支持传单个ID）
+     */
+    @Override
+    public void checkRoleDataScope(List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds) || LoginHelper.isSuperAdmin()) {
             return;
         }
-        List<SysRoleVo> roles = this.selectRoleList(new SysRoleQuery(roleId));
-        if (CollUtil.isEmpty(roles)) {
-            throw new ServiceException("没有权限访问角色数据！");
+        long count = baseMapper.selectRoleCount(roleIds);
+        if (count != roleIds.size()) {
+            throw new ServiceException("没有权限访问部分角色数据！");
         }
-
     }
 
     /**
@@ -356,7 +372,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             rm.setMenuId(menuId);
             list.add(rm);
         }
-        if (!list.isEmpty()) {
+        if (CollUtil.isNotEmpty(list)) {
             rows = roleMenuMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;
@@ -377,7 +393,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             rd.setDeptId(deptId);
             list.add(rd);
         }
-        if (list.size() > 0) {
+        if (CollUtil.isNotEmpty(list)) {
             rows = roleDeptMapper.insertBatch(list) ? list.size() : 0;
         }
         return rows;
@@ -409,24 +425,20 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @CacheEvict(cacheNames = CacheNames.SYS_ROLE_CUSTOM, allEntries = true)
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int deleteRoleByIds(Long[] roleIds) {
-        List<SysRole> roles = listByIds(Arrays.asList(roleIds));
+    public int deleteRoleByIds(List<Long> roleIds) {
+        this.checkRoleDataScope(roleIds);
+        List<SysRole> roles = baseMapper.selectByIds(roleIds);
         for (SysRole role : roles) {
-            if (role.getRoleKey().equals(Constants.ADMIN_ROLE)) {
-                throw new ServiceException("禁止删除管理员角色保留关键字【" + Constants.ADMIN_ROLE + "】");
-            }
             checkRoleAllowed(BeanUtil.toBean(role, SysRoleBo.class));
-            checkRoleDataScope(role.getRoleId());
             if (countUserRoleByRoleId(role.getRoleId()) > 0) {
                 throw new ServiceException(String.format("%1$s已分配，不能删除!", role.getRoleName()));
             }
         }
-        List<Long> ids = Arrays.asList(roleIds);
         // 删除角色与菜单关联
-        roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids));
+        roleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, roleIds));
         // 删除角色与部门关联
-        roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().in(SysRoleDept::getRoleId, ids));
-        return baseMapper.deleteByIds(ids);
+        roleDeptMapper.delete(new LambdaQueryWrapper<SysRoleDept>().in(SysRoleDept::getRoleId, roleIds));
+        return baseMapper.deleteByIds(roleIds);
     }
 
     /**
@@ -437,6 +449,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
      */
     @Override
     public int deleteAuthUser(SysUserRole userRole) {
+        if (LoginHelper.getUserId().equals(userRole.getUserId())) {
+            throw new ServiceException("不允许修改当前用户角色!");
+        }
         int rows = userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
             .eq(SysUserRole::getRoleId, userRole.getRoleId())
             .eq(SysUserRole::getUserId, userRole.getUserId()));
@@ -456,6 +471,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Override
     public int deleteAuthUsers(Long roleId, Long[] userIds) {
         List<Long> ids = List.of(userIds);
+        if (ids.contains(LoginHelper.getUserId())) {
+            throw new ServiceException("不允许修改当前用户角色!");
+        }
         int rows = userRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>()
             .eq(SysUserRole::getRoleId, roleId)
             .in(SysUserRole::getUserId, ids));
@@ -477,6 +495,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         // 新增用户与角色管理
         int rows = 1;
         List<Long> ids = List.of(userIds);
+        if (ids.contains(LoginHelper.getUserId())) {
+            throw new ServiceException("不允许修改当前用户角色!");
+        }
         List<SysUserRole> list = StreamUtils.toList(ids, userId -> {
             SysUserRole ur = new SysUserRole();
             ur.setUserId(userId);
@@ -493,9 +514,15 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     /**
-     * 清理角色关联的在线用户登录状态
+     * 根据角色ID清除该角色关联的所有在线用户的登录状态（踢出在线用户）
      *
-     * @param roleId 角色id
+     * <p>
+     * 先判断角色是否绑定用户，若无绑定则直接返回
+     * 然后遍历当前所有在线Token，查找拥有该角色的用户并强制登出
+     * 注意：在线用户量过大时，操作可能导致 Redis 阻塞，需谨慎调用
+     * </p>
+     *
+     * @param roleId 角色ID
      */
     @Override
     public void cleanOnlineUserByRole(Long roleId) {
@@ -528,6 +555,16 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         });
     }
 
+    /**
+     * 根据用户ID列表清除对应在线用户的登录状态（踢出指定用户）
+     *
+     * <p>
+     * 遍历当前所有在线Token，匹配用户ID列表中的用户，强制登出
+     * 注意：在线用户量过大时，操作可能导致 Redis 阻塞，需谨慎调用
+     * </p>
+     *
+     * @param userIds 需要清除的用户ID列表
+     */
     @Override
     public void cleanOnlineUser(List<Long> userIds) {
         List<String> keys = StpUtil.searchTokenValue("", 0, -1, false);
@@ -552,6 +589,25 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
                 }
             }
         });
+    }
+
+    /**
+     * 根据角色 ID 列表查询角色名称映射关系
+     *
+     * @param roleIds 角色 ID 列表
+     * @return Map，其中 key 为角色 ID，value 为对应的角色名称
+     */
+    @Override
+    public Map<Long, String> selectRoleNamesByIds(List<Long> roleIds) {
+        if (CollUtil.isEmpty(roleIds)) {
+            return Collections.emptyMap();
+        }
+        List<SysRole> list = baseMapper.selectList(
+            new LambdaQueryWrapper<SysRole>()
+                .select(SysRole::getRoleId, SysRole::getRoleName)
+                .in(SysRole::getRoleId, roleIds)
+        );
+        return StreamUtils.toMap(list, SysRole::getRoleId, SysRole::getRoleName);
     }
 
 }
