@@ -448,7 +448,7 @@ INSERT INTO sys_menu VALUES ('11625', '流程分类修改', '11622', '3', '#', '
 INSERT INTO sys_menu VALUES ('11626', '流程分类删除', '11622', '4', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:remove', '#', null, null, 103, 1, now(), NULL, NULL, '');
 INSERT INTO sys_menu VALUES ('11627', '流程分类导出', '11622', '5', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:export', '#', null, null, 103, 1, now(), NULL, NULL, '');
 
-INSERT INTO sys_menu VALUES ('11801', '流程表达式', '11616', '2', 'spel',    'workflow/spel/index', '', '', '0', '1', 'C', '1', '1', 'workflow:spel:list', 'input', null, null, 103, 1, now(), 1, now(), '流程达式定义菜单');
+INSERT INTO sys_menu VALUES ('11801', '流程表达式', '11616', '2', 'spel',    'workflow/spel/index', '', '', '0', '1', 'C', '1', '1', 'workflow:spel:list', 'component-input', null, null, 103, 1, now(), 1, now(), '流程达式定义菜单');
 INSERT INTO sys_menu VALUES ('11802', '流程spel达式定义查询', '11801', 1, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:query', '#', null, null, 103, 1, now(), NULL, NULL, '');
 INSERT INTO sys_menu VALUES ('11803', '流程spel达式定义新增', '11801', 2, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:add', '#', null, null, 103, 1, now(), NULL, NULL, '');
 INSERT INTO sys_menu VALUES ('11804', '流程spel达式定义修改', '11801', 3, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:edit', '#', null, null, 103, 1, now(), NULL, NULL, '');

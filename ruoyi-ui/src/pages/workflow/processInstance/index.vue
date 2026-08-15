@@ -88,12 +88,13 @@
             <template #operation="{ row, rowIndex }">
               <t-space :size="8" break-line>
                 <t-popup
+                  v-if="tab === 'running'"
                   :ref="`popoverRef${rowIndex}`"
                   trigger="click"
                   placement="left"
                   :overlay-style="{ width: '300px' }"
                 >
-                  <my-link theme="danger" @click.stop="handleInvalid(row)">
+                  <my-link theme="danger">
                     <template #prefix-icon><close-circle-icon /></template>作废
                   </my-link>
                   <template #content>
@@ -160,7 +161,14 @@
           </div>
         </t-card>
         <t-card style="margin-top: 16px">
-          <t-form ref="ruleFormRef" :data="form" :rules="rules" layout="inline" label-width="120px" @submit="handleVariable">
+          <t-form
+            ref="ruleFormRef"
+            :data="form"
+            :rules="rules"
+            layout="inline"
+            label-width="120px"
+            @submit="handleVariable"
+          >
             <t-form-item label="变量KEY" name="key">
               <t-input v-model="form.key" placeholder="请输入变量KEY" />
             </t-form-item>
@@ -439,6 +447,8 @@ const handleInvalid = async (row: FlowInstanceVo) => {
       await invalid(param).finally(() => (loading.value = false));
       getProcessInstanceRunningList();
       await proxy?.$modal.msgSuccess('操作成功');
+    } else {
+      await proxy?.$modal.msgError('当前流程已结束，不能作废');
     }
   });
 };
