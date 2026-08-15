@@ -262,7 +262,6 @@ insert into sys_menu values ('11622', '流程分类', '11616', '1', 'category', 
 insert into sys_menu values ('11629', '我发起的', '11618', '1', 'myDocument', 'workflow/task/myDocument', '', '', '0', '0', 'C', '1', '1', '', 'send', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11630', '流程监控', '11616', '4', 'monitor', '', '', '', '0', '1', 'M', '1', '1', '', 'chart-analytics', null, null, 103, 1, sysdate(), NULL, NULL, '');
 insert into sys_menu values ('11631', '待办任务', '11630', '2', 'allTaskWaiting', 'workflow/task/allTaskWaiting', '', '', '0', '0', 'C', '1', '1', '', 'task-visible', null, null, 103, 1, sysdate(), NULL, NULL, '');
-insert into sys_menu values ('11700', '流程设计', '11616', '5', 'design/index',   'workflow/processDefinition/design', '', '', '0', '1', 'C', '0', '1', 'workflow:leave:edit', '#', null, null, 103, 1, sysdate(), null, null, '/workflow/processDefinition');
 insert into sys_menu values ('11701', '请假申请', '11616', '6', 'leaveEdit/index', 'workflow/leave/leaveEdit', '', '', '0', '1', 'C', '0', '1', 'workflow:leave:edit', '#', null, null, 103, 1, sysdate(), null, null, '');
 -- 流程分类管理相关按钮
 insert into sys_menu values ('11623', '流程分类查询', '11622', '1', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:query', '#', null, null, 103, 1,sysdate(), null, null, '');

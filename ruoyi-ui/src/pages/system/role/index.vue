@@ -196,9 +196,9 @@
           <t-form-item label="菜单权限">
             <t-space direction="vertical">
               <t-space>
-                <t-checkbox v-model="menuExpand" @change="handleCheckedTreeExpand($event, 'menu')"
-                  >展开/折叠</t-checkbox
-                >
+                <t-checkbox v-model="menuExpand" @change="handleCheckedTreeExpand($event, 'menu')">
+                  展开/折叠
+                </t-checkbox>
                 <t-checkbox v-model="menuNodeAll" @change="handleCheckedTreeNodeAll($event, 'menu')">
                   全选/全不选
                 </t-checkbox>
@@ -215,7 +215,7 @@
                 empty="加载中，请稍候"
                 :keys="{ value: 'id', label: 'label', children: 'children' }"
                 @expand="onExpand('menu', $event)"
-              ></t-tree>
+              />
             </t-space>
           </t-form-item>
           <t-form-item label="备注">
@@ -260,9 +260,9 @@
           <t-form-item v-show="form.dataScope === '2'" label="数据权限">
             <t-space direction="vertical">
               <t-space>
-                <t-checkbox v-model="deptExpand" @change="handleCheckedTreeExpand($event, 'dept')"
-                  >展开/折叠</t-checkbox
-                >
+                <t-checkbox v-model="deptExpand" @change="handleCheckedTreeExpand($event, 'dept')">
+                  展开/折叠
+                </t-checkbox>
                 <t-checkbox v-model="deptNodeAll" @change="handleCheckedTreeNodeAll($event, 'dept')">
                   全选/全不选
                 </t-checkbox>
@@ -414,13 +414,13 @@ const dataScopeOptions = ref([
 // 列显隐信息
 const columns = ref<Array<PrimaryTableCol>>([
   { title: `选择列`, colKey: 'row-select', type: 'multiple', width: 50, align: 'center' },
-  { title: `角色编号`, colKey: 'roleId', align: 'center', width: 120 },
+  // { title: `角色编号`, colKey: 'roleId', align: 'center', width: 120 },
   { title: `角色名称`, colKey: 'roleName', ellipsis: true, align: 'center', width: 150 },
   { title: `权限字符`, colKey: 'roleKey', ellipsis: true, align: 'center', width: 150 },
   { title: `显示顺序`, colKey: 'roleSort', align: 'center', width: 120, sorter: true },
   { title: `状态`, colKey: 'status', align: 'center', width: 100 },
   { title: `创建时间`, colKey: 'createTime', align: 'center', sorter: true, width: '15%', minWidth: 112 },
-  { title: `操作`, colKey: 'operation', align: 'center', width: '10%', minWidth: 185 },
+  { title: `操作`, colKey: 'operation', align: 'center', width: '25%', minWidth: 185 },
 ]);
 
 const rules = ref<Record<string, Array<FormRule>>>({
