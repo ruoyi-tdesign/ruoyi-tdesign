@@ -72,8 +72,8 @@ public class WorkflowGlobalListener implements GlobalListener {
     public void start(ListenerVariable listenerVariable) {
         String ext = listenerVariable.getNode().getExt();
         if (StringUtils.isNotBlank(ext)) {
-            NodeExtVo nodeExt = nodeExtService.parseNodeExt(ext);
             Map<String, Object> variable = listenerVariable.getVariable();
+            NodeExtVo nodeExt = nodeExtService.parseNodeExt(ext, variable);
             Set<String> copyList = nodeExt.getCopySettings();
             if (CollUtil.isNotEmpty(copyList)) {
                 List<FlowCopyBo> list = StreamUtils.toList(copyList, x -> {
@@ -180,12 +180,14 @@ public class WorkflowGlobalListener implements GlobalListener {
         }
 
         if (variable.containsKey(FlowConstant.FLOW_COPY_LIST)) {
-            List<FlowCopyBo> flowCopyList = MapUtil.get(variable, FlowConstant.FLOW_COPY_LIST, new TypeReference<>() {});
+            List<FlowCopyBo> flowCopyList = MapUtil.get(variable, FlowConstant.FLOW_COPY_LIST, new TypeReference<>() {
+            });
             // 添加抄送人
             flwTaskService.setCopy(task, flowCopyList);
         }
         if (variable.containsKey(FlowConstant.MESSAGE_TYPE)) {
-            List<String> messageType = MapUtil.get(variable, FlowConstant.MESSAGE_TYPE, new TypeReference<>() {});
+            List<String> messageType = MapUtil.get(variable, FlowConstant.MESSAGE_TYPE, new TypeReference<>() {
+            });
             String notice = MapUtil.getStr(variable, FlowConstant.MESSAGE_NOTICE);
             flwCommonService.sendMessage(definition.getFlowName(), instance.getId(), messageType, notice);
         }

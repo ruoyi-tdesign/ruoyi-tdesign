@@ -10,6 +10,8 @@ import lombok.Data;
 import org.dromara.common.core.constant.RegexConstants;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
+import org.dromara.common.json.validate.JsonPattern;
+import org.dromara.common.json.validate.JsonType;
 import org.dromara.system.domain.SysMenu;
 
 import java.io.Serial;
@@ -72,6 +74,7 @@ public class SysMenuBo implements Serializable {
     /**
      * 路由参数
      */
+    @JsonPattern(type = JsonType.OBJECT, message = "路由参数必须符合JSON格式")
     private String queryParam;
 
     /**

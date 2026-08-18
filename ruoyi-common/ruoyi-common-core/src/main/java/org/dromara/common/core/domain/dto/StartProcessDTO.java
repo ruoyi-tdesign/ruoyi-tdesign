@@ -1,6 +1,7 @@
 package org.dromara.common.core.domain.dto;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import lombok.Data;
 
 import java.io.Serial;
@@ -40,11 +41,23 @@ public class StartProcessDTO implements Serializable {
      */
     private Map<String, Object> variables;
 
+    /**
+     * 流程业务扩展信息
+     */
+    private FlowInstanceBizExtDTO bizExt;
+
     public Map<String, Object> getVariables() {
         if (variables == null) {
             return new HashMap<>(16);
         }
         variables.entrySet().removeIf(entry -> Objects.isNull(entry.getValue()));
         return variables;
+    }
+
+    public FlowInstanceBizExtDTO getBizExt() {
+        if (ObjectUtil.isNull(bizExt)) {
+            bizExt = new FlowInstanceBizExtDTO();
+        }
+        return bizExt;
     }
 }
