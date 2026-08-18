@@ -86,4 +86,9 @@ public interface ISysTenantService extends IService<SysTenant> {
      * 同步租户字典
      */
     void syncTenantDict();
+
+    /**
+     * 同步租户参数配置
+     */
+    void syncTenantConfig();
 }

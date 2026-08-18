@@ -76,4 +76,11 @@ public interface ISysClientService extends IService<SysClient> {
      */
     Boolean deleteWithValidByIds(Collection<Long> ids);
 
+    /**
+     * 校验客户端key是否唯一
+     *
+     * @param client 客户端信息
+     * @return 结果
+     */
+    boolean checkClickKeyUnique(SysClientBo client);
 }

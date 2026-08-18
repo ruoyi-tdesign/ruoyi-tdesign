@@ -1,14 +1,21 @@
 package org.dromara.common.sse.core;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.sse.dto.SseMessageDto;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -26,6 +33,12 @@ public class SseEmitterManager {
 
     private final static Map<String, Map<Long, Map<String, SseEmitter>>> USER_TOKEN_EMITTERS = new ConcurrentHashMap<>();
 
+    public SseEmitterManager() {
+        // 定时执行 SSE 心跳检测
+        SpringUtils.getBean(ScheduledExecutorService.class)
+            .scheduleWithFixedDelay(this::sseMonitor, 60L, 60L, TimeUnit.SECONDS);
+    }
+
     /**
      * 建立与指定用户的 SSE 连接
      *
@@ -39,6 +52,12 @@ public class SseEmitterManager {
         // 每个用户可以有多个 SSE 连接，通过 token 进行区分
         Map<Long, Map<String, SseEmitter>> sseMap = USER_TOKEN_EMITTERS.computeIfAbsent(loginType, k -> new ConcurrentHashMap<>());
         Map<String, SseEmitter> emitters = sseMap.computeIfAbsent(userId, k -> new ConcurrentHashMap<>());
+
+        // 关闭已存在的SseEmitter，防止超过最大连接数
+        SseEmitter oldEmitter = emitters.remove(token);
+        if (oldEmitter != null) {
+            oldEmitter.complete();
+        }
 
         // 创建一个新的 SseEmitter 实例，超时时间设置为一天 避免连接之后直接关闭浏览器导致连接停滞
         SseEmitter emitter = new SseEmitter(86400000L);
@@ -101,6 +120,44 @@ public class SseEmitterManager {
         } else {
             sseMap.remove(userId);
         }
+    }
+
+    /**
+     * SSE 心跳检测，关闭无效连接
+     */
+    public void sseMonitor() {
+        final SseEmitter.SseEventBuilder heartbeat = SseEmitter.event().comment("heartbeat");
+        USER_TOKEN_EMITTERS.forEach((loginType, sseMap) -> {
+            // 记录需要移除的用户ID
+            List<Long> toRemoveUsers = new ArrayList<>();
+            sseMap.forEach((userId, emitterMap) -> {
+                if (CollUtil.isEmpty(emitterMap)) {
+                    toRemoveUsers.add(userId);
+                    return;
+                }
+
+                emitterMap.entrySet().removeIf(entry -> {
+                    try {
+                        entry.getValue().send(heartbeat);
+                        return false;
+                    } catch (Exception ex) {
+                        try {
+                            entry.getValue().complete();
+                        } catch (Exception ignore) {
+                            // 忽略重复关闭异常
+                        }
+                        return true; // 发送失败 → 移除该连接
+                    }
+                });
+
+                // 移除空连接用户
+                if (emitterMap.isEmpty()) {
+                    toRemoveUsers.add(userId);
+                }
+            });
+            // 循环结束后统一清理空用户，避免并发修改异常
+            toRemoveUsers.forEach(sseMap::remove);
+        });
     }
 
     /**
