@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.utils.SpringUtils;
+import org.dromara.common.core.utils.spring.SpringUtils;
 
 /**
  * ID 生成工具类
