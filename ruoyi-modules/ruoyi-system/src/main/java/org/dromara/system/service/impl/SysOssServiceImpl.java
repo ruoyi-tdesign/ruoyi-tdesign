@@ -200,6 +200,9 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
      */
     @Override
     public SysOssVo upload(MultipartFile file, SysOssBo bo) {
+        if (ObjectUtil.isNull(file) || file.isEmpty()) {
+            throw new ServiceException("上传文件不能为空");
+        }
         String originalFilename = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalFilename, originalFilename.lastIndexOf('.'), originalFilename.length());
         if (suffix != null) {
@@ -228,16 +231,20 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
      */
     @Override
     public SysOssVo upload(File file, SysOssBo bo) {
+        if (ObjectUtil.isNull(file) || !file.isFile() || file.length() <= 0) {
+            throw new ServiceException("上传文件不能为空");
+        }
         String originalFileName = file.getName();
         String suffix = StringUtils.substring(originalFileName, originalFileName.lastIndexOf("."), originalFileName.length());
         if (suffix != null) {
             suffix = suffix.toLowerCase();
         }
         OssClient storage = OssFactory.instance();
+        long length = file.length();
         UploadResult uploadResult = storage.uploadSuffix(file, suffix);
         String mimeType = FileUtil.getMimeType(file.getAbsolutePath());
         SysOssExt ext1 = new SysOssExt();
-        ext1.setFileSize(file.length());
+        ext1.setFileSize(length);
         ext1.setContentType(mimeType);
         // 保存文件信息
         return buildResultEntity(originalFileName, suffix, storage.getConfigKey(), uploadResult, bo, ext1);
@@ -343,7 +350,7 @@ public class SysOssServiceImpl extends ServiceImpl<SysOssMapper, SysOss> impleme
             OssClient storage = OssFactory.instance(oss.getService());
             // 仅修改桶类型为 private 的URL，临时URL时长为120s
             if (AccessPolicyType.PRIVATE == storage.getAccessPolicy()) {
-                oss.setUrl(storage.getPrivateUrl(oss.getFileName(), Duration.ofSeconds(120)));
+                oss.setUrl(storage.createPresignedGetUrl(oss.getFileName(), Duration.ofSeconds(120)));
             }
         } catch (Exception e) {
             log.error("获取oss地址失败", e);

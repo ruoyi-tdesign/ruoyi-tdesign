@@ -1,7 +1,7 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import com.baomidou.dynamic.datasource.annotation.DS;
+import cn.hutool.core.lang.Dict;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.GlobalConstants;
@@ -11,6 +11,7 @@ import org.dromara.common.core.service.ConfigService;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
 import org.dromara.common.redis.utils.CacheUtils;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,7 +45,6 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      * 分页查询参数配置列表
      *
      * @param config    查询条件
-     * @param pageQuery 分页参数
      * @return 参数配置分页列表
      */
     @Override
@@ -70,15 +69,16 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      * @param configKey 参数key
      * @return 参数键值
      */
-    @Cacheable(cacheNames = CacheNames.SYS_CONFIG, key = "#configKey")
     @Override
     public String selectConfigByKey(String configKey) {
-        Optional<SysConfig> oneOpt = lambdaQuery()
-            .eq(SysConfig::getConfigKey, configKey)
-            .select(SysConfig::getConfigId, SysConfig::getConfigValue)
-            .eq(SysConfig::getIsGlobal, YesNoEnum.NO.getCodeNum())
-            .oneOpt();
-        return oneOpt.map(SysConfig::getConfigValue).orElse(StringUtils.EMPTY);
+        return CacheUtils.get(CacheNames.SYS_CONFIG, configKey, () -> {
+            Optional<SysConfig> oneOpt = lambdaQuery()
+                .eq(SysConfig::getConfigKey, configKey)
+                .select(SysConfig::getConfigId, SysConfig::getConfigValue)
+                .eq(SysConfig::getIsGlobal, YesNoEnum.NO.getCodeNum())
+                .oneOpt();
+            return oneOpt.map(SysConfig::getConfigValue).orElse(StringUtils.EMPTY);
+        });
     }
 
     /**
@@ -323,7 +323,6 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
      * @return 参数值
      */
     @Override
-    @Cacheable(cacheNames = CacheNames.SYS_CONFIG, key = "#configKey")
     public String getConfigValue(String configKey) {
         return selectConfigByKey(configKey);
     }
@@ -347,5 +346,55 @@ public class SysConfigServiceImpl extends ServiceImpl<SysConfigMapper, SysConfig
             return oneOpt.get().getConfigValue();
         }
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * 根据参数 key 获取 Map 类型的配置
+     *
+     * @param configKey 参数 key
+     * @return Dict 对象，如果配置为空或无法解析，返回空 Dict
+     */
+    @Override
+    public Dict getConfigMap(String configKey) {
+        String configValue = getConfigValue(configKey);
+        return JsonUtils.parseMap(configValue);
+    }
+
+    /**
+     * 根据参数 key 获取 Map 类型的配置列表
+     *
+     * @param configKey 参数 key
+     * @return Dict 列表，如果配置为空或无法解析，返回空列表
+     */
+    @Override
+    public List<Dict> getConfigArrayMap(String configKey) {
+        String configValue = getConfigValue(configKey);
+        return JsonUtils.parseArrayMap(configValue);
+    }
+
+    /**
+     * 根据参数 key 获取指定类型的配置对象
+     *
+     * @param configKey 参数 key
+     * @param clazz     目标对象类型
+     * @return 对象实例，如果配置为空或无法解析，返回 null
+     */
+    @Override
+    public <T> T getConfigObject(String configKey, Class<T> clazz) {
+        String configValue = getConfigValue(configKey);
+        return JsonUtils.parseObject(configValue, clazz);
+    }
+
+    /**
+     * 根据参数 key 获取指定类型的配置列表=
+     *
+     * @param configKey 参数 key
+     * @param clazz     目标元素类型
+     * @return 指定类型列表，如果配置为空或无法解析，返回空列表
+     */
+    @Override
+    public <T> List<T> getConfigArray(String configKey, Class<T> clazz) {
+        String configValue = getConfigValue(configKey);
+        return JsonUtils.parseArray(configValue, clazz);
     }
 }

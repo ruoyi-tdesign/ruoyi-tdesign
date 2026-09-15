@@ -5,6 +5,7 @@ import org.dromara.common.core.events.LoginEvent;
 import org.dromara.common.core.events.LogoutEvent;
 import org.dromara.common.core.events.NoticeInsertEvent;
 import org.dromara.common.core.service.DictService;
+import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.sse.core.SseEmitterManager;
@@ -12,6 +13,7 @@ import org.dromara.common.sse.utils.SseMessageUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +37,7 @@ public class SystemEventsListener {
     @EventListener
     public void login(LoginEvent loginEvent) {
         scheduledExecutorService.schedule(() -> {
-            String message = StringUtils.format("[登录] 欢迎登录{}后台管理系统", SpringUtils.getApplicationName());
+            String message = StringUtils.format(DateUtils.getTodayHour(new Date()) + "好，欢迎登录 RuoYi-Vue-Plus 后台管理系统", SpringUtils.getApplicationName());
             SseMessageUtils.sendMessage(loginEvent.getLoginType(), loginEvent.getUserId(), message);
         }, 5, TimeUnit.SECONDS);
     }
