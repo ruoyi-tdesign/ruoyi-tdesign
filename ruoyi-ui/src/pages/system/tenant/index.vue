@@ -75,6 +75,10 @@
                 <template #icon> <download-icon /> </template>
                 导出
               </t-button>
+              <t-button v-if="userId === 1" theme="success" variant="outline" @click="handleSyncTenantConfig">
+                <template #icon> <refresh-icon /> </template>
+                同步租户参数配置
+              </t-button>
               <span class="selected-count">已选 {{ ids.length }} 项</span>
             </t-col>
             <t-col flex="none">
@@ -277,7 +281,7 @@ import type {
   SubmitContext,
   TableSort,
 } from 'tdesign-vue-next';
-import { computed, getCurrentInstance, ref } from 'vue';
+import { computed, getCurrentInstance, ref, toRefs } from 'vue';
 
 import type { SysTenantForm, SysTenantQuery, SysTenantVo } from '@/api/system/model/tenantModel';
 import type { SysTenantPackageVo } from '@/api/system/model/tenantPackageModel';
@@ -287,15 +291,18 @@ import {
   delTenant,
   getTenant,
   listTenant,
+  syncTenantConfig,
   syncTenantPackage,
   updateTenant,
 } from '@/api/system/tenant';
 import { selectTenantPackage } from '@/api/system/tenantPackage';
 import { DEFAULT_TENANT_ID } from '@/constants';
+import { useUserStore } from '@/store';
 import { ArrayOps } from '@/utils/array';
 import { handleChangeStatus } from '@/utils/ruoyi';
 
 const { proxy } = getCurrentInstance();
+const { userId } = toRefs(useUserStore());
 const { sys_normal_disable } = proxy.useDict('sys_normal_disable');
 
 const queryRef = ref<FormInstanceFunctions>();
@@ -542,6 +549,20 @@ function handleSyncTenantPackage(row: SysTenantVo) {
       })
       .finally(() => {
         loading.value = false;
+        proxy.$modal.msgClose(msgLoading);
+      });
+  });
+}
+
+/** 同步租户参数配置按钮操作 */
+function handleSyncTenantConfig() {
+  proxy.$modal.confirm('确认要同步所有租户参数配置吗？', () => {
+    const msgLoading = proxy.$modal.msgLoading('正在同步中...');
+    return syncTenantConfig()
+      .then((res) => {
+        proxy.$modal.msgSuccess(res.msg);
+      })
+      .finally(() => {
         proxy.$modal.msgClose(msgLoading);
       });
   });

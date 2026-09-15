@@ -278,6 +278,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
                 .setWeight(menu.getOrderNum());
             menuTree.put("menuType", menu.getMenuType());
             menuTree.put("icon", menu.getIcon());
+            menuTree.put("visible", menu.getVisible());
+            menuTree.put("status", menu.getStatus());
         });
     }
 

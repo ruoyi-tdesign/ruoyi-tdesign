@@ -14,7 +14,7 @@
 
     <properties>
         <revision>1.4.1</revision>
-        <spring-boot.version>3.5.6</spring-boot.version>
+        <spring-boot.version>3.5.7</spring-boot.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>17</java.version>
@@ -30,7 +30,7 @@
         <pagehelper.version>2.1.0</pagehelper.version>
         <p6spy.version>3.9.1</p6spy.version>
         <hutool.version>5.8.40</hutool.version>
-        <spring-boot-admin.version>3.5.3</spring-boot-admin.version>
+        <spring-boot-admin.version>3.5.5</spring-boot-admin.version>
         <redisson.version>3.51.0</redisson.version>
         <lock4j.version>2.2.7</lock4j.version>
         <dynamic-ds.version>4.3.1</dynamic-ds.version>
@@ -51,7 +51,7 @@
         <!-- 面向运行时的D-ORM依赖 -->
         <anyline.version>8.7.2-20250603</anyline.version>
         <!-- 工作流配置 -->
-        <warm-flow.version>1.8.1</warm-flow.version>
+        <warm-flow.version>1.8.2</warm-flow.version>
         <x-file-storage.version>2.3.0</x-file-storage.version>
 
         <!-- 插件版本 -->

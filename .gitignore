@@ -39,6 +39,7 @@ nbdist/
 # Others
 logs
 *.log
+*.log.gz
 *.xml.versionsBackup
 *.swp
 

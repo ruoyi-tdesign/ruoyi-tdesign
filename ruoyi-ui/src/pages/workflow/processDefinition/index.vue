@@ -214,7 +214,7 @@
         </t-form-item>
         <t-form-item label="是否动态表单" name="formCustom">
           <t-radio-group v-model="form.formCustom">
-            <t-radio value="Y" variant="outline">是</t-radio>
+            <t-radio value="Y" variant="outline" disabled>是</t-radio>
             <t-radio value="N" variant="outline">否</t-radio>
           </t-radio-group>
         </t-form-item>

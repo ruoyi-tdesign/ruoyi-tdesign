@@ -319,7 +319,7 @@ const openDialog = async (id?: string | number) => {
   const response = await getTask(taskId.value);
   task.value = response.data;
   buttonObj.value = {};
-  task.value.buttonList.forEach((e) => {
+  task.value.buttonList?.forEach((e) => {
     buttonObj.value[e.code] = e.show;
   });
   selectCopyUserList.value = task.value.copyList ?? [];

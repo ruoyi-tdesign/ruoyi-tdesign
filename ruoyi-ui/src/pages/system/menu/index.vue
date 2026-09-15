@@ -58,7 +58,12 @@
                 <template #icon> <unfold-less-icon v-if="isExpand" /> <unfold-more-icon v-else /> </template>
                 全部{{ isExpand ? '折叠' : '展开' }}
               </t-button>
-              <t-button theme="danger" variant="outline" @click="handleCascadeDelete">
+              <t-button
+                v-hasPermi="['system:menu:remove']"
+                theme="danger"
+                variant="outline"
+                @click="handleCascadeDelete"
+              >
                 <template #icon> <delete-icon /> </template>
                 级联删除
               </t-button>

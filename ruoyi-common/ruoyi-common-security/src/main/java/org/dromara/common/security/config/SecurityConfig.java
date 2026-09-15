@@ -8,11 +8,14 @@ import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpLogic;
 import cn.dev33.satoken.util.SaResult;
+import cn.dev33.satoken.util.SaTokenConsts;
 import cn.hutool.core.collection.CollUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.HttpStatus;
 import org.dromara.common.core.domain.model.BaseUser;
+import org.dromara.common.core.utils.ServletUtils;
 import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.satoken.config.MultipleSaTokenConfig;
 import org.dromara.common.satoken.config.MultipleSaTokenProperties;
@@ -69,6 +72,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                     }
                 }
                 if (SaSecurityContext.getContext() == null) {
+                    HttpServletResponse response = ServletUtils.getResponse();
+                    response.setContentType(SaTokenConsts.CONTENT_TYPE_APPLICATION_JSON);
                     throw NotLoginException.newInstance("unknown", NotLoginException.NOT_TOKEN, NotLoginException.NOT_TOKEN_MESSAGE, null)
                         .setCode(SaErrorCode.CODE_11011);
                 }
@@ -90,7 +95,11 @@ public class SecurityConfig implements WebMvcConfigurer {
             .setAuth(obj -> {
                 SaHttpBasicUtil.check(username + ":" + password);
             })
-            .setError(e -> SaResult.error(e.getMessage()).setCode(HttpStatus.UNAUTHORIZED));
+            .setError(e -> {
+                HttpServletResponse response = ServletUtils.getResponse();
+                response.setContentType(SaTokenConsts.CONTENT_TYPE_APPLICATION_JSON);
+                return SaResult.error(e.getMessage()).setCode(HttpStatus.UNAUTHORIZED);
+            });
     }
 
 }
