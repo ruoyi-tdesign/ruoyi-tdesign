@@ -84,3 +84,10 @@ export function syncTenantPackage(tenantId: string, packageId: number) {
     params: data,
   });
 }
+
+// 同步租户参数配置
+export function syncTenantConfig() {
+  return request.get<R>({
+    url: '/system/tenant/syncTenantConfig',
+  });
+}
