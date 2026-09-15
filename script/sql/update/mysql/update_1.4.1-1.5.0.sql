@@ -36,11 +36,11 @@ INSERT INTO flow_spel VALUES (1, 'spelRuleComponent', 'selectDeptLeaderById', 'i
 INSERT INTO flow_spel VALUES (2, NULL, NULL, 'initiator', '${initiator}', '流程发起人', '0', '0', 103, 1, sysdate(), 1, sysdate());
 
 INSERT INTO sys_menu VALUES ('11801', '流程表达式', '11616', '2', 'spel',    'workflow/spel/index', '', '', '0', '1', 'C', '1', '1', 'workflow:spel:list', 'component-input', null, null, 103, 1, sysdate(), 1, sysdate(), '流程达式定义菜单');
-INSERT INTO sys_menu VALUES ('11802', '流程spel达式定义查询', '11801', 1, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11803', '流程spel达式定义新增', '11801', 2, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11804', '流程spel达式定义修改', '11801', 3, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11805', '流程spel达式定义删除', '11801', 4, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:remove', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11806', '流程spel达式定义导出', '11801', 5, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:export', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11802', '流程spel表达式定义查询', '11801', 1, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11803', '流程spel表达式定义新增', '11801', 2, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11804', '流程spel表达式定义修改', '11801', 3, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11805', '流程spel表达式定义删除', '11801', 4, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:remove', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11806', '流程spel表达式定义导出', '11801', 5, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:export', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
 
 ALTER TABLE `flow_definition`
     ADD COLUMN `model_value` varchar(40) NOT NULL DEFAULT 'CLASSICS' COMMENT '设计器模式（CLASSICS经典模式 MIMIC仿钉钉模式）' AFTER `flow_name`;
@@ -96,3 +96,10 @@ ALTER TABLE `flow_task`
 
 ALTER TABLE `flow_user`
     ADD COLUMN `update_by` varchar(64) NULL DEFAULT NULL COMMENT '更新人' AFTER `update_time`;
+
+-- ----------------------------
+-- 流程节点表：签署比例值字段改为字符串，移除已废弃的处理器字段
+-- ----------------------------
+ALTER TABLE `flow_node` MODIFY COLUMN `node_ratio` varchar(200) NULL COMMENT '流程签署比例值';
+ALTER TABLE `flow_node` DROP COLUMN `handler_type`;
+ALTER TABLE `flow_node` DROP COLUMN `handler_path`;
