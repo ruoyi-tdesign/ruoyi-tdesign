@@ -162,4 +162,13 @@ public interface ISysMenuService extends IService<SysMenu> {
      * @return 结果
      */
     boolean checkMenuNameUnique(SysMenuBo menu);
+
+    /**
+     * 校验路由组合是否唯一
+     *
+     * @param menu 菜单信息
+     * @return 结果
+     */
+    boolean checkRouteConfigUnique(SysMenuBo menu);
+
 }

@@ -34,7 +34,7 @@ comment on column sys_tenant.status is '租户状态（1正常 0停用）';
 comment on column sys_tenant.del_flag is '删除标志（0代表存在 1代表删除）';
 comment on column sys_tenant_package.status is '状态（1正常 0停用）';
 comment on column sys_tenant_package.del_flag is '删除标志（0代表存在 1代表删除）';
-comment on column sys_user.status is '帐号状态（1正常 0停用）';
+comment on column sys_user.status is '账号状态（1正常 0停用）';
 comment on column sys_user.del_flag is '删除标志（0代表存在 1代表删除）';
 
 -- 存在数据时使用该脚本，对状态值取反

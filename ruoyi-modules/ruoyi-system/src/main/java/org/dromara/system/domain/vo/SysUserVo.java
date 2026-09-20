@@ -100,7 +100,7 @@ public class SysUserVo implements Serializable {
     private String password;
 
     /**
-     * 帐号状态（1正常 0停用）
+     * 账号状态（1正常 0停用）
      */
     private String status;
 

@@ -47,7 +47,7 @@ public class SysUserQuery extends BasePageQuery {
     private String phonenumber;
 
     /**
-     * 帐号状态（1正常 0停用）
+     * 账号状态（1正常 0停用）
      */
     private String status;
 

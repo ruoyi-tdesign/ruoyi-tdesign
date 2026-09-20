@@ -189,11 +189,11 @@ public class SysMenuVo implements Serializable {
     public String getRouterPath() {
         String routerPath = this.path;
         // 内链打开外网方式
-        if (getParentId() != 0L && isInnerLink()) {
+        if (!Constants.TOP_PARENT_ID.equals(getParentId()) && isInnerLink()) {
             routerPath = innerLinkReplaceEach(routerPath);
         }
         // 非外链并且是一级目录（类型为目录）
-        if (0L == getParentId() && MenuTypeEnum.DIRECTORY.getType().equals(getMenuType())
+        if (Constants.TOP_PARENT_ID.equals(getParentId()) && MenuTypeEnum.DIRECTORY.getType().equals(getMenuType())
             && YesNoFrameEnum.NO.getCode().equals(getIsFrame())) {
             routerPath = "/" + this.path;
         }
@@ -211,7 +211,7 @@ public class SysMenuVo implements Serializable {
         String component = SystemConstants.LAYOUT;
         if (StringUtils.isNotEmpty(this.component) && !isMenuFrame()) {
             component = this.component;
-        } else if (StringUtils.isEmpty(this.component) && getParentId() != 0L && isInnerLink()) {
+        } else if (StringUtils.isEmpty(this.component) && !Constants.TOP_PARENT_ID.equals(getParentId()) && isInnerLink()) {
             component = SystemConstants.INNER_LINK;
         } else if (StringUtils.isEmpty(this.component) && isParentView()) {
             component = SystemConstants.PARENT_VIEW;
@@ -223,7 +223,7 @@ public class SysMenuVo implements Serializable {
      * 是否为菜单内部跳转
      */
     public boolean isMenuFrame() {
-        return getParentId() == 0L && MenuTypeEnum.MENU.getType().equals(menuType) && YesNoFrameEnum.NO.getCode().equals(isFrame);
+        return Constants.TOP_PARENT_ID.equals(getParentId()) && MenuTypeEnum.MENU.getType().equals(menuType) && YesNoFrameEnum.NO.getCode().equals(isFrame);
     }
 
     /**
@@ -237,7 +237,7 @@ public class SysMenuVo implements Serializable {
      * 是否为parent_view组件
      */
     public boolean isParentView() {
-        return getParentId() != 0L && MenuTypeEnum.DIRECTORY.getType().equals(menuType);
+        return !Constants.TOP_PARENT_ID.equals(getParentId()) && MenuTypeEnum.DIRECTORY.getType().equals(menuType);
     }
 
     /**

@@ -9,7 +9,7 @@
       </template>
     </t-table>
 
-    <h3>你可以绑定以下第三方帐号</h3>
+    <h3>你可以绑定以下第三方账号</h3>
     <t-space>
       <t-button shape="circle" variant="outline" title="使用 微信 账号授权登录" @click="authUrl('wechat_open')">
         <template #icon>

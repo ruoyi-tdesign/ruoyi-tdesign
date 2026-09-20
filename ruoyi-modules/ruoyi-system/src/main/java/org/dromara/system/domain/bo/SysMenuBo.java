@@ -2,6 +2,7 @@ package org.dromara.system.domain.bo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.linpeilie.annotations.AutoMapper;
+import io.github.linpeilie.annotations.AutoMappers;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -13,6 +14,7 @@ import org.dromara.common.core.validate.EditGroup;
 import org.dromara.common.json.validate.JsonPattern;
 import org.dromara.common.json.validate.JsonType;
 import org.dromara.system.domain.SysMenu;
+import org.dromara.system.domain.vo.SysMenuVo;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -23,7 +25,10 @@ import java.io.Serializable;
  * @author Michelle.Chung
  */
 @Data
-@AutoMapper(target = SysMenu.class, reverseConvertGenerate = false)
+@AutoMappers({
+    @AutoMapper(target = SysMenu.class, reverseConvertGenerate = false),
+    @AutoMapper(target = SysMenuVo.class, reverseConvertGenerate = false)
+})
 public class SysMenuBo implements Serializable {
 
     @Serial

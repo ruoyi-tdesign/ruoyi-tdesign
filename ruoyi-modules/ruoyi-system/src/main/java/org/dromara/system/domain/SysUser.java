@@ -85,10 +85,10 @@ public class SysUser extends TenantEntity {
     private String password;
 
     /**
-     * 帐号状态（1正常 0停用）
+     * 账号状态（1正常 0停用）
      */
-    @NotBlank(message = "帐号状态不能为空")
-    @Pattern(regexp = "^[01]$", message = "帐号状态值错误")
+    @NotBlank(message = "账号状态不能为空")
+    @Pattern(regexp = "^[01]$", message = "账号状态值错误")
     private String status;
 
     /**
