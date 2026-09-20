@@ -30,6 +30,8 @@ interface ImportMetaEnv {
   readonly VITE_APP_PASSWORD: string;
   /** SSE开关 */
   readonly VITE_APP_SSE: string;
+  /** 开发者工具保护开关(生产环境默认开启) */
+  readonly VITE_ENABLE_ANTI_DEBUG: string;
 }
 
 interface ImportMeta {

@@ -17,6 +17,7 @@ import ImagePreview from '@/components/image-preview/index.vue';
 // 图片上传组件
 import ImageUpload from '@/components/image-upload/index.vue';
 import Layout from '@/layouts/index.vue';
+import { initDevToolsProtection } from '@/utils/devtools-protection';
 import { useDict } from '@/utils/dict';
 import { download } from '@/utils/request';
 import {
@@ -70,3 +71,6 @@ app.use(plugins);
 directive(app);
 
 app.mount('#app');
+
+// 初始化开发者工具保护（仅生产环境）
+initDevToolsProtection();

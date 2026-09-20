@@ -292,6 +292,19 @@
                 </t-radio-group>
               </t-form-item>
             </t-col>
+            <t-col v-if="form.menuType !== 'F' && form.visible === '0'" :span="6">
+              <t-form-item name="remark">
+                <template #label>
+                  <span>
+                    <t-tooltip content="隐藏菜单填写默认激活路由，比如激活父菜单的路由 /system/user" placement="top">
+                      <help-circle-filled-icon />
+                    </t-tooltip>
+                    激活路由
+                  </span>
+                </template>
+                <t-input v-model="form.remark" placeholder="请输入激活路径" clearable />
+              </t-form-item>
+            </t-col>
             <t-col :span="6">
               <t-form-item>
                 <template #label>

@@ -141,7 +141,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 import { getCodeImg } from '@/api/login';
 import type { LoginParam } from '@/api/model/loginModel';
-import { authBinding } from '@/api/system/social';
+import { authRouterUrl } from '@/api/system/social';
 import GiteeSvg from '@/assets/icons/svg/gitee.svg?component';
 import MaxKey from '@/assets/icons/svg/maxkey.svg?component';
 import TopIam from '@/assets/icons/svg/topiam.svg?url';
@@ -189,6 +189,8 @@ function getCode() {
   getCodeImg().then((res) => {
     captchaEnabled.value = res.data.captchaEnabled === undefined ? true : res.data.captchaEnabled;
     if (captchaEnabled.value) {
+      // 刷新验证码时清空输入框
+      formData.value.code = '';
       codeUrl.value = `data:image/gif;base64,${res.data.img}`;
       formData.value.uuid = res.data.uuid;
     }
@@ -281,7 +283,7 @@ const onSubmit = async (ctx: SubmitContext) => {
  * @param type
  */
 function doSocialLogin(type: string) {
-  authBinding(type).then((res) => {
+  authRouterUrl(type).then((res) => {
     // 获取授权地址跳转
     window.location.href = res.data;
   });
