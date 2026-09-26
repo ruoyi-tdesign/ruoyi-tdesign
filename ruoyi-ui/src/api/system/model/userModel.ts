@@ -18,7 +18,7 @@ export interface SysUserQuery extends BaseEntity {
   email?: string;
   /** 手机号码 */
   phonenumber?: string;
-  /** 帐号状态（1正常 0停用） */
+  /** 账号状态（1正常 0停用） */
   status?: string;
   /** 数据权限 当前角色ID */
   roleId?: number;
@@ -51,7 +51,7 @@ export interface SysUserForm {
   avatar?: string;
   /** 密码 */
   password?: string;
-  /** 帐号状态（1正常 0停用） */
+  /** 账号状态（1正常 0停用） */
   status?: string;
   /** 最后登录IP */
   loginIp?: string;
@@ -100,7 +100,7 @@ export interface SysUserVo {
   avatarUrl?: string;
   /** 密码 */
   password?: string;
-  /** 帐号状态（1正常 0停用） */
+  /** 账号状态（1正常 0停用） */
   status?: string;
   /** 最后登录IP */
   loginIp?: string;
@@ -179,7 +179,7 @@ export interface UserDTO {
   phonenumber?: string;
   /** 用户性别（0男 1女 2未知） */
   sex?: string;
-  /** 帐号状态（0正常 1停用） */
+  /** 账号状态（0正常 1停用） */
   status?: string;
   /** 创建时间 */
   createTime?: string;

@@ -2,8 +2,8 @@ import type { R } from '@/api/model/resultModel';
 import type { SysSocialVo } from '@/api/system/model/socialModel';
 import { request } from '@/utils/request';
 
-// 绑定账号
-export function authBinding(source: string) {
+// 获取跳转URL
+export function authRouterUrl(source: string) {
   return request.get<R<string>>({
     url: `/auth/binding/${source}`,
   });

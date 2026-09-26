@@ -14,7 +14,9 @@ import org.dromara.common.oss.exception.OssException;
 import org.dromara.common.oss.properties.OssProperties;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.async.*;
+import software.amazon.awssdk.core.async.AsyncResponseTransformer;
+import software.amazon.awssdk.core.async.BlockingInputStreamAsyncRequestBody;
+import software.amazon.awssdk.core.async.ResponsePublisher;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -43,6 +45,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -104,7 +107,11 @@ public class OssClient {
                 .region(of())
                 .forcePathStyle(isStyle)
                 .httpClient(NettyNioAsyncHttpClient.builder()
-                    .connectionTimeout(Duration.ofSeconds(60)).build())
+                    .connectionTimeout(Duration.ofSeconds(60))
+                    .connectionAcquisitionTimeout(Duration.ofSeconds(30))
+                    .maxConcurrency(100)
+                    .maxPendingConnectionAcquires(1000)
+                    .build())
                 .build();
 
             //AWS基于 CRT 的 S3 AsyncClient 实例用作 S3 传输管理器的底层客户端
@@ -144,7 +151,8 @@ public class OssClient {
         try {
             // 构建上传请求对象
             FileUpload fileUpload = transferManager.uploadFile(
-                x -> x.putObjectRequest(
+                x -> {
+                    x.source(filePath).putObjectRequest(
                         y -> y.bucket(properties.getBucketName())
                             .key(key)
                             .contentMD5(StringUtils.isNotEmpty(md5Digest) ? md5Digest : null)
@@ -152,10 +160,13 @@ public class OssClient {
                             // 用于设置对象的访问控制列表（ACL）。不同云厂商对ACL的支持和实现方式有所不同，
                             // 因此根据具体的云服务提供商，你可能需要进行不同的配置（自行开启，阿里云有acl权限配置，腾讯云没有acl权限配置）
                             //.acl(getAccessPolicy().getObjectCannedACL())
-                            .build())
-                    .addTransferListener(LoggingTransferListener.create())
-                    .source(filePath).build());
-
+                            .build()
+                    );
+                    if (log.isDebugEnabled()) {
+                        x.addTransferListener(LoggingTransferListener.create());
+                    }
+                }
+            );
             // 等待上传完成并获取上传结果
             CompletedFileUpload uploadResult = fileUpload.completionFuture().join();
             String eTag = uploadResult.response().eTag();
@@ -195,16 +206,21 @@ public class OssClient {
 
             // 使用 transferManager 进行上传
             Upload upload = transferManager.upload(
-                x -> x.requestBody(body).addTransferListener(LoggingTransferListener.create())
-                    .putObjectRequest(
+                x -> {
+                    x.requestBody(body).putObjectRequest(
                         y -> y.bucket(properties.getBucketName())
                             .key(key)
                             .contentType(contentType)
                             // 用于设置对象的访问控制列表（ACL）。不同云厂商对ACL的支持和实现方式有所不同，
                             // 因此根据具体的云服务提供商，你可能需要进行不同的配置（自行开启，阿里云有acl权限配置，腾讯云没有acl权限配置）
                             //.acl(getAccessPolicy().getObjectCannedACL())
-                            .build())
-                    .build());
+                            .build()
+                    );
+                    if (log.isDebugEnabled()) {
+                        x.addTransferListener(LoggingTransferListener.create());
+                    }
+                }
+            );
 
             // 将输入流写入请求体
             body.writeInputStream(inputStream);
@@ -232,13 +248,17 @@ public class OssClient {
         Path tempFilePath = FileUtils.createTempFile().toPath();
         // 使用 S3TransferManager 下载文件
         FileDownload downloadFile = transferManager.downloadFile(
-            x -> x.getObjectRequest(
+            x -> {
+                x.destination(tempFilePath).getObjectRequest(
                     y -> y.bucket(properties.getBucketName())
                         .key(removeBaseUrl(path))
-                        .build())
-                .addTransferListener(LoggingTransferListener.create())
-                .destination(tempFilePath)
-                .build());
+                        .build()
+                );
+                if (log.isDebugEnabled()) {
+                    x.addTransferListener(LoggingTransferListener.create());
+                }
+            }
+        );
         // 等待文件下载操作完成
         downloadFile.completionFuture().join();
         return tempFilePath;
@@ -247,8 +267,8 @@ public class OssClient {
     /**
      * 下载文件从 Amazon S3 到 输出流
      *
-     * @param key 文件在 Amazon S3 中的对象键
-     * @param out 输出流
+     * @param key      文件在 Amazon S3 中的对象键
+     * @param out      输出流
      * @param consumer 自定义处理逻辑
      * @throws OssException 如果下载失败，抛出自定义异常
      */
@@ -263,26 +283,24 @@ public class OssClient {
     /**
      * 下载文件从 Amazon S3 到 输出流
      *
-     * @param key 文件在 Amazon S3 中的对象键
+     * @param key                   文件在 Amazon S3 中的对象键
      * @param contentLengthConsumer 文件大小消费者函数
      * @return 写出订阅器
      * @throws OssException 如果下载失败，抛出自定义异常
      */
     public WriteOutSubscriber<OutputStream> download(String key, Consumer<Long> contentLengthConsumer) {
         try {
-            // 构建下载请求
-            DownloadRequest<ResponsePublisher<GetObjectResponse>> publisherDownloadRequest = DownloadRequest.builder()
-                // 文件对象
-                .getObjectRequest(y -> y.bucket(properties.getBucketName())
-                    .key(key)
-                    .build())
-                .addTransferListener(LoggingTransferListener.create())
+            DownloadRequest.TypedBuilder<ResponsePublisher<GetObjectResponse>> typedBuilder = DownloadRequest.builder()
                 // 使用发布订阅转换器
                 .responseTransformer(AsyncResponseTransformer.toPublisher())
-                .build();
+                // 文件对象
+                .getObjectRequest(y -> y.bucket(properties.getBucketName()).key(key).build());
+            if (log.isDebugEnabled()) {
+                typedBuilder.addTransferListener(LoggingTransferListener.create());
+            }
 
             // 使用 S3TransferManager 下载文件
-            Download<ResponsePublisher<GetObjectResponse>> publisherDownload = transferManager.download(publisherDownloadRequest);
+            Download<ResponsePublisher<GetObjectResponse>> publisherDownload = transferManager.download(typedBuilder.build());
             // 获取下载发布订阅转换器
             ResponsePublisher<GetObjectResponse> publisher = publisherDownload.completionFuture().join().result();
             // 执行文件大小消费者函数
@@ -292,7 +310,7 @@ public class OssClient {
             // 构建写出订阅器对象
             return out -> {
                 // 创建可写入的字节通道
-                try(WritableByteChannel channel = Channels.newChannel(out)){
+                try (WritableByteChannel channel = Channels.newChannel(out)) {
                     // 订阅数据
                     publisher.subscribe(byteBuffer -> {
                         while (byteBuffer.hasRemaining()) {
@@ -327,13 +345,13 @@ public class OssClient {
     }
 
     /**
-     * 获取私有URL链接
+     * 创建下载请求的预签名URL
      *
      * @param objectKey   对象KEY
      * @param expiredTime 链接授权到期时间
      */
-    public String getPrivateUrl(String objectKey, Duration expiredTime) {
-        // 使用 AWS S3 预签名 URL 的生成器 获取对象的预签名 URL
+    public String createPresignedGetUrl(String objectKey, Duration expiredTime) {
+        // 使用 AWS S3 预签名 URL 的生成器 获取下载对象的预签名 URL
         URL url = presigner.presignGetObject(
                 x -> x.signatureDuration(expiredTime)
                     .getObjectRequest(
@@ -342,7 +360,28 @@ public class OssClient {
                             .build())
                     .build())
             .url();
-        return url.toString();
+        return url.toExternalForm();
+    }
+
+    /**
+     * 创建上传请求的预签名URL
+     *
+     * @param objectKey   对象KEY
+     * @param expiredTime 链接授权到期时间
+     * @param metadata    元数据
+     */
+    public String createPresignedPutUrl(String objectKey, Duration expiredTime, Map<String, String> metadata) {
+        // 使用 AWS S3 预签名 URL 的生成器 获取上传文件对象的预签名 URL
+        URL url = presigner.presignPutObject(
+                x -> x.signatureDuration(expiredTime)
+                    .putObjectRequest(
+                        y -> y.bucket(properties.getBucketName())
+                            .key(objectKey)
+                            .metadata(metadata)
+                            .build())
+                    .build())
+            .url();
+        return url.toExternalForm();
     }
 
     /**

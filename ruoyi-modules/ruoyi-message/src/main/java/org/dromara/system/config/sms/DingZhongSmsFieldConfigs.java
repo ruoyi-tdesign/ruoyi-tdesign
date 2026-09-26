@@ -22,7 +22,7 @@ public class DingZhongSmsFieldConfigs extends SmsFieldConfigs {
         this.accessKeyId = FieldConfig.<String>builder()
             .useInput()
             .label("cdkey")
-            .help("短信帐号")
+            .help("短信账号")
             .required(true)
             .build();
         this.accessKeySecret = FieldConfig.<String>builder()

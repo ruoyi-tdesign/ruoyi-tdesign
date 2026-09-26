@@ -12,6 +12,7 @@ import org.springframework.web.socket.PongMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,7 +48,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
             log.info("[connect] invalid token received. sessionId: {}", session.getId());
             return;
         }
-        WebSocketSessionHolder.addSession(user.getLoginType(), user.getUserId(), session);
+        WebSocketSessionHolder.addSession(user.getLoginType(), user.getUserId(), new ConcurrentWebSocketSessionDecorator(session, 10 * 1000, 64000));
         log.info("[connect] sessionId: {},userId:{},loginType:{},deviceType:{}", session.getId(), user.getUserId(), user.getLoginType(), user.getDeviceType());
         if (customWebSocketHandler != null) {
             customWebSocketHandler.afterConnectionEstablished(session, user);

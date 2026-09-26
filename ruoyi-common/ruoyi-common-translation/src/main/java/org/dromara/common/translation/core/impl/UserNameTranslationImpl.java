@@ -1,5 +1,6 @@
 package org.dromara.common.translation.core.impl;
 
+import cn.hutool.core.convert.Convert;
 import lombok.AllArgsConstructor;
 import org.dromara.common.core.service.UserService;
 import org.dromara.common.translation.annotation.Translation;
@@ -19,9 +20,6 @@ public class UserNameTranslationImpl extends SimpleTranslationImpl {
 
     @Override
     public Object translation(Object key, Translation translation) {
-        if (key instanceof Long id) {
-            return userService.selectUserNameById(id);
-        }
-        return null;
+        return userService.selectUserNameById(Convert.toLong(key));
     }
 }

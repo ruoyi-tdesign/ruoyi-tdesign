@@ -3,10 +3,8 @@ package org.dromara.common.core.config;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.dromara.common.core.config.properties.ThreadPoolProperties;
 import org.dromara.common.core.utils.spring.SpringUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
 
@@ -25,7 +23,6 @@ import java.util.concurrent.TimeUnit;
  **/
 @Slf4j
 @AutoConfiguration
-@EnableConfigurationProperties(ThreadPoolProperties.class)
 public class ThreadPoolConfig {
 
     /**

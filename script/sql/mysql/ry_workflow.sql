@@ -33,13 +33,11 @@ CREATE TABLE `flow_node`
     `node_code`       varchar(100)    NOT NULL COMMENT '流程节点编码',
     `node_name`       varchar(100)  DEFAULT NULL COMMENT '流程节点名称',
     `permission_flag` varchar(200)  DEFAULT NULL COMMENT '权限标识（权限类型:权限标识，可以多个，用@@隔开)',
-    `node_ratio`      decimal(6, 3) DEFAULT NULL COMMENT '流程签署比例值',
+    `node_ratio`      varchar(200)  DEFAULT NULL COMMENT '流程签署比例值',
     `coordinate`      varchar(100)  DEFAULT NULL COMMENT '坐标',
     `any_node_skip`   varchar(100)  DEFAULT NULL COMMENT '任意结点跳转',
     `listener_type`   varchar(100)  DEFAULT NULL COMMENT '监听器类型',
     `listener_path`   varchar(400)  DEFAULT NULL COMMENT '监听器路径',
-    `handler_type`    varchar(100)  DEFAULT NULL COMMENT '处理器类型',
-    `handler_path`    varchar(400)  DEFAULT NULL COMMENT '处理器路径',
     `form_custom`     char(1)       DEFAULT 'N' COMMENT '审批表单是否自定义（Y是 N否）',
     `form_path`       varchar(100)  DEFAULT NULL COMMENT '审批表单路径',
     `version`         varchar(20)     NOT NULL COMMENT '版本',
@@ -282,11 +280,11 @@ insert into sys_menu values ('11625', '流程分类修改', '11622', '3', '#', '
 insert into sys_menu values ('11626', '流程分类删除', '11622', '4', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:remove', '#', null, null, 103,1, sysdate(), null, null, '');
 insert into sys_menu values ('11627', '流程分类导出', '11622', '5', '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:category:export', '#', null, null, 103,1, sysdate(), null, null, '');
 -- 流程表达式管理相关按钮
-INSERT INTO sys_menu VALUES ('11802', '流程达式定义查询', '11801', 1, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11803', '流程达式定义新增', '11801', 2, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11804', '流程达式定义修改', '11801', 3, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11805', '流程达式定义删除', '11801', 4, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:remove', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11806', '流程达式定义导出', '11801', 5, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:export', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11802', '流程spel表达式定义查询', '11801', 1, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11803', '流程spel表达式定义新增', '11801', 2, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:add', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11804', '流程spel表达式定义修改', '11801', 3, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:edit', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11805', '流程spel表达式定义删除', '11801', 4, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:remove', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11806', '流程spel表达式定义导出', '11801', 5, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:export', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');
 -- 请假测试相关按钮
 insert into sys_menu VALUES ('11638', '请假申请',    '11618',    1, 'leave', 'workflow/leave/index', '', '', '0', '1', 'C', '1', '1', 'workflow:leave:list', '#', null, null, 103, 1, sysdate(), NULL, NULL, '请假申请菜单');
 insert into sys_menu VALUES ('11639', '请假申请查询', '11638', 1, '#', '', '', '', '0', '1', 'F', '1', '1', 'workflow:leave:query', '#', null, null, 103, 1, sysdate(), NULL, NULL, '');

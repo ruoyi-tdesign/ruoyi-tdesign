@@ -9,7 +9,7 @@
       </template>
     </t-table>
 
-    <h3>你可以绑定以下第三方帐号</h3>
+    <h3>你可以绑定以下第三方账号</h3>
     <t-space>
       <t-button shape="circle" variant="outline" title="使用 微信 账号授权登录" @click="authUrl('wechat_open')">
         <template #icon>
@@ -53,7 +53,7 @@ import type { PrimaryTableCol } from 'tdesign-vue-next';
 import { getCurrentInstance, onMounted, ref } from 'vue';
 
 import type { SysSocialVo } from '@/api/system/model/socialModel';
-import { authBinding, authUnlock, getAuthList } from '@/api/system/social';
+import { authRouterUrl, authUnlock, getAuthList } from '@/api/system/social';
 import GiteeSvg from '@/assets/icons/svg/gitee.svg?component';
 import MaxKey from '@/assets/icons/svg/maxkey.svg?component';
 import TopIam from '@/assets/icons/svg/topiam.svg?url';
@@ -92,7 +92,7 @@ function unlockAuth(row: SysSocialVo) {
 }
 // 授权
 function authUrl(source: string) {
-  authBinding(source).then((res: any) => {
+  authRouterUrl(source).then((res: any) => {
     if (res.code === 200) {
       window.open(res.data, '_blank');
     } else {

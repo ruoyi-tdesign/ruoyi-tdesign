@@ -91,10 +91,12 @@ public class GenController extends BaseController {
     /**
      * 导入表结构（保存）
      *
-     * @param tables 表名串
+     * @param tables   表名串
+     * @param dataName 数据源名称
      */
     @SaCheckPermission("tool:gen:import")
     @Log(title = "代码生成", businessType = BusinessType.IMPORT)
+    @Lock4j(keys = {"#dataName"}, acquireTimeout = 10000)
     @RepeatSubmit()
     @PostMapping("/importTable")
     public R<Void> importTableSave(String tables, String dataName) {
@@ -198,7 +200,7 @@ public class GenController extends BaseController {
      */
     @SaCheckPermission("tool:gen:edit")
     @Log(title = "代码生成", businessType = BusinessType.UPDATE)
-    @Lock4j
+    @Lock4j(keys = {"#tableId"}, acquireTimeout = 5000)
     @GetMapping("/synchDb/{tableId}")
     public R<Void> synchDb(@PathVariable Long tableId) {
         genTableService.synchDb(tableId);

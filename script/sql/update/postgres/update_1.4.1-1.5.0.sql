@@ -48,11 +48,11 @@ INSERT INTO flow_spel VALUES (1, 'spelRuleComponent', 'selectDeptLeaderById', 'i
 INSERT INTO flow_spel VALUES (2, NULL, NULL, 'initiator', '${initiator}', '流程发起人', '0', '0', 103, 1, now(), 1, now());
 
 INSERT INTO sys_menu VALUES ('11801', '流程表达式', '11616', '2', 'spel',    'workflow/spel/index', '', '', '0', '1', 'C', '1', '1', 'workflow:spel:list', 'component-input', null, null, 103, 1, now(), 1, now(), '流程达式定义菜单');
-INSERT INTO sys_menu VALUES ('11802', '流程spel达式定义查询', '11801', 1, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:query', '#', null, null, 103, 1, now(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11803', '流程spel达式定义新增', '11801', 2, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:add', '#', null, null, 103, 1, now(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11804', '流程spel达式定义修改', '11801', 3, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:edit', '#', null, null, 103, 1, now(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11805', '流程spel达式定义删除', '11801', 4, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:remove', '#', null, null, 103, 1, now(), NULL, NULL, '');
-INSERT INTO sys_menu VALUES ('11806', '流程spel达式定义导出', '11801', 5, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:export', '#', null, null, 103, 1, now(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11802', '流程spel表达式定义查询', '11801', 1, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:query', '#', null, null, 103, 1, now(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11803', '流程spel表达式定义新增', '11801', 2, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:add', '#', null, null, 103, 1, now(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11804', '流程spel表达式定义修改', '11801', 3, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:edit', '#', null, null, 103, 1, now(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11805', '流程spel表达式定义删除', '11801', 4, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:remove', '#', null, null, 103, 1, now(), NULL, NULL, '');
+INSERT INTO sys_menu VALUES ('11806', '流程spel表达式定义导出', '11801', 5, '#', '', NULL, '', 0, 1, 'F', '1', '1', 'workflow:spel:export', '#', null, null, 103, 1, now(), NULL, NULL, '');
 
 ALTER TABLE flow_definition ADD COLUMN model_value VARCHAR(40) NOT NULL DEFAULT 'CLASSICS';
 COMMENT ON COLUMN flow_definition.model_value IS '设计器模式（CLASSICS经典模式 MIMIC仿钉钉模式）';
@@ -104,28 +104,38 @@ COMMENT ON COLUMN test_leave.apply_code IS '申请编号';
 
 update sys_menu set remark = '/workflow/processDefinition' where menu_id = 11700;
 
-ALTER TABLE flow_definition ADD create_by VARCHAR2(64) DEFAULT '' NOT NULL;
-ALTER TABLE flow_definition ADD update_by VARCHAR2(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_definition ADD create_by VARCHAR(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_definition ADD update_by VARCHAR(64) DEFAULT '' NOT NULL;
 COMMENT ON COLUMN flow_definition.create_by IS '创建人';
 COMMENT ON COLUMN flow_definition.update_by IS '更新人';
 
-ALTER TABLE flow_node ADD create_by VARCHAR2(64) DEFAULT '' NOT NULL;
-ALTER TABLE flow_node ADD update_by VARCHAR2(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_node ADD create_by VARCHAR(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_node ADD update_by VARCHAR(64) DEFAULT '' NOT NULL;
 COMMENT ON COLUMN flow_node.create_by IS '创建人';
 COMMENT ON COLUMN flow_node.update_by IS '更新人';
 
-ALTER TABLE flow_skip ADD create_by VARCHAR2(64) DEFAULT '' NOT NULL;
-ALTER TABLE flow_skip ADD update_by VARCHAR2(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_skip ADD create_by VARCHAR(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_skip ADD update_by VARCHAR(64) DEFAULT '' NOT NULL;
 COMMENT ON COLUMN flow_skip.create_by IS '创建人';
 COMMENT ON COLUMN flow_skip.update_by IS '更新人';
 
-ALTER TABLE flow_instance ADD update_by VARCHAR2(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_instance ADD update_by VARCHAR(64) DEFAULT '' NOT NULL;
 COMMENT ON COLUMN flow_instance.update_by IS '更新人';
 
-ALTER TABLE flow_task ADD create_by VARCHAR2(64) DEFAULT '' NOT NULL;
-ALTER TABLE flow_task ADD update_by VARCHAR2(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_task ADD create_by VARCHAR(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_task ADD update_by VARCHAR(64) DEFAULT '' NOT NULL;
 COMMENT ON COLUMN flow_task.create_by IS '创建人';
 COMMENT ON COLUMN flow_task.update_by IS '更新人';
 
-ALTER TABLE flow_user ADD update_by VARCHAR2(64) DEFAULT '' NOT NULL;
+ALTER TABLE flow_user ADD update_by VARCHAR(64) DEFAULT '' NOT NULL;
 COMMENT ON COLUMN flow_user.update_by IS '更新人';
+
+-- ----------------------------
+-- 流程节点表：签署比例值字段改为字符串，移除已废弃的处理器字段
+-- ----------------------------
+ALTER TABLE flow_node
+    ALTER COLUMN node_ratio TYPE VARCHAR(200),
+    ALTER COLUMN node_ratio DROP NOT NULL;
+COMMENT ON COLUMN flow_node.node_ratio IS '流程签署比例值';
+ALTER TABLE flow_node DROP COLUMN handler_type;
+ALTER TABLE flow_node DROP COLUMN handler_path;

@@ -355,7 +355,7 @@
         <t-descriptions-item label="头像地址">
           <x-image-preview :src="formView.avatar" :width="60" :height="60" />
         </t-descriptions-item>
-        <t-descriptions-item label="帐号状态">
+        <t-descriptions-item label="账号状态">
           <dict-tag :options="sys_normal_disable" :value="formView.status" />
         </t-descriptions-item>
         <t-descriptions-item label="最后登录IP">{{ formView.loginIp }}</t-descriptions-item>

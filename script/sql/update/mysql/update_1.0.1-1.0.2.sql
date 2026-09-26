@@ -18,7 +18,7 @@ ALTER TABLE sys_tenant MODIFY COLUMN status char(1) NULL DEFAULT '1' COMMENT '�
 ALTER TABLE sys_tenant MODIFY COLUMN del_flag char(1) NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）' AFTER status;
 ALTER TABLE sys_tenant_package MODIFY COLUMN status char(1) NULL DEFAULT '1' COMMENT '状态（1正常 0停用）' AFTER menu_check_strictly;
 ALTER TABLE sys_tenant_package MODIFY COLUMN del_flag char(1) NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）' AFTER status;
-ALTER TABLE sys_user MODIFY COLUMN status char(1) NULL DEFAULT '1' COMMENT '帐号状态（1正常 0停用）' AFTER password;
+ALTER TABLE sys_user MODIFY COLUMN status char(1) NULL DEFAULT '1' COMMENT '账号状态（1正常 0停用）' AFTER password;
 ALTER TABLE sys_user MODIFY COLUMN del_flag char(1) NULL DEFAULT '0' COMMENT '删除标志（0代表存在 1代表删除）' AFTER status;
 
 -- 存在数据时使用该脚本，对状态值取反

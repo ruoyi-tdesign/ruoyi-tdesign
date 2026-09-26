@@ -16,7 +16,7 @@
             <t-checkbox value="3" name="type">短信</t-checkbox>
           </t-checkbox-group>
         </t-form-item>
-        <t-form-item label="附件">
+        <t-form-item v-if="buttonObj.file" label="附件">
           <fileUpload
             v-model="form.fileId"
             :file-type="['png', 'jpg', 'jpeg', 'doc', 'docx', 'xlsx', 'xls', 'ppt', 'txt', 'pdf']"

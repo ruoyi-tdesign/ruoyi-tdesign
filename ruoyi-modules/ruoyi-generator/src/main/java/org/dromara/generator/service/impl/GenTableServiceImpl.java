@@ -30,6 +30,7 @@ import org.dromara.common.core.utils.spring.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatis.core.page.PageQuery;
 import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.mybatis.utils.IdGeneratorUtil;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.generator.constant.GenConstants;
 import org.dromara.generator.domain.GenTable;
@@ -382,7 +383,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
     private Map<String, String> previewCode(GenTableVo tableVo) {
         List<Long> menuIds = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
-            menuIds.add(identifierGenerator.nextId(null).longValue());
+            menuIds.add(IdGeneratorUtil.nextLongId());
         }
         tableVo.setMenuIds(menuIds);
         // 设置主键列信息
@@ -542,7 +543,7 @@ public class GenTableServiceImpl extends ServiceImpl<GenTableMapper, GenTable> i
         GenTableVo table = baseMapper.selectGenTableById(tableId);
         List<Long> menuIds = new ArrayList<>();
         for (int i = 0; i < 7; i++) {
-            menuIds.add(identifierGenerator.nextId(null).longValue());
+            menuIds.add(IdGeneratorUtil.nextLongId());
         }
         table.setMenuIds(menuIds);
         // 设置主键列信息

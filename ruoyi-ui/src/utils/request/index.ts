@@ -297,6 +297,10 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         authenticationScheme: 'Bearer',
         // 超时
         timeout: 30 * 1000,
+        transitional: {
+          // 超时错误更明确
+          clarifyTimeoutError: true,
+        },
         // 携带Cookie
         withCredentials: true,
         // 头信息
